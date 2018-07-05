@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane prefHeight="231.0" prefWidth="436.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="152.0" prefWidth="407.0">
+         <children>
+            <HBox>
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Report">
+                           <font>
+                              <Font name="System Bold" size="35.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="10.0" layoutY="10.0" text="Tagesauswertung">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <DatePicker prefHeight="103.0" prefWidth="125.0" showWeekNumbers="true" />
+               </children>
+            </HBox>
+            <HBox spacing="50.0">
+               <children>
+                  <Label text="Dienstag 05.07.2018">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="10.0" layoutY="10.0" text="\$ 99:99:99">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </Label>
+                  <Label layoutX="162.0" layoutY="10.0" text="99:99:99">
+                     <font>
+                        <Font size="17.0" />
+                     </font>
+                  </Label>
+               </children>
+            </HBox>
+            <VBox>
+               <children>
+                  <HBox>
+                     <children>
+                        <Label text="RED doubleSlash$" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
