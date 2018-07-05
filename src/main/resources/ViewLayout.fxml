@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="pane" prefHeight="175.0" prefWidth="416.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ViewController">
+   <children>
+      <Label fx:id="currentProjectLabel" alignment="CENTER" layoutX="125.0" layoutY="90.0" prefHeight="2.0" prefWidth="286.0" text="Kardex">
+         <font>
+            <Font size="29.0" />
+         </font>
+      </Label>
+      <Label fx:id="bigTimeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="121.0" layoutY="-19.0" prefHeight="113.0" prefWidth="294.0" text="01:02:23" textAlignment="CENTER">
+         <font>
+            <Font size="78.0" />
+         </font>
+      </Label>
+      <TextArea fx:id="textArea" layoutX="125.0" layoutY="125.0" prefHeight="43.0" prefWidth="286.0" stylesheets="@Neues%20Textdokument.txt" text="- Menü gefixt&#10;- Accordion&#10;- adasdasdasd&#10;-">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </TextArea>
+      <Label fx:id="allTimeLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="319.0" layoutY="71.0" text="04:23:24" textFill="#000000b1">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <Label fx:id="todayAllSeconds" alignment="CENTER" contentDisplay="CENTER" layoutX="125.0" layoutY="71.0" text="02:55:12" textFill="#000000b4">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <Canvas fx:id="canvas" height="2.0" layoutX="125.0" layoutY="71.0" width="286.0" />
+      <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" layoutX="7.0" layoutY="5.0" prefHeight="166.0" prefWidth="114.0" />
+   </children>
+</Pane>
