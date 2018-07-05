@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<keepTimeConfigXML taskBarColor="BLACK">
+    <projects>
+	
+		<!-- One default project should exist (or it is created). It is used as active project when starting the application -->
+		<project isDefault="true">
+            <name>Idle</name>
+            <isWork>false</isWork>
+            <color>BROWN</color>
+        </project>
+				
+		<project>
+            <name>G&amp;D</name>
+            <isWork>true</isWork>
+            <color>BLUE</color>
+        </project>
+		
+		<project>
+            <name>G&amp;D AR</name>
+            <isWork>true</isWork>
+            <color>WHITE</color>
+        </project>
+		
+		<project>
+            <name>ZF 3D</name>
+            <isWork>true</isWork>
+            <color>PINK</color>
+        </project>
+		
+		<project>
+            <name>Karl Storz</name>
+            <isWork>true</isWork>
+            <color>GREEN</color>
+        </project>
+		
+		<project>
+            <name>Fronius</name>
+            <isWork>true</isWork>
+            <color>VIOLETT</color>
+        </project>
+		
+		<project>
+            <name>Kicker</name>
+            <isWork>false</isWork>
+            <color>YELLOW</color>
+        </project>
+		
+		<project>
+            <name>Mittagessen</name>
+            <isWork>false</isWork>
+            <color>RED</color>
+        </project>
+		
+		<project>
+            <name>Zeppelin</name>
+            <isWork>true</isWork>
+            <color>ORANGE</color>
+        </project>
+		
+		<project>
+            <name>Other</name>
+            <isWork>true</isWork>
+            <color>ORANGE</color>
+        </project>
+
+		
+    </projects>
+</keepTimeConfigXML>
