@@ -27,6 +27,7 @@ import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.effect.Bloom;
@@ -59,6 +60,11 @@ public class ViewController {
 
    @FXML
    private Label currentProjectLabel;
+
+   @FXML
+   private Button minimizeButton;
+   @FXML
+   private Button closeButton;
 
    @FXML
    private TextArea textArea;
@@ -162,6 +168,13 @@ public class ViewController {
 
       textArea.setWrapText(true);
       textArea.setEditable(false);
+
+      minimizeButton.setOnAction((ae) -> {
+         DemoApplication.stage.setIconified(true);
+      });
+      closeButton.setOnAction((ae) -> {
+         DemoApplication.stage.close();
+      });
 
       changeProject(DemoApplication.idleProject);
 
