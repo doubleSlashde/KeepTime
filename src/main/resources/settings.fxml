@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60">
+   <children>
+      <VBox spacing="10.0">
+         <children>
+            <Group>
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Hover" />
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background" />
+                              <ColorPicker />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                              <ColorPicker />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Group>
+            <Group layoutX="10.0" layoutY="10.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Default" />
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Background" />
+                              <ColorPicker />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                              <ColorPicker />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Group>
+            <HBox spacing="10.0">
+               <children>
+                  <Button mnemonicParsing="false" text="Save" />
+                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

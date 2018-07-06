@@ -7,10 +7,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefHeight="231.0" prefWidth="436.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox prefHeight="152.0" prefWidth="407.0">
+      <VBox prefHeight="231.0" prefWidth="436.0">
          <children>
             <HBox>
                <children>
@@ -50,13 +49,38 @@
                   </Label>
                </children>
             </HBox>
-            <VBox>
+            <VBox prefHeight="139.0" prefWidth="407.0">
                <children>
-                  <HBox>
+                  <VBox>
                      <children>
-                        <Label text="RED doubleSlash$" />
+                        <HBox prefWidth="96.0" spacing="100.0">
+                           <children>
+                              <Label text="RED doubleSlash$">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="10.0" layoutY="10.0" text="01:00">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="10.0" prefWidth="96.0" spacing="100.0">
+                           <children>
+                              <Label text="I did nothing all day long" />
+                              <Label layoutX="10.0" layoutY="10.0" text="13:01 - 13:31 # 00:30h" />
+                           </children>
+                        </HBox>
+                        <HBox layoutX="10.0" layoutY="27.0" prefWidth="96.0" spacing="100.0">
+                           <children>
+                              <Label text="Creating a mockup of the ui" />
+                              <Label layoutX="10.0" layoutY="10.0" text="14:01 - 14:31 # 00:30h" />
+                           </children>
+                        </HBox>
                      </children>
-                  </HBox>
+                  </VBox>
                </children>
             </VBox>
          </children>

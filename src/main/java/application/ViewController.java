@@ -52,6 +52,9 @@ public class ViewController {
    private VBox availableProjectVbox;
 
    @FXML
+   private VBox projectsVBox;
+
+   @FXML
    private Label bigTimeLabel;
    @FXML
    private Label allTimeLabel;
@@ -231,7 +234,7 @@ public class ViewController {
          pane.setStyle(style);
 
          textArea.setEditable(true);
-         availableProjectVbox.setVisible(true);
+         projectsVBox.setVisible(true);
 
       });
 
@@ -241,7 +244,7 @@ public class ViewController {
          pane.setStyle(style);
 
          textArea.setEditable(false);
-         availableProjectVbox.setVisible(false);
+         projectsVBox.setVisible(false);
       });
 
       // Drag stage
