@@ -1,1 +1,53 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.text-area {
+	-fx-text-fill: rgba(1,1,1,.5);
+    -fx-background-color: rgba(0,0,0,0);
+	-fx-border-color: rgba(0,0,0,0);
+}
+
+.text-area:hover {
+	-fx-text-fill: rgba(1,1,1,1);
+	-fx-border-color: rgba(54,143,179,.3);
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-pane .viewport{
+    -fx-background-color: transparent;
+}
+
+
+.text-area .scroll-pane .content{
+    -fx-background-color: transparent;
+}
+
+.text-area .scroll-bar:vertical {
+    -fx-opacity: 0;
+}
+
+.text-area:hover .scroll-bar:vertical {
+    -fx-opacity: .2;
+}
+
+.scroll-pane > .viewport {
+   -fx-background-color: transparent;
+}
+
+.scroll-pane {
+   -fx-background-color: transparent;
+}
+
+.button {
+    -fx-background-color: transparent;
+}
+.button:hover {
+    -fx-background-color: rgba(54,143,179,.3);
+}
+.button:focused {
+    -fx-background-color: transparent;
+}
+.button:pressed {
+    -fx-background-color: transparent;
+}
