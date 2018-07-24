@@ -18,7 +18,9 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 import application.Resources.RESOURCE;
-import application.time.Interval;
+import application.model.Project;
+import application.model.Work;
+import application.view.time.Interval;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -86,24 +88,6 @@ public class ViewController {
 
    Delta dragDelta = new Delta();
 
-   class Work {
-      public LocalDateTime startTime;
-      public LocalDateTime endTime;
-
-      public Project project;
-      public String notes;
-
-      public Work(final LocalDateTime startTime, final LocalDateTime endTime, final Project project,
-            final String notes) {
-         super();
-         this.startTime = startTime;
-         this.endTime = endTime;
-         this.project = project;
-         this.notes = notes;
-      }
-
-   }
-
    List<Work> workItems = new ArrayList<>();
 
    Work currentWork;
@@ -111,7 +95,6 @@ public class ViewController {
    // TODO alle 10min stand speichern
 
    public void changeProject(final Project newProject) {
-
       final LocalDateTime now = LocalDateTime.now();
       if (currentWork != null) {
          currentWork.endTime = now;

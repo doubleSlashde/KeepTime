@@ -1,19 +1,18 @@
 package application;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXB;
-
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import application.Resources.RESOURCE;
+import application.model.Project;
+import application.model.repos.ProjectRepository;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -43,7 +42,7 @@ public class DemoApplication extends Application {
    public static Project idleProject;
    public static Color taskBarColor;
 
-   private final Project defaultProject = new Project("DEFAULT", Color.BROWN, false);
+   private final Project defaultProject = new Project("Idle", Color.ORANGE, false);
 
    @Override
    public void init() throws Exception {
@@ -54,16 +53,26 @@ public class DemoApplication extends Application {
    public void start(final Stage primaryStage) throws Exception {
       stage = primaryStage;
 
+      final Test a = springContext.getBean(Test.class);
+      System.out.println(a.projectRepository.count());
+
       try {
          Log.debug("Reading configuration");
-         // load projects
-         final KeepTimeConfigXML config = JAXB.unmarshal(new File(CONFIG_FILE), KeepTimeConfigXML.class);
-         Log.debug("Config read successfull");
 
-         projects = config.projects;
+         final ProjectRepository projectRepo = springContext.getBean(ProjectRepository.class);
+
+         projects = projectRepo.findAll();
+
          Log.debug("Found '%s' projects", projects.size());
 
-         taskBarColor = config.taskBarColor;
+         if (projects.isEmpty()) {
+            Log.info("Adding default project");
+            defaultProject.isDefault = true;
+            projects.add(defaultProject);
+            projectRepo.save(defaultProject); // TODO autosave?
+         }
+
+         taskBarColor = Color.BLACK;// TODO read from config config.taskBarColor;
          Log.debug("Using color '%s' for taskbar.", taskBarColor);
 
          // set default project

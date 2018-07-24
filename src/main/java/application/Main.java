@@ -10,6 +10,7 @@ import java.util.Optional;
 import javax.xml.bind.JAXB;
 
 import application.Resources.RESOURCE;
+import application.model.Project;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -26,140 +27,140 @@ import javafx.stage.StageStyle;
 
 public class Main extends Application {
 
-	private static final String CONFIG_FILE = "config.xml";
+   private static final String CONFIG_FILE = "config.xml";
 
-	public static Stage stage;
+   public static Stage stage;
 
-	public static List<Project> projects;
-	public static Project idleProject;
-	public static Color taskBarColor;
+   public static List<Project> projects;
+   public static Project idleProject;
+   public static Color taskBarColor;
 
-	private final Project defaultProject = new Project("DEFAULT", Color.BROWN, false);
+   private final Project defaultProject = new Project("DEFAULT", Color.BROWN, false);
 
-	@Override
-	public void start(Stage primaryStage) {
-		stage = primaryStage;
+   @Override
+   public void start(final Stage primaryStage) {
+      stage = primaryStage;
 
-		try {
-			Log.debug("Reading configuration");
-			// load projects
-			KeepTimeConfigXML config = JAXB.unmarshal(new File(CONFIG_FILE), KeepTimeConfigXML.class);
-			Log.debug("Config read successfull");
+      try {
+         Log.debug("Reading configuration");
+         // load projects
+         final KeepTimeConfigXML config = JAXB.unmarshal(new File(CONFIG_FILE), KeepTimeConfigXML.class);
+         Log.debug("Config read successfull");
 
-			projects = config.projects;
-			Log.debug("Found '%s' projects", projects.size());
+         projects = config.projects;
+         Log.debug("Found '%s' projects", projects.size());
 
-			taskBarColor = config.taskBarColor;
-			Log.debug("Using color '%s' for taskbar.", taskBarColor);
+         taskBarColor = config.taskBarColor;
+         Log.debug("Using color '%s' for taskbar.", taskBarColor);
 
-			// set default project
-			final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault).findAny();
-			if (findAny.isPresent()) {
-				idleProject = findAny.get();
-				Log.debug("Using project '%s' as default project.", idleProject);
-			} else {
-				Log.warning("No default project was found!");
-				idleProject = defaultProject;
+         // set default project
+         final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault).findAny();
+         if (findAny.isPresent()) {
+            idleProject = findAny.get();
+            Log.debug("Using project '%s' as default project.", idleProject);
+         } else {
+            Log.warning("No default project was found!");
+            idleProject = defaultProject;
 
-			}
+         }
 
-		} catch (Exception e) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Error");
-			alert.setHeaderText("Could not read config file (" + CONFIG_FILE + ").");
-			alert.setContentText("Please check your '" + CONFIG_FILE + "' file");
+      } catch (final Exception e) {
+         final Alert alert = new Alert(AlertType.ERROR);
+         alert.setTitle("Error");
+         alert.setHeaderText("Could not read config file (" + CONFIG_FILE + ").");
+         alert.setContentText("Please check your '" + CONFIG_FILE + "' file");
 
-			StringWriter sw = new StringWriter();
-			PrintWriter pw = new PrintWriter(sw);
-			e.printStackTrace(pw);
-			String exceptionText = sw.toString();
+         final StringWriter sw = new StringWriter();
+         final PrintWriter pw = new PrintWriter(sw);
+         e.printStackTrace(pw);
+         final String exceptionText = sw.toString();
 
-			Label label = new Label("The exception stacktrace was:");
+         final Label label = new Label("The exception stacktrace was:");
 
-			TextArea textArea = new TextArea(exceptionText);
-			textArea.setEditable(false);
-			textArea.setWrapText(true);
+         final TextArea textArea = new TextArea(exceptionText);
+         textArea.setEditable(false);
+         textArea.setWrapText(true);
 
-			textArea.setMaxWidth(Double.MAX_VALUE);
-			textArea.setMaxHeight(Double.MAX_VALUE);
-			GridPane.setVgrow(textArea, Priority.ALWAYS);
-			GridPane.setHgrow(textArea, Priority.ALWAYS);
+         textArea.setMaxWidth(Double.MAX_VALUE);
+         textArea.setMaxHeight(Double.MAX_VALUE);
+         GridPane.setVgrow(textArea, Priority.ALWAYS);
+         GridPane.setHgrow(textArea, Priority.ALWAYS);
 
-			GridPane expContent = new GridPane();
-			expContent.setMaxWidth(Double.MAX_VALUE);
-			expContent.add(label, 0, 0);
-			expContent.add(textArea, 0, 1);
+         final GridPane expContent = new GridPane();
+         expContent.setMaxWidth(Double.MAX_VALUE);
+         expContent.add(label, 0, 0);
+         expContent.add(textArea, 0, 1);
 
-			alert.getDialogPane().setExpandableContent(expContent);
-			alert.showAndWait();
-			System.exit(1);
-		}
+         alert.getDialogPane().setExpandableContent(expContent);
+         alert.showAndWait();
+         System.exit(1);
+      }
 
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				// Not on FX thread!
-				shutdown();
-			}
-		});
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+         @Override
+         public void run() {
+            // Not on FX thread!
+            shutdown();
+         }
+      });
 
-		primaryStage.setOnCloseRequest((we) -> {
-			// shutdown hook will take over
-			System.exit(0);
-		});
+      primaryStage.setOnCloseRequest((we) -> {
+         // shutdown hook will take over
+         System.exit(0);
+      });
 
-		try {
-			initialiseLogin(primaryStage);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+      try {
+         initialiseLogin(primaryStage);
+      } catch (final Exception e) {
+         e.printStackTrace();
+      }
+   }
 
-	private void shutdown() {
-		Log.info("Shutting down");
-		mainController.changeProject(idleProject);
-		try {
-			Log.info("Creating summary.");
-			mainController.createSummary();
-			Log.info("Created summary");
-		} catch (IOException e) {
-			Log.error("Error while creating summery :/", e);
-		}
-	}
+   private void shutdown() {
+      Log.info("Shutting down");
+      mainController.changeProject(idleProject);
+      try {
+         Log.info("Creating summary.");
+         mainController.createSummary();
+         Log.info("Created summary");
+      } catch (final IOException e) {
+         Log.error("Error while creating summery :/", e);
+      }
+   }
 
-	ViewController mainController;
+   ViewController mainController;
 
-	private void initialiseLogin(Stage primaryStage) {
-		try {
-			Pane loginLayout;
+   private void initialiseLogin(final Stage primaryStage) {
+      try {
+         Pane loginLayout;
 
-			// Load root layout from fxml file.
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
-			loginLayout = loader.load();
-			primaryStage.initStyle(StageStyle.TRANSPARENT);
-			// Show the scene containing the root layout.
-			Scene loginScene = new Scene(loginLayout, Color.TRANSPARENT);
+         // Load root layout from fxml file.
+         final FXMLLoader loader = new FXMLLoader();
+         loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
+         loginLayout = loader.load();
+         primaryStage.initStyle(StageStyle.TRANSPARENT);
+         // Show the scene containing the root layout.
+         final Scene loginScene = new Scene(loginLayout, Color.TRANSPARENT);
 
-			// Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-			primaryStage.setTitle("KeepTime");
-			primaryStage.setScene(loginScene);
-			// Give the controller access to the main app.
-			primaryStage.setAlwaysOnTop(true);
-			mainController = loader.getController();
-			mainController.setStage(primaryStage);
-			// primaryStage.getIcons().add(new
-			// Image(Resources.getResource(RESOURCE.IMG_XHODER_ICON).toString()));
-			primaryStage.show();
+         primaryStage.setTitle("KeepTime");
+         primaryStage.setScene(loginScene);
+         // Give the controller access to the main app.
+         primaryStage.setAlwaysOnTop(true);
+         mainController = loader.getController();
+         mainController.setStage(primaryStage);
+         // primaryStage.getIcons().add(new
+         // Image(Resources.getResource(RESOURCE.IMG_XHODER_ICON).toString()));
+         primaryStage.show();
 
-		} catch (Exception e) {
-			Log.error("Error: " + e.toString(), e);
-			e.printStackTrace();
-		}
-	}
+      } catch (final Exception e) {
+         Log.error("Error: " + e.toString(), e);
+         e.printStackTrace();
+      }
+   }
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+   public static void main(final String[] args) {
+      launch(args);
+   }
 }
