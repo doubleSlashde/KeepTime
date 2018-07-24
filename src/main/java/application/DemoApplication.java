@@ -6,6 +6,8 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -44,6 +46,8 @@ public class DemoApplication extends Application {
 
    private final Project defaultProject = new Project("Idle", Color.ORANGE, false);
 
+   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+
    @Override
    public void init() throws Exception {
       springContext = SpringApplication.run(DemoApplication.class);
@@ -54,7 +58,7 @@ public class DemoApplication extends Application {
       stage = primaryStage;
 
       final Test a = springContext.getBean(Test.class);
-      System.out.println(a.projectRepository.count());
+      Log.info("Test {}", a.projectRepository.count());
 
       try {
          Log.debug("Reading configuration");
@@ -63,7 +67,7 @@ public class DemoApplication extends Application {
 
          projects = projectRepo.findAll();
 
-         Log.debug("Found '%s' projects", projects.size());
+         Log.debug("Found '{}' projects", projects.size());
 
          if (projects.isEmpty()) {
             Log.info("Adding default project");
@@ -73,15 +77,15 @@ public class DemoApplication extends Application {
          }
 
          taskBarColor = Color.BLACK;// TODO read from config config.taskBarColor;
-         Log.debug("Using color '%s' for taskbar.", taskBarColor);
+         Log.debug("Using color '{}' for taskbar.", taskBarColor);
 
          // set default project
          final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault).findAny();
          if (findAny.isPresent()) {
             idleProject = findAny.get();
-            Log.debug("Using project '%s' as default project.", idleProject);
+            Log.debug("Using project '{}' as default project.", idleProject);
          } else {
-            Log.warning("No default project was found!");
+            Log.warn("No default project was found!");
             idleProject = defaultProject;
 
          }
