@@ -9,6 +9,9 @@ import java.util.Optional;
 
 import javax.xml.bind.JAXB;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import application.Resources.RESOURCE;
 import application.model.Project;
 import javafx.application.Application;
@@ -37,6 +40,8 @@ public class Main extends Application {
 
    private final Project defaultProject = new Project("DEFAULT", Color.BROWN, false);
 
+   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+
    @Override
    public void start(final Stage primaryStage) {
       stage = primaryStage;
@@ -48,18 +53,18 @@ public class Main extends Application {
          Log.debug("Config read successfull");
 
          projects = config.projects;
-         Log.debug("Found '%s' projects", projects.size());
+         Log.debug("Found '{}' projects", projects.size());
 
          taskBarColor = config.taskBarColor;
-         Log.debug("Using color '%s' for taskbar.", taskBarColor);
+         Log.debug("Using color '{}' for taskbar.", taskBarColor);
 
          // set default project
          final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault).findAny();
          if (findAny.isPresent()) {
             idleProject = findAny.get();
-            Log.debug("Using project '%s' as default project.", idleProject);
+            Log.debug("Using project '{}' as default project.", idleProject);
          } else {
-            Log.warning("No default project was found!");
+            Log.warn("No default project was found!");
             idleProject = defaultProject;
 
          }

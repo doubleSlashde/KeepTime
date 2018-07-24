@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import application.Resources.RESOURCE;
@@ -92,6 +94,8 @@ public class ViewController {
 
    Work currentWork;
 
+   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+
    // TODO alle 10min stand speichern
 
    public void changeProject(final Project newProject) {
@@ -104,7 +108,7 @@ public class ViewController {
          }
 
          final String time = secondsToHHMMSS(Duration.between(currentWork.startTime, currentWork.endTime).getSeconds());
-         Log.info("You worked from '%s' to '%s' (%s) on project '%s' with notes '%s'", currentWork.startTime,
+         Log.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.startTime,
                currentWork.endTime, time, currentWork.project.name, currentWork.notes);
 
          try {
@@ -134,7 +138,7 @@ public class ViewController {
       final String fileName = formatter2.format(currentWork.startTime) + ".txt";
       final Path path = Paths.get(fileName);
       if (path.toFile().createNewFile()) {
-         Log.info("Log file '%s' was created.", path);
+         Log.info("Log file '{}' was created.", path);
       }
       Files.write(path, string.getBytes(), StandardOpenOption.APPEND);
    }
@@ -373,7 +377,7 @@ public class ViewController {
    public static String changeStyleAttribute(final String style, final String attribute, final String newValue) {
 
       String newStyle = "";
-      // Log.info("Old style %s", style);
+      // Log.info("Old style {}", style);
       final String newStyleAttribute = "-" + attribute + ": " + newValue + "; ";
       if (style.contains(attribute)) {
          // Log.info("replacing");
@@ -383,7 +387,7 @@ public class ViewController {
          newStyle = style + newStyleAttribute;
       }
 
-      // Log.info("new style: %s", newStyle);
+      // Log.info("new style: {}", newStyle);
 
       return newStyle;
    }
