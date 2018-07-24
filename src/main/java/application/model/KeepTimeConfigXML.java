@@ -1,9 +1,8 @@
-package application;
+package application.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import application.model.Project;
 import javafx.scene.paint.Color;
 
 public class KeepTimeConfigXML {

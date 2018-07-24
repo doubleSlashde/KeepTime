@@ -1,21 +1,25 @@
 package application;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXB;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-import application.Resources.RESOURCE;
+import application.common.Resources;
+import application.common.Resources.RESOURCE;
 import application.model.Project;
+import application.model.repos.ProjectRepository;
+import application.view.ViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -28,7 +32,11 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+@SpringBootApplication
 public class Main extends Application {
+
+   private ConfigurableApplicationContext springContext;
+   private Parent root;
 
    private static final String CONFIG_FILE = "config.xml";
 
@@ -38,24 +46,36 @@ public class Main extends Application {
    public static Project idleProject;
    public static Color taskBarColor;
 
-   private final Project defaultProject = new Project("DEFAULT", Color.BROWN, false);
+   private final Project defaultProject = new Project("Idle", Color.ORANGE, false);
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    @Override
-   public void start(final Stage primaryStage) {
+   public void init() throws Exception {
+      springContext = SpringApplication.run(Main.class);
+   }
+
+   @Override
+   public void start(final Stage primaryStage) throws Exception {
       stage = primaryStage;
 
       try {
          Log.debug("Reading configuration");
-         // load projects
-         final KeepTimeConfigXML config = JAXB.unmarshal(new File(CONFIG_FILE), KeepTimeConfigXML.class);
-         Log.debug("Config read successfull");
 
-         projects = config.projects;
+         final ProjectRepository projectRepo = springContext.getBean(ProjectRepository.class);
+
+         projects = projectRepo.findAll();
+
          Log.debug("Found '{}' projects", projects.size());
 
-         taskBarColor = config.taskBarColor;
+         if (projects.isEmpty()) {
+            Log.info("Adding default project");
+            defaultProject.isDefault = true;
+            projects.add(defaultProject);
+            projectRepo.save(defaultProject); // TODO autosave?
+         }
+
+         taskBarColor = Color.BLACK;// TODO read from config config.taskBarColor;
          Log.debug("Using color '{}' for taskbar.", taskBarColor);
 
          // set default project
@@ -142,6 +162,7 @@ public class Main extends Application {
          // Load root layout from fxml file.
          final FXMLLoader loader = new FXMLLoader();
          loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
+         loader.setControllerFactory(springContext::getBean);
          loginLayout = loader.load();
          primaryStage.initStyle(StageStyle.TRANSPARENT);
          // Show the scene containing the root layout.
@@ -165,7 +186,12 @@ public class Main extends Application {
       }
    }
 
+   @Override
+   public void stop() throws Exception {
+      springContext.stop();
+   }
+
    public static void main(final String[] args) {
-      launch(args);
+      launch(Main.class, args);
    }
 }
