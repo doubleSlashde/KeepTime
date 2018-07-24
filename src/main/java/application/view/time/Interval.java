@@ -1,4 +1,4 @@
-package application.time;
+package application.view.time;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
