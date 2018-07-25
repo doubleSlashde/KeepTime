@@ -12,6 +12,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import application.common.Resources;
 import application.common.Resources.RESOURCE;
+import application.controller.Controller;
+import application.model.Model;
 import application.model.Project;
 import application.model.repos.ProjectRepository;
 import application.view.ViewController;
@@ -90,7 +92,7 @@ public class Main extends Application {
       });
 
       try {
-         initialiseLogin(primaryStage);
+         initialiseUI(primaryStage);
       } catch (final Exception e) {
          e.printStackTrace();
       }
@@ -98,19 +100,19 @@ public class Main extends Application {
 
    private void shutdown() {
       Log.info("Shutting down");
-      mainController.changeProject(idleProject);
+      viewController.changeProject(idleProject);
       try {
          Log.info("Creating summary.");
-         mainController.createSummary();
+         viewController.createSummary();
          Log.info("Created summary");
       } catch (final IOException e) {
          Log.error("Error while creating summery :/", e);
       }
    }
 
-   ViewController mainController;
+   ViewController viewController;
 
-   private void initialiseLogin(final Stage primaryStage) {
+   private void initialiseUI(final Stage primaryStage) {
       try {
          Pane loginLayout;
 
@@ -129,10 +131,13 @@ public class Main extends Application {
          primaryStage.setScene(loginScene);
          // Give the controller access to the main app.
          primaryStage.setAlwaysOnTop(true);
-         mainController = loader.getController();
-         mainController.setStage(primaryStage);
-         // primaryStage.getIcons().add(new
-         // Image(Resources.getResource(RESOURCE.IMG_XHODER_ICON).toString()));
+         viewController = loader.getController();
+         viewController.setStage(primaryStage);
+
+         final Model model = new Model(); // TODO init model
+         final Controller controller = new Controller(model);
+         viewController.setController(controller, model);
+
          primaryStage.show();
 
       } catch (final Exception e) {
