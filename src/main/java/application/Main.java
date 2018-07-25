@@ -1,8 +1,6 @@
 package application;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,15 +17,8 @@ import application.model.repos.ProjectRepository;
 import application.view.ViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -36,9 +27,6 @@ import javafx.stage.StageStyle;
 public class Main extends Application {
 
    private ConfigurableApplicationContext springContext;
-   private Parent root;
-
-   private static final String CONFIG_FILE = "config.xml";
 
    public static Stage stage;
 
@@ -59,66 +47,33 @@ public class Main extends Application {
    public void start(final Stage primaryStage) throws Exception {
       stage = primaryStage;
 
-      try {
-         Log.debug("Reading configuration");
+      Log.debug("Reading configuration");
 
-         final ProjectRepository projectRepo = springContext.getBean(ProjectRepository.class);
+      final ProjectRepository projectRepo = springContext.getBean(ProjectRepository.class);
 
-         projects = projectRepo.findAll();
+      projects = projectRepo.findAll();
 
-         Log.debug("Found '{}' projects", projects.size());
+      Log.debug("Found '{}' projects", projects.size());
 
-         if (projects.isEmpty()) {
-            Log.info("Adding default project");
-            defaultProject.isDefault = true;
-            projects.add(defaultProject);
-            projectRepo.save(defaultProject); // TODO autosave?
-         }
+      if (projects.isEmpty()) {
+         Log.info("Adding default project");
+         defaultProject.setDefault(true);
+         projects.add(defaultProject);
+         projectRepo.save(defaultProject); // TODO autosave?
+      }
 
-         taskBarColor = Color.BLACK;// TODO read from config config.taskBarColor;
-         Log.debug("Using color '{}' for taskbar.", taskBarColor);
+      taskBarColor = Color.BLACK;// TODO read from config config.taskBarColor;
+      Log.debug("Using color '{}' for taskbar.", taskBarColor);
 
-         // set default project
-         final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault).findAny();
-         if (findAny.isPresent()) {
-            idleProject = findAny.get();
-            Log.debug("Using project '{}' as default project.", idleProject);
-         } else {
-            Log.warn("No default project was found!");
-            idleProject = defaultProject;
+      // set default project
+      final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
+      if (findAny.isPresent()) {
+         idleProject = findAny.get();
+         Log.debug("Using project '{}' as default project.", idleProject);
+      } else {
+         Log.warn("No default project was found!");
+         idleProject = defaultProject;
 
-         }
-
-      } catch (final Exception e) {
-         final Alert alert = new Alert(AlertType.ERROR);
-         alert.setTitle("Error");
-         alert.setHeaderText("Could not read config file (" + CONFIG_FILE + ").");
-         alert.setContentText("Please check your '" + CONFIG_FILE + "' file");
-
-         final StringWriter sw = new StringWriter();
-         final PrintWriter pw = new PrintWriter(sw);
-         e.printStackTrace(pw);
-         final String exceptionText = sw.toString();
-
-         final Label label = new Label("The exception stacktrace was:");
-
-         final TextArea textArea = new TextArea(exceptionText);
-         textArea.setEditable(false);
-         textArea.setWrapText(true);
-
-         textArea.setMaxWidth(Double.MAX_VALUE);
-         textArea.setMaxHeight(Double.MAX_VALUE);
-         GridPane.setVgrow(textArea, Priority.ALWAYS);
-         GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-         final GridPane expContent = new GridPane();
-         expContent.setMaxWidth(Double.MAX_VALUE);
-         expContent.add(label, 0, 0);
-         expContent.add(textArea, 0, 1);
-
-         alert.getDialogPane().setExpandableContent(expContent);
-         alert.showAndWait();
-         System.exit(1);
       }
 
       Runtime.getRuntime().addShutdownHook(new Thread() {

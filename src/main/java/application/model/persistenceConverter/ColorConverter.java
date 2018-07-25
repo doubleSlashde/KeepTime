@@ -1,4 +1,4 @@
-package application.model;
+package application.model.persistenceConverter;
 
 import javax.persistence.AttributeConverter;
 

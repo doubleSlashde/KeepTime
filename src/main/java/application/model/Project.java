@@ -8,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import application.model.persistenceConverter.ColorConverter;
 import javafx.scene.paint.Color;
 
 @Entity
@@ -19,20 +20,19 @@ public class Project {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
-   public String name;
+   private String name;
 
-   // TODO color mapper
    @Convert(converter = ColorConverter.class, disableConversion = false)
-   public Color color;
+   private Color color;
 
-   public boolean isWork;
+   private boolean isWork;
 
-   public boolean isDefault;
+   private boolean isDefault;
 
-   public boolean isEnabled;
+   private boolean isEnabled;
 
    public Project() {
-
+      // Needed for jpa
    }
 
    public Project(final String name, final Color color, final boolean isWork) {
@@ -43,9 +43,54 @@ public class Project {
       this.isEnabled = true;
    }
 
+   public String getName() {
+      return name;
+   }
+
+   public void setName(final String name) {
+      this.name = name;
+   }
+
+   public Color getColor() {
+      return color;
+   }
+
+   public void setColor(final Color color) {
+      this.color = color;
+   }
+
+   public boolean isWork() {
+      return isWork;
+   }
+
+   public void setWork(final boolean isWork) {
+      this.isWork = isWork;
+   }
+
+   public boolean isDefault() {
+      return isDefault;
+   }
+
+   public void setDefault(final boolean isDefault) {
+      this.isDefault = isDefault;
+   }
+
+   public boolean isEnabled() {
+      return isEnabled;
+   }
+
+   public void setEnabled(final boolean isEnabled) {
+      this.isEnabled = isEnabled;
+   }
+
+   public long getId() {
+      return id;
+   }
+
    @Override
    public String toString() {
-      return "Project [name=" + name + ", color=" + color + ", isWork=" + isWork + ", isDefault=" + isDefault + "]";
+      return "Project [name=" + name + ", color=" + color + ", isWork=" + isWork + ", isDefault=" + isDefault
+            + ", isEnabled=" + isEnabled + "]";
    }
 
 }
