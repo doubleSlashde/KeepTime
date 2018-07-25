@@ -9,9 +9,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -20,8 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import application.Main;
+import application.common.DateFormatter;
 import application.common.Resources;
 import application.common.Resources.RESOURCE;
+import application.controller.IController;
+import application.model.Model;
 import application.model.Project;
 import application.model.Work;
 import application.view.time.Interval;
@@ -92,54 +93,26 @@ public class ViewController {
 
    Delta dragDelta = new Delta();
 
-   List<Work> workItems = new ArrayList<>();
+   IController controller;
+   Model model;
 
-   Work currentWork;
+   public void setController(final IController controller, final Model model) {
+      this.controller = controller;
+      this.model = model;
+   }
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    // TODO alle 10min stand speichern
 
    public void changeProject(final Project newProject) {
-      final LocalDateTime now = LocalDateTime.now();
-      if (currentWork != null) {
-         currentWork.setEndTime(now);
-         currentWork.setNotes(textArea.getText());
-         if (currentWork.getNotes().isEmpty()) {
-            currentWork.setNotes("- No notes -");
-         }
-
-         final String time = secondsToHHMMSS(
-               Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
-         Log.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
-               currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
-
-         try {
-            final DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd.MM.yyyy - HH:mm:ss");
-            final String startTime = formatter1.format(currentWork.getStartTime());
-            final String endTime = DateTimeFormatter.ofPattern("dd.MM.yyyy -  HH:mm:ss")
-                  .format(currentWork.getEndTime());
-            final String s = "------------------------------------\n" + currentWork.getProject().getName() + "\t"
-                  + startTime + " - " + endTime + "( " + time + " )" + "\n" + currentWork.getNotes() + "\n\n";
-
-            appendToFile(s);
-         } catch (final IOException e) {
-            // exception handling left as an exercise for the reader
-         }
-
-      }
-
-      // Save last work
-      final Work work = new Work(now, now, newProject, "");
-      workItems.add(work);
-
-      // Start new work
-      currentWork = work;
+      // TODO npe as in initialize no controller was yet set
+      controller.changeProject(newProject, textArea.getText());
    }
 
    private void appendToFile(final String string) throws IOException {
       final DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyyMMdd");
-      final String fileName = formatter2.format(currentWork.getStartTime()) + ".txt";
+      final String fileName = formatter2.format(model.activeWorkItem.getStartTime()) + ".txt";
       final Path path = Paths.get(fileName);
       if (path.toFile().createNewFile()) {
          Log.info("Log file '{}' was created.", path);
@@ -254,20 +227,20 @@ public class ViewController {
 
       Interval.registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
-         currentWork.setEndTime(now);
+         model.activeWorkItem.setEndTime(now);
 
-         final long currentWorkSeconds = Duration.between(currentWork.getStartTime(), currentWork.getEndTime())
-               .getSeconds();
+         final long currentWorkSeconds = Duration
+               .between(model.activeWorkItem.getStartTime(), model.activeWorkItem.getEndTime()).getSeconds();
          final long todayWorkingSeconds = calcTodaysWorkSeconds();
 
-         bigTimeLabel.setText(secondsToHHMMSS(currentWorkSeconds));
+         bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
          // TODO only count work time (not idle or kicker)
-         allTimeLabel.setText(secondsToHHMMSS(todayWorkingSeconds));
+         allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
          if (todayWorkingSeconds > 60 * 60 * 8) {
             allTimeLabel.setTextFill(Color.DARKGREEN);
          }
 
-         todayAllSeconds.setText(secondsToHHMMSS(Duration.between(startTime, now).getSeconds()));
+         todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(Duration.between(startTime, now).getSeconds()));
 
          final GraphicsContext gc = canvas.getGraphicsContext2D();
 
@@ -276,7 +249,7 @@ public class ViewController {
          gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
          int currentX = 0;
-         for (final Work w : workItems) {
+         for (final Work w : model.pastWorkItems) {
             final long maxSeconds = 60 * 60 * 10;
             final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
             final int fillX = (int) ((float) workedSeconds / maxSeconds * canvas.getWidth());
@@ -288,10 +261,11 @@ public class ViewController {
          for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
             final Label label = elapsedProjectTimeLabelMap.get(p);
 
-            final long seconds = workItems.stream().filter((work) -> work.getProject() == p).mapToLong(work -> {
-               return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-            }).sum();
-            label.setText(secondsToHHMMSS(seconds));
+            final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject() == p)
+                  .mapToLong(work -> {
+                     return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
+                  }).sum();
+            label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
          // update taskbar icon
@@ -302,13 +276,13 @@ public class ViewController {
          // 0);
 
          gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
-         gcIcon.setFill(currentWork.getProject().getColor());
+         gcIcon.setFill(model.activeWorkItem.getProject().getColor());
          gcIcon.fillRect(1, 27, 31, 5);
 
          gcIcon.setStroke(Main.taskBarColor);
          gcIcon.setTextAlign(TextAlignment.CENTER);
          gcIcon.setFont(new Font("Arial", 12));
-         gcIcon.strokeText(secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
+         gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
                Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5);
 
          final SnapshotParameters snapshotParameters = new SnapshotParameters();
@@ -333,9 +307,9 @@ public class ViewController {
 
    private void updateProjectView() {
       textArea.setText("");
-      currentProjectLabel.setText(currentWork.getProject().getName());
+      currentProjectLabel.setText(model.activeWorkItem.getProject().getName());
       final Circle circle = new Circle(4);
-      circle.setFill(currentWork.getProject().getColor());
+      circle.setFill(model.activeWorkItem.getProject().getColor());
       currentProjectLabel.setGraphic(circle);
    }
 
@@ -345,16 +319,16 @@ public class ViewController {
 
       for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
 
-         Stream<Work> work = workItems.stream().filter((w) -> w.getProject() == p);
+         Stream<Work> work = model.pastWorkItems.stream().filter((w) -> w.getProject() == p);
          final long seconds = work.mapToLong(w -> {
             return Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
          }).sum();
 
-         work = workItems.stream().filter((w) -> w.getProject() == p);
-         sb.append(p.getName() + "\t\t\t" + secondsToHHMMSS(seconds) + "\n");
-         work.forEach(w -> sb
-               .append("Duration: " + secondsToHHMMSS(Duration.between(w.getStartTime(), w.getEndTime()).getSeconds())
-                     + "\n" + "- " + w.getNotes() + "\n"));
+         work = model.pastWorkItems.stream().filter((w) -> w.getProject() == p);
+         sb.append(p.getName() + "\t\t\t" + DateFormatter.secondsToHHMMSS(seconds) + "\n");
+         work.forEach(w -> sb.append("Duration: "
+               + DateFormatter.secondsToHHMMSS(Duration.between(w.getStartTime(), w.getEndTime()).getSeconds()) + "\n"
+               + "- " + w.getNotes() + "\n"));
          sb.append("--------------------------\n");
       }
 
@@ -363,20 +337,9 @@ public class ViewController {
    }
 
    private long calcTodaysWorkSeconds() {
-      return workItems.stream().filter((work) -> work.getProject().isWork()).mapToLong((work) -> {
+      return model.pastWorkItems.stream().filter((work) -> work.getProject().isWork()).mapToLong((work) -> {
          return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
       }).sum();
-   }
-
-   private String secondsToHHMMSS(final long currentWorkSeconds) {
-      final int hours = (int) (currentWorkSeconds / 3600);
-      final int minutes = (int) ((currentWorkSeconds % 3600) / 60);
-
-      final int sec = (int) (((currentWorkSeconds % 3600) % 60));
-
-      final String a = (hours > 9 ? hours : "0" + hours) + ":" + (minutes > 9 ? minutes : "0" + minutes) + ":"
-            + (sec > 9 ? sec : "0" + sec);
-      return a;
    }
 
    public static String changeStyleAttribute(final String style, final String attribute, final String newValue) {
