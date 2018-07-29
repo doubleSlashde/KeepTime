@@ -19,4 +19,6 @@ public interface IController {
     */
    public void setColors(Object colors);
 
+   public void shutdown();
+
 }

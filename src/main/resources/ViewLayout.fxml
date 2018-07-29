@@ -29,7 +29,7 @@
                         <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" prefHeight="166.0" prefWidth="130.0" />
                      </content>
                   </ScrollPane>
-                  <Button minHeight="-Infinity" mnemonicParsing="false" prefHeight="23.0" prefWidth="115.0" stylesheets="@Neues%20Textdokument.txt" text="+ Add new project" />
+                  <Button fx:id="addNewProjectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="23.0" prefWidth="115.0" stylesheets="@Neues%20Textdokument.txt" text="+ Add new project" />
                </children>
             </VBox>
             <Group>
@@ -48,7 +48,7 @@
                      <center>
                         <HBox alignment="CENTER" prefHeight="36.0">
                            <children>
-                              <Button fx:id="minimizeButton1" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt">
+                              <Button fx:id="calendarButton" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -57,7 +57,7 @@
                                     </ImageView>
                                  </graphic>
                               </Button>
-                              <Button fx:id="minimizeButton11" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@Neues%20Textdokument.txt">
+                              <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@Neues%20Textdokument.txt">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                        <image>

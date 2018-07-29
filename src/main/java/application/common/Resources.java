@@ -9,9 +9,10 @@ public class Resources {
       // main
       FXML_VIEW_LAYOUT("ViewLayout.fxml"),
       FXML_PROJECT_LAYOUT("ProjectDetailLayout.fxml"),
-
+      FXML_SETTINGS("settings.fxml"),
       // icon
       ICON_MAIN("icon.png"),
+      FXML_REPORT("report.fxml"),
 
       ;
       String resourceLocation;

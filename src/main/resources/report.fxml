@@ -7,11 +7,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="231.0" prefWidth="436.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="231.0" prefWidth="436.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.view.ReportController">
    <children>
       <VBox prefHeight="231.0" prefWidth="436.0">
          <children>
-            <HBox>
+            <HBox fx:id="topHBox">
                <children>
                   <VBox>
                      <children>
@@ -27,7 +27,7 @@
                         </Label>
                      </children>
                   </VBox>
-                  <DatePicker prefHeight="103.0" prefWidth="125.0" showWeekNumbers="true" />
+                  <DatePicker prefHeight="103.0" prefWidth="125.0" showWeekNumbers="true" visible="false" />
                </children>
             </HBox>
             <HBox spacing="50.0">
