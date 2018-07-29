@@ -1,6 +1,5 @@
 package application;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import application.common.Resources;
 import application.common.Resources.RESOURCE;
 import application.controller.Controller;
+import application.controller.IController;
 import application.model.Model;
 import application.model.Project;
 import application.model.repos.ProjectRepository;
@@ -32,13 +32,10 @@ public class Main extends Application {
 
    public static Stage stage;
 
-   public static List<Project> projects;
-   public static Project idleProject;
-   public static Color taskBarColor;
-
-   private final Project defaultProject = new Project("Idle", Color.ORANGE, false);
-
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
+
+   private final Model model = new Model(); // TODO init model
+   private IController controller;
 
    @Override
    public void init() throws Exception {
@@ -53,29 +50,23 @@ public class Main extends Application {
 
       final ProjectRepository projectRepo = springContext.getBean(ProjectRepository.class);
 
-      projects = projectRepo.findAll();
+      final List<Project> projects = projectRepo.findAll();
 
       Log.debug("Found '{}' projects", projects.size());
 
       if (projects.isEmpty()) {
          Log.info("Adding default project");
-         defaultProject.setDefault(true);
-         projects.add(defaultProject);
-         projectRepo.save(defaultProject); // TODO autosave?
+         projects.add(model.DEFAULT_PROJECT);
+         projectRepo.save(model.DEFAULT_PROJECT); // TODO autosave?
       }
 
-      taskBarColor = Color.BLACK;// TODO read from config config.taskBarColor;
-      Log.debug("Using color '{}' for taskbar.", taskBarColor);
+      model.availableProjects.addAll(projects);
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
       if (findAny.isPresent()) {
-         idleProject = findAny.get();
-         Log.debug("Using project '{}' as default project.", idleProject);
-      } else {
-         Log.warn("No default project was found!");
-         idleProject = defaultProject;
-
+         model.idleProject = findAny.get();
+         Log.debug("Using project '{}' as default project.", model.idleProject);
       }
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -100,14 +91,11 @@ public class Main extends Application {
 
    private void shutdown() {
       Log.info("Shutting down");
-      viewController.changeProject(idleProject);
-      try {
-         Log.info("Creating summary.");
-         viewController.createSummary();
-         Log.info("Created summary");
-      } catch (final IOException e) {
-         Log.error("Error while creating summery :/", e);
-      }
+      controller.shutdown();
+      viewController.changeProject(model.idleProject);
+      Log.info("Creating summary.");
+      // viewController.createSummary(); // TODO
+      Log.info("Created summary");
    }
 
    ViewController viewController;
@@ -134,8 +122,7 @@ public class Main extends Application {
          viewController = loader.getController();
          viewController.setStage(primaryStage);
 
-         final Model model = new Model(); // TODO init model
-         final Controller controller = new Controller(model);
+         controller = new Controller(model);
          viewController.setController(controller, model);
 
          primaryStage.show();

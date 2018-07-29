@@ -32,7 +32,7 @@ public class Controller implements IController {
 
    @Override
    public void changeProject(final Project newProject, final String notes, final int minusSeconds) {
-      Work currentWork = model.activeWorkItem;
+      final Work currentWork = model.activeWorkItem.get();
 
       final LocalDateTime now = LocalDateTime.now();
       if (currentWork != null) {
@@ -57,19 +57,18 @@ public class Controller implements IController {
          // appendToFile(s);
       }
 
-      // Save last work
+      // Start new work
       final Work work = new Work(now, now, newProject, "");
       model.pastWorkItems.add(work);
 
-      // Start new work
-      currentWork = work;
+      model.activeWorkItem.set(work);
    }
 
    @Override
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor) {
       final Project project = new Project(projectName, projectColor, isWork);
       // TODO save new project into db
-
+      model.availableProjects.add(project);
    }
 
    @Override
@@ -80,6 +79,11 @@ public class Controller implements IController {
 
    @Override
    public void setColors(final Object colors) {
+      // XXX Auto-generated method stub
+
+   }
+
+   public void shutdown() {
       // XXX Auto-generated method stub
 
    }

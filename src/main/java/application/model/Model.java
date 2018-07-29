@@ -1,15 +1,24 @@
 package application.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 
-// TODO observable stuff for ui
 public class Model {
 
-   public List<Project> availableProjects = new ArrayList<>();
+   public final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false);
 
-   public List<Work> pastWorkItems = new ArrayList<>();
+   public ObservableList<Project> availableProjects = FXCollections.observableArrayList();
 
-   public Work activeWorkItem;
+   public ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
+
+   public ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
+
+   public long neededWorkSeconds = 60 * 60 * 8; // 8 hours
+
+   public Project idleProject = DEFAULT_PROJECT;
+   public Color taskBarColor = Color.BLACK;
 
 }
