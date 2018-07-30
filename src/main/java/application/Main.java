@@ -1,5 +1,6 @@
 package application;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,9 @@ import application.controller.Controller;
 import application.controller.IController;
 import application.model.Model;
 import application.model.Project;
+import application.model.Work;
 import application.model.repos.ProjectRepository;
+import application.model.repos.WorkRepository;
 import application.view.ViewController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -37,6 +40,10 @@ public class Main extends Application {
    private final Model model = new Model(); // TODO init model
    private IController controller;
 
+   public static ProjectRepository projectRepo;
+
+   public static WorkRepository workRepository;
+
    @Override
    public void init() throws Exception {
       springContext = SpringApplication.run(Main.class);
@@ -48,12 +55,18 @@ public class Main extends Application {
 
       Log.debug("Reading configuration");
 
-      final ProjectRepository projectRepo = springContext.getBean(ProjectRepository.class);
+      projectRepo = springContext.getBean(ProjectRepository.class);
+      workRepository = springContext.getBean(WorkRepository.class);
+      final List<Work> todaysWorkItems = workRepository.findByCreationDate(LocalDate.now());
+      Log.info("Found {} past work items", todaysWorkItems.size());
+      model.pastWorkItems.addAll(todaysWorkItems);
 
       final List<Project> projects = projectRepo.findAll();
 
       Log.debug("Found '{}' projects", projects.size());
-
+      for (final Project project : projects) {
+         Log.info(project.toString());
+      }
       if (projects.isEmpty()) {
          Log.info("Adding default project");
          projects.add(model.DEFAULT_PROJECT);
@@ -73,12 +86,12 @@ public class Main extends Application {
          @Override
          public void run() {
             // Not on FX thread!
-            shutdown();
+            // shutdown();
          }
       });
 
       primaryStage.setOnCloseRequest((we) -> {
-         // shutdown hook will take over
+         shutdown(); // spring cant save on shutdown hook
          System.exit(0);
       });
 
@@ -91,11 +104,9 @@ public class Main extends Application {
 
    private void shutdown() {
       Log.info("Shutting down");
-      controller.shutdown();
       viewController.changeProject(model.idleProject);
-      Log.info("Creating summary.");
-      // viewController.createSummary(); // TODO
-      Log.info("Created summary");
+      controller.shutdown();
+      // springContext.close();
    }
 
    ViewController viewController;

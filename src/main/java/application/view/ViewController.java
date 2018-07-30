@@ -130,8 +130,16 @@ public class ViewController {
 
    BooleanProperty mouseHovering = new SimpleBooleanProperty(false);
 
+   Stage reportStage;
+   ReportController reportController;
+
+   Stage settingsStage;
+   SettingsController settingsController;
+
    @FXML
-   private void initialize() {
+   private void initialize() throws IOException {
+
+      loadSubStages();
 
       bigTimeLabel.setText("00:00:00");
       allTimeLabel.setText("00:00:00");
@@ -150,48 +158,20 @@ public class ViewController {
       });
 
       addNewProjectButton.setOnAction((ae) -> {
+         Log.info("Add new project clicked");
          controller.addNewProject("NewProject", true, Color.ANTIQUEWHITE);
       });
 
       settingsButton.setOnAction((ae) -> {
          Log.info("Settings clicked");
-         try {
-            final FXMLLoader fxmlLoader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_SETTINGS));
-            final Parent root1 = (Parent) fxmlLoader.load();
-            final SettingsController settingsController = fxmlLoader.getController();
-            final Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Settings");
-            stage.setScene(new Scene(root1));
-
-            stage.setAlwaysOnTop(false);
-            stage.show();
-            // stage.setAlwaysOnTop(true); // Change back after closed
-
-         } catch (final Exception e) {
-
-         }
+         this.mainStage.setAlwaysOnTop(false);
+         settingsStage.show();
       });
 
       calendarButton.setOnAction((ae) -> {
          Log.info("Calendar clicked");
-
-         try {
-            final FXMLLoader fxmlLoader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_REPORT));
-            final Parent root1 = (Parent) fxmlLoader.load();
-            final ReportController settingsController = fxmlLoader.getController();
-            final Stage stage = new Stage();
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Report");
-            stage.setScene(new Scene(root1));
-
-            stage.setAlwaysOnTop(false);
-            stage.show();
-            // stage.setAlwaysOnTop(true); // Change back after closed
-
-         } catch (final Exception e) {
-
-         }
+         this.mainStage.setAlwaysOnTop(false);
+         reportStage.show();
       });
 
       Platform.runLater(() -> {
@@ -231,14 +211,14 @@ public class ViewController {
       // Drag stage
       pane.setOnMousePressed((mouseEvent) -> {
          // record a delta distance for the drag and drop operation.
-         dragDelta.x = stage.getX() - mouseEvent.getScreenX();
-         dragDelta.y = stage.getY() - mouseEvent.getScreenY();
+         dragDelta.x = mainStage.getX() - mouseEvent.getScreenX();
+         dragDelta.y = mainStage.getY() - mouseEvent.getScreenY();
          wasDragged = false;
       });
 
       pane.setOnMouseDragged((mouseEvent) -> {
-         stage.setX(mouseEvent.getScreenX() + dragDelta.x);
-         stage.setY(mouseEvent.getScreenY() + dragDelta.y);
+         mainStage.setX(mouseEvent.getScreenX() + dragDelta.x);
+         mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
          wasDragged = true;
       });
 
@@ -278,6 +258,39 @@ public class ViewController {
          updateTaskbarIcon(currentWorkSeconds);
       });
 
+   }
+
+   private void loadSubStages() throws IOException {
+      // Report stage
+      final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
+      final Parent sceneRoot = (Parent) fxmlLoader.load();
+      reportController = fxmlLoader.getController();
+      reportStage = new Stage();
+      reportStage.initModality(Modality.APPLICATION_MODAL);
+      reportStage.setScene(new Scene(sceneRoot));
+      reportStage.setTitle("Report");
+      reportStage.setOnCloseRequest(e -> {
+         this.mainStage.setAlwaysOnTop(true);
+      });
+
+      // Settings stage
+      final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
+      final Parent root1 = (Parent) fxmlLoader2.load();
+      settingsController = fxmlLoader2.getController();
+
+      settingsStage = new Stage();
+      settingsStage.initModality(Modality.APPLICATION_MODAL);
+      settingsStage.setTitle("Settings");
+      settingsStage.setScene(new Scene(root1));
+      settingsStage.setOnCloseRequest(e -> {
+         this.mainStage.setAlwaysOnTop(true);
+      });
+   }
+
+   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
+      final FXMLLoader fxmlLoader = new FXMLLoader(Resources.getResource(fxmlLayout));
+
+      return fxmlLoader;
    }
 
    private void addProjectToProjectList(final Project p) {
@@ -406,10 +419,10 @@ public class ViewController {
       return newStyle;
    }
 
-   Stage stage;
+   Stage mainStage;
 
    public void setStage(final Stage primaryStage) {
-      this.stage = primaryStage;
+      this.mainStage = primaryStage;
    }
 
 }
