@@ -26,7 +26,7 @@
                <children>
                   <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="142.0" prefWidth="132.0" stylesheets="@Neues%20Textdokument.txt">
                      <content>
-                        <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" prefHeight="166.0" prefWidth="130.0" />
+                        <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" prefWidth="130.0" />
                      </content>
                   </ScrollPane>
                   <Button fx:id="addNewProjectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="23.0" prefWidth="115.0" stylesheets="@Neues%20Textdokument.txt" text="+ Add new project" />

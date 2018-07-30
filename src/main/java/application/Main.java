@@ -3,6 +3,7 @@ package application;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +74,9 @@ public class Main extends Application {
          projectRepo.save(model.DEFAULT_PROJECT); // TODO autosave?
       }
 
-      model.availableProjects.addAll(projects);
+      model.allProjects.addAll(projects);
+      model.availableProjects
+            .addAll(model.allProjects.stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
@@ -104,7 +107,7 @@ public class Main extends Application {
 
    private void shutdown() {
       Log.info("Shutting down");
-      viewController.changeProject(model.idleProject);
+      viewController.changeProject(model.idleProject, 0);
       controller.shutdown();
       // springContext.close();
    }

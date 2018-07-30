@@ -44,6 +44,10 @@ public class Project {
       this.isEnabled = true;
    }
 
+   public Project(final String name, final Color color, final boolean isWork) {
+      this(name, color, isWork, false);
+   }
+
    public String getName() {
       return name;
    }
