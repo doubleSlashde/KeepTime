@@ -11,6 +11,7 @@ public class Model {
    public final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, true);
 
    public ObservableList<Project> availableProjects = FXCollections.observableArrayList();
+   public ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
    public ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
 

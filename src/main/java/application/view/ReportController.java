@@ -121,7 +121,7 @@ public class ReportController {
          rowIndex++;
          final RowConstraints row1 = new RowConstraints(17, 17, 17);
          // row1.setVgrow(Priority.ALWAYS);
-         gridPane.getRowConstraints().add(row1);
+         // gridPane.getRowConstraints().add(row1);
 
          for (int j = 0; j < onlyCurrentProjectWork.size(); j++) {
             final Work work = onlyCurrentProjectWork.get(j);
@@ -138,8 +138,9 @@ public class ReportController {
             gridPane.add(workedHoursLabel, 1, rowIndex);
 
             final RowConstraints row2 = new RowConstraints(15, 15, 15);
+
             // row2.setVgrow(Priority.ALWAYS);
-            gridPane.getRowConstraints().add(row2);
+            // gridPane.getRowConstraints().add(row2);
             rowIndex++;
          }
       }
