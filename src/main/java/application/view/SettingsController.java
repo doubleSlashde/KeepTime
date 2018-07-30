@@ -9,7 +9,14 @@ import javafx.scene.control.ColorPicker;
 
 public class SettingsController {
    @FXML
-   private ColorPicker color1;
+   private ColorPicker hoverBackgroundColor;
+   @FXML
+   private ColorPicker hoverFontColor;
+
+   @FXML
+   private ColorPicker defaultBackgroundColor;
+   @FXML
+   private ColorPicker defaultFontColor;
 
    @FXML
    private Button saveButton;
@@ -21,6 +28,14 @@ public class SettingsController {
 
    @FXML
    private void initialize() {
+      // TODO can we create an instant preview of the color, while the color dialog is open??
+      hoverBackgroundColor.onShownProperty().addListener(a -> {
+         Log.info("showing");
+      });
+
+      hoverBackgroundColor.onHiddenProperty().addListener(a -> {
+         Log.info("hiding");
+      });
 
    }
 }

@@ -35,11 +35,12 @@ public class Project {
       // Needed for jpa
    }
 
-   public Project(final String name, final Color color, final boolean isWork) {
+   public Project(final String name, final Color color, final boolean isWork, final boolean isDefault) {
       super();
       this.name = name;
       this.color = color;
       this.isWork = isWork;
+      this.isDefault = isDefault;
       this.isEnabled = true;
    }
 
@@ -89,8 +90,8 @@ public class Project {
 
    @Override
    public String toString() {
-      return "Project [name=" + name + ", color=" + color + ", isWork=" + isWork + ", isDefault=" + isDefault
-            + ", isEnabled=" + isEnabled + "]";
+      return "Project [id=" + id + ", name=" + name + ", color=" + color + ", isWork=" + isWork + ", isDefault="
+            + isDefault + ", isEnabled=" + isEnabled + "]";
    }
 
 }

@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import application.Main;
 import application.common.DateFormatter;
 import application.model.Model;
 import application.model.Project;
@@ -55,6 +56,7 @@ public class Controller implements IController {
 
          // TODO Save in db
          // appendToFile(s);
+         Main.workRepository.save(currentWork);
       }
 
       // Start new work
@@ -66,9 +68,11 @@ public class Controller implements IController {
 
    @Override
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor) {
-      final Project project = new Project(projectName, projectColor, isWork);
+      final Project project = new Project(projectName, projectColor, isWork, false);
       // TODO save new project into db
       model.availableProjects.add(project);
+
+      Main.projectRepo.save(project);
    }
 
    @Override
@@ -83,6 +87,7 @@ public class Controller implements IController {
 
    }
 
+   @Override
    public void shutdown() {
       // XXX Auto-generated method stub
 

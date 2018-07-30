@@ -8,8 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.60">
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox spacing="10.0">
          <children>
@@ -21,13 +20,13 @@
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background" />
-                              <ColorPicker />
+                              <ColorPicker fx:id="hoverBackgroundColor" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
-                              <ColorPicker />
+                              <ColorPicker fx:id="hoverFontColor" />
                            </children>
                         </HBox>
                      </children>
@@ -42,13 +41,13 @@
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Background" />
-                              <ColorPicker />
+                              <ColorPicker fx:id="defaultBackgroundColor" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
-                              <ColorPicker />
+                              <ColorPicker fx:id="defaultFontColor" />
                            </children>
                         </HBox>
                      </children>
@@ -57,8 +56,8 @@
             </Group>
             <HBox spacing="10.0">
                <children>
-                  <Button mnemonicParsing="false" text="Save" />
-                  <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel" />
+                  <Button fx:id="saveButton" mnemonicParsing="false" text="Save" />
+                  <Button fx:id="cancelButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel" />
                </children>
             </HBox>
          </children>
