@@ -13,12 +13,18 @@ public interface IController {
    /**
     * Colors for background and fonts
     */
-   public void setColors(Object colors);
 
    public void shutdown();
 
    public void deleteProject(Project p);
 
    public void editProject(Project p, String newName, Color newColor, boolean isWork);
+
+   public void setColors(Color hoverBackgroundColor, Color hoverFontColor, Color defaultBackgroundColor,
+         Color defaultFontColor, Color taskBarColor);
+
+   public long calcTodaysSeconds();
+
+   public long calcTodaysWorkSeconds();
 
 }

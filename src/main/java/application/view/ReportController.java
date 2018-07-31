@@ -41,13 +41,15 @@ public class ReportController {
    @FXML
    private GridPane gridPane;
 
+   private DatePicker datePicker;
+
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    @FXML
    private void initialize() {
       Log.info("Init reportController");
 
-      final DatePicker datePicker = new DatePicker(LocalDate.now());
+      datePicker = new DatePicker(LocalDate.now());
       //
       final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
          @Override
@@ -69,8 +71,8 @@ public class ReportController {
       datePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
          Log.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);
-
       });
+
       updateReport(datePicker.getValue());
       // HACK to show calendar from datepicker
       // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
@@ -148,5 +150,9 @@ public class ReportController {
 
       currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+   }
+
+   public void update() {
+      updateReport(datePicker.getValue());
    }
 }

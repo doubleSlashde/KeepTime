@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import application.Main;
+import application.common.ColorHelper;
 import application.common.DateFormatter;
 import application.common.Resources;
 import application.common.Resources.RESOURCE;
@@ -23,9 +24,13 @@ import application.model.Project;
 import application.model.Work;
 import application.view.time.Interval;
 import javafx.application.Platform;
-import javafx.beans.binding.IntegerBinding;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleLongProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -48,7 +53,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Spinner;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Bloom;
@@ -140,7 +145,9 @@ public class ViewController {
 
    Canvas taskbarCanvas = new Canvas(32, 32);
 
-   BooleanProperty mouseHovering = new SimpleBooleanProperty(false);
+   BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
+   LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
+   ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
 
    Stage reportStage;
    ReportController reportController;
@@ -153,16 +160,14 @@ public class ViewController {
    @FXML
    private void initialize() throws IOException {
 
-      loadSubStages();
-
       bigTimeLabel.setText("00:00:00");
       allTimeLabel.setText("00:00:00");
       todayAllSeconds.setText("00:00:00");
 
       textArea.setWrapText(true);
       textArea.setEditable(false);
-      textArea.editableProperty().bind(mouseHovering);
-      projectsVBox.visibleProperty().bind(mouseHovering);
+      textArea.editableProperty().bind(mouseHoveringProperty);
+      projectsVBox.visibleProperty().bind(mouseHoveringProperty);
 
       minimizeButton.setOnAction((ae) -> {
          Main.stage.setIconified(true);
@@ -224,10 +229,55 @@ public class ViewController {
       calendarButton.setOnAction((ae) -> {
          Log.info("Calendar clicked");
          this.mainStage.setAlwaysOnTop(false);
+         reportController.update();
          reportStage.show();
       });
 
+      final Runnable updateMainBackgroundColor = () -> {
+         Color color = model.defaultBackgroundColor.get();
+         double opacity = 0;
+         if (mouseHoveringProperty.get()) {
+            color = model.hoverBackgroundColor.get();
+            opacity = .3;
+         }
+         String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
+               "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+         style = changeStyleAttribute(style, "fx-border-color",
+               "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+         pane.setStyle(style);
+      };
+
+      mouseHoveringProperty.addListener((a, b, c) -> {
+         updateMainBackgroundColor.run();
+      });
+
       Platform.runLater(() -> {
+         loadSubStages();
+         fontColorProperty.set(model.defaultFontColor.get());
+         fontColorProperty.bind(Bindings.createObjectBinding(() -> {
+            if (mouseHoveringProperty.get()) {
+               return model.hoverFontColor.get();
+            } else {
+               return model.defaultFontColor.get();
+            }
+         }, mouseHoveringProperty, model.defaultFontColor, model.hoverFontColor));
+
+         bigTimeLabel.textFillProperty().bind(fontColorProperty);
+         allTimeLabel.textFillProperty().bind(fontColorProperty);
+         todayAllSeconds.textFillProperty().bind(fontColorProperty);
+         currentProjectLabel.textFillProperty().bind(fontColorProperty);
+
+         // Setup textarea font color binding
+         final Runnable textAreaColorRunnable = () -> {
+            final String textAreaStyle = changeStyleAttribute(textArea.getStyle(), "fx-text-fill",
+                  "rgba(" + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
+            textArea.setStyle(textAreaStyle);
+         };
+         fontColorProperty.addListener((a, b, c) -> {
+            textAreaColorRunnable.run();
+         });
+         textAreaColorRunnable.run();
+
          projectSelectionNodeMap = new HashMap<>(model.availableProjects.size());
          for (final Project project : model.availableProjects) {
             if (project.isEnabled()) {
@@ -256,22 +306,21 @@ public class ViewController {
                }
             }
          });
+
+         model.defaultBackgroundColor.addListener((a, b, c) -> {
+            updateMainBackgroundColor.run();
+         });
+         model.hoverBackgroundColor.addListener((a, b, c) -> {
+            updateMainBackgroundColor.run();
+         });
       });
 
-      // Change color
       pane.setOnMouseEntered((a) -> {
-         String style = changeStyleAttribute(pane.getStyle(), "fx-background-color", "rgba(54,143,179,.1)");
-         style = changeStyleAttribute(style, "fx-border-color", "rgba(54,143,179,.3)");
-         pane.setStyle(style);
-
-         mouseHovering.set(true);
+         mouseHoveringProperty.set(true);
       });
 
       pane.setOnMouseExited((a) -> {
-         String style = changeStyleAttribute(pane.getStyle(), "fx-background-color", "rgba(54,143,179,0.01)");
-         style = changeStyleAttribute(style, "fx-border-color", "rgba(54,143,179,0)");
-         pane.setStyle(style);
-         mouseHovering.set(false);
+         mouseHoveringProperty.set(false);
       });
 
       // Drag stage
@@ -288,6 +337,10 @@ public class ViewController {
          wasDragged = true;
       });
 
+      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+         return DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get());
+      }, activeWorkSecondsProperty));
+
       Interval.registerCallBack(() -> {
          // update ui each second
 
@@ -297,12 +350,13 @@ public class ViewController {
          final long currentWorkSeconds = Duration
                .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
                .getSeconds();
-         final long todayWorkingSeconds = calcTodaysWorkSeconds();
-         final long todaySeconds = calcTodaysSeconds();
+         activeWorkSecondsProperty.set(currentWorkSeconds);
+         final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
+         final long todaySeconds = controller.calcTodaysSeconds();
 
          // update all ui labels
          // TODO do it with bindings (maybe create a viewmodel for this)
-         bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+         // bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
          allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
          todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
 
@@ -327,36 +381,40 @@ public class ViewController {
 
    }
 
-   private void loadSubStages() throws IOException {
-      // Report stage
-      final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
-      final Parent sceneRoot = (Parent) fxmlLoader.load();
-      reportController = fxmlLoader.getController();
-      reportStage = new Stage();
-      reportStage.initModality(Modality.APPLICATION_MODAL);
-      reportStage.setScene(new Scene(sceneRoot));
-      reportStage.setTitle("Report");
-      reportStage.setOnCloseRequest(e -> {
-         this.mainStage.setAlwaysOnTop(true);
-      });
+   private void loadSubStages() {
+      try {
+         // Report stage
+         final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
+         final Parent sceneRoot = (Parent) fxmlLoader.load();
+         reportController = fxmlLoader.getController();
+         reportStage = new Stage();
+         reportStage.initModality(Modality.APPLICATION_MODAL);
+         reportStage.setScene(new Scene(sceneRoot));
+         reportStage.setTitle("Report");
+         reportStage.setOnHiding(e -> {
+            this.mainStage.setAlwaysOnTop(true);
+         });
 
-      // Settings stage
-      final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
-      final Parent root1 = (Parent) fxmlLoader2.load();
-      settingsController = fxmlLoader2.getController();
-
-      settingsStage = new Stage();
-      settingsStage.initModality(Modality.APPLICATION_MODAL);
-      settingsStage.setTitle("Settings");
-      settingsStage.setScene(new Scene(root1));
-      settingsStage.setOnCloseRequest(e -> {
-         this.mainStage.setAlwaysOnTop(true);
-      });
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
+         final Parent root1 = (Parent) fxmlLoader2.load();
+         settingsController = fxmlLoader2.getController();
+         settingsController.setModelAndController(model, controller);
+         settingsStage = new Stage();
+         settingsController.setStage(settingsStage);
+         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.setTitle("Settings");
+         settingsStage.setScene(new Scene(root1));
+         settingsStage.setOnHiding(e -> {
+            this.mainStage.setAlwaysOnTop(true);
+         });
+      } catch (final IOException e) {
+         throw new RuntimeException(e);
+      }
    }
 
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       final FXMLLoader fxmlLoader = new FXMLLoader(Resources.getResource(fxmlLayout));
-
       return fxmlLoader;
    }
 
@@ -376,9 +434,11 @@ public class ViewController {
 
       final Label projectNameLabel = (Label) projectElement.getChildren().get(0);
       final Label elapsedTimeLabel = (Label) projectElement.getChildren().get(1);
+      elapsedTimeLabel.textFillProperty().bind(fontColorProperty);
       elapsedProjectTimeLabelMap.put(p, elapsedTimeLabel);
 
       projectNameLabel.setText(p.getName());
+      projectNameLabel.setUnderline(p.isWork());
       final Color color = p.getColor();
       final double dimFactor = .6;
       final Color dimmedColor = new Color(color.getRed() * dimFactor, color.getGreen() * dimFactor,
@@ -408,13 +468,13 @@ public class ViewController {
          final Bloom bloom = new Bloom();
          bloom.setThreshold(0.3);
          projectNameLabel.setEffect(bloom);
-         projectNameLabel.setUnderline(true);
+         // projectNameLabel.setUnderline(true);
       });
       projectNameLabel.setOnMouseExited(ae -> {
          projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor, p.getColor().getGreen() * dimFactor,
                p.getColor().getBlue() * dimFactor, 1));
          projectNameLabel.setEffect(null);
-         projectNameLabel.setUnderline(false);
+         // projectNameLabel.setUnderline(false);
       });
 
       availableProjectVbox.getChildren().add(projectElement);
@@ -426,48 +486,70 @@ public class ViewController {
          final Dialog<Integer> dialog = new Dialog<>();
          dialog.setTitle("Change project with time");
          dialog.setHeaderText("Choose the time to subtract");
-
          dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+         final VBox vBox = new VBox();
+         final Label description = new Label(
+               "Choose the amount of minutes to transfer from the active project to the new project");
+         description.setWrapText(true);
+         vBox.getChildren().add(description);
 
          final GridPane grid = new GridPane();
          grid.setHgap(10);
          grid.setVgap(10);
          grid.setPadding(new Insets(20, 150, 10, 10));
-         // TODO calc max values (difference now-start)
-         grid.add(new Label("Hours:"), 0, 0);
-         final Spinner<Integer> hoursSpinner = new Spinner<>(0, 100, 0);
-         grid.add(hoursSpinner, 1, 0);
 
-         grid.add(new Label("Minutes:"), 0, 1);
-         final Spinner<Integer> minutesSpinner = new Spinner<>(0, 100, 0);
-         grid.add(minutesSpinner, 1, 1);
-
-         grid.add(new Label("Seconds:"), 0, 2);
-         final Spinner<Integer> secondsSpiner = new Spinner<>(0, 100, 0);
-         grid.add(secondsSpiner, 1, 2);
-
-         grid.add(new Label("Offset:"), 0, 3);
-         final Label offsetLabel = new Label("0 seconds");
-         grid.add(offsetLabel, 1, 3);
-
-         final IntegerBinding secondOffsetBinding = new IntegerBinding() {
-            {
-               super.bind(hoursSpinner.valueProperty(), minutesSpinner.valueProperty(), secondsSpiner.valueProperty());
+         grid.add(new Label("Minutes to transfer"), 0, 0);
+         final Slider slider = new Slider();
+         slider.setMin(0);
+         slider.maxProperty().bind(Bindings.createLongBinding(() -> {
+            final long maxValue = activeWorkSecondsProperty.longValue() / 60;
+            if (maxValue > 0) {
+               slider.setDisable(false);
+               return maxValue;
             }
+            slider.setDisable(true);
+            return 1l;
+         }, activeWorkSecondsProperty));
+         slider.setValue(0);
+         slider.setShowTickLabels(true);
+         slider.setShowTickMarks(true);
+         slider.setMajorTickUnit(60);
+         slider.setMinorTickCount(58);
+         slider.setBlockIncrement(1);
+         slider.setSnapToTicks(true);
+         grid.add(slider, 1, 0);
 
-            @Override
-            protected int computeValue() {
-               return hoursSpinner.getValue() * 60 * 60 + minutesSpinner.getValue() * 60 + secondsSpiner.getValue();
-            }
+         grid.add(new Label("Active project: " + model.activeWorkItem.get().getProject().getName()), 0, 1);
+         final Label currentProjectTimeLabel = new Label("00:00:00");
+         grid.add(currentProjectTimeLabel, 1, 1);
+
+         grid.add(new Label("New project: " + p.getName()), 0, 2);
+         final Label newProjectTimeLabel = new Label("00:00:00");
+         grid.add(newProjectTimeLabel, 1, 2);
+
+         final Runnable updateLabelsRunnable = () -> {
+            final long minutesOffset = slider.valueProperty().longValue();
+            final long secondsOffset = minutesOffset * 60;
+
+            final long secondsActiveWork = activeWorkSecondsProperty.get() - secondsOffset;
+            final long secondsNewWork = 0 + secondsOffset;
+            currentProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsActiveWork));
+            newProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsNewWork));
          };
+         activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> {
+            updateLabelsRunnable.run();
+         });
+         slider.valueProperty().addListener((obs, oldValue, newValue) -> {
+            updateLabelsRunnable.run();
+         });
+         vBox.getChildren().add(grid);
 
-         offsetLabel.textProperty().bind(secondOffsetBinding.asString());
-
-         dialog.getDialogPane().setContent(grid);
+         dialog.getDialogPane().setContent(vBox);
 
          dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
-               return secondOffsetBinding.get();
+               return slider.valueProperty().intValue();
             }
             return null;
          });
@@ -545,6 +627,7 @@ public class ViewController {
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
                   p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
+            projectNameLabel.setUnderline(p.isWork());
          });
          updateProjectView();
 
@@ -576,13 +659,13 @@ public class ViewController {
 
    private void updateTaskbarIcon(final long currentWorkSeconds) {
       // update taskbar icon
-      final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
+      final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D(); // TODO save instance????
 
       gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
       gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
       gcIcon.fillRect(1, 27, 31, 5);
 
-      gcIcon.setStroke(model.taskBarColor);
+      gcIcon.setStroke(model.taskBarColor.get());
       gcIcon.setTextAlign(TextAlignment.CENTER);
       gcIcon.setFont(new Font("Arial", 12));
       gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
@@ -606,22 +689,12 @@ public class ViewController {
    }
 
    private void updateProjectView() {
-      currentProjectLabel.setText(model.activeWorkItem.get().getProject().getName());
+      final Project project = model.activeWorkItem.get().getProject();
+      currentProjectLabel.setText(project.getName());
+      currentProjectLabel.setUnderline(project.isWork());
       final Circle circle = new Circle(4);
-      circle.setFill(model.activeWorkItem.get().getProject().getColor());
+      circle.setFill(project.getColor());
       currentProjectLabel.setGraphic(circle);
-   }
-
-   private long calcTodaysWorkSeconds() {
-      return model.pastWorkItems.stream().filter((work) -> work.getProject().isWork()).mapToLong((work) -> {
-         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-      }).sum();
-   }
-
-   private long calcTodaysSeconds() {
-      return model.pastWorkItems.stream().mapToLong((work) -> {
-         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-      }).sum();
    }
 
    public static String changeStyleAttribute(final String style, final String attribute, final String newValue) {

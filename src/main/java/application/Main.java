@@ -17,8 +17,10 @@ import application.controller.Controller;
 import application.controller.IController;
 import application.model.Model;
 import application.model.Project;
+import application.model.Settings;
 import application.model.Work;
 import application.model.repos.ProjectRepository;
+import application.model.repos.SettingsRepository;
 import application.model.repos.WorkRepository;
 import application.view.ViewController;
 import javafx.application.Application;
@@ -38,12 +40,13 @@ public class Main extends Application {
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
-   private final Model model = new Model(); // TODO init model
+   public final static Model model = new Model();
    private IController controller;
 
-   public static ProjectRepository projectRepo;
+   public static ProjectRepository projectRepository;
 
    public static WorkRepository workRepository;
+   public static SettingsRepository settingsRepository;
 
    @Override
    public void init() throws Exception {
@@ -56,22 +59,44 @@ public class Main extends Application {
 
       Log.debug("Reading configuration");
 
-      projectRepo = springContext.getBean(ProjectRepository.class);
+      projectRepository = springContext.getBean(ProjectRepository.class);
       workRepository = springContext.getBean(WorkRepository.class);
+      settingsRepository = springContext.getBean(SettingsRepository.class);
+
+      // TODO there should just be one instance of settings in the repo
+      final List<Settings> settingsList = settingsRepository.findAll();
+      final Settings settings;
+      if (settingsList.isEmpty()) {
+         settings = new Settings();
+         settings.setTaskBarColor(model.taskBarColor.get());
+
+         settings.setDefaultBackgroundColor(model.defaultBackgroundColor.get());
+         settings.setDefaultFontColor(model.defaultFontColor.get());
+
+         settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
+         settings.setHoverFontColor(model.hoverFontColor.get());
+         settingsRepository.save(settings);
+      } else {
+         settings = settingsList.get(0);
+      }
+
+      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
+      model.defaultFontColor.set(settings.getDefaultFontColor());
+      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
+      model.hoverFontColor.set(settings.getHoverFontColor());
+      model.taskBarColor.set(settings.getTaskBarColor());
+
       final List<Work> todaysWorkItems = workRepository.findByCreationDate(LocalDate.now());
       Log.info("Found {} past work items", todaysWorkItems.size());
       model.pastWorkItems.addAll(todaysWorkItems);
 
-      final List<Project> projects = projectRepo.findAll();
+      final List<Project> projects = projectRepository.findAll();
 
       Log.debug("Found '{}' projects", projects.size());
-      for (final Project project : projects) {
-         Log.info(project.toString());
-      }
       if (projects.isEmpty()) {
          Log.info("Adding default project");
          projects.add(model.DEFAULT_PROJECT);
-         projectRepo.save(model.DEFAULT_PROJECT);
+         projectRepository.save(model.DEFAULT_PROJECT);
       }
 
       // createProjects();
@@ -87,17 +112,8 @@ public class Main extends Application {
          Log.debug("Using project '{}' as default project.", model.idleProject);
       }
 
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-         @Override
-         public void run() {
-            // Not on FX thread!
-            // shutdown();
-         }
-      });
-
-      primaryStage.setOnCloseRequest((we) -> {
-         shutdown(); // spring cant save on shutdown hook
-         System.exit(0);
+      primaryStage.setOnHiding((we) -> {
+         shutdown();
       });
 
       try {
@@ -108,23 +124,23 @@ public class Main extends Application {
    }
 
    private void createProjects() {
-      projectRepo.save(new Project("G&D", Color.BLUE, true));
-      projectRepo.save(new Project("G&D AR", Color.WHITE, true));
-      projectRepo.save(new Project("ZF 3d", Color.PINK, true));
-      projectRepo.save(new Project("Karl Storz", Color.GREEN, true));
-      projectRepo.save(new Project("Fronius", Color.VIOLET, true));
-      projectRepo.save(new Project("Kicker", Color.YELLOW, true));
-      projectRepo.save(new Project("Mitagessen", Color.RED, true));
-      projectRepo.save(new Project("Zeppelin", Color.ORANGE, true));
-      projectRepo.save(new Project("Other", Color.ORANGE, true));
+      projectRepository.save(new Project("G&D", Color.BLUE, true));
+      projectRepository.save(new Project("G&D AR", Color.WHITE, true));
+      projectRepository.save(new Project("ZF 3d", Color.PINK, true));
+      projectRepository.save(new Project("Karl Storz", Color.GREEN, true));
+      projectRepository.save(new Project("Fronius", Color.VIOLET, true));
+      projectRepository.save(new Project("Kicker", Color.YELLOW, true));
+      projectRepository.save(new Project("Mitagessen", Color.RED, true));
+      projectRepository.save(new Project("Zeppelin", Color.ORANGE, true));
+      projectRepository.save(new Project("Other", Color.ORANGE, true));
 
    }
 
    private void shutdown() {
       Log.info("Shutting down");
-      viewController.changeProject(model.idleProject, 0);
+      viewController.changeProject(model.idleProject, 0); // TODO not so nice (view has the comments for the current
+                                                          // job)
       controller.shutdown();
-      // springContext.close();
    }
 
    ViewController viewController;

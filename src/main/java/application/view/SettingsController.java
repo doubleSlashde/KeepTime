@@ -3,9 +3,12 @@ package application.view;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import application.controller.IController;
+import application.model.Model;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
+import javafx.stage.Stage;
 
 public class SettingsController {
    @FXML
@@ -19,6 +22,20 @@ public class SettingsController {
    private ColorPicker defaultFontColor;
 
    @FXML
+   private ColorPicker taskBarColor;
+
+   @FXML
+   private Button resetHoverBackgroundButton;
+   @FXML
+   private Button resetHoverFontButton;
+   @FXML
+   private Button resetDefaultBackgroundButton;
+   @FXML
+   private Button resetDefaultFontButton;
+   @FXML
+   private Button resetTaskBarFontButton;
+
+   @FXML
    private Button saveButton;
 
    @FXML
@@ -26,16 +43,56 @@ public class SettingsController {
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
+   private Model model;
+   private IController controller;
+   private Stage thisStage;
+
    @FXML
    private void initialize() {
-      // TODO can we create an instant preview of the color, while the color dialog is open??
-      hoverBackgroundColor.onShownProperty().addListener(a -> {
-         Log.info("showing");
+
+      saveButton.setOnAction(ae -> {
+         Log.info("Save clicked");
+         controller.setColors(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue());
+         thisStage.close();
       });
 
-      hoverBackgroundColor.onHiddenProperty().addListener(a -> {
-         Log.info("hiding");
+      cancelButton.setOnAction(ae -> {
+         Log.info("Cancel clicked");
+         thisStage.close();
       });
 
+      resetHoverBackgroundButton.setOnAction(ae -> {
+         hoverBackgroundColor.setValue(Model.originalHoverBackgroundColor);
+      });
+      resetHoverFontButton.setOnAction(ae -> {
+         hoverFontColor.setValue(Model.originalHoverFontColor);
+      });
+      resetDefaultBackgroundButton.setOnAction(ae -> {
+         defaultBackgroundColor.setValue(Model.originalDefaultBackgroundColor);
+      });
+      resetDefaultFontButton.setOnAction(ae -> {
+         defaultFontColor.setValue(Model.originalDefaultFontColor);
+      });
+      resetTaskBarFontButton.setOnAction(ae -> {
+         taskBarColor.setValue(Model.originalTaskBarFontColor);
+      });
+   }
+
+   public void setModelAndController(final Model model, final IController controller) {
+      this.model = model;
+      this.controller = controller;
+
+      hoverBackgroundColor.setValue(model.hoverBackgroundColor.get());
+      hoverFontColor.setValue(model.hoverFontColor.get());
+
+      defaultBackgroundColor.setValue(model.defaultBackgroundColor.get());
+      defaultFontColor.setValue(model.defaultFontColor.get());
+
+      taskBarColor.setValue(model.taskBarColor.get());
+   }
+
+   public void setStage(final Stage thisStage) {
+      this.thisStage = thisStage;
    }
 }

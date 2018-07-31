@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.view.SettingsController">
    <children>
       <VBox spacing="10.0">
          <children>
@@ -21,12 +21,14 @@
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background" />
                               <ColorPicker fx:id="hoverBackgroundColor" />
+                              <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" text="Reset" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
                               <ColorPicker fx:id="hoverFontColor" />
+                              <Button fx:id="resetHoverFontButton" mnemonicParsing="false" text="Reset" />
                            </children>
                         </HBox>
                      </children>
@@ -42,12 +44,30 @@
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Background" />
                               <ColorPicker fx:id="defaultBackgroundColor" />
+                              <Button fx:id="resetDefaultBackgroundButton" mnemonicParsing="false" text="Reset" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
                               <ColorPicker fx:id="defaultFontColor" />
+                              <Button fx:id="resetDefaultFontButton" mnemonicParsing="false" text="Reset" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Group>
+            <Group layoutX="10.0" layoutY="88.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Taskbar" />
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                              <ColorPicker fx:id="taskBarColor" />
+                              <Button fx:id="resetTaskBarFontButton" mnemonicParsing="false" text="Reset" />
                            </children>
                         </HBox>
                      </children>

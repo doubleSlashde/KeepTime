@@ -2,6 +2,7 @@ package application.controller;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import application.Main;
 import application.common.DateFormatter;
 import application.model.Model;
 import application.model.Project;
+import application.model.Settings;
 import application.model.Work;
 import javafx.scene.paint.Color;
 
@@ -63,13 +65,29 @@ public class Controller implements IController {
       model.allProjects.add(project);
       model.availableProjects.add(project);
 
-      Main.projectRepo.save(project);
+      Main.projectRepository.save(project);
    }
 
    @Override
-   public void setColors(final Object colors) {
-      // XXX Auto-generated method stub
+   public void setColors(final Color hoverBackgroundColor, final Color hoverFontColor,
+         final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor) {
+      // TODO what is this mess :)
+      final Settings settings = Main.settingsRepository.findAll().get(0);
+      settings.setTaskBarColor(taskBarColor);
 
+      settings.setDefaultBackgroundColor(defaultBackgroundColor);
+      settings.setDefaultFontColor(defaultFontColor);
+
+      settings.setHoverBackgroundColor(hoverBackgroundColor);
+      settings.setHoverFontColor(hoverFontColor);
+
+      Main.settingsRepository.save(settings);
+
+      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
+      model.defaultFontColor.set(settings.getDefaultFontColor());
+      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
+      model.hoverFontColor.set(settings.getHoverFontColor());
+      model.taskBarColor.set(settings.getTaskBarColor());
    }
 
    @Override
@@ -83,7 +101,7 @@ public class Controller implements IController {
       Log.info("Disabeling project '{}'.", p);
       p.setEnabled(false);
       model.availableProjects.remove(p);
-      Main.projectRepo.save(p);
+      Main.projectRepository.save(p);
    }
 
    @Override
@@ -92,7 +110,39 @@ public class Controller implements IController {
       p.setName(newName);
       p.setColor(newColor);
       p.setWork(isWork);
-      Main.projectRepo.save(p);
+      Main.projectRepository.save(p);
+   }
+
+   /**
+    * Calculate todays seconds counted as work
+    */
+   @Override
+   public long calcTodaysWorkSeconds() {
+
+      return model.pastWorkItems.stream().filter((work) -> {
+         final Project project = work.getProject();
+         // find up to date reference to project
+         final Optional<Project> optionalProject = model.allProjects.stream().filter(p -> {
+            return p.getId() == project.getId();
+         }).findAny();
+         if (optionalProject.isPresent()) {
+            return optionalProject.get().isWork();
+         }
+         // TODO should not happen
+         return false;
+      }).mapToLong((work) -> {
+         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
+      }).sum();
+   }
+
+   /**
+    * Calculate todays present seconds (work+nonWork)
+    */
+   @Override
+   public long calcTodaysSeconds() {
+      return model.pastWorkItems.stream().mapToLong((work) -> {
+         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
+      }).sum();
    }
 
 }
