@@ -51,7 +51,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.effect.Bloom;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -107,8 +106,6 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
-   private final LocalDateTime startTime = LocalDateTime.now();
-
    boolean pressed = false;
    double startX = -1;
 
@@ -134,6 +131,7 @@ public class ViewController {
    public void changeProject(final Project newProject, final long minusSeconds) {
       controller.changeProject(newProject, textArea.getText(), minusSeconds);
       updateProjectView();
+      textArea.setText("");
    }
 
    Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
@@ -175,7 +173,7 @@ public class ViewController {
 
       addNewProjectButton.setOnAction((ae) -> {
          Log.info("Add new project clicked");
-
+         // TODO somewhat duplicate dialog of create and edit
          final Dialog<Project> dialog = new Dialog<>();
          dialog.setTitle("Create new project");
          dialog.setHeaderText("Create a new project");
@@ -189,6 +187,7 @@ public class ViewController {
 
          grid.add(new Label("Name:"), 0, 0);
          final TextField projectNameTextField = new TextField();
+         projectNameTextField.setPromptText("Projectname");
          grid.add(projectNameTextField, 1, 0);
 
          grid.add(new Label("Color:"), 0, 1);
@@ -198,7 +197,7 @@ public class ViewController {
          grid.add(new Label("IsWork:"), 0, 2);
          final CheckBox isWorkCheckBox = new CheckBox();
          grid.add(isWorkCheckBox, 1, 2);
-
+         // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
          dialog.setResultConverter(dialogButton -> {
@@ -299,12 +298,13 @@ public class ViewController {
                .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
                .getSeconds();
          final long todayWorkingSeconds = calcTodaysWorkSeconds();
+         final long todaySeconds = calcTodaysSeconds();
 
          // update all ui labels
          // TODO do it with bindings (maybe create a viewmodel for this)
          bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
          allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
-         todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(Duration.between(startTime, now).getSeconds()));
+         todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
 
          // Test if needed hours are achieved
          if (todayWorkingSeconds > model.neededWorkSeconds) {
@@ -314,7 +314,7 @@ public class ViewController {
          for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
             final Label label = elapsedProjectTimeLabelMap.get(p);
 
-            final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject() == p)
+            final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject().getId() == p.getId())
                   .mapToLong(work -> {
                      return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
                   }).sum();
@@ -479,24 +479,6 @@ public class ViewController {
             changeProject(p, minusSeconds);
          });
       });
-      final MenuItem renameMenuItem = new MenuItem("Rename");
-      renameMenuItem.setOnAction(e -> {
-         Log.info("Rename");
-
-         final TextInputDialog dialog = new TextInputDialog(p.getName());
-         dialog.setTitle("Rename project");
-         dialog.setHeaderText("Change name '" + p.getName() + "'");
-         dialog.setContentText("Please enter new project name:");
-
-         mainStage.setAlwaysOnTop(false);
-         final Optional<String> result = dialog.showAndWait();
-         mainStage.setAlwaysOnTop(true);
-
-         result.ifPresent(newName -> {
-            controller.renameProject(p, newName);
-            projectNameLabel.setText(newName);
-         });
-      });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setOnAction(e -> {
          Log.info("Delete");
@@ -516,12 +498,12 @@ public class ViewController {
 
       });
 
-      final MenuItem changeColorMenuItem = new MenuItem("Change color");
-      changeColorMenuItem.setOnAction(e -> {
-         Log.info("Change color");
-         final Dialog<Color> dialog = new Dialog<>();
-         dialog.setTitle("Change color");
-         dialog.setHeaderText("Change the projects color");
+      final MenuItem editMenuItem = new MenuItem("Edit");
+      editMenuItem.setOnAction(e -> {
+         Log.info("Edit project");
+         final Dialog<ButtonType> dialog = new Dialog<>();
+         dialog.setTitle("Edit project");
+         dialog.setHeaderText("Edit project '" + p.getName() + "'");
 
          dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
@@ -530,32 +512,46 @@ public class ViewController {
          grid.setVgap(10);
          grid.setPadding(new Insets(20, 150, 10, 10));
 
-         grid.add(new Label("Color:"), 0, 0);
-         final ColorPicker colorPicker = new ColorPicker(p.getColor());
-         grid.add(colorPicker, 1, 0);
+         grid.add(new Label("Name:"), 0, 0);
+         final TextField projectNameTextField = new TextField(p.getName());
+         grid.add(projectNameTextField, 1, 0);
 
+         grid.add(new Label("Color:"), 0, 1);
+         final ColorPicker colorPicker = new ColorPicker(p.getColor());
+         grid.add(colorPicker, 1, 1);
+
+         grid.add(new Label("IsWork:"), 0, 2);
+         final CheckBox isWorkCheckBox = new CheckBox();
+         isWorkCheckBox.setSelected(p.isWork());
+         grid.add(isWorkCheckBox, 1, 2);
+         // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
          dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-               return colorPicker.getValue();
-            }
-            return null;
+            return dialogButton;
          });
+
          mainStage.setAlwaysOnTop(false);
-         final Optional<Color> result = dialog.showAndWait();
+         final Optional<ButtonType> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
 
-         result.ifPresent(newColor -> {
-            controller.changeProjectColor(p, newColor);
-            projectNameLabel.setTextFill(new Color(newColor.getRed() * dimFactor, newColor.getGreen() * dimFactor,
-                  newColor.getBlue() * dimFactor, 1));
+         result.ifPresent(buttonType -> {
+            if (buttonType != ButtonType.OK) {
+               return;
+            }
+            controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(),
+                  isWorkCheckBox.isSelected());
+
+            projectNameLabel.setText(p.getName());
+            projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
+                  p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
          });
+         updateProjectView();
 
       });
 
       // Add MenuItem to ContextMenu
-      contextMenu.getItems().addAll(changeWithTimeMenuItem, deleteMenuItem, renameMenuItem, changeColorMenuItem);
+      contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
    }
@@ -610,7 +606,6 @@ public class ViewController {
    }
 
    private void updateProjectView() {
-      textArea.setText("");
       currentProjectLabel.setText(model.activeWorkItem.get().getProject().getName());
       final Circle circle = new Circle(4);
       circle.setFill(model.activeWorkItem.get().getProject().getColor());
@@ -619,6 +614,12 @@ public class ViewController {
 
    private long calcTodaysWorkSeconds() {
       return model.pastWorkItems.stream().filter((work) -> work.getProject().isWork()).mapToLong((work) -> {
+         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
+      }).sum();
+   }
+
+   private long calcTodaysSeconds() {
+      return model.pastWorkItems.stream().mapToLong((work) -> {
          return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
       }).sum();
    }

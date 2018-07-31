@@ -1,7 +1,6 @@
 package application.controller;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
@@ -68,12 +67,6 @@ public class Controller implements IController {
    }
 
    @Override
-   public Object getDetails(final LocalDate date) {
-      // XXX Auto-generated method stub
-      return null;
-   }
-
-   @Override
    public void setColors(final Object colors) {
       // XXX Auto-generated method stub
 
@@ -86,13 +79,6 @@ public class Controller implements IController {
    }
 
    @Override
-   public void renameProject(final Project p, final String newName) {
-      Log.info("Renaming project '{}' to '{}'", p, newName);
-      p.setName(newName);
-      Main.projectRepo.save(p);
-   }
-
-   @Override
    public void deleteProject(final Project p) {
       Log.info("Disabeling project '{}'.", p);
       p.setEnabled(false);
@@ -101,9 +87,11 @@ public class Controller implements IController {
    }
 
    @Override
-   public void changeProjectColor(final Project p, final Color newColor) {
-      Log.info("Changing project '{}' color to '{}'.", p, newColor);
+   public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork) {
+      Log.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+      p.setName(newName);
       p.setColor(newColor);
+      p.setWork(isWork);
       Main.projectRepo.save(p);
    }
 
