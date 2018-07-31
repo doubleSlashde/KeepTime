@@ -1,7 +1,5 @@
 package application.controller;
 
-import java.time.LocalDate;
-
 import application.model.Project;
 import javafx.scene.paint.Color;
 
@@ -12,8 +10,6 @@ public interface IController {
 
    public void addNewProject(String projectName, boolean isWork, Color projectColor);
 
-   public Object getDetails(LocalDate date);
-
    /**
     * Colors for background and fonts
     */
@@ -21,10 +17,8 @@ public interface IController {
 
    public void shutdown();
 
-   public void renameProject(Project p, String newName);
-
    public void deleteProject(Project p);
 
-   public void changeProjectColor(Project p, Color newColor);
+   public void editProject(Project p, String newName, Color newColor, boolean isWork);
 
 }

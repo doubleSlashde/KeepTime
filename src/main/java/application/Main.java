@@ -71,8 +71,10 @@ public class Main extends Application {
       if (projects.isEmpty()) {
          Log.info("Adding default project");
          projects.add(model.DEFAULT_PROJECT);
-         projectRepo.save(model.DEFAULT_PROJECT); // TODO autosave?
+         projectRepo.save(model.DEFAULT_PROJECT);
       }
+
+      // createProjects();
 
       model.allProjects.addAll(projects);
       model.availableProjects
@@ -103,6 +105,19 @@ public class Main extends Application {
       } catch (final Exception e) {
          e.printStackTrace();
       }
+   }
+
+   private void createProjects() {
+      projectRepo.save(new Project("G&D", Color.BLUE, true));
+      projectRepo.save(new Project("G&D AR", Color.WHITE, true));
+      projectRepo.save(new Project("ZF 3d", Color.PINK, true));
+      projectRepo.save(new Project("Karl Storz", Color.GREEN, true));
+      projectRepo.save(new Project("Fronius", Color.VIOLET, true));
+      projectRepo.save(new Project("Kicker", Color.YELLOW, true));
+      projectRepo.save(new Project("Mitagessen", Color.RED, true));
+      projectRepo.save(new Project("Zeppelin", Color.ORANGE, true));
+      projectRepo.save(new Project("Other", Color.ORANGE, true));
+
    }
 
    private void shutdown() {
