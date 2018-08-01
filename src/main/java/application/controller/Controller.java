@@ -99,7 +99,7 @@ public class Controller implements IController {
    @Override
    public void deleteProject(final Project p) {
       Log.info("Disabeling project '{}'.", p);
-      p.setEnabled(false);
+      p.setEnabled(false); // TODO or can we remove the project? but work references??
       model.availableProjects.remove(p);
       Main.projectRepository.save(p);
    }
