@@ -585,19 +585,21 @@ public class ViewController {
       deleteMenuItem.setOnAction(e -> {
          Log.info("Delete");
 
-         final Alert alert = new Alert(AlertType.WARNING);
+         final Alert alert = new Alert(AlertType.CONFIRMATION);
          alert.setTitle("Delete project");
          alert.setHeaderText("Delete project '" + p.getName() + "'.");
-         alert.setContentText("You sure?");
+         alert.setContentText(
+               "The project will just be hidden from display, as there may be work references to this project.");
 
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = alert.showAndWait();
          mainStage.setAlwaysOnTop(true);
 
-         if (result.get() == ButtonType.OK) {
-            controller.deleteProject(p);
-         }
-
+         result.ifPresent(res -> {
+            if (result.get() == ButtonType.OK) {
+               controller.deleteProject(p);
+            }
+         });
       });
 
       final MenuItem editMenuItem = new MenuItem("Edit");
