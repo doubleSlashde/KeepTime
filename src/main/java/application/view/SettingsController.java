@@ -83,6 +83,10 @@ public class SettingsController {
       this.model = model;
       this.controller = controller;
 
+      update();
+   }
+
+   void update() {
       hoverBackgroundColor.setValue(model.hoverBackgroundColor.get());
       hoverFontColor.setValue(model.hoverFontColor.get());
 

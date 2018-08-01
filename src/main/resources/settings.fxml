@@ -12,29 +12,6 @@
    <children>
       <VBox spacing="10.0">
          <children>
-            <Group>
-               <children>
-                  <VBox>
-                     <children>
-                        <Label text="Hover" />
-                        <HBox spacing="10.0">
-                           <children>
-                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background" />
-                              <ColorPicker fx:id="hoverBackgroundColor" />
-                              <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" text="Reset" />
-                           </children>
-                        </HBox>
-                        <HBox spacing="10.0">
-                           <children>
-                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
-                              <ColorPicker fx:id="hoverFontColor" />
-                              <Button fx:id="resetHoverFontButton" mnemonicParsing="false" text="Reset" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
-               </children>
-            </Group>
             <Group layoutX="10.0" layoutY="10.0">
                <children>
                   <VBox>
@@ -52,6 +29,29 @@
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
                               <ColorPicker fx:id="defaultFontColor" />
                               <Button fx:id="resetDefaultFontButton" mnemonicParsing="false" text="Reset" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Group>
+            <Group>
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Hover" />
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background" />
+                              <ColorPicker fx:id="hoverBackgroundColor" />
+                              <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" text="Reset" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                              <ColorPicker fx:id="hoverFontColor" />
+                              <Button fx:id="resetHoverFontButton" mnemonicParsing="false" text="Reset" />
                            </children>
                         </HBox>
                      </children>
