@@ -223,6 +223,7 @@ public class ViewController {
       settingsButton.setOnAction((ae) -> {
          Log.info("Settings clicked");
          this.mainStage.setAlwaysOnTop(false);
+         settingsController.update();
          settingsStage.show();
       });
 
@@ -391,6 +392,7 @@ public class ViewController {
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportStage.setScene(new Scene(sceneRoot));
          reportStage.setTitle("Report");
+         reportStage.setResizable(false);
          reportStage.setOnHiding(e -> {
             this.mainStage.setAlwaysOnTop(true);
          });
@@ -404,6 +406,7 @@ public class ViewController {
          settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
+         settingsStage.setResizable(false);
          settingsStage.setScene(new Scene(root1));
          settingsStage.setOnHiding(e -> {
             this.mainStage.setAlwaysOnTop(true);
@@ -484,8 +487,8 @@ public class ViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          Log.info("Change with time");
          final Dialog<Integer> dialog = new Dialog<>();
-         dialog.setTitle("Change project with time");
-         dialog.setHeaderText("Choose the time to subtract");
+         dialog.setTitle("Change project with time transfer");
+         dialog.setHeaderText("Choose the time to transfer");
          dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
          final VBox vBox = new VBox();
@@ -498,8 +501,8 @@ public class ViewController {
          grid.setHgap(10);
          grid.setVgap(10);
          grid.setPadding(new Insets(20, 150, 10, 10));
-
-         grid.add(new Label("Minutes to transfer"), 0, 0);
+         int gridRow = 0;
+         grid.add(new Label("Minutes to transfer"), 0, gridRow);
          final Slider slider = new Slider();
          slider.setMin(0);
          slider.maxProperty().bind(Bindings.createLongBinding(() -> {
@@ -518,15 +521,20 @@ public class ViewController {
          slider.setMinorTickCount(58);
          slider.setBlockIncrement(1);
          slider.setSnapToTicks(true);
-         grid.add(slider, 1, 0);
+         grid.add(slider, 1, gridRow);
+         gridRow++;
 
-         grid.add(new Label("Active project: " + model.activeWorkItem.get().getProject().getName()), 0, 1);
+         grid.add(new Label("New time distribution"), 0, gridRow);
+         gridRow++;
+         grid.add(new Label("Active project: " + model.activeWorkItem.get().getProject().getName()), 0, gridRow);
          final Label currentProjectTimeLabel = new Label("00:00:00");
-         grid.add(currentProjectTimeLabel, 1, 1);
+         grid.add(currentProjectTimeLabel, 1, gridRow);
+         gridRow++;
 
-         grid.add(new Label("New project: " + p.getName()), 0, 2);
+         grid.add(new Label("New project: " + p.getName()), 0, gridRow);
          final Label newProjectTimeLabel = new Label("00:00:00");
-         grid.add(newProjectTimeLabel, 1, 2);
+         grid.add(newProjectTimeLabel, 1, gridRow);
+         gridRow++;
 
          final Runnable updateLabelsRunnable = () -> {
             final long minutesOffset = slider.valueProperty().longValue();
@@ -698,19 +706,13 @@ public class ViewController {
    }
 
    public static String changeStyleAttribute(final String style, final String attribute, final String newValue) {
-
       String newStyle = "";
-      // Log.info("Old style {}", style);
       final String newStyleAttribute = "-" + attribute + ": " + newValue + "; ";
       if (style.contains(attribute)) {
-         // Log.info("replacing");
          newStyle = style.replaceAll("-" + attribute + ": " + "[^;]+;", newStyleAttribute);
       } else {
-         // Log.info("adding");
          newStyle = style + newStyleAttribute;
       }
-
-      // Log.info("new style: {}", newStyle);
 
       return newStyle;
    }

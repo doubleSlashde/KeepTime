@@ -90,6 +90,8 @@ public class Main extends Application {
       Log.info("Found {} past work items", todaysWorkItems.size());
       model.pastWorkItems.addAll(todaysWorkItems);
 
+      // createProjects();
+
       final List<Project> projects = projectRepository.findAll();
 
       Log.debug("Found '{}' projects", projects.size());
@@ -98,8 +100,6 @@ public class Main extends Application {
          projects.add(model.DEFAULT_PROJECT);
          projectRepository.save(model.DEFAULT_PROJECT);
       }
-
-      // createProjects();
 
       model.allProjects.addAll(projects);
       model.availableProjects
@@ -129,11 +129,10 @@ public class Main extends Application {
       projectRepository.save(new Project("ZF 3d", Color.PINK, true));
       projectRepository.save(new Project("Karl Storz", Color.GREEN, true));
       projectRepository.save(new Project("Fronius", Color.VIOLET, true));
-      projectRepository.save(new Project("Kicker", Color.YELLOW, true));
+      projectRepository.save(new Project("Kicker", Color.YELLOW, false));
       projectRepository.save(new Project("Mitagessen", Color.RED, true));
       projectRepository.save(new Project("Zeppelin", Color.ORANGE, true));
       projectRepository.save(new Project("Other", Color.ORANGE, true));
-
    }
 
    private void shutdown() {
@@ -162,9 +161,10 @@ public class Main extends Application {
 
          primaryStage.setTitle("KeepTime");
          primaryStage.setScene(loginScene);
-         // Give the controller access to the main app.
          primaryStage.setAlwaysOnTop(true);
+         primaryStage.setResizable(false);
          viewController = loader.getController();
+         // Give the controller access to the main app.
          viewController.setStage(primaryStage);
 
          controller = new Controller(model);

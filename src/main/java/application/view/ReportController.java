@@ -20,8 +20,8 @@ import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -29,7 +29,7 @@ import javafx.util.Callback;
 
 public class ReportController {
    @FXML
-   private HBox topHBox;
+   private BorderPane topBorderPane;
 
    @FXML
    private Label currentDayLabel;
@@ -80,7 +80,8 @@ public class ReportController {
       final Node popupContent = datePickerSkin.getPopupContent();
 
       // root.setCenter(popupContent);
-      topHBox.getChildren().add(popupContent);
+      // topBorderPane.getChildren().add(popupContent);
+      topBorderPane.setRight(popupContent);
    }
 
    long currentWorkSeconds = 0;
