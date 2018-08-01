@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="pane" prefHeight="175.0" prefWidth="429.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.view.ViewController">
+<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.view.ViewController">
    <children>
       <HBox layoutX="5.0" layoutY="-15.0">
          <children>
@@ -34,7 +34,7 @@
             </VBox>
             <Group>
                <children>
-                  <Label fx:id="currentProjectLabel" alignment="CENTER" layoutX="4.0" layoutY="110.0" prefHeight="2.0" prefWidth="286.0" text="Kardex">
+                  <Label fx:id="currentProjectLabel" alignment="CENTER" layoutX="4.0" layoutY="108.0" prefHeight="2.0" prefWidth="286.0" text="Kardex">
                      <font>
                         <Font size="29.0" />
                      </font>
@@ -90,11 +90,11 @@
                         <Font size="14.0" />
                      </font>
                   </TextArea>
+                  <Button fx:id="minimizeButton" layoutX="248.0" layoutY="2.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt" text="_" />
+                  <Button fx:id="closeButton" layoutX="268.0" layoutY="6.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt" text="x" />
                </children>
             </Group>
          </children>
       </HBox>
-      <Button fx:id="minimizeButton" layoutX="374.0" layoutY="-12.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt" text="_" />
-      <Button fx:id="closeButton" layoutX="396.0" layoutY="-7.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt" text="x" />
    </children>
 </Pane>

@@ -77,10 +77,11 @@
             </Label>
             <ScrollPane prefHeight="300.0" prefWidth="500.0">
                <content>
-                  <GridPane fx:id="gridPane" gridLinesVisible="true" prefWidth="498.0">
+                  <GridPane fx:id="gridPane" prefWidth="498.0">
                     <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="349.0" minWidth="10.0" prefWidth="349.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="243.0" minWidth="10.0" prefWidth="149.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="349.0" minWidth="10.0" prefWidth="290.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="243.0" minWidth="10.0" prefWidth="131.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="243.0" minWidth="10.0" prefWidth="77.0" />
                     </columnConstraints>
                     <rowConstraints>
                       <RowConstraints maxHeight="57.0" minHeight="4.0" prefHeight="26.0" vgrow="SOMETIMES" />
@@ -89,6 +90,21 @@
                         <RowConstraints maxHeight="190.0" minHeight="0.0" prefHeight="19.0" vgrow="SOMETIMES" />
                         <RowConstraints maxHeight="226.0" minHeight="10.0" prefHeight="127.0" vgrow="SOMETIMES" />
                     </rowConstraints>
+                     <children>
+                        <Label text="99:99:99" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="375.0" layoutY="39.0" text="99:99:99 - 99:99:99" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
                   </GridPane>
                </content>
             </ScrollPane>

@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 
 public class DateFormatter {
    private static DateTimeFormatter dayDateFormatter = DateTimeFormatter.ofPattern("eeee dd.MM.yyyy");
+   private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
    public static String secondsToHHMMSS(final long currentWorkSeconds) {
       final int hours = (int) (currentWorkSeconds / 3600);
@@ -25,6 +26,10 @@ public class DateFormatter {
 
    public static String toDayDateString(final LocalDate newvalue) {
       return newvalue.format(dayDateFormatter);
+   }
+
+   public static String toTimeString(final LocalDateTime localDateTime) {
+      return localDateTime.format(timeFormatter);
    }
 
 }
