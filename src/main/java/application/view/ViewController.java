@@ -167,7 +167,19 @@ public class ViewController {
       textArea.setWrapText(true);
       textArea.setEditable(false);
       textArea.editableProperty().bind(mouseHoveringProperty);
-      projectsVBox.visibleProperty().bind(mouseHoveringProperty);
+
+      // reposition window if projects are hidden (as anchor is top left)
+      mouseHoveringProperty.addListener((a, b, c) -> {
+         // TODO fix the not so nice jumping..
+         // TODO make side configurable? if user wants to have it in top left corner, projects should appear right?
+         projectsVBox.setManaged(c);
+         final double beforeWidth = Main.stage.getWidth();
+         Main.stage.sizeToScene();
+         final double afterWidth = Main.stage.getWidth();
+         projectsVBox.setVisible(c);
+         final double offset = afterWidth - beforeWidth;
+         Main.stage.setX(Main.stage.getX() - offset);
+      });
 
       minimizeButton.setOnAction((ae) -> {
          Main.stage.setIconified(true);

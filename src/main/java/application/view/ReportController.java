@@ -19,15 +19,15 @@ import javafx.scene.Node;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 
 public class ReportController {
+   private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #ffc0cb;";
+
    @FXML
    private BorderPane topBorderPane;
 
@@ -60,8 +60,8 @@ public class ReportController {
                   super.updateItem(item, empty);
                   if (Main.workRepository.findByCreationDate(item).isEmpty()) {
                      setDisable(true);
-                     setStyle("-fx-background-color: #ffc0cb;");
-                     setTooltip(new Tooltip("You did not work here. Lazy!"));// may only work if enabled
+                     setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
+                     // setTooltip(new Tooltip("You did not work here. Lazy!"));// may only work if enabled
                   }
                }
             };
@@ -97,6 +97,7 @@ public class ReportController {
 
       gridPane.getChildren().clear();
       gridPane.getRowConstraints().clear();
+      // gridPane.getColumnConstraints().clear();
 
       int rowIndex = 0;
       currentWorkSeconds = 0;
@@ -108,6 +109,7 @@ public class ReportController {
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
+         // TODO sort projects by name?
 
          final long todaysWorkSeconds = onlyCurrentProjectWork.stream().mapToLong(work -> {
             return DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime());
@@ -120,11 +122,8 @@ public class ReportController {
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
          workedTimeLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
-         gridPane.add(workedTimeLabel, 1, rowIndex);
+         gridPane.add(workedTimeLabel, 2, rowIndex);
          rowIndex++;
-         final RowConstraints row1 = new RowConstraints(17, 17, 17);
-         // row1.setVgrow(Priority.ALWAYS);
-         // gridPane.getRowConstraints().add(row1);
 
          for (int j = 0; j < onlyCurrentProjectWork.size(); j++) {
             final Work work = onlyCurrentProjectWork.get(j);
@@ -136,14 +135,17 @@ public class ReportController {
             commentLabel.setWrapText(true);
             gridPane.add(commentLabel, 0, rowIndex);
 
+            // TODO add from till
+            final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
+                  + DateFormatter.toTimeString(work.getEndTime()));
+            fromTillLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            fromTillLabel.setWrapText(true);
+            gridPane.add(fromTillLabel, 1, rowIndex);
+
             final Label workedHoursLabel = new Label(workedHours);
             workedHoursLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
-            gridPane.add(workedHoursLabel, 1, rowIndex);
+            gridPane.add(workedHoursLabel, 2, rowIndex);
 
-            final RowConstraints row2 = new RowConstraints(15, 15, 15);
-
-            // row2.setVgrow(Priority.ALWAYS);
-            // gridPane.getRowConstraints().add(row2);
             rowIndex++;
          }
       }
