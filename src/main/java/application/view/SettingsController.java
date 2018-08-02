@@ -3,7 +3,7 @@ package application.view;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import application.controller.IController;
+import application.controller.Controller;
 import application.model.Model;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -44,7 +44,7 @@ public class SettingsController {
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    private Model model;
-   private IController controller;
+   private Controller controller;
    private Stage thisStage;
 
    @FXML
@@ -79,7 +79,7 @@ public class SettingsController {
       });
    }
 
-   public void setModelAndController(final Model model, final IController controller) {
+   public void setModelAndController(final Model model, final Controller controller) {
       this.model = model;
       this.controller = controller;
 

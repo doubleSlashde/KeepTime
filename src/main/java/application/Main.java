@@ -14,7 +14,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import application.common.Resources;
 import application.common.Resources.RESOURCE;
 import application.controller.Controller;
-import application.controller.IController;
 import application.model.Model;
 import application.model.Project;
 import application.model.Settings;
@@ -40,8 +39,8 @@ public class Main extends Application {
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
-   public final static Model model = new Model();
-   private IController controller;
+   public static Model model;
+   private Controller controller;
 
    public static ProjectRepository projectRepository;
 
@@ -58,6 +57,7 @@ public class Main extends Application {
       stage = primaryStage;
 
       Log.debug("Reading configuration");
+      model = springContext.getBean(Model.class);
 
       projectRepository = springContext.getBean(ProjectRepository.class);
       workRepository = springContext.getBean(WorkRepository.class);
@@ -113,7 +113,15 @@ public class Main extends Application {
       }
 
       primaryStage.setOnHiding((we) -> {
-         shutdown();
+         // shutdown();
+      });
+
+      Runtime.getRuntime().addShutdownHook(new Thread() {
+         @Override
+         public void run() {
+            // TODO this does not work - spring uses own hooks and may already be shutdown
+            // shutdown();
+         }
       });
 
       try {
@@ -137,8 +145,8 @@ public class Main extends Application {
 
    private void shutdown() {
       Log.info("Shutting down");
-      viewController.changeProject(model.idleProject, 0); // TODO not so nice (view has the comments for the current
-                                                          // job)
+      // viewController.changeProject(model.idleProject, 0); // TODO not so nice (view has the comments for the current
+      // // job)
       controller.shutdown();
    }
 
@@ -167,7 +175,8 @@ public class Main extends Application {
          // Give the controller access to the main app.
          viewController.setStage(primaryStage);
 
-         controller = new Controller(model);
+         controller = springContext.getBean(Controller.class, model);
+
          viewController.setController(controller, model);
 
          primaryStage.show();

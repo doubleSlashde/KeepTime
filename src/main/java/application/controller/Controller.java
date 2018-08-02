@@ -4,8 +4,11 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javax.annotation.PreDestroy;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import application.Main;
 import application.common.DateFormatter;
@@ -15,7 +18,8 @@ import application.model.Settings;
 import application.model.Work;
 import javafx.scene.paint.Color;
 
-public class Controller implements IController {
+@Service
+public class Controller {
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
@@ -26,19 +30,19 @@ public class Controller implements IController {
 
    }
 
-   @Override
-   public void changeProject(final Project newProject, final String notes) {
-      changeProject(newProject, notes, 0);
+   public void changeProject(final Project newProject) {
+      changeProject(newProject, 0);
    }
 
-   @Override
-   public void changeProject(final Project newProject, final String notes, final long minusSeconds) {
+   public void changeProject(final Project newProject, final long minusSeconds) {
+      // TODO consider day change (clean workRepo, ...)
+
       final Work currentWork = model.activeWorkItem.get();
 
       final LocalDateTime now = LocalDateTime.now().minusSeconds(minusSeconds);
       if (currentWork != null) {
          currentWork.setEndTime(now);
-         currentWork.setNotes(notes);
+         // currentWork.setNotes(notes);
          if (currentWork.getNotes().isEmpty()) {
             currentWork.setNotes("- No notes -");
          }
@@ -59,7 +63,6 @@ public class Controller implements IController {
       model.activeWorkItem.set(work);
    }
 
-   @Override
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor) {
       final Project project = new Project(projectName, projectColor, isWork, false);
       model.allProjects.add(project);
@@ -68,7 +71,6 @@ public class Controller implements IController {
       Main.projectRepository.save(project);
    }
 
-   @Override
    public void setColors(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor) {
       // TODO what is this mess :)
@@ -90,13 +92,13 @@ public class Controller implements IController {
       model.taskBarColor.set(settings.getTaskBarColor());
    }
 
-   @Override
+   @PreDestroy
    public void shutdown() {
       // XXX Auto-generated method stub
-
+      Log.info("Controller shutdown");
+      changeProject(model.idleProject, 0); // TODO get notes from view
    }
 
-   @Override
    public void deleteProject(final Project p) {
       Log.info("Disabeling project '{}'.", p);
       p.setEnabled(false); // TODO or can we remove the project? but work references??
@@ -104,7 +106,6 @@ public class Controller implements IController {
       Main.projectRepository.save(p);
    }
 
-   @Override
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork) {
       Log.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
       p.setName(newName);
@@ -113,10 +114,16 @@ public class Controller implements IController {
       Main.projectRepository.save(p);
    }
 
+   public void setComment(final String notes) {
+      final Work work = model.activeWorkItem.get();
+      work.setNotes(notes);
+      // TODO when to save to repo??
+      // Main.workRepository.save(work);
+   }
+
    /**
     * Calculate todays seconds counted as work
     */
-   @Override
    public long calcTodaysWorkSeconds() {
 
       return model.pastWorkItems.stream().filter((work) -> {
@@ -138,7 +145,6 @@ public class Controller implements IController {
    /**
     * Calculate todays present seconds (work+nonWork)
     */
-   @Override
    public long calcTodaysSeconds() {
       return model.pastWorkItems.stream().mapToLong((work) -> {
          return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
