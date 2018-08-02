@@ -569,7 +569,7 @@ public class ViewController {
 
          dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
-               return slider.valueProperty().intValue();
+               return slider.valueProperty().intValue() * 60;
             }
             return null;
          });
@@ -681,7 +681,7 @@ public class ViewController {
 
    private void updateTaskbarIcon(final long currentWorkSeconds) {
       // update taskbar icon
-      final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D(); // TODO save instance????
+      final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
 
       gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
       gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
