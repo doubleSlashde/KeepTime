@@ -1,11 +1,14 @@
 package application.model;
 
+import org.springframework.stereotype.Component;
+
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
+@Component
 public class Model {
    public static final Color originalHoverBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., .1);
    public static final Color originalHoverFontColor = Color.BLACK;

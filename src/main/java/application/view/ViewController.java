@@ -18,7 +18,7 @@ import application.common.ColorHelper;
 import application.common.DateFormatter;
 import application.common.Resources;
 import application.common.Resources.RESOURCE;
-import application.controller.IController;
+import application.controller.Controller;
 import application.model.Model;
 import application.model.Project;
 import application.model.Work;
@@ -120,10 +120,10 @@ public class ViewController {
 
    Delta dragDelta = new Delta();
 
-   IController controller;
+   Controller controller;
    Model model;
 
-   public void setController(final IController controller, final Model model) {
+   public void setController(final Controller controller, final Model model) {
       this.controller = controller;
       this.model = model;
 
@@ -134,7 +134,7 @@ public class ViewController {
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      controller.changeProject(newProject, textArea.getText(), minusSeconds);
+      controller.changeProject(newProject, minusSeconds);
       updateProjectView();
       textArea.setText("");
    }
@@ -167,6 +167,10 @@ public class ViewController {
       textArea.setWrapText(true);
       textArea.setEditable(false);
       textArea.editableProperty().bind(mouseHoveringProperty);
+
+      textArea.textProperty().addListener((a, b, c) -> {
+         controller.setComment(textArea.getText());
+      });
 
       // reposition window if projects are hidden (as anchor is top left)
       mouseHoveringProperty.addListener((a, b, c) -> {
