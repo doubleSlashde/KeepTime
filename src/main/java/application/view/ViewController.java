@@ -302,6 +302,11 @@ public class ViewController {
                projectSelectionNodeMap.put(project, node);
             }
          }
+
+         model.activeWorkItem.addListener((a, b, c) -> {
+            updateProjectView();
+         });
+
          model.availableProjects.addListener((ListChangeListener<Project>) lis -> {
             while (lis.next()) {
                if (lis.wasAdded()) {

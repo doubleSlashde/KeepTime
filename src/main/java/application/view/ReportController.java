@@ -19,6 +19,7 @@ import javafx.scene.Node;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -40,6 +41,8 @@ public class ReportController {
 
    @FXML
    private GridPane gridPane;
+   @FXML
+   private ScrollPane scrollPane;
 
    private DatePicker datePicker;
 
@@ -149,7 +152,7 @@ public class ReportController {
             rowIndex++;
          }
       }
-      gridPane.setGridLinesVisible(true);
+      scrollPane.setVvalue(0); // scroll to the top
 
       currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));

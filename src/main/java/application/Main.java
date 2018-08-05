@@ -1,5 +1,6 @@
 package application;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,13 +23,18 @@ import application.model.repos.ProjectRepository;
 import application.model.repos.SettingsRepository;
 import application.model.repos.WorkRepository;
 import application.view.ViewController;
+import application.viewPopup.GlobalScreenListener;
+import application.viewPopup.ViewControllerPopup;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 @SpringBootApplication
 public class Main extends Application {
@@ -36,6 +42,7 @@ public class Main extends Application {
    private ConfigurableApplicationContext springContext;
 
    public static Stage stage;
+   Stage popupViewStage;
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
@@ -114,6 +121,7 @@ public class Main extends Application {
 
       primaryStage.setOnHiding((we) -> {
          // shutdown();
+         popupViewStage.close();
       });
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -129,6 +137,41 @@ public class Main extends Application {
       } catch (final Exception e) {
          e.printStackTrace();
       }
+
+      try {
+         initialisePopupUI(primaryStage);
+      } catch (final Exception e) {
+         e.printStackTrace();
+      }
+   }
+
+   GlobalScreenListener globalScreenListener;
+
+   private void initialisePopupUI(final Stage primaryStage) throws IOException {
+      // TODO register only if it is enabled
+      globalScreenListener = new GlobalScreenListener();
+      // TODO stop and close stage when main stage is shutdown
+
+      // Platform.setImplicitExit(false); // TODO maybe not needed as other view will be available
+      popupViewStage = new Stage();
+      popupViewStage.initOwner(primaryStage);
+      // Load root layout from fxml file.
+      final FXMLLoader loader = new FXMLLoader();
+      loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_POPUP_LAYOUT));
+      final Parent popupLayout = loader.load();
+      popupViewStage.initStyle(StageStyle.TRANSPARENT);
+      // Show the scene containing the root layout.
+      final Scene popupScene = new Scene(popupLayout, Color.TRANSPARENT);
+
+      popupViewStage.setResizable(false);
+      popupViewStage.setScene(popupScene);
+      // Give the controller access to the main app.
+      popupViewStage.setAlwaysOnTop(true);
+      final ViewControllerPopup viewControllerPopupController = loader.getController();
+      viewControllerPopupController.setStage(popupViewStage, popupScene);
+      viewControllerPopupController.setController(controller, model);
+      globalScreenListener.setViewController(viewControllerPopupController);
+
    }
 
    private void createProjects() {
@@ -154,23 +197,33 @@ public class Main extends Application {
 
    private void initialiseUI(final Stage primaryStage) {
       try {
-         Pane loginLayout;
+         Pane mainPane;
 
          // Load root layout from fxml file.
          final FXMLLoader loader = new FXMLLoader();
          loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
          loader.setControllerFactory(springContext::getBean);
-         loginLayout = loader.load();
+         mainPane = loader.load();
          primaryStage.initStyle(StageStyle.TRANSPARENT);
          // Show the scene containing the root layout.
-         final Scene loginScene = new Scene(loginLayout, Color.TRANSPARENT);
+         final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
          // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          primaryStage.setTitle("KeepTime");
-         primaryStage.setScene(loginScene);
+         primaryStage.setScene(mainScene);
          primaryStage.setAlwaysOnTop(true);
          primaryStage.setResizable(false);
+
+         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(final WindowEvent event) {
+               Log.info("On close request");
+               // shutdown();
+               // Platform.exit();
+            }
+         });
+
          viewController = loader.getController();
          // Give the controller access to the main app.
          viewController.setStage(primaryStage);

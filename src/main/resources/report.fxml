@@ -75,7 +75,7 @@
                   <Font size="16.0" />
                </font>
             </Label>
-            <ScrollPane prefHeight="300.0" prefWidth="500.0">
+            <ScrollPane fx:id="scrollPane" prefHeight="300.0" prefWidth="500.0">
                <content>
                   <GridPane fx:id="gridPane" prefWidth="498.0">
                     <columnConstraints>
