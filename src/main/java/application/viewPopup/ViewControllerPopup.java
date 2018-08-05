@@ -180,9 +180,10 @@ public class ViewControllerPopup {
          projectListView.getSelectionModel().select(0);
          projectListView.refresh();
 
-         stage.setX(mouseLocation.getX());
-         stage.setY(mouseLocation.getY());
+         stage.setX(mouseLocation.getX() - 2);
+         stage.setY(mouseLocation.getY() - 2);
          stage.show();
+         stage.requestFocus();
          searchTextField.requestFocus();
 
          // simulate a mouse click on title bar of window
@@ -202,19 +203,19 @@ public class ViewControllerPopup {
          // alert.show();
          // TODO the window wont get active -> no focus
          Platform.runLater(() -> {
-            stage.requestFocus();
-            stage.setAlwaysOnTop(false);
-            stage.setAlwaysOnTop(true);
-            stage.setAlwaysOnTop(false);
-            stage.toFront();
-            stage.setAlwaysOnTop(true);
+            // stage.requestFocus();
+            // stage.setAlwaysOnTop(false);
+            // stage.setAlwaysOnTop(true);
+            // stage.setAlwaysOnTop(false);
+            // stage.toFront();
+            // stage.setAlwaysOnTop(true);
             // stage.setIconified(true);
             // Platform.runLater(() -> {
             // stage.setIconified(false);
             // });
-            final Stage stage2 = new Stage();
-            stage2.setTitle("666");
-            stage2.show();
+            // final Stage stage2 = new Stage();
+            // stage2.setTitle("666");
+            // stage2.show();
          });
       }
    }
