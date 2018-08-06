@@ -6,8 +6,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.javafx.scene.control.skin.LabeledText;
-
 import application.controller.Controller;
 import application.model.Model;
 import application.model.Project;
@@ -15,7 +13,6 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
@@ -78,12 +75,6 @@ public class ViewControllerPopup {
 
             };
          }
-      });
-
-      projectListView.setOnMouseClicked((ev) -> {
-         System.out.println(ev.toString());
-         final EventTarget target = ev.getTarget();
-         System.out.println(target instanceof LabeledText);
       });
 
       searchTextField.textProperty().addListener((a, b, newValue) -> {

@@ -82,6 +82,7 @@ public class Main extends Application {
 
          settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
          settings.setHoverFontColor(model.hoverFontColor.get());
+         settings.setUseHotkey(false);
          settingsRepository.save(settings);
       } else {
          settings = settingsList.get(0);
@@ -92,6 +93,7 @@ public class Main extends Application {
       model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
       model.hoverFontColor.set(settings.getHoverFontColor());
       model.taskBarColor.set(settings.getTaskBarColor());
+      model.useHotkey.set(settings.isUseHotkey());
 
       final List<Work> todaysWorkItems = workRepository.findByCreationDate(LocalDate.now());
       Log.info("Found {} past work items", todaysWorkItems.size());
@@ -122,6 +124,7 @@ public class Main extends Application {
       primaryStage.setOnHiding((we) -> {
          // shutdown();
          popupViewStage.close();
+         globalScreenListener.register(false); // deregister, as this will keep app running
       });
 
       Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -151,6 +154,10 @@ public class Main extends Application {
       // TODO register only if it is enabled
       globalScreenListener = new GlobalScreenListener();
       // TODO stop and close stage when main stage is shutdown
+      model.useHotkey.addListener((a, b, newValue) -> {
+         globalScreenListener.register(newValue);
+      });
+      globalScreenListener.register(model.useHotkey.get());
 
       // Platform.setImplicitExit(false); // TODO maybe not needed as other view will be available
       popupViewStage = new Stage();

@@ -7,6 +7,7 @@ import application.controller.Controller;
 import application.model.Model;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.stage.Stage;
 
@@ -36,6 +37,9 @@ public class SettingsController {
    private Button resetTaskBarFontButton;
 
    @FXML
+   private CheckBox useHotkeyCheckBox;
+
+   @FXML
    private Button saveButton;
 
    @FXML
@@ -52,8 +56,9 @@ public class SettingsController {
 
       saveButton.setOnAction(ae -> {
          Log.info("Save clicked");
-         controller.setColors(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
-               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue());
+         controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
+               useHotkeyCheckBox.isSelected());
          thisStage.close();
       });
 
@@ -77,6 +82,7 @@ public class SettingsController {
       resetTaskBarFontButton.setOnAction(ae -> {
          taskBarColor.setValue(Model.originalTaskBarFontColor);
       });
+
    }
 
    public void setModelAndController(final Model model, final Controller controller) {
@@ -94,6 +100,8 @@ public class SettingsController {
       defaultFontColor.setValue(model.defaultFontColor.get());
 
       taskBarColor.setValue(model.taskBarColor.get());
+
+      useHotkeyCheckBox.setSelected(model.useHotkey.get());
    }
 
    public void setStage(final Stage thisStage) {

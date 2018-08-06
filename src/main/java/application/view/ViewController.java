@@ -335,6 +335,7 @@ public class ViewController {
          model.hoverBackgroundColor.addListener((a, b, c) -> {
             updateMainBackgroundColor.run();
          });
+         updateMainBackgroundColor.run();
       });
 
       pane.setOnMouseEntered((a) -> {
@@ -363,8 +364,8 @@ public class ViewController {
          return DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get());
       }, activeWorkSecondsProperty));
 
+      // update ui each second
       Interval.registerCallBack(() -> {
-         // update ui each second
 
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
