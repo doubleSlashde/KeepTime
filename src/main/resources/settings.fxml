@@ -2,6 +2,7 @@
 
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -68,6 +69,22 @@
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
                               <ColorPicker fx:id="taskBarColor" />
                               <Button fx:id="resetTaskBarFontButton" mnemonicParsing="false" text="Reset" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Group>
+            <Group layoutX="10.0" layoutY="166.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <Label text="Hotkey" />
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Use Hotkey" />
+                              <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey" />
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" disable="true" layoutX="10.0" layoutY="10.0" prefWidth="100.0" text="(global keylogger!)" />
                            </children>
                         </HBox>
                      </children>

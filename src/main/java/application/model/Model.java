@@ -34,5 +34,6 @@ public class Model {
    public ObjectProperty<Color> hoverFontColor = new SimpleObjectProperty<>(originalHoverFontColor);
    public ObjectProperty<Color> defaultBackgroundColor = new SimpleObjectProperty<>(originalDefaultBackgroundColor);
    public ObjectProperty<Color> defaultFontColor = new SimpleObjectProperty<>(originalDefaultFontColor);
+   public ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
 
 }

@@ -71,9 +71,10 @@ public class Controller {
       Main.projectRepository.save(project);
    }
 
-   public void setColors(final Color hoverBackgroundColor, final Color hoverFontColor,
-         final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor) {
-      // TODO what is this mess :)
+   public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
+         final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
+         final boolean useHotkey) {
+      // TODO create holder for all the properties (or reuse Settings.class?)
       final Settings settings = Main.settingsRepository.findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
 
@@ -82,6 +83,7 @@ public class Controller {
 
       settings.setHoverBackgroundColor(hoverBackgroundColor);
       settings.setHoverFontColor(hoverFontColor);
+      settings.setUseHotkey(useHotkey);
 
       Main.settingsRepository.save(settings);
 
@@ -90,6 +92,7 @@ public class Controller {
       model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
       model.hoverFontColor.set(settings.getHoverFontColor());
       model.taskBarColor.set(settings.getTaskBarColor());
+      model.useHotkey.set(settings.isUseHotkey());
    }
 
    @PreDestroy

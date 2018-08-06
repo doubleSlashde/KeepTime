@@ -17,23 +17,36 @@ import org.slf4j.LoggerFactory;
 import javafx.application.Platform;
 
 public class GlobalScreenListener implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener {
+   private static final int SMALLER_KEY = 226;
+
+   private static final int LEFT_CTRL = 162;
+
    private final org.slf4j.Logger Log = LoggerFactory.getLogger(this.getClass());
 
    private ViewControllerPopup viewController;
 
    public GlobalScreenListener() {
-      try {
-         GlobalScreen.registerNativeHook();
-      } catch (final NativeHookException ex) {
-         Log.error("Could not register native hooks.", ex);
-      }
+
       setGlobalScreenLogLevel();
 
       GlobalScreen.addNativeKeyListener(this);
       GlobalScreen.addNativeMouseListener(this);
       GlobalScreen.addNativeMouseMotionListener(this);
       GlobalScreen.addNativeMouseWheelListener(this);
+   }
 
+   public void register(final boolean register) {
+      try {
+         if (register) {
+            Log.info("Registering native hook");
+            GlobalScreen.registerNativeHook();
+         } else {
+            Log.info("Unregistering native hook");
+            GlobalScreen.unregisterNativeHook();
+         }
+      } catch (final NativeHookException ex) {
+         Log.error("Error whill (un)registering natvice hooks.", ex);
+      }
    }
 
    public void setGlobalScreenLogLevel() {
@@ -57,13 +70,13 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
 
    @Override
    public void nativeKeyPressed(final NativeKeyEvent e) {
-      final String keyText = NativeKeyEvent.getKeyText(e.getKeyCode());
+      // TODO find better hotkey - maybe configurable?
 
-      switch (e.getKeyCode()) {
-      case NativeKeyEvent.VC_CONTROL:
+      switch (e.getRawCode()) {
+      case LEFT_CTRL:
          controllPressed = true;
          break;
-      case NativeKeyEvent.VC_SHIFT:
+      case 226:
          shiftPressed = true;
          break;
       default:
@@ -78,11 +91,11 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
 
    @Override
    public void nativeKeyReleased(final NativeKeyEvent e) {
-      switch (e.getKeyCode()) {
-      case NativeKeyEvent.VC_CONTROL:
+      switch (e.getRawCode()) {
+      case LEFT_CTRL:
          controllPressed = false;
          break;
-      case NativeKeyEvent.VC_SHIFT:
+      case SMALLER_KEY:
          shiftPressed = false;
          break;
       default:

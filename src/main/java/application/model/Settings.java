@@ -37,6 +37,8 @@ public class Settings {
    @Convert(converter = ColorConverter.class, disableConversion = false)
    private Color taskBarColor;
 
+   private boolean useHotkey;
+
    public long getId() {
       return id;
    }
@@ -79,6 +81,14 @@ public class Settings {
 
    public void setTaskBarColor(final Color taskBarColor) {
       this.taskBarColor = taskBarColor;
+   }
+
+   public boolean isUseHotkey() {
+      return useHotkey;
+   }
+
+   public void setUseHotkey(final boolean useHotkey) {
+      this.useHotkey = useHotkey;
    }
 
 }
