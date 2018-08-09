@@ -50,7 +50,8 @@ public class ViewControllerPopup {
       // ask for a note for the current project
       final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
       dialog.setTitle("Note for current project");
-      dialog.setHeaderText("Add a note before changing project?");
+      dialog.setHeaderText(
+            "Add a note for '" + model.activeWorkItem.get().getProject().getName() + "' before changing project?");
       dialog.setContentText("Note: ");
 
       this.stage.setAlwaysOnTop(false);

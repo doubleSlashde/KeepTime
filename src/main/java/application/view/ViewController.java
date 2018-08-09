@@ -127,7 +127,7 @@ public class ViewController {
       this.controller = controller;
       this.model = model;
 
-      changeProject(model.idleProject, 0); // TODO not here!
+      changeProject(model.idleProject, 0); // TODO initialize not here!
       updateProjectView();
    }
 
@@ -305,6 +305,7 @@ public class ViewController {
 
          model.activeWorkItem.addListener((a, b, c) -> {
             updateProjectView();
+            textArea.setText("");
          });
 
          model.availableProjects.addListener((ListChangeListener<Project>) lis -> {
