@@ -99,5 +99,6 @@
             </HBox>
          </children>
       </VBox>
+      <Label alignment="CENTER_RIGHT" disable="true" layoutX="245.0" layoutY="260.0" prefHeight="17.0" prefWidth="52.0" text="v 1.0.0" />
    </children>
 </AnchorPane>

@@ -3,6 +3,7 @@ package application.viewPopup;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import application.model.Model;
 import application.model.Project;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.IntegerBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -166,8 +168,16 @@ public class ViewControllerPopup {
 
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      // TODO if the list is filtered, the size is not adapted
-      projectListView.prefHeightProperty().bind(Bindings.size(filteredData).multiply(LIST_CELL_HEIGHT));
+      final Consumer<Double> updateSize = (height) -> {
+         projectListView.setPrefHeight(height);
+         stage.sizeToScene(); // also update scene size
+      };
+      final IntegerBinding size = Bindings.size(filteredData);
+      final IntegerBinding multiply = size.multiply(LIST_CELL_HEIGHT);
+      multiply.addListener((observable, oldValue, newValue) -> {
+         updateSize.accept(newValue.doubleValue());
+      });
+      updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
    }
 
    public void setStage(final Stage primaryStage, final Scene scene) {
