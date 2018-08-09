@@ -2,6 +2,7 @@ package application.viewPopup;
 
 import java.awt.Point;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -42,6 +44,21 @@ public class ViewControllerPopup {
 
    private void changeProject(final Project item) {
       Log.info("Change project to '" + item.getName() + "'.");
+
+      // ask for a note for the current project
+      final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
+      dialog.setTitle("Note for current project");
+      dialog.setHeaderText("Add a note before changing project?");
+      dialog.setContentText("Note: ");
+
+      this.stage.setAlwaysOnTop(false);
+      final Optional<String> result = dialog.showAndWait();
+      this.stage.setAlwaysOnTop(true);
+
+      result.ifPresent(note -> {
+         controller.setComment(note);
+      });
+
       hide();
       controller.changeProject(item);
    }
@@ -159,8 +176,9 @@ public class ViewControllerPopup {
 
       // if we loose focus, hide the final stage
       stage.focusedProperty().addListener((a, b, c) -> {
+         Log.info("Focudes {}", c);
          if (!c) {
-            stage.hide();
+            hide();
          }
       });
    }
@@ -214,7 +232,6 @@ public class ViewControllerPopup {
    private void hide() {
       if (stage.isShowing()) {
 
-         // TODO reset stuff
          searchTextField.setText("");
 
          stage.hide();
