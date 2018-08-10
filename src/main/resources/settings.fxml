@@ -79,12 +79,16 @@
                <children>
                   <VBox>
                      <children>
-                        <Label text="Hotkey" />
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label text="Hotkey" />
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefWidth="100.0" text="(global keylogger!)" />
+                           </children>
+                        </HBox>
                         <HBox spacing="10.0">
                            <children>
                               <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Use Hotkey" />
-                              <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey" />
-                              <Label alignment="TOP_LEFT" contentDisplay="TOP" disable="true" layoutX="10.0" layoutY="10.0" prefWidth="100.0" text="(global keylogger!)" />
+                              <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)" />
                            </children>
                         </HBox>
                      </children>
@@ -99,6 +103,6 @@
             </HBox>
          </children>
       </VBox>
-      <Label alignment="CENTER_RIGHT" disable="true" layoutX="245.0" layoutY="260.0" prefHeight="17.0" prefWidth="52.0" text="v 1.0.0" />
+      <Label alignment="CENTER_RIGHT" disable="true" layoutX="245.0" layoutY="260.0" prefHeight="17.0" prefWidth="52.0" text="v 1.0.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="306.0" AnchorPane.rightAnchor="5.0" />
    </children>
 </AnchorPane>

@@ -176,6 +176,7 @@ public class ViewControllerPopup {
       final IntegerBinding size = Bindings.size(filteredData);
       final IntegerBinding multiply = size.multiply(LIST_CELL_HEIGHT);
       multiply.addListener((observable, oldValue, newValue) -> {
+         // TODO why is this not updated if the user added a new project
          updateSize.accept(newValue.doubleValue());
       });
       updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
@@ -187,7 +188,6 @@ public class ViewControllerPopup {
 
       // if we loose focus, hide the final stage
       stage.focusedProperty().addListener((a, b, c) -> {
-         Log.info("Focudes {}", c);
          if (!c) {
             hide();
          }
