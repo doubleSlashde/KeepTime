@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import javafx.application.Platform;
 
 public class GlobalScreenListener implements NativeKeyListener, NativeMouseInputListener, NativeMouseWheelListener {
-   private static final int SMALLER_KEY = 226;
+   private static final int LEFT_WINDOWS = 91;
 
    private static final int LEFT_CTRL = 162;
 
@@ -64,7 +64,7 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
    }
 
    boolean controllPressed = false;
-   boolean shiftPressed = false;
+   boolean windowsPressed = false;
 
    private Point mouseLocation = new Point(0, 0);
 
@@ -76,13 +76,13 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
       case LEFT_CTRL:
          controllPressed = true;
          break;
-      case 226:
-         shiftPressed = true;
+      case LEFT_WINDOWS:
+         windowsPressed = true;
          break;
       default:
       }
 
-      if (controllPressed && shiftPressed) {
+      if (controllPressed && windowsPressed) {
          Platform.runLater(() -> {
             viewController.show(mouseLocation);
          });
@@ -95,15 +95,10 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
       case LEFT_CTRL:
          controllPressed = false;
          break;
-      case SMALLER_KEY:
-         shiftPressed = false;
+      case LEFT_WINDOWS:
+         windowsPressed = false;
          break;
       default:
-      }
-
-      if (!controllPressed || !shiftPressed) {
-         // System.out.println("Hide");
-         // Platform.runLater(() -> viewController.hide());
       }
    }
 
