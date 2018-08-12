@@ -1,4 +1,4 @@
-package application.view;
+package de.ds.keeptime.view;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -13,16 +13,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import application.Main;
-import application.common.ColorHelper;
-import application.common.DateFormatter;
-import application.common.Resources;
-import application.common.Resources.RESOURCE;
-import application.controller.Controller;
-import application.model.Model;
-import application.model.Project;
-import application.model.Work;
-import application.view.time.Interval;
+import de.ds.keeptime.Main;
+import de.ds.keeptime.common.ColorHelper;
+import de.ds.keeptime.common.DateFormatter;
+import de.ds.keeptime.common.Resources;
+import de.ds.keeptime.common.Resources.RESOURCE;
+import de.ds.keeptime.controller.Controller;
+import de.ds.keeptime.model.Model;
+import de.ds.keeptime.model.Project;
+import de.ds.keeptime.model.Work;
+import de.ds.keeptime.view.time.Interval;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;

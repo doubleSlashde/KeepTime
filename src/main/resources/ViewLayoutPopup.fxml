@@ -4,7 +4,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefWidth="100.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.viewPopup.ViewControllerPopup">
+<VBox prefWidth="100.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.ds.keeptime.viewPopup.ViewControllerPopup">
    <children>
       <TextField fx:id="searchTextField" promptText="Search" />
       <ListView fx:id="projectListView" prefWidth="100.0" />

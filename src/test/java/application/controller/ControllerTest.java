@@ -2,7 +2,8 @@ package application.controller;
 
 import org.junit.Before;
 
-import application.model.Model;
+import de.ds.keeptime.controller.Controller;
+import de.ds.keeptime.model.Model;
 
 public class ControllerTest {
 

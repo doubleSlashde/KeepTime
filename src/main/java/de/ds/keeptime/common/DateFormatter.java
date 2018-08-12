@@ -1,4 +1,4 @@
-package application.common;
+package de.ds.keeptime.common;
 
 import java.time.Duration;
 import java.time.LocalDate;
