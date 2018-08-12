@@ -1,4 +1,4 @@
-package application;
+package de.ds.keeptime;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -12,19 +12,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import application.common.Resources;
-import application.common.Resources.RESOURCE;
-import application.controller.Controller;
-import application.model.Model;
-import application.model.Project;
-import application.model.Settings;
-import application.model.Work;
-import application.model.repos.ProjectRepository;
-import application.model.repos.SettingsRepository;
-import application.model.repos.WorkRepository;
-import application.view.ViewController;
-import application.viewPopup.GlobalScreenListener;
-import application.viewPopup.ViewControllerPopup;
+import de.ds.keeptime.common.Resources;
+import de.ds.keeptime.common.Resources.RESOURCE;
+import de.ds.keeptime.controller.Controller;
+import de.ds.keeptime.model.Model;
+import de.ds.keeptime.model.Project;
+import de.ds.keeptime.model.Settings;
+import de.ds.keeptime.model.Work;
+import de.ds.keeptime.model.repos.ProjectRepository;
+import de.ds.keeptime.model.repos.SettingsRepository;
+import de.ds.keeptime.model.repos.WorkRepository;
+import de.ds.keeptime.view.ViewController;
+import de.ds.keeptime.viewPopup.GlobalScreenListener;
+import de.ds.keeptime.viewPopup.ViewControllerPopup;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;

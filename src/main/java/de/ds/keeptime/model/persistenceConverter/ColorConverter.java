@@ -1,4 +1,4 @@
-package application.model.persistenceConverter;
+package de.ds.keeptime.model.persistenceConverter;
 
 import javax.persistence.AttributeConverter;
 

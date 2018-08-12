@@ -1,4 +1,4 @@
-package application.viewPopup;
+package de.ds.keeptime.viewPopup;
 
 import java.awt.Point;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import application.controller.Controller;
-import application.model.Model;
-import application.model.Project;
+import de.ds.keeptime.controller.Controller;
+import de.ds.keeptime.model.Model;
+import de.ds.keeptime.model.Project;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.IntegerBinding;

@@ -1,4 +1,4 @@
-package application.controller;
+package de.ds.keeptime.controller;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -10,12 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import application.Main;
-import application.common.DateFormatter;
-import application.model.Model;
-import application.model.Project;
-import application.model.Settings;
-import application.model.Work;
+import de.ds.keeptime.Main;
+import de.ds.keeptime.common.DateFormatter;
+import de.ds.keeptime.model.Model;
+import de.ds.keeptime.model.Project;
+import de.ds.keeptime.model.Settings;
+import de.ds.keeptime.model.Work;
 import javafx.scene.paint.Color;
 
 @Service

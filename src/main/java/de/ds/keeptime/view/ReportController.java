@@ -1,4 +1,4 @@
-package application.view;
+package de.ds.keeptime.view;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,10 +10,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
-import application.Main;
-import application.common.DateFormatter;
-import application.model.Project;
-import application.model.Work;
+import de.ds.keeptime.Main;
+import de.ds.keeptime.common.DateFormatter;
+import de.ds.keeptime.model.Project;
+import de.ds.keeptime.model.Work;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.DateCell;

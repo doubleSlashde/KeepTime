@@ -1,4 +1,4 @@
-package application.viewPopup;
+package de.ds.keeptime.viewPopup;
 
 import java.awt.Point;
 import java.util.logging.Level;
