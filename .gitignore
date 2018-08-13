@@ -24,5 +24,4 @@
 /nbdist/
 /.nb-gradle/
 /bin/
-*.txt
 *.lck
