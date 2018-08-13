@@ -24,12 +24,12 @@
                   <Insets top="25.0" />
                </HBox.margin>
                <children>
-                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="142.0" prefWidth="132.0" stylesheets="@Neues%20Textdokument.txt">
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="142.0" prefWidth="132.0" stylesheets="@application.css">
                      <content>
                         <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" prefWidth="130.0" />
                      </content>
                   </ScrollPane>
-                  <Button fx:id="addNewProjectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="23.0" prefWidth="115.0" stylesheets="@Neues%20Textdokument.txt" text="+ Add new project" />
+                  <Button fx:id="addNewProjectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="23.0" prefWidth="115.0" stylesheets="@application.css" text="+ Add new project" />
                </children>
             </VBox>
             <Group>
@@ -48,7 +48,7 @@
                      <center>
                         <HBox alignment="CENTER" prefHeight="36.0">
                            <children>
-                              <Button fx:id="calendarButton" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt">
+                              <Button fx:id="calendarButton" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@application.css">
                                  <graphic>
                                     <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -57,7 +57,7 @@
                                     </ImageView>
                                  </graphic>
                               </Button>
-                              <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@Neues%20Textdokument.txt">
+                              <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@application.css">
                                  <graphic>
                                     <ImageView fitHeight="24.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
                                        <image>
@@ -85,13 +85,13 @@
                      </right>
                   </BorderPane>
                   <Canvas fx:id="canvas" height="2.0" layoutX="4.0" layoutY="88.0" width="286.0" />
-                  <TextArea fx:id="textArea" layoutX="4.0" layoutY="145.0" prefHeight="43.0" prefWidth="286.0" stylesheets="@Neues%20Textdokument.txt" text="- Menü gefixt&#10;- Accordion&#10;- adasdasdasd&#10;-">
+                  <TextArea fx:id="textArea" layoutX="4.0" layoutY="145.0" prefHeight="43.0" prefWidth="286.0" stylesheets="@application.css" text="- Menü gefixt&#10;- Accordion&#10;- adasdasdasd&#10;-">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </TextArea>
-                  <Button fx:id="minimizeButton" layoutX="248.0" layoutY="2.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt" text="_" />
-                  <Button fx:id="closeButton" layoutX="268.0" layoutY="6.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@Neues%20Textdokument.txt" text="x" />
+                  <Button fx:id="minimizeButton" layoutX="248.0" layoutY="2.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@application.css" text="_" />
+                  <Button fx:id="closeButton" layoutX="268.0" layoutY="6.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@application.css" text="x" />
                </children>
             </Group>
          </children>

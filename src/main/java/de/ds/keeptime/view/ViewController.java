@@ -57,6 +57,8 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Bloom;
+import javafx.scene.effect.Light;
+import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -188,10 +190,13 @@ public class ViewController {
       minimizeButton.setOnAction((ae) -> {
          Main.stage.setIconified(true);
       });
+      minimizeButton.textFillProperty().bind(fontColorProperty);
       closeButton.setOnAction((ae) -> {
          Main.stage.close();
       });
+      closeButton.textFillProperty().bind(fontColorProperty);
 
+      addNewProjectButton.textFillProperty().bind(fontColorProperty);
       addNewProjectButton.setOnAction((ae) -> {
          Log.info("Add new project clicked");
          // TODO somewhat duplicate dialog of create and edit
@@ -236,12 +241,21 @@ public class ViewController {
          });
       });
 
+      // Add a light to colorize buttons
+      // TODO does this go nicer?
+      final Lighting lighting = new Lighting();
+      lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
+         final Color color = fontColorProperty.get();
+         return new Light.Distant(45, 45, color);
+      }, fontColorProperty));
+
       settingsButton.setOnAction((ae) -> {
          Log.info("Settings clicked");
          this.mainStage.setAlwaysOnTop(false);
          settingsController.update();
          settingsStage.show();
       });
+      settingsButton.setEffect(lighting);
 
       calendarButton.setOnAction((ae) -> {
          Log.info("Calendar clicked");
@@ -249,6 +263,7 @@ public class ViewController {
          reportController.update();
          reportStage.show();
       });
+      calendarButton.setEffect(lighting);
 
       final Runnable updateMainBackgroundColor = () -> {
          Color color = model.defaultBackgroundColor.get();
