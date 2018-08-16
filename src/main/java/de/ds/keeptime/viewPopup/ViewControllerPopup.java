@@ -12,8 +12,6 @@ import de.ds.keeptime.controller.Controller;
 import de.ds.keeptime.model.Model;
 import de.ds.keeptime.model.Project;
 import javafx.application.Platform;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.IntegerBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -31,7 +29,7 @@ import javafx.util.Callback;
 
 public class ViewControllerPopup {
 
-   private static final int LIST_CELL_HEIGHT = 24 + 2;
+   private static final int LIST_CELL_HEIGHT = 23 + 2;
 
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
@@ -97,7 +95,16 @@ public class ViewControllerPopup {
          }
       });
 
+      // TODO why is there no nice way for listview height?
+      // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
+      final Consumer<Double> updateSize = (height) -> {
+         Log.debug("update size" + height);
+         projectListView.setPrefHeight(height);
+         stage.sizeToScene(); // also update scene size
+      };
+
       searchTextField.textProperty().addListener((a, b, newValue) -> {
+         // TODO do i always have to create a new predicate?
          filteredData.setPredicate(project -> {
             // If filter text is empty, display all persons.
             if (newValue == null || newValue.isEmpty()) {
@@ -114,7 +121,9 @@ public class ViewControllerPopup {
 
             return false; // Does not match.
          });
+
          projectListView.getSelectionModel().selectFirst();
+         updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
       });
 
       searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -166,20 +175,8 @@ public class ViewControllerPopup {
 
       filteredData = new FilteredList<>(model.availableProjects, p -> true);
       projectListView.setItems(filteredData);
-
-      // TODO why is there no nice way for listview height?
-      // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      final Consumer<Double> updateSize = (height) -> {
-         projectListView.setPrefHeight(height);
-         stage.sizeToScene(); // also update scene size
-      };
-      final IntegerBinding size = Bindings.size(filteredData);
-      final IntegerBinding multiply = size.multiply(LIST_CELL_HEIGHT);
-      multiply.addListener((observable, oldValue, newValue) -> {
-         // TODO why is this not updated if the user added a new project
-         updateSize.accept(newValue.doubleValue());
-      });
-      updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
+      searchTextField.setText("a"); // inital trigger to update of listsize...
+      searchTextField.setText("");
    }
 
    public void setStage(final Stage primaryStage, final Scene scene) {
