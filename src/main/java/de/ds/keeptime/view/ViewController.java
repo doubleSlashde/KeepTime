@@ -521,7 +521,6 @@ public class ViewController {
       availableProjectVbox.getChildren().add(projectElement);
       // TODO dialog modality
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
-      changeWithTimeMenuItem.setGraphic(new ImageView("file:volleyball.png"));
       changeWithTimeMenuItem.setOnAction(e -> {
          Log.info("Change with time");
          final Dialog<Integer> dialog = new Dialog<>();
@@ -560,16 +559,24 @@ public class ViewController {
          slider.setBlockIncrement(1);
          slider.setSnapToTicks(true);
          grid.add(slider, 1, gridRow);
+         final Label minutesToTransferLabel = new Label("999 minute(s)");
+         grid.add(minutesToTransferLabel, 2, gridRow);
          gridRow++;
 
          grid.add(new Label("New time distribution"), 0, gridRow);
          gridRow++;
-         grid.add(new Label("Active project: " + model.activeWorkItem.get().getProject().getName()), 0, gridRow);
+         grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
+               gridRow);
          final Label currentProjectTimeLabel = new Label("00:00:00");
          grid.add(currentProjectTimeLabel, 1, gridRow);
          gridRow++;
 
-         grid.add(new Label("New project: " + p.getName()), 0, gridRow);
+         grid.add(new Label("New end and start time:"), 0, gridRow);
+         final Label newEndTimeLabel = new Label("00:00:00");
+         grid.add(newEndTimeLabel, 1, gridRow);
+         gridRow++;
+
+         grid.add(new Label("New project duration: " + p.getName()), 0, gridRow);
          final Label newProjectTimeLabel = new Label("00:00:00");
          grid.add(newProjectTimeLabel, 1, gridRow);
          gridRow++;
@@ -580,8 +587,11 @@ public class ViewController {
 
             final long secondsActiveWork = activeWorkSecondsProperty.get() - secondsOffset;
             final long secondsNewWork = 0 + secondsOffset;
+            minutesToTransferLabel.setText(minutesOffset + " minute(s)");
             currentProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsActiveWork));
             newProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsNewWork));
+            newEndTimeLabel.setText(
+                  DateFormatter.toTimeString(model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
          };
          activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> {
             updateLabelsRunnable.run();
