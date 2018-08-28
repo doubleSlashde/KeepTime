@@ -1,8 +1,10 @@
 package de.ds.keeptime.view;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -94,9 +96,9 @@ public class ReportController {
       currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
       final List<Work> currentWorkItems = Main.workRepository.findByCreationDate(newvalue);
 
-      final Set<Project> workedProjectsSet = currentWorkItems.stream().map(m -> {
+      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> {
          return m.getProject();
-      }).collect(Collectors.toSet());
+      }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
 
       gridPane.getChildren().clear();
       gridPane.getRowConstraints().clear();
@@ -112,7 +114,6 @@ public class ReportController {
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
-         // TODO sort projects by name?
 
          final long todaysWorkSeconds = onlyCurrentProjectWork.stream().mapToLong(work -> {
             return DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime());
@@ -138,7 +139,6 @@ public class ReportController {
             commentLabel.setWrapText(true);
             gridPane.add(commentLabel, 0, rowIndex);
 
-            // TODO add from till
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
             fromTillLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
