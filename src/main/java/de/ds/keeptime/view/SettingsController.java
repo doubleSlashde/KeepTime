@@ -38,6 +38,8 @@ public class SettingsController {
 
    @FXML
    private CheckBox useHotkeyCheckBox;
+   @FXML
+   private CheckBox displayProjectsRightCheckBox;
 
    @FXML
    private Button saveButton;
@@ -58,7 +60,7 @@ public class SettingsController {
          Log.info("Save clicked");
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
-               useHotkeyCheckBox.isSelected());
+               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected());
          thisStage.close();
       });
 
@@ -102,6 +104,7 @@ public class SettingsController {
       taskBarColor.setValue(model.taskBarColor.get());
 
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
+      displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
    }
 
    public void setStage(final Stage thisStage) {

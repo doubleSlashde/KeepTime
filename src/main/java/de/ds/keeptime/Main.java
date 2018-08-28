@@ -83,6 +83,7 @@ public class Main extends Application {
          settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
          settings.setHoverFontColor(model.hoverFontColor.get());
          settings.setUseHotkey(false);
+         settings.setDisplayProjectsRight(false);
          settingsRepository.save(settings);
       } else {
          settings = settingsList.get(0);
@@ -94,6 +95,7 @@ public class Main extends Application {
       model.hoverFontColor.set(settings.getHoverFontColor());
       model.taskBarColor.set(settings.getTaskBarColor());
       model.useHotkey.set(settings.isUseHotkey());
+      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
 
       final List<Work> todaysWorkItems = workRepository.findByCreationDate(LocalDate.now());
       Log.info("Found {} past work items", todaysWorkItems.size());

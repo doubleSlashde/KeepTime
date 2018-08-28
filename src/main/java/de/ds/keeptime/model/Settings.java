@@ -39,6 +39,8 @@ public class Settings {
 
    private boolean useHotkey;
 
+   private boolean displayProjectsRight;
+
    public long getId() {
       return id;
    }
@@ -89,6 +91,14 @@ public class Settings {
 
    public void setUseHotkey(final boolean useHotkey) {
       this.useHotkey = useHotkey;
+   }
+
+   public boolean isDisplayProjectsRight() {
+      return displayProjectsRight;
+   }
+
+   public void setDisplayProjectsRight(final boolean displayProjectsRight) {
+      this.displayProjectsRight = displayProjectsRight;
    }
 
 }
