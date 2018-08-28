@@ -75,6 +75,25 @@
                   </VBox>
                </children>
             </Group>
+            <Group layoutX="10.0" layoutY="219.0">
+               <children>
+                  <VBox>
+                     <children>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label text="Layout" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="10.0">
+                           <children>
+                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Projects" />
+                              <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" text="Display projects on the right" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </Group>
             <Group layoutX="10.0" layoutY="166.0">
                <children>
                   <VBox>

@@ -73,7 +73,7 @@ public class Controller {
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey) {
+         final boolean useHotkey, final boolean displayProjectsRight) {
       // TODO create holder for all the properties (or reuse Settings.class?)
       final Settings settings = Main.settingsRepository.findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
@@ -84,6 +84,7 @@ public class Controller {
       settings.setHoverBackgroundColor(hoverBackgroundColor);
       settings.setHoverFontColor(hoverFontColor);
       settings.setUseHotkey(useHotkey);
+      settings.setDisplayProjectsRight(displayProjectsRight);
 
       Main.settingsRepository.save(settings);
 
@@ -93,6 +94,7 @@ public class Controller {
       model.hoverFontColor.set(settings.getHoverFontColor());
       model.taskBarColor.set(settings.getTaskBarColor());
       model.useHotkey.set(settings.isUseHotkey());
+      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
    }
 
    @PreDestroy
