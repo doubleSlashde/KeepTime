@@ -2,6 +2,8 @@ package de.ds.keeptime.controller;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PreDestroy;
@@ -63,12 +65,16 @@ public class Controller {
       model.activeWorkItem.set(work);
    }
 
-   public void addNewProject(final String projectName, final boolean isWork, final Color projectColor) {
-      final Project project = new Project(projectName, projectColor, isWork, false);
+   public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
+         final int index) {
+      final Project project = new Project(projectName, projectColor, isWork, index, false);
       model.allProjects.add(project);
       model.availableProjects.add(project);
 
-      Main.projectRepository.save(project);
+      final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, project,
+            model.availableProjects.size(), index);
+      changedProjects.add(project);
+      Main.projectRepository.saveAll(changedProjects);
    }
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
@@ -103,18 +109,98 @@ public class Controller {
    }
 
    public void deleteProject(final Project p) {
+      if (p.isDefault()) {
+         Log.error("You cannot delete the default project. Tried to delete project '{}'", p);
+         return;
+      }
       Log.info("Disabeling project '{}'.", p);
+      final int indexToRemove = p.getIndex();
       p.setEnabled(false); // TODO or can we remove the project? but work references??
+      p.setIndex(-1);
+
       model.availableProjects.remove(p);
-      Main.projectRepository.save(p);
+
+      // TODO decrease index of all projects after this index
+      final int size = model.availableProjects.size();
+      final List<Project> changedProjects = new ArrayList<>(size - p.getIndex());
+      for (int i = 0; i < size; i++) {
+         final Project project = model.availableProjects.get(i);
+         if (project.getIndex() < indexToRemove) {
+            // Not affected
+            continue;
+         }
+
+         project.setIndex(project.getIndex() - 1);
+         changedProjects.add(project);
+      }
+
+      changedProjects.add(p);
+      Main.projectRepository.saveAll(changedProjects);
    }
 
-   public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork) {
+   public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
+         final int newIndex) {
       Log.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+
       p.setName(newName);
       p.setColor(newColor);
       p.setWork(isWork);
-      Main.projectRepository.save(p);
+      final int oldIndex = p.getIndex();
+      p.setIndex(newIndex);
+
+      final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, p, oldIndex, newIndex);
+      changedProjects.add(p);
+
+      // save all projects which changed index
+      Main.projectRepository.saveAll(changedProjects);
+   }
+
+   /**
+    * Changes the indexes of the originalList parameter to have a consistent order.
+    * 
+    * @param originalList
+    *           list of all projects to adapt the indexes for
+    * @param changedProject
+    *           the project which has changed which already has the new index
+    * @param oldIndex
+    *           the old index of the changed project
+    * @param newIndex
+    *           the new index of the changed project (which the projects also already has)
+    * @return all projects whose index has been adapted
+    */
+   List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
+         final int oldIndex, final int newIndex) {
+      final ArrayList<Project> changedProjects = new ArrayList<>(Math.abs(oldIndex - newIndex));
+      if (newIndex == oldIndex) {
+         return changedProjects;
+      }
+
+      final boolean newIndexGreater = newIndex > oldIndex;
+      final int adjustOffset = newIndexGreater ? -1 : +1;
+
+      final int smallerIndex = Math.min(newIndex, oldIndex);
+      final int biggerIndex = Math.max(newIndex, oldIndex);
+
+      for (int i = 0; i < originalList.size(); i++) {
+         final Project project = originalList.get(i);
+         final int currentIndex = project.getIndex();
+         if (currentIndex < smallerIndex || currentIndex > biggerIndex) {
+            // index is not affected by change
+            continue;
+         }
+
+         if (project.getId() == changedProject.getId()) {// TODO test equality by id
+            // this one is already at the right/wanted index
+            continue;
+         }
+
+         final int newCurrentIndex = currentIndex + adjustOffset;
+         // System.out.println("Moving index '" + currentIndex + "' to '" + newCurrentIndex + "'.");
+         project.setIndex(newCurrentIndex);
+         changedProjects.add(project);
+      }
+
+      return changedProjects;
    }
 
    public void setComment(final String notes) {

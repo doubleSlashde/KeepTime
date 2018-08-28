@@ -54,6 +54,8 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Bloom;
@@ -223,12 +225,20 @@ public class ViewController {
          grid.add(new Label("IsWork:"), 0, 2);
          final CheckBox isWorkCheckBox = new CheckBox();
          grid.add(isWorkCheckBox, 1, 2);
+
+         grid.add(new Label("SortIndex:"), 0, 3);
+         final Spinner<Integer> indexSpinner = new Spinner<>();
+         final int availableProjectAmount = model.availableProjects.size();
+         indexSpinner
+               .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
+         grid.add(indexSpinner, 1, 3);
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
          dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
-               return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected());
+               return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
+                     indexSpinner.getValue()); // temporary (misused) transfer object for project
             }
             return null;
          });
@@ -237,7 +247,7 @@ public class ViewController {
          mainStage.setAlwaysOnTop(true);
 
          result.ifPresent(project -> {
-            controller.addNewProject(project.getName(), project.isWork(), project.getColor());
+            controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
          });
       });
 
@@ -311,7 +321,8 @@ public class ViewController {
          textAreaColorRunnable.run();
 
          projectSelectionNodeMap = new HashMap<>(model.availableProjects.size());
-         for (final Project project : model.availableProjects) {
+         // TODO if sort was changed update the display
+         for (final Project project : model.sortedAvailableProjects) {
             if (project.isEnabled()) {
                final Node node = addProjectToProjectList(project);
                projectSelectionNodeMap.put(project, node);
@@ -618,6 +629,7 @@ public class ViewController {
          });
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
+      deleteMenuItem.setDisable(p.isDefault());
       deleteMenuItem.setOnAction(e -> {
          Log.info("Delete");
 
@@ -640,6 +652,7 @@ public class ViewController {
 
       final MenuItem editMenuItem = new MenuItem("Edit");
       editMenuItem.setOnAction(e -> {
+         // TODO refactor to use "add project" controls
          Log.info("Edit project");
          final Dialog<ButtonType> dialog = new Dialog<>();
          dialog.setTitle("Edit project");
@@ -664,6 +677,13 @@ public class ViewController {
          final CheckBox isWorkCheckBox = new CheckBox();
          isWorkCheckBox.setSelected(p.isWork());
          grid.add(isWorkCheckBox, 1, 2);
+
+         grid.add(new Label("SortIndex:"), 0, 3);
+         final Spinner<Integer> indexSpinner = new Spinner<>();
+         final int availableProjectAmount = model.availableProjects.size();
+         indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
+         grid.add(indexSpinner, 1, 3);
+
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
@@ -680,7 +700,7 @@ public class ViewController {
                return;
             }
             controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(),
-                  isWorkCheckBox.isSelected());
+                  isWorkCheckBox.isSelected(), indexSpinner.getValue());
 
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,

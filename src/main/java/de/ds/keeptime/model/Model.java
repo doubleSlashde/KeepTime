@@ -1,11 +1,14 @@
 package de.ds.keeptime.model;
 
+import java.util.Comparator;
+
 import org.springframework.stereotype.Component;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
 
 @Component
@@ -17,10 +20,12 @@ public class Model {
 
    public static final Color originalTaskBarFontColor = Color.BLACK;
 
-   public final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, true);
+   public final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
    public Project idleProject = DEFAULT_PROJECT;
 
    public ObservableList<Project> availableProjects = FXCollections.observableArrayList();
+   public SortedList<Project> sortedAvailableProjects = new SortedList<>(availableProjects,
+         Comparator.comparing(Project::getIndex));
    public ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
    public ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();

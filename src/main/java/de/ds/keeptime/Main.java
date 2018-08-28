@@ -69,6 +69,7 @@ public class Main extends Application {
       projectRepository = springContext.getBean(ProjectRepository.class);
       workRepository = springContext.getBean(WorkRepository.class);
       settingsRepository = springContext.getBean(SettingsRepository.class);
+      // TODO how to do data migration for updates??
 
       // TODO there should just be one instance of settings in the repo
       final List<Settings> settingsList = settingsRepository.findAll();
@@ -179,18 +180,6 @@ public class Main extends Application {
       viewControllerPopupController.setController(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
 
-   }
-
-   private void createProjects() {
-      projectRepository.save(new Project("G&D", Color.BLUE, true));
-      projectRepository.save(new Project("G&D AR", Color.WHITE, true));
-      projectRepository.save(new Project("ZF 3d", Color.PINK, true));
-      projectRepository.save(new Project("Karl Storz", Color.GREEN, true));
-      projectRepository.save(new Project("Fronius", Color.VIOLET, true));
-      projectRepository.save(new Project("Kicker", Color.YELLOW, false));
-      projectRepository.save(new Project("Mitagessen", Color.RED, true));
-      projectRepository.save(new Project("Zeppelin", Color.ORANGE, true));
-      projectRepository.save(new Project("Other", Color.ORANGE, true));
    }
 
    private void shutdown() {
