@@ -31,21 +31,25 @@ public class Project {
 
    private boolean isEnabled;
 
+   private int index;
+
    public Project() {
       // Needed for jpa
    }
 
-   public Project(final String name, final Color color, final boolean isWork, final boolean isDefault) {
+   public Project(final String name, final Color color, final boolean isWork, final int index,
+         final boolean isDefault) {
       super();
       this.name = name;
       this.color = color;
       this.isWork = isWork;
       this.isDefault = isDefault;
       this.isEnabled = true;
+      this.index = index;
    }
 
-   public Project(final String name, final Color color, final boolean isWork) {
-      this(name, color, isWork, false);
+   public Project(final String name, final Color color, final boolean isWork, final int index) {
+      this(name, color, isWork, index, false);
    }
 
    public String getName() {
@@ -90,6 +94,14 @@ public class Project {
 
    public long getId() {
       return id;
+   }
+
+   public int getIndex() {
+      return index;
+   }
+
+   public void setIndex(final int index) {
+      this.index = index;
    }
 
    @Override
