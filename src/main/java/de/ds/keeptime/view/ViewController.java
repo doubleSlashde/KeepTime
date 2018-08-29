@@ -65,6 +65,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -80,6 +81,8 @@ import javafx.stage.Stage;
 public class ViewController {
    @FXML
    private Pane pane;
+   @FXML
+   private BorderPane borderPane;
 
    @FXML
    private VBox availableProjectVbox;
@@ -186,7 +189,10 @@ public class ViewController {
          final double afterWidth = Main.stage.getWidth();
          projectsVBox.setVisible(c);
          final double offset = afterWidth - beforeWidth;
-         Main.stage.setX(Main.stage.getX() - offset);
+         if (!model.displayProjectsRight.get()) {
+            // we only need to move the stage if the node on the left is hidden
+            Main.stage.setX(Main.stage.getX() - offset);
+         }
       });
 
       minimizeButton.setOnAction((ae) -> {
@@ -308,6 +314,21 @@ public class ViewController {
          allTimeLabel.textFillProperty().bind(fontColorProperty);
          todayAllSeconds.textFillProperty().bind(fontColorProperty);
          currentProjectLabel.textFillProperty().bind(fontColorProperty);
+
+         final Runnable displayProjectRightRunnable = () -> {
+            if (model.displayProjectsRight.get()) {
+               borderPane.setLeft(null);
+               borderPane.setRight(projectsVBox);
+            } else {
+               borderPane.setRight(null);
+               borderPane.setLeft(projectsVBox);
+
+            }
+         };
+         model.displayProjectsRight.addListener((a, oldValue, newValue) -> {
+            displayProjectRightRunnable.run();
+         });
+         displayProjectRightRunnable.run();
 
          // Setup textarea font color binding
          final Runnable textAreaColorRunnable = () -> {
