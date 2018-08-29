@@ -120,19 +120,7 @@ public class Controller {
 
       model.availableProjects.remove(p);
 
-      // TODO decrease index of all projects after this index
-      final int size = model.availableProjects.size();
-      final List<Project> changedProjects = new ArrayList<>(size - p.getIndex());
-      for (int i = 0; i < size; i++) {
-         final Project project = model.availableProjects.get(i);
-         if (project.getIndex() < indexToRemove) {
-            // Not affected
-            continue;
-         }
-
-         project.setIndex(project.getIndex() - 1);
-         changedProjects.add(project);
-      }
+      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(model.availableProjects, indexToRemove);
 
       changedProjects.add(p);
       Main.projectRepository.saveAll(changedProjects);
@@ -189,7 +177,7 @@ public class Controller {
             continue;
          }
 
-         if (project.getId() == changedProject.getId()) {// TODO test equality by id
+         if (project == changedProject) {
             // this one is already at the right/wanted index
             continue;
          }
@@ -200,6 +188,31 @@ public class Controller {
          changedProjects.add(project);
       }
 
+      return changedProjects;
+   }
+
+   /**
+    * Decreases all indexes by one, after the removed index
+    * 
+    * @param originalList
+    *           list of all projects to adapt the indexes for
+    * @param removedIndex
+    *           the index which has been removed
+    * @return all projects whose index has been adapted
+    */
+   List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {
+      final int size = originalList.size();
+      final List<Project> changedProjects = new ArrayList<>(size - removedIndex);
+      for (int i = 0; i < size; i++) {
+         final Project project = originalList.get(i);
+         if (project.getIndex() < removedIndex) {
+            // Not affected
+            continue;
+         }
+
+         project.setIndex(project.getIndex() - 1);
+         changedProjects.add(project);
+      }
       return changedProjects;
    }
 
