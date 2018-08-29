@@ -173,7 +173,7 @@ public class ViewControllerPopup {
       this.controller = controller;
       this.model = model;
 
-      filteredData = new FilteredList<>(model.availableProjects, p -> true);
+      filteredData = new FilteredList<>(model.sortedAvailableProjects, p -> true);
       projectListView.setItems(filteredData);
       searchTextField.setText("a"); // inital trigger to update of listsize...
       searchTextField.setText("");

@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -182,7 +183,6 @@ public class ViewController {
       // reposition window if projects are hidden (as anchor is top left)
       mouseHoveringProperty.addListener((a, b, c) -> {
          // TODO fix the not so nice jumping..
-         // TODO make side configurable? if user wants to have it in top left corner, projects should appear right?
          projectsVBox.setManaged(c);
          final double beforeWidth = Main.stage.getWidth();
          Main.stage.sizeToScene();
@@ -254,6 +254,7 @@ public class ViewController {
 
          result.ifPresent(project -> {
             controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
+            realignProjectList();
          });
       });
 
@@ -342,7 +343,7 @@ public class ViewController {
          textAreaColorRunnable.run();
 
          projectSelectionNodeMap = new HashMap<>(model.availableProjects.size());
-         // TODO if sort was changed update the display
+
          for (final Project project : model.sortedAvailableProjects) {
             if (project.isEnabled()) {
                final Node node = addProjectToProjectList(project);
@@ -667,6 +668,7 @@ public class ViewController {
          result.ifPresent(res -> {
             if (result.get() == ButtonType.OK) {
                controller.deleteProject(p);
+               realignProjectList();
             }
          });
       });
@@ -727,15 +729,29 @@ public class ViewController {
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
                   p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
             projectNameLabel.setUnderline(p.isWork());
-         });
-         updateProjectView();
 
+            updateProjectView();
+            realignProjectList();
+         });
       });
 
       // Add MenuItem to ContextMenu
       contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
+   }
+
+   private void realignProjectList() {
+      Log.debug("Sorting project view");
+      final ObservableList<Node> children = availableProjectVbox.getChildren();
+      children.clear();
+      // TODO changing the model is not ok from here, but the list is not resorted
+      final Comparator<? super Project> comparator = model.sortedAvailableProjects.getComparator();
+      model.sortedAvailableProjects.setComparator(null); // TODO is there a better way?
+      model.sortedAvailableProjects.setComparator(comparator);
+      for (final Project p : model.sortedAvailableProjects) {
+         children.add(projectSelectionNodeMap.get(p));
+      }
    }
 
    private void updateProjectColorTimeline() {
