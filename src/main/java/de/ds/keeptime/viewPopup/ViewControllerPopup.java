@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import de.ds.keeptime.controller.Controller;
 import de.ds.keeptime.model.Model;
 import de.ds.keeptime.model.Project;
-import javafx.application.Platform;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -58,10 +57,9 @@ public class ViewControllerPopup {
 
       result.ifPresent(note -> {
          controller.setComment(note);
+         hide();
+         controller.changeProject(item);
       });
-
-      hide();
-      controller.changeProject(item);
    }
 
    @FXML
@@ -111,8 +109,6 @@ public class ViewControllerPopup {
                return true;
             }
 
-            // Compare first name and last name of every person with filter
-            // text.
             final String lowerCaseFilter = newValue.toLowerCase();
 
             if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
@@ -175,17 +171,15 @@ public class ViewControllerPopup {
 
       filteredData = new FilteredList<>(model.sortedAvailableProjects, p -> true);
       projectListView.setItems(filteredData);
-      searchTextField.setText("a"); // inital trigger to update of listsize...
-      searchTextField.setText("");
    }
 
    public void setStage(final Stage primaryStage, final Scene scene) {
       this.stage = primaryStage;
       this.scene = scene;
 
-      // if we loose focus, hide the final stage
-      stage.focusedProperty().addListener((a, b, c) -> {
-         if (!c) {
+      // if we loose focus, hide the stage
+      stage.focusedProperty().addListener((a, b, newValue) -> {
+         if (!newValue) {
             hide();
          }
       });
@@ -197,43 +191,14 @@ public class ViewControllerPopup {
          projectListView.getSelectionModel().select(0);
          projectListView.refresh();
 
+         searchTextField.setText("a"); // trigger to update list size
+         searchTextField.setText("");
+
          stage.setX(mouseLocation.getX() - 2);
          stage.setY(mouseLocation.getY() - 2);
          stage.show();
          stage.requestFocus();
          searchTextField.requestFocus();
-
-         // simulate a mouse click on title bar of window
-         // Robot robot;
-         // try {
-         // robot = new Robot();
-         // robot.mouseMove((int) mouseLocation.getX(), (int) mouseLocation.getY());
-         // robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-         // robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-         // } catch (final AWTException e) {
-         // // XXX Auto-generated catch block
-         // e.printStackTrace();
-         // }
-
-         // final Alert alert = new Alert(AlertType.CONFIRMATION);
-         // alert.initModality(Modality.APPLICATION_MODAL);
-         // alert.show();
-         // TODO the window wont get active -> no focus
-         Platform.runLater(() -> {
-            // stage.requestFocus();
-            // stage.setAlwaysOnTop(false);
-            // stage.setAlwaysOnTop(true);
-            // stage.setAlwaysOnTop(false);
-            // stage.toFront();
-            // stage.setAlwaysOnTop(true);
-            // stage.setIconified(true);
-            // Platform.runLater(() -> {
-            // stage.setIconified(false);
-            // });
-            // final Stage stage2 = new Stage();
-            // stage2.setTitle("666");
-            // stage2.show();
-         });
       }
    }
 
