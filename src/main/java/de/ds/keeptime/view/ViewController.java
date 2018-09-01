@@ -756,11 +756,11 @@ public class ViewController {
       gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
       gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-      int currentX = 0;
-      final long maxSeconds = controller.calcTodaysSeconds();// 60 * 60 * 10;
+      double currentX = 0;
+      final long maxSeconds = controller.calcTodaysSeconds();
       for (final Work w : model.pastWorkItems) {
          final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
-         final int fillX = (int) ((float) workedSeconds / maxSeconds * canvas.getWidth());
+         final double fillX = (float) workedSeconds / maxSeconds * canvas.getWidth();
          gc.setFill(w.getProject().getColor());
          gc.fillRect(currentX, 0, fillX, canvas.getHeight());
          currentX += fillX;
@@ -768,7 +768,6 @@ public class ViewController {
    }
 
    private void updateTaskbarIcon(final long currentWorkSeconds) {
-      // update taskbar icon
       final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
 
       gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
