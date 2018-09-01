@@ -415,8 +415,6 @@ public class ViewController {
 
       // update ui each second
       Interval.registerCallBack(() -> {
-         Log.info("Updating ui");
-
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
 
