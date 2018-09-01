@@ -757,8 +757,8 @@ public class ViewController {
       gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
       int currentX = 0;
+      final long maxSeconds = controller.calcTodaysSeconds();// 60 * 60 * 10;
       for (final Work w : model.pastWorkItems) {
-         final long maxSeconds = 60 * 60 * 10;
          final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
          final int fillX = (int) ((float) workedSeconds / maxSeconds * canvas.getWidth());
          gc.setFill(w.getProject().getColor());
