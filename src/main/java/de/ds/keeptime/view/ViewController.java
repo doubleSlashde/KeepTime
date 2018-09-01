@@ -432,11 +432,6 @@ public class ViewController {
          allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
          todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
 
-         // Test if needed hours are achieved
-         if (todayWorkingSeconds > model.neededWorkSeconds) {
-            allTimeLabel.setTextFill(Color.DARKGREEN);
-         }
-
          for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
             final Label label = elapsedProjectTimeLabelMap.get(p);
 
