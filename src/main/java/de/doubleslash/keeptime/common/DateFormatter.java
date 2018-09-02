@@ -21,7 +21,7 @@ public class DateFormatter {
    }
 
    public static long getSecondsBewtween(final LocalDateTime startDate, final LocalDateTime endDate) {
-      return Duration.between(startDate, endDate).getSeconds();
+      return Math.abs(Duration.between(startDate, endDate).getSeconds());
    }
 
    public static String toDayDateString(final LocalDate newvalue) {
