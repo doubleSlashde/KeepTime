@@ -15,7 +15,7 @@
     </encoder>
   </appender>
 
-  <logger name="de.ds" level="debug" />
+  <logger name="de.doubleslash" level="debug" />
   
   <root level="error">
     <appender-ref ref="STDOUT" />
