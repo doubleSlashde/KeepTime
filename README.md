@@ -1,10 +1,12 @@
 # KeepTime
 
 #Use
-Application to track your time spent on different projects each day.
+
+Application to track your time spent on different projects each day. Aim was to create an easy and fast way to track the doings over the day. In the end you get a summary for the day.
 
 Main view (when you hover over the app):\
 ![Alt text](/readme/images/main.png?raw=true "Main")
+You can easily move the window by dragging it around.
 
 If you don't hover over the application the project list collapses:\
 ![Alt text](/readme/images/standby.png?raw=true "Standby")
@@ -25,7 +27,7 @@ After a day you can open the Reports, which will summarize the work done for the
 **You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved to database.**
 
 # Install
-Download and execute .jar file. You should put the .jar in an extra folder, as a *logs* folder will be created next to it.
+Download and execute .jar file (TBD). You should put the .jar in an extra folder as a *logs* folder will be created next to it.\
 You can put the .jar in the autostart folder
 
 ## Requirements
