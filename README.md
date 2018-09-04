@@ -6,6 +6,8 @@ You will most probaply have to reconfigure the application with your details if 
 # Use
 Application to track your time spent on different projects each day. Aim was to create an easy and fast way to track the doings over the day. In the end you get a summary for the day.
 
+Create projects and choose if they are counted as 'work time'. Select the project you work on. Before you switch the project, write a comment on what u did. Change the project. Repeat.
+
 Main view (when you hover over the app):\
 ![Alt text](/readme/images/main.png?raw=true "Main")  
 You can move the window by dragging it around.
