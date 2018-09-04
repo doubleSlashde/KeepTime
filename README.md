@@ -1,7 +1,7 @@
 # KeepTime
 Readme is WIP\
 Project is Beta\
-You will most probaply have to reconfigure the application with your details if a newer version will appear.\
+You will most probably have to reconfigure the application with your details if a newer version will appear.\
 
 # Use
 Application to track your time spent on different projects each day. Aim was to create an easy and fast way to track the doings over the day. In the end you get a summary for the day.
