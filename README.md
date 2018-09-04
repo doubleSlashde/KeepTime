@@ -1,12 +1,11 @@
 # KeepTime
 
-#Use
-
+# Use
 Application to track your time spent on different projects each day. Aim was to create an easy and fast way to track the doings over the day. In the end you get a summary for the day.
 
 Main view (when you hover over the app):\
 ![Alt text](/readme/images/main.png?raw=true "Main")
-You can easily move the window by dragging it around.
+You can move the window by dragging it around.
 
 If you don't hover over the application the project list collapses:\
 ![Alt text](/readme/images/standby.png?raw=true "Standby")
