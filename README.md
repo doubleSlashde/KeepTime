@@ -34,7 +34,7 @@ In the taskbar you will also see the current time + the color of the active proj
 **You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved to database.**
 
 # Install
-Download and execute .jar file (TBD). You should put the .jar in an extra folder as a *logs* folder will be created next to it.\
+Download and execute .jar file (see releases). You should put the .jar in an extra folder as a *logs* folder will be created next to it.\
 You can put the .jar in the autostart folder
 
 ## Requirements
