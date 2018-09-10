@@ -23,7 +23,10 @@ Main view (when you hover over the app):\
 
 # Install
 Download and execute .jar file (see releases). You should put the .jar in an extra folder as a *logs* folder will be created next to it.\
-You can put the .jar in the autostart folder
+It is recommended to run the application at windows start. 
+* Copy the keeptime.bat file from this repo next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. Close the app.
+* Open the autostart folder: Press *Windows+R*, execute *shell:startup*.
+* Create a shortcut to the *.bat* in the autostart folder
 
 ## Requirements
 Only works correct for windows currently. Tested on 7 and 10.

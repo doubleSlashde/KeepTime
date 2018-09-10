@@ -27,3 +27,5 @@
 *.lck
 logs/
 *.jar
+
+config.xml
