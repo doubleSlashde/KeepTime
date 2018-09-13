@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<keepTimeConfigXML taskBarColor="0x00f701">
+  <projects>
+  
+    <!-- One default project should exist (or it is created). It is used as active project when starting the application -->
+    <project isDefault="true">
+      <name>Idle</name>
+      <isWork>false</isWork>
+      <color>BROWN</color>
+    </project>
+  
+    <project>
+      <name>Carl Zeiss</name>
+      <isWork>true</isWork>
+      <color>GREEN</color>
+    </project>
+    
+    <project>
+      <name>Carl Zeiss</name>
+      <isWork>true</isWork>
+      <color>GREEN</color>
+    </project>
+    
+    <project>
+      <name>Peter Lustig</name>
+      <isWork>false</isWork>
+      <color>WHITE</color>
+    </project>
+    
+    <project isDefault="true">
+      <name>Idle</name>
+      <isWork>false</isWork>
+      <color>BROWN</color>
+    </project>
+    
+  </projects>
+</keepTimeConfigXML>
