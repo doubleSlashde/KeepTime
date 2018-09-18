@@ -186,6 +186,18 @@ public class ControllerTest {
       Mockito.when(mockedDateProvider.dateNow()).thenReturn(secondProjectDate);
       testee.changeProject(secondProject);
 
+      Mockito.verify(model.workRepository, Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
+         if (savedWork.getProject() != firstProject) {
+            return false;
+         }
+         if (!savedWork.getStartTime().equals(firstProjectDateTime)) {
+            return false;
+         }
+         if (!savedWork.getEndTime().equals(secondProjectDateTime)) {
+            return false;
+         }
+         return true;
+      }));
       assertThat("Two project should be in the past work items", model.pastWorkItems.size(), is(2));
       assertThat("The first project should be the past work project", model.pastWorkItems.get(0).getProject(),
             is(firstProject));
@@ -209,7 +221,18 @@ public class ControllerTest {
       Mockito.when(mockedDateProvider.dateNow()).thenReturn(secondProjectDate);
       testee.changeProject(secondProject);
 
-      Mockito.verify(model.workRepository, Mockito.times(1)).save(Mockito.any(Work.class));
+      Mockito.verify(model.workRepository, Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
+         if (savedWork.getProject() != firstProject) {
+            return false;
+         }
+         if (!savedWork.getStartTime().equals(firstProjectDateTime)) {
+            return false;
+         }
+         if (!savedWork.getEndTime().equals(secondProjectDateTime)) {
+            return false;
+         }
+         return true;
+      }));
       assertThat("One projects should be in the past work items", model.pastWorkItems.size(), is(1));
       assertThat("The project should be the second work project", model.pastWorkItems.get(0).getProject(),
             is(secondProject));

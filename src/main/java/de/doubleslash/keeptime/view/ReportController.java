@@ -31,7 +31,7 @@ import javafx.util.Callback;
 
 public class ReportController {
 
-   private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #ffc0cb;";
+   private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #BBBBBB;";
 
    @FXML
    private BorderPane topBorderPane;
@@ -64,15 +64,6 @@ public class ReportController {
          LOG.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);
       });
-
-      // HACK to show calendar from datepicker
-      // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
-      final DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
-      final Node popupContent = datePickerSkin.getPopupContent();
-
-      // root.setCenter(popupContent);
-      // topBorderPane.getChildren().add(popupContent);
-      topBorderPane.setRight(popupContent);
    }
 
    private void updateReport(final LocalDate newvalue) {
@@ -145,6 +136,9 @@ public class ReportController {
       this.model = model;
       this.controller = controller;
 
+      // HACK to show calendar from datepicker
+      // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
+      final DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
       final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
          @Override
          public DateCell call(final DatePicker datePicker) {
@@ -161,6 +155,8 @@ public class ReportController {
          }
       };
       datePicker.setDayCellFactory(dayCellFactory);
+      final Node popupContent = datePickerSkin.getPopupContent();
+      topBorderPane.setRight(popupContent);
    }
 
    public void update() {

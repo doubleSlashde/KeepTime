@@ -1,6 +1,7 @@
 package de.doubleslash.keeptime.controller;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class Controller {
 
       final Work currentWork = model.activeWorkItem.get();
 
+      final LocalDate dateNow = dateProvider.dateNow();
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       if (currentWork != null) {
          currentWork.setEndTime(now);
@@ -63,11 +65,13 @@ public class Controller {
       }
 
       // Start new work
-      final Work work = new Work(dateProvider.dateNow(), now, now.plusSeconds(minusSeconds), newProject, "");
+      final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
       model.pastWorkItems.add(work);
-      if (currentWork != null && !currentWork.getCreationDate().isEqual(work.getCreationDate())) {
-         Log.info("Removing projects from the other daya then today from list.");
-         model.pastWorkItems.removeIf(w -> !w.getCreationDate().isEqual(work.getCreationDate()));
+      if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
+         Log.info("Removing projects with other creation date than today '{}' from list.", dateNow);
+         final int sizeBefore = model.pastWorkItems.size();
+         model.pastWorkItems.removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
+         Log.debug("Removed '{}' work items from past work items.", sizeBefore - model.pastWorkItems.size());
       }
       model.activeWorkItem.set(work);
    }
