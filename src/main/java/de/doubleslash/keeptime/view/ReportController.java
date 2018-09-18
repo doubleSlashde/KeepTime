@@ -12,8 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
-import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.DateFormatter;
+import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.fxml.FXML;
@@ -29,6 +30,7 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 
 public class ReportController {
+
    private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #ffc0cb;";
 
    @FXML
@@ -46,39 +48,23 @@ public class ReportController {
    @FXML
    private ScrollPane scrollPane;
 
-   private DatePicker datePicker;
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+   private DatePicker datePicker; // for calender element
+
+   private Controller controller;
+   private Model model;
 
    @FXML
    private void initialize() {
-      Log.info("Init reportController");
+      LOG.info("Init reportController");
 
       datePicker = new DatePicker(LocalDate.now());
-      //
-      final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
-         @Override
-         public DateCell call(final DatePicker datePicker) {
-            return new DateCell() {
-               @Override
-               public void updateItem(final LocalDate item, final boolean empty) {
-                  super.updateItem(item, empty);
-                  if (Main.workRepository.findByCreationDate(item).isEmpty()) {
-                     setDisable(true);
-                     setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
-                     // setTooltip(new Tooltip("You did not work here. Lazy!"));// may only work if enabled
-                  }
-               }
-            };
-         }
-      };
-      datePicker.setDayCellFactory(dayCellFactory);
       datePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
-         Log.info("Datepicker selected value changed to {}", newvalue);
+         LOG.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);
       });
 
-      updateReport(datePicker.getValue());
       // HACK to show calendar from datepicker
       // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
       final DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
@@ -89,12 +75,9 @@ public class ReportController {
       topBorderPane.setRight(popupContent);
    }
 
-   long currentWorkSeconds = 0;
-   long currentSeconds = 0;
-
    private void updateReport(final LocalDate newvalue) {
       currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
-      final List<Work> currentWorkItems = Main.workRepository.findByCreationDate(newvalue);
+      final List<Work> currentWorkItems = model.workRepository.findByCreationDate(newvalue);
 
       final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> {
          return m.getProject();
@@ -105,8 +88,8 @@ public class ReportController {
       // gridPane.getColumnConstraints().clear();
 
       int rowIndex = 0;
-      currentWorkSeconds = 0;
-      currentSeconds = 0;
+      long currentWorkSeconds = 0;
+      long currentSeconds = 0;
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
          projectName.setFont(Font.font("System", FontWeight.BOLD, 15));
@@ -156,6 +139,28 @@ public class ReportController {
 
       currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+   }
+
+   public void setModelAndController(final Model model, final Controller controller) {
+      this.model = model;
+      this.controller = controller;
+
+      final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
+         @Override
+         public DateCell call(final DatePicker datePicker) {
+            return new DateCell() {
+               @Override
+               public void updateItem(final LocalDate item, final boolean empty) {
+                  super.updateItem(item, empty);
+                  if (model.workRepository.findByCreationDate(item).isEmpty()) {
+                     setDisable(true);
+                     setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
+                  }
+               }
+            };
+         }
+      };
+      datePicker.setDayCellFactory(dayCellFactory);
    }
 
    public void update() {

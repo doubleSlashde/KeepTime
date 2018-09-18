@@ -47,7 +47,7 @@ public class SettingsController {
    @FXML
    private Button cancelButton;
 
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
    private Model model;
    private Controller controller;
@@ -57,7 +57,7 @@ public class SettingsController {
    private void initialize() {
 
       saveButton.setOnAction(ae -> {
-         Log.info("Save clicked");
+         LOG.info("Save clicked");
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected());
@@ -65,7 +65,7 @@ public class SettingsController {
       });
 
       cancelButton.setOnAction(ae -> {
-         Log.info("Cancel clicked");
+         LOG.info("Cancel clicked");
          thisStage.close();
       });
 

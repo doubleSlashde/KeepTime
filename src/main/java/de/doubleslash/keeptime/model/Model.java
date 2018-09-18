@@ -2,8 +2,12 @@ package de.doubleslash.keeptime.model;
 
 import java.util.Comparator;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.model.repos.ProjectRepository;
+import de.doubleslash.keeptime.model.repos.SettingsRepository;
+import de.doubleslash.keeptime.model.repos.WorkRepository;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -13,6 +17,19 @@ import javafx.scene.paint.Color;
 
 @Component
 public class Model {
+   public ProjectRepository projectRepository;
+   public WorkRepository workRepository;
+   public SettingsRepository settingsRepository;
+
+   @Autowired
+   public Model(final ProjectRepository projectRepository, final WorkRepository workRepository,
+         final SettingsRepository settingsRepository) {
+      super();
+      this.projectRepository = projectRepository;
+      this.workRepository = workRepository;
+      this.settingsRepository = settingsRepository;
+   }
+
    public static final Color originalHoverBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., .1);
    public static final Color originalHoverFontColor = Color.BLACK;
    public static final Color originalDefaultBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., 0.01);

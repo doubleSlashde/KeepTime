@@ -30,7 +30,7 @@ public class ViewControllerPopup {
 
    private static final int LIST_CELL_HEIGHT = 23 + 2;
 
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
    @FXML
    private Pane pane;
@@ -39,10 +39,18 @@ public class ViewControllerPopup {
    private TextField searchTextField;
    @FXML
    private ListView<Project> projectListView;
-   FilteredList<Project> filteredData;
+
+   private Stage stage;
+
+   private Scene scene;
+
+   private Controller controller;
+   private Model model;
+
+   private FilteredList<Project> filteredData;
 
    private void changeProject(final Project item) {
-      Log.info("Change project to '" + item.getName() + "'.");
+      LOG.info("Change project to '" + item.getName() + "'.");
 
       // ask for a note for the current project
       final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
@@ -96,7 +104,7 @@ public class ViewControllerPopup {
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
       final Consumer<Double> updateSize = (height) -> {
-         Log.debug("update size" + height);
+         LOG.debug("update size" + height);
          projectListView.setPrefHeight(height);
          stage.sizeToScene(); // also update scene size
       };
@@ -158,13 +166,6 @@ public class ViewControllerPopup {
 
    }
 
-   Stage stage;
-
-   private Scene scene;
-
-   Controller controller;
-   Model model;
-
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
       this.model = model;
@@ -187,7 +188,7 @@ public class ViewControllerPopup {
 
    public void show(final Point mouseLocation) {
       if (!stage.isShowing()) {
-         Log.info("Showing popup");
+         LOG.info("Showing popup");
          projectListView.getSelectionModel().select(0);
          projectListView.refresh();
 

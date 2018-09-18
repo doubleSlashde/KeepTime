@@ -19,9 +19,6 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
-import de.doubleslash.keeptime.model.repos.ProjectRepository;
-import de.doubleslash.keeptime.model.repos.SettingsRepository;
-import de.doubleslash.keeptime.model.repos.WorkRepository;
 import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewPopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewPopup.ViewControllerPopup;
@@ -44,35 +41,27 @@ public class Main extends Application {
    public static Stage stage;
    Stage popupViewStage;
 
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-   public static Model model;
+   private Model model;
    private Controller controller;
-
-   public static ProjectRepository projectRepository;
-
-   public static WorkRepository workRepository;
-   public static SettingsRepository settingsRepository;
 
    @Override
    public void init() throws Exception {
       springContext = SpringApplication.run(Main.class);
+      // TODO test if everywhere is used the same model
+      model = springContext.getBean(Model.class);
+      controller = springContext.getBean(Controller.class);
    }
 
    @Override
    public void start(final Stage primaryStage) throws Exception {
       stage = primaryStage;
 
-      Log.debug("Reading configuration");
-      model = springContext.getBean(Model.class);
-
-      projectRepository = springContext.getBean(ProjectRepository.class);
-      workRepository = springContext.getBean(WorkRepository.class);
-      settingsRepository = springContext.getBean(SettingsRepository.class);
-      // TODO how to do data migration for updates??
+      LOG.debug("Reading configuration");
 
       // TODO there should just be one instance of settings in the repo
-      final List<Settings> settingsList = settingsRepository.findAll();
+      final List<Settings> settingsList = model.settingsRepository.findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
          settings = new Settings();
@@ -85,7 +74,7 @@ public class Main extends Application {
          settings.setHoverFontColor(model.hoverFontColor.get());
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
-         settingsRepository.save(settings);
+         model.settingsRepository.save(settings);
       } else {
          settings = settingsList.get(0);
       }
@@ -98,19 +87,19 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
 
-      final List<Work> todaysWorkItems = workRepository.findByCreationDate(LocalDate.now());
-      Log.info("Found {} past work items", todaysWorkItems.size());
+      final List<Work> todaysWorkItems = model.workRepository.findByCreationDate(LocalDate.now());
+      LOG.info("Found {} past work items", todaysWorkItems.size());
       model.pastWorkItems.addAll(todaysWorkItems);
 
       // createProjects();
 
-      final List<Project> projects = projectRepository.findAll();
+      final List<Project> projects = model.projectRepository.findAll();
 
-      Log.debug("Found '{}' projects", projects.size());
+      LOG.debug("Found '{}' projects", projects.size());
       if (projects.isEmpty()) {
-         Log.info("Adding default project");
+         LOG.info("Adding default project");
          projects.add(model.DEFAULT_PROJECT);
-         projectRepository.save(model.DEFAULT_PROJECT);
+         model.projectRepository.save(model.DEFAULT_PROJECT);
       }
 
       model.allProjects.addAll(projects);
@@ -121,7 +110,7 @@ public class Main extends Application {
       final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
       if (findAny.isPresent()) {
          model.idleProject = findAny.get();
-         Log.debug("Using project '{}' as default project.", model.idleProject);
+         LOG.debug("Using project '{}' as default project.", model.idleProject);
       }
 
       primaryStage.setOnHiding((we) -> {
@@ -185,7 +174,7 @@ public class Main extends Application {
    }
 
    private void shutdown() {
-      Log.info("Shutting down");
+      LOG.info("Shutting down");
       // viewController.changeProject(model.idleProject, 0); // TODO not so nice (view has the comments for the current
       // // job)
       controller.shutdown();
@@ -216,7 +205,7 @@ public class Main extends Application {
          primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(final WindowEvent event) {
-               Log.info("On close request");
+               LOG.info("On close request");
                // shutdown();
                // Platform.exit();
             }
@@ -226,14 +215,14 @@ public class Main extends Application {
          // Give the controller access to the main app.
          viewController.setStage(primaryStage);
 
-         controller = springContext.getBean(Controller.class, model);
+         // controller = springContext.getBean(Controller.class, model, new RealDateProvider());
 
          viewController.setController(controller, model);
 
          primaryStage.show();
 
       } catch (final Exception e) {
-         Log.error("Error: " + e.toString(), e);
+         LOG.error("Error: " + e.toString(), e);
          e.printStackTrace();
       }
    }
