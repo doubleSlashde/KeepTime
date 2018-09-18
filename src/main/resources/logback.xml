@@ -17,7 +17,7 @@
 
   <logger name="de.doubleslash" level="debug" />
   
-  <root level="error">
+  <root level="info">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="rollingFile" />
   </root>
