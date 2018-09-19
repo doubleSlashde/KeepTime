@@ -2,6 +2,7 @@ package de.doubleslash.keeptime.model;
 
 import java.util.Comparator;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.springframework.stereotype.Component;
 
 import javafx.beans.property.ObjectProperty;
@@ -13,9 +14,13 @@ import javafx.scene.paint.Color;
 
 @Component
 public class Model {
-   public static final Color originalHoverBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., .1);
+   public static final Color originalHoverBackgroundColor = (SystemUtils.IS_OS_LINUX)
+         ? new Color(54 / 255., 143 / 255., 179 / 255., 1.)
+         : new Color(54 / 255., 143 / 255., 179 / 255., 0.01);
    public static final Color originalHoverFontColor = Color.BLACK;
-   public static final Color originalDefaultBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., 0.01);
+   public static final Color originalDefaultBackgroundColor = (SystemUtils.IS_OS_LINUX)
+         ? new Color(54 / 255., 143 / 255., 179 / 255., 1.)
+         : new Color(54 / 255., 143 / 255., 179 / 255., .1);
    public static final Color originalDefaultFontColor = Color.BLACK;
 
    public static final Color originalTaskBarFontColor = Color.BLACK;
