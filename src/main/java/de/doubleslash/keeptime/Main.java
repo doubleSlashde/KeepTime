@@ -1,6 +1,5 @@
 package de.doubleslash.keeptime;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -41,8 +39,6 @@ import javafx.stage.WindowEvent;
 @SpringBootApplication
 public class Main extends Application {
 
-   private static final String CONFIG_FILENAME = "config.xml";
-   
    private ConfigurableApplicationContext springContext;
 
    public static Stage stage;
@@ -152,11 +148,6 @@ public class Main extends Application {
          initialisePopupUI(primaryStage);
       } catch (final Exception e) {
          e.printStackTrace();
-      }
-      
-      if (ConfigParser.hasConfigFile(CONFIG_FILENAME)) {
-         final ConfigParser parser = new ConfigParser(model, controller);
-         parser.parserConfig(new File(CONFIG_FILENAME));
       }
    }
 
