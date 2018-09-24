@@ -1,5 +1,5 @@
 # KeepTime
-Project is Beta\
+Project is Beta
 
 # Use
 Application to track your time spent on different projects each day. Aim was to create an easy and fast way to track the doings over the day. In the end you get a summary for the day.
@@ -26,5 +26,7 @@ It is recommended to run the application at windows start.
 * Open the autostart folder: Press *Windows+R*, execute *shell:startup*.
 * Create a shortcut to the *.bat* in the autostart folder
 
+**migrate from old version**
+If you used this application before with a *config.xml* you can import your old projects in the settings dialog. Place your config.xml next to the jar and press "parse config.xml". Otherwise no steps are needed.
 ## Requirements
 Only works correct for windows currently. Tested on 7 and 10.
