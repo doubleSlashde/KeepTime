@@ -1,11 +1,12 @@
 package de.doubleslash.keeptime.common;
 
 import java.io.File;
-import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,9 +17,9 @@ import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;
 
 public class ConfigParser {
-   Logger log = Logger.getLogger(ConfigParser.class.getName());
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-   Controller controller;
+   private final Controller controller;
 
    public ConfigParser(final Controller controller) {
       this.controller = controller;
@@ -30,14 +31,14 @@ public class ConfigParser {
    }
 
    public void parseConfig(final File inputFile) {
+      LOG.info("Starting import of projects in file '{}'.", inputFile);
       try {
          final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
          final Document doc = dBuilder.parse(inputFile);
          doc.getDocumentElement().normalize();
-         log.info("Root element :" + doc.getDocumentElement().getNodeName());
+         LOG.debug("Root element '{}'.", doc.getDocumentElement().getNodeName());
          final NodeList nList = doc.getElementsByTagName("project");
-         log.info("----------------------------");
 
          // index makes sure to add new projects at the end
          int index = controller.getAvailableProjects().size();
@@ -50,26 +51,29 @@ public class ConfigParser {
                final String isWork = eElement.getElementsByTagName("isWork").item(0).getTextContent();
                final String color = eElement.getElementsByTagName("color").item(0).getTextContent();
 
-               log.info("checking for: " + name);
+               LOG.debug("Testing if project with name '{}' already exists.", name);
                boolean exists = false;
 
                for (final Project p : controller.getAvailableProjects()) {
                   if (name.equals(p.getName())) {
-                     log.info(name + "    " + Boolean.toString(exists));
                      exists = true;
+                     break;
                   }
                }
                if (!exists) {
+                  LOG.info("Adding project '{}'.", name);
                   final Color colorTemp = Color.valueOf(color);
                   controller.addNewProject(name, Boolean.parseBoolean(isWork), colorTemp, index);
                   index++;
+               } else {
+                  LOG.debug("Project '{}' already exists", name);
                }
 
             }
          }
-
+         LOG.info("Import of '{}' finished.", inputFile);
       } catch (final Exception e) {
-         e.printStackTrace();
+         LOG.error("There was an error while importing projects from config.xml", e);
       }
    }
 }
