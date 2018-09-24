@@ -56,6 +56,7 @@ public class Main extends Application {
 
    @Override
    public void start(final Stage primaryStage) throws Exception {
+
       stage = primaryStage;
 
       LOG.debug("Reading configuration");

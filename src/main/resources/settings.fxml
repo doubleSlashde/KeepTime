@@ -118,6 +118,7 @@
                <children>
                   <Button fx:id="saveButton" mnemonicParsing="false" text="Save" />
                   <Button fx:id="cancelButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel" />
+                  <Button fx:id="parseConfigButton" mnemonicParsing="false" text="pars config.xml" />
                </children>
             </HBox>
          </children>
