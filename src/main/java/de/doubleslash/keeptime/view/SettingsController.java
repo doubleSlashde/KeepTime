@@ -73,6 +73,11 @@ public class SettingsController {
          thisStage.close();
       });
 
+      cancelButton.setOnAction(ae -> {
+         Log.info("Cancel clicked");
+         thisStage.close();
+      });
+
       resetHoverBackgroundButton.setOnAction(ae -> {
          hoverBackgroundColor.setValue(Model.originalHoverBackgroundColor);
       });
