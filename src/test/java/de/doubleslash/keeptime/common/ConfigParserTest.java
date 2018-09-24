@@ -40,10 +40,11 @@ public class ConfigParserTest {
    private final Project peter = new Project("Peter", Color.CRIMSON, true, 2);
    private final Project hinzUndKunz = new Project("Hinz und Kunz", Color.DARKRED, true, 3);
    private final ObservableList<Project> projects = FXCollections.observableArrayList();
+
    private final Controller controller = mock(Controller.class);
 
    @Before
-   public void setUp() {
+   public void beforeTest() {
       projects.add(idle);
       projects.add(heinz);
       projects.add(peter);

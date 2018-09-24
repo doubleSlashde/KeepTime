@@ -31,9 +31,10 @@ public class Work {
 
    public Work() {}
 
-   public Work(final LocalDateTime startTime, final LocalDateTime endTime, final Project project, final String notes) {
+   public Work(final LocalDate creationDate, final LocalDateTime startTime, final LocalDateTime endTime,
+         final Project project, final String notes) {
       super();
-      this.creationDate = LocalDate.now();
+      this.creationDate = creationDate;
       this.startTime = startTime;
       this.endTime = endTime;
       this.project = project;

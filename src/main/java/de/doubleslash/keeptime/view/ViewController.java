@@ -119,6 +119,8 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
    boolean pressed = false;
    double startX = -1;
 
@@ -126,10 +128,10 @@ public class ViewController {
       double x, y;
    }
 
-   Delta dragDelta = new Delta();
+   private final Delta dragDelta = new Delta();
 
-   Controller controller;
-   Model model;
+   private Controller controller;
+   private Model model;
 
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
@@ -138,8 +140,6 @@ public class ViewController {
       changeProject(model.idleProject, 0); // TODO initialize not here!
       updateProjectView();
    }
-
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    public void changeProject(final Project newProject, final long minusSeconds) {
       controller.changeProject(newProject, minusSeconds);
@@ -206,7 +206,7 @@ public class ViewController {
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
       addNewProjectButton.setOnAction((ae) -> {
-         Log.info("Add new project clicked");
+         LOG.info("Add new project clicked");
          // TODO somewhat duplicate dialog of create and edit
          final Dialog<Project> dialog = new Dialog<>();
          dialog.setTitle("Create new project");
@@ -267,7 +267,7 @@ public class ViewController {
       }, fontColorProperty));
 
       settingsButton.setOnAction((ae) -> {
-         Log.info("Settings clicked");
+         LOG.info("Settings clicked");
          this.mainStage.setAlwaysOnTop(false);
          settingsController.update();
          settingsStage.show();
@@ -275,7 +275,7 @@ public class ViewController {
       settingsButton.setEffect(lighting);
 
       calendarButton.setOnAction((ae) -> {
-         Log.info("Calendar clicked");
+         LOG.info("Calendar clicked");
          this.mainStage.setAlwaysOnTop(false);
          reportController.update();
          reportStage.show();
@@ -453,6 +453,7 @@ public class ViewController {
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
          final Parent sceneRoot = (Parent) fxmlLoader.load();
          reportController = fxmlLoader.getController();
+         reportController.setModelAndController(model, controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportStage.setScene(new Scene(sceneRoot));
@@ -496,7 +497,7 @@ public class ViewController {
       try {
          projectElement = (Pane) loader.load();
       } catch (final IOException e1) {
-         Log.error("Could not load '{}'.", loader.getLocation(), e1);
+         LOG.error("Could not load '{}'.", loader.getLocation(), e1);
          throw new RuntimeException(e1);
       }
 
@@ -549,7 +550,7 @@ public class ViewController {
       // TODO dialog modality
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
-         Log.info("Change with time");
+         LOG.info("Change with time");
          final Dialog<Integer> dialog = new Dialog<>();
          dialog.setTitle("Change project with time transfer");
          dialog.setHeaderText("Choose the time to transfer");
@@ -647,7 +648,7 @@ public class ViewController {
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
       deleteMenuItem.setOnAction(e -> {
-         Log.info("Delete");
+         LOG.info("Delete");
 
          final Alert alert = new Alert(AlertType.CONFIRMATION);
          alert.setTitle("Delete project");
@@ -670,7 +671,7 @@ public class ViewController {
       final MenuItem editMenuItem = new MenuItem("Edit");
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
-         Log.info("Edit project");
+         LOG.info("Edit project");
          final Dialog<ButtonType> dialog = new Dialog<>();
          dialog.setTitle("Edit project");
          dialog.setHeaderText("Edit project '" + p.getName() + "'");
@@ -736,7 +737,7 @@ public class ViewController {
    }
 
    private void realignProjectList() {
-      Log.debug("Sorting project view");
+      LOG.debug("Sorting project view");
       final ObservableList<Node> children = availableProjectVbox.getChildren();
       children.clear();
       // TODO changing the model is not ok from here, but the list is not resorted
