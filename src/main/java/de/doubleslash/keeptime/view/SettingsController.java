@@ -99,7 +99,7 @@ public class SettingsController {
          public void handle(final ActionEvent actionEvent) {
             if (ConfigParser.hasConfigFile(INPUT_FILE)) {
                final ConfigParser parser = new ConfigParser(controller);
-               parser.parserConfig(new File(INPUT_FILE));
+               parser.parseConfig(new File(INPUT_FILE));
             }
          }
       });

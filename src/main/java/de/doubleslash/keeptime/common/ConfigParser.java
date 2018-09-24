@@ -29,7 +29,7 @@ public class ConfigParser {
       return f.exists();
    }
 
-   public void parserConfig(final File inputFile) {
+   public void parseConfig(final File inputFile) {
       try {
          final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
          final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
