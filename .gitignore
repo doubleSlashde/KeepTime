@@ -29,3 +29,4 @@ logs/
 *.jar
 
 config.xml
+db/

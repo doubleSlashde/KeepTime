@@ -123,6 +123,6 @@
             </HBox>
          </children>
       </VBox>
-      <Label alignment="CENTER_RIGHT" disable="true" layoutX="245.0" layoutY="260.0" prefHeight="17.0" prefWidth="52.0" text="v 1.0.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
+      <Label fx:id="versionLabel" alignment="CENTER_RIGHT" disable="true" layoutX="245.0" layoutY="260.0" prefHeight="17.0" prefWidth="52.0" text="v1.0.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
    </children>
 </AnchorPane>
