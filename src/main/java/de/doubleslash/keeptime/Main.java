@@ -48,6 +48,9 @@ public class Main extends Application {
 
    @Override
    public void init() throws Exception {
+      final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
+      defaultExceptionHandler.register();
+
       springContext = SpringApplication.run(Main.class);
       // TODO test if everywhere is used the same model
       model = springContext.getBean(Model.class);
