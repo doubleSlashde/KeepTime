@@ -1,6 +1,7 @@
 package de.doubleslash.keeptime.common;
 
 import java.io.File;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,6 +17,7 @@ import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;
 
 public class ConfigParser {
+   Logger log = Logger.getLogger(ConfigParser.class.getName());
 
    Controller controller;
    Model model;
@@ -36,9 +38,9 @@ public class ConfigParser {
          final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
          final Document doc = dBuilder.parse(inputFile);
          doc.getDocumentElement().normalize();
-         System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+         log.info("Root element :" + doc.getDocumentElement().getNodeName());
          final NodeList nList = doc.getElementsByTagName("project");
-         System.out.println("----------------------------");
+         log.info("----------------------------");
 
          // index makes sure to add new projects at the end
          int index = controller.getAvailableProjects().size();
@@ -51,12 +53,12 @@ public class ConfigParser {
                final String isWork = eElement.getElementsByTagName("isWork").item(0).getTextContent();
                final String color = eElement.getElementsByTagName("color").item(0).getTextContent();
 
-               System.out.println("checking for: " + name);
+               log.info("checking for: " + name);
                boolean exists = false;
 
                for (final Project p : controller.getAvailableProjects()) {
                   if (name.equals(p.getName())) {
-                     System.out.println(name + "    " + Boolean.toString(exists));
+                     log.info(name + "    " + Boolean.toString(exists));
                      exists = true;
                   }
                }
