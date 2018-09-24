@@ -81,7 +81,7 @@ public class ConfigParserTest {
    }
 
    private void loadConfigFile(final String configFile) {
-      final ConfigParser testSubject = new ConfigParser(model, controller);
+      final ConfigParser testSubject = new ConfigParser(controller);
       final File inputfile = new File(configFile);
       testSubject.parserConfig(inputfile);
    }

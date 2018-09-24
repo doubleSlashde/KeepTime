@@ -12,7 +12,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import de.doubleslash.keeptime.controller.Controller;
-import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;
 
@@ -20,10 +19,8 @@ public class ConfigParser {
    Logger log = Logger.getLogger(ConfigParser.class.getName());
 
    Controller controller;
-   Model model;
 
-   public ConfigParser(final Model model, final Controller controller) {
-      this.model = model;
+   public ConfigParser(final Controller controller) {
       this.controller = controller;
    }
 
