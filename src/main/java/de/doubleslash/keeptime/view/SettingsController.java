@@ -98,8 +98,8 @@ public class SettingsController {
          @Override
          public void handle(final ActionEvent actionEvent) {
             if (ConfigParser.hasConfigFile(INPUT_FILE)) {
-               final ConfigParser parser = new ConfigParser(model, controller);
-               parser.parserConfig(new File(INPUT_FILE));
+               final ConfigParser parser = new ConfigParser(controller);
+               parser.parseConfig(new File(INPUT_FILE));
             }
          }
       });
