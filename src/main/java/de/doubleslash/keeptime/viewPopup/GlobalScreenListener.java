@@ -21,7 +21,7 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
 
    private static final int LEFT_CTRL = 162;
 
-   private final org.slf4j.Logger Log = LoggerFactory.getLogger(this.getClass());
+   private final org.slf4j.Logger LOG = LoggerFactory.getLogger(this.getClass());
 
    private ViewControllerPopup viewController;
 
@@ -38,14 +38,14 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
    public void register(final boolean register) {
       try {
          if (register) {
-            Log.info("Registering native hook");
+            LOG.info("Registering native hook");
             GlobalScreen.registerNativeHook();
          } else {
-            Log.info("Unregistering native hook");
+            LOG.info("Unregistering native hook");
             GlobalScreen.unregisterNativeHook();
          }
       } catch (final NativeHookException ex) {
-         Log.error("Error whill (un)registering natvice hooks.", ex);
+         LOG.error("Error whill (un)registering natvice hooks.", ex);
       }
    }
 

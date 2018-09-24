@@ -1,6 +1,7 @@
 package de.doubleslash.keeptime.controller;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,14 +11,16 @@ import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.DateFormatter;
+import de.doubleslash.keeptime.common.DateProvider;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
+import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
 @Service
@@ -27,9 +30,12 @@ public class Controller {
 
    private final Model model;
 
-   public Controller(final Model model) {
-      this.model = model;
+   private final DateProvider dateProvider;
 
+   @Autowired
+   public Controller(final Model model, final DateProvider dateProvider) {
+      this.model = model;
+      this.dateProvider = dateProvider;
    }
 
    public void changeProject(final Project newProject) {
@@ -41,7 +47,8 @@ public class Controller {
 
       final Work currentWork = model.activeWorkItem.get();
 
-      final LocalDateTime now = LocalDateTime.now().minusSeconds(minusSeconds);
+      final LocalDate dateNow = dateProvider.dateNow();
+      final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       if (currentWork != null) {
          currentWork.setEndTime(now);
          // currentWork.setNotes(notes);
@@ -55,13 +62,18 @@ public class Controller {
                currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
          // Save in db
-         Main.workRepository.save(currentWork);
+         model.workRepository.save(currentWork);
       }
 
       // Start new work
-      final Work work = new Work(now, now.plusSeconds(minusSeconds), newProject, "");
+      final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
       model.pastWorkItems.add(work);
-
+      if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
+         Log.info("Removing projects with other creation date than today '{}' from list.", dateNow);
+         final int sizeBefore = model.pastWorkItems.size();
+         model.pastWorkItems.removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
+         Log.debug("Removed '{}' work items from past work items.", sizeBefore - model.pastWorkItems.size());
+      }
       model.activeWorkItem.set(work);
    }
 
@@ -74,14 +86,14 @@ public class Controller {
       final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, project,
             model.availableProjects.size(), index);
       changedProjects.add(project);
-      Main.projectRepository.saveAll(changedProjects);
+      model.projectRepository.saveAll(changedProjects);
    }
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
          final boolean useHotkey, final boolean displayProjectsRight) {
       // TODO create holder for all the properties (or reuse Settings.class?)
-      final Settings settings = Main.settingsRepository.findAll().get(0);
+      final Settings settings = model.settingsRepository.findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
 
       settings.setDefaultBackgroundColor(defaultBackgroundColor);
@@ -92,7 +104,7 @@ public class Controller {
       settings.setUseHotkey(useHotkey);
       settings.setDisplayProjectsRight(displayProjectsRight);
 
-      Main.settingsRepository.save(settings);
+      model.settingsRepository.save(settings);
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
@@ -125,7 +137,7 @@ public class Controller {
       final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(model.availableProjects, indexToRemove);
 
       changedProjects.add(p);
-      Main.projectRepository.saveAll(changedProjects);
+      model.projectRepository.saveAll(changedProjects);
    }
 
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
@@ -142,20 +154,20 @@ public class Controller {
       changedProjects.add(p);
 
       // save all projects which changed index
-      Main.projectRepository.saveAll(changedProjects);
+      model.projectRepository.saveAll(changedProjects);
    }
 
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                          list of all projects to adapt the indexes for
     * @param changedProject
-    *           the project which has changed which already has the new index
+    *                          the project which has changed which already has the new index
     * @param oldIndex
-    *           the old index of the changed project
+    *                          the old index of the changed project
     * @param newIndex
-    *           the new index of the changed project (which the projects also already has)
+    *                          the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -197,9 +209,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                        list of all projects to adapt the indexes for
     * @param removedIndex
-    *           the index which has been removed
+    *                        the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {
@@ -221,8 +233,7 @@ public class Controller {
    public void setComment(final String notes) {
       final Work work = model.activeWorkItem.get();
       work.setNotes(notes);
-      // TODO when to save to repo??
-      // Main.workRepository.save(work);
+      // TODO when to save to repo?
    }
 
    /**
@@ -255,4 +266,7 @@ public class Controller {
       }).sum();
    }
 
+   public ObservableList<Project> getAvailableProjects() {
+      return this.model.availableProjects;
+   }
 }

@@ -1,10 +1,15 @@
 package de.doubleslash.keeptime.view;
 
+import java.io.File;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -47,17 +52,21 @@ public class SettingsController {
    @FXML
    private Button cancelButton;
 
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+   @FXML
+   private Button parseConfigButton;
 
    private Model model;
    private Controller controller;
    private Stage thisStage;
+   private static final String INPUT_FILE = "config.xml";
 
    @FXML
    private void initialize() {
 
       saveButton.setOnAction(ae -> {
-         Log.info("Save clicked");
+         LOG.info("Save clicked");
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected());
@@ -65,7 +74,7 @@ public class SettingsController {
       });
 
       cancelButton.setOnAction(ae -> {
-         Log.info("Cancel clicked");
+         LOG.info("Cancel clicked");
          thisStage.close();
       });
 
@@ -83,6 +92,16 @@ public class SettingsController {
       });
       resetTaskBarFontButton.setOnAction(ae -> {
          taskBarColor.setValue(Model.originalTaskBarFontColor);
+      });
+
+      parseConfigButton.setOnAction(new EventHandler<ActionEvent>() {
+         @Override
+         public void handle(final ActionEvent actionEvent) {
+            if (ConfigParser.hasConfigFile(INPUT_FILE)) {
+               final ConfigParser parser = new ConfigParser(model, controller);
+               parser.parserConfig(new File(INPUT_FILE));
+            }
+         }
       });
 
    }

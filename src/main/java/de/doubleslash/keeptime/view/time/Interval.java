@@ -15,7 +15,7 @@ import javafx.util.Duration;
 
 public class Interval {
 
-   private final static Logger Log = LoggerFactory.getLogger(Interval.class);
+   private final static Logger LOG = LoggerFactory.getLogger(Interval.class);
 
    public static List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
 
