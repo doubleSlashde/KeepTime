@@ -48,7 +48,6 @@ public class ConfigParserTest {
       projects.add(heinz);
       projects.add(peter);
       projects.add(hinzUndKunz);
-
    }
 
    @Test
