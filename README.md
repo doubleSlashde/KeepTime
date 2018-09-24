@@ -1,7 +1,4 @@
 # KeepTime
-Project is Beta
-
-# Use
 Application to track your time spent on different projects each day. Aim was to create an easy and fast way to track the doings over the day. In the end you get a summary for the day.
 
 Create projects and choose if they are counted as 'work time'. Select the project you work on. Before you switch the project, write a comment on what u did. Change the project. Repeat.
@@ -20,10 +17,10 @@ Main view (when you hover over the app):\
 **You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved to database.**
 
 # Install
-Download and execute .jar file (see releases). You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
+Download and execute .jar file (see [releases](https://github.com/doubleSlashde/KeepTime/releases)). You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
 It is recommended to run the application at windows start. 
-* Copy the keeptime.bat file from this repo next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. Close the app.
-* Open the autostart folder: Press *Windows+R*, execute *shell:startup*.
+* Copy the keeptime.bat file from this repo next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. Close the app
+* Open the autostart folder: Press *Windows+R*, execute *shell:startup*
 * Create a shortcut to the *.bat* in the autostart folder
 
 **migrate from old version**
