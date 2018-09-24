@@ -74,8 +74,8 @@ public class ConfigParserTest {
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller).addNewProject(eq("Carl Zeiss"), anyBoolean(), any(Color.class), anyInt());
       verify(controller).addNewProject(eq("Peter Lustig"), anyBoolean(), any(Color.class), anyInt());
+      verify(controller).addNewProject(eq("Peter Pan"), anyBoolean(), any(Color.class), anyInt());
 
       assertEquals(6, projects.size());
    }
@@ -125,7 +125,7 @@ public class ConfigParserTest {
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller, atLeastOnce()).addNewProject(eq("Peter Lustig"), anyBoolean(), any(Color.class), anyInt());
+      verify(controller, atLeastOnce()).addNewProject(eq("Peter Pan"), anyBoolean(), any(Color.class), anyInt());
    }
 
    @Test
@@ -146,7 +146,7 @@ public class ConfigParserTest {
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller).addNewProject(eq("Peter Lustig"), anyBoolean(), any(Color.class), eq(5));
+      verify(controller).addNewProject(eq("Peter Pan"), anyBoolean(), any(Color.class), eq(5));
    }
 
    @Test
@@ -166,7 +166,7 @@ public class ConfigParserTest {
       }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
-      verify(controller, atLeastOnce()).addNewProject("Carl Zeiss", true, Color.GREEN, 4);
+      verify(controller, atLeastOnce()).addNewProject("Peter Lustig", true, Color.GREEN, 4);
    }
 
    @Test
@@ -187,6 +187,6 @@ public class ConfigParserTest {
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller, atLeastOnce()).addNewProject("Peter Lustig", false, Color.WHITE, 5);
+      verify(controller, atLeastOnce()).addNewProject("Peter Pan", false, Color.WHITE, 5);
    }
 }

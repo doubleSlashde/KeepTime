@@ -10,19 +10,19 @@
     </project>
   
     <project>
-      <name>Carl Zeiss</name>
-      <isWork>true</isWork>
-      <color>GREEN</color>
-    </project>
-    
-    <project>
-      <name>Carl Zeiss</name>
+      <name>Peter Lustig</name>
       <isWork>true</isWork>
       <color>GREEN</color>
     </project>
     
     <project>
       <name>Peter Lustig</name>
+      <isWork>true</isWork>
+      <color>GREEN</color>
+    </project>
+    
+    <project>
+      <name>Peter Pan</name>
       <isWork>false</isWork>
       <color>WHITE</color>
     </project>
