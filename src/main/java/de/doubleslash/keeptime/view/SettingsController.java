@@ -67,15 +67,15 @@ public class SettingsController {
          LOG.info("Save clicked");
 
          if (System.getProperty("os.name").contains("Linux")) {
-            if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
+            if (hoverBackgroundColor.getValue().getOpacity() < 0.51) {
                hoverBackgroundColor.setValue(Color.rgb((int) hoverBackgroundColor.getValue().getRed() * 255,
                      (int) hoverBackgroundColor.getValue().getGreen() * 255,
-                     (int) hoverBackgroundColor.getValue().getBlue() * 255, 0.5));
+                     (int) hoverBackgroundColor.getValue().getBlue() * 255, 0.51));
             }
-            if (defaultBackgroundColor.getValue().getOpacity() < 0.5) {
+            if (defaultBackgroundColor.getValue().getOpacity() < 0.51) {
                defaultBackgroundColor.setValue(Color.rgb((int) defaultBackgroundColor.getValue().getRed() * 255,
                      (int) defaultBackgroundColor.getValue().getGreen() * 255,
-                     (int) defaultBackgroundColor.getValue().getBlue() * 255, 0.5));
+                     (int) defaultBackgroundColor.getValue().getBlue() * 255, 0.51));
             }
          }
 
