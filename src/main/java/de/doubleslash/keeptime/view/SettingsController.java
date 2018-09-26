@@ -8,12 +8,11 @@ import org.slf4j.LoggerFactory;
 import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class SettingsController {
@@ -64,9 +63,22 @@ public class SettingsController {
 
    @FXML
    private void initialize() {
-
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
+
+         if (System.getProperty("os.name").contains("Linux")) {
+            if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
+               hoverBackgroundColor.setValue(Color.rgb((int) hoverBackgroundColor.getValue().getRed() * 255,
+                     (int) hoverBackgroundColor.getValue().getGreen() * 255,
+                     (int) hoverBackgroundColor.getValue().getBlue() * 255, 0.5));
+            }
+            if (defaultBackgroundColor.getValue().getOpacity() < 0.5) {
+               defaultBackgroundColor.setValue(Color.rgb((int) defaultBackgroundColor.getValue().getRed() * 255,
+                     (int) defaultBackgroundColor.getValue().getGreen() * 255,
+                     (int) defaultBackgroundColor.getValue().getBlue() * 255, 0.5));
+            }
+         }
+
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected());
@@ -94,13 +106,10 @@ public class SettingsController {
          taskBarColor.setValue(Model.originalTaskBarFontColor);
       });
 
-      parseConfigButton.setOnAction(new EventHandler<ActionEvent>() {
-         @Override
-         public void handle(final ActionEvent actionEvent) {
-            if (ConfigParser.hasConfigFile(INPUT_FILE)) {
-               final ConfigParser parser = new ConfigParser(model, controller);
-               parser.parserConfig(new File(INPUT_FILE));
-            }
+      parseConfigButton.setOnAction(ae -> {
+         if (ConfigParser.hasConfigFile(INPUT_FILE)) {
+            final ConfigParser parser = new ConfigParser(model, controller);
+            parser.parserConfig(new File(INPUT_FILE));
          }
       });
 
