@@ -440,6 +440,7 @@ public class ViewController {
                      return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
                   }).sum();
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
+            label.setFont(new Font("Arial", 9));
          }
 
          updateProjectColorTimeline();
