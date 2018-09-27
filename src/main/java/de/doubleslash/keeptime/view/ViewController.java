@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
@@ -130,6 +129,7 @@ public class ViewController {
 
    private final Delta dragDelta = new Delta();
 
+   private Stage mainStage;
    private Controller controller;
    private Model model;
 
@@ -185,23 +185,23 @@ public class ViewController {
       mouseHoveringProperty.addListener((a, b, c) -> {
          // TODO fix the not so nice jumping..
          projectsVBox.setManaged(c);
-         final double beforeWidth = Main.stage.getWidth();
-         Main.stage.sizeToScene();
-         final double afterWidth = Main.stage.getWidth();
+         final double beforeWidth = mainStage.getWidth();
+         mainStage.sizeToScene();
+         final double afterWidth = mainStage.getWidth();
          projectsVBox.setVisible(c);
          final double offset = afterWidth - beforeWidth;
          if (!model.displayProjectsRight.get()) {
             // we only need to move the stage if the node on the left is hidden
-            Main.stage.setX(Main.stage.getX() - offset);
+            mainStage.setX(mainStage.getX() - offset);
          }
       });
 
       minimizeButton.setOnAction((ae) -> {
-         Main.stage.setIconified(true);
+         mainStage.setIconified(true);
       });
       minimizeButton.textFillProperty().bind(fontColorProperty);
       closeButton.setOnAction((ae) -> {
-         Main.stage.close();
+         mainStage.close();
       });
       closeButton.textFillProperty().bind(fontColorProperty);
 
@@ -792,7 +792,7 @@ public class ViewController {
       final BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
       final Image icon = SwingFXUtils.toFXImage(bi, null);
 
-      final ObservableList<Image> icons = Main.stage.getIcons();
+      final ObservableList<Image> icons = mainStage.getIcons();
       icons.addAll(icon);
       if (icons.size() > 1) {
          icons.remove(0);
@@ -819,8 +819,6 @@ public class ViewController {
 
       return newStyle;
    }
-
-   Stage mainStage;
 
    public void setStage(final Stage primaryStage) {
       this.mainStage = primaryStage;

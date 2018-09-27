@@ -36,18 +36,23 @@ import javafx.stage.WindowEvent;
 @SpringBootApplication
 public class Main extends Application {
 
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+   public static final String VERSION = "v0.0.2";
+
    private ConfigurableApplicationContext springContext;
 
-   public static Stage stage;
-   Stage popupViewStage;
-
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private Stage popupViewStage;
 
    private Model model;
    private Controller controller;
 
    @Override
    public void init() throws Exception {
+      LOG.info("Starting KeepTime {}", VERSION);
+      final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
+      defaultExceptionHandler.register();
+
       springContext = SpringApplication.run(Main.class);
       // TODO test if everywhere is used the same model
       model = springContext.getBean(Model.class);
@@ -56,8 +61,6 @@ public class Main extends Application {
 
    @Override
    public void start(final Stage primaryStage) throws Exception {
-
-      stage = primaryStage;
 
       LOG.debug("Reading configuration");
 
@@ -91,8 +94,6 @@ public class Main extends Application {
       final List<Work> todaysWorkItems = model.workRepository.findByCreationDate(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.pastWorkItems.addAll(todaysWorkItems);
-
-      // createProjects();
 
       final List<Project> projects = model.projectRepository.findAll();
 

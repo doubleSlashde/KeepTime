@@ -5,15 +5,19 @@ import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -54,10 +58,13 @@ public class SettingsController {
    @FXML
    private Button cancelButton;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-
    @FXML
    private Button parseConfigButton;
+
+   @FXML
+   private Label versionLabel;
+
+   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
    private Model model;
    private Controller controller;
@@ -66,6 +73,7 @@ public class SettingsController {
 
    @FXML
    private void initialize() {
+      versionLabel.setText(Main.VERSION);
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
@@ -133,10 +141,13 @@ public class SettingsController {
          taskBarColor.setValue(Model.originalTaskBarFontColor);
       });
 
-      parseConfigButton.setOnAction(ae -> {
-         if (ConfigParser.hasConfigFile(INPUT_FILE)) {
-            final ConfigParser parser = new ConfigParser(model, controller);
-            parser.parserConfig(new File(INPUT_FILE));
+      parseConfigButton.setOnAction(new EventHandler<ActionEvent>() {
+         @Override
+         public void handle(final ActionEvent actionEvent) {
+            if (ConfigParser.hasConfigFile(INPUT_FILE)) {
+               final ConfigParser parser = new ConfigParser(controller);
+               parser.parseConfig(new File(INPUT_FILE));
+            }
          }
       });
 

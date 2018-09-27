@@ -10,7 +10,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,18 +18,13 @@ import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.controller.Controller;
-import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.repos.ProjectRepository;
-import de.doubleslash.keeptime.model.repos.SettingsRepository;
-import de.doubleslash.keeptime.model.repos.WorkRepository;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
@@ -47,16 +41,10 @@ public class ConfigParserTest {
    private final Project hinzUndKunz = new Project("Hinz und Kunz", Color.DARKRED, true, 3);
    private final ObservableList<Project> projects = FXCollections.observableArrayList();
 
-   private Model model;
-   private ObservableList<Project> spyModel;
    private final Controller controller = mock(Controller.class);
 
    @Before
    public void beforeTest() {
-      model = new Model(Mockito.mock(ProjectRepository.class), Mockito.mock(WorkRepository.class),
-            Mockito.mock(SettingsRepository.class));
-      spyModel = spy(model.availableProjects);
-
       projects.add(idle);
       projects.add(heinz);
       projects.add(peter);
@@ -66,7 +54,6 @@ public class ConfigParserTest {
    @Test
    public void testImportFromFileOnce() {
       when(controller.getAvailableProjects()).thenReturn(projects);
-      when(spyModel.size()).thenReturn(4);
       doAnswer(new Answer() {
          @Override
          public Object answer(final InvocationOnMock invocation) {
@@ -88,15 +75,14 @@ public class ConfigParserTest {
    }
 
    private void loadConfigFile(final String configFile) {
-      final ConfigParser testSubject = new ConfigParser(model, controller);
+      final ConfigParser testSubject = new ConfigParser(controller);
       final File inputfile = new File(configFile);
-      testSubject.parserConfig(inputfile);
+      testSubject.parseConfig(inputfile);
    }
 
    @Test
    public void testDoNotImportIdle() {
       when(controller.getAvailableProjects()).thenReturn(projects);
-      when(spyModel.size()).thenReturn(4);
       doAnswer(new Answer() {
          @Override
          public Object answer(final InvocationOnMock invocation) {
@@ -117,7 +103,6 @@ public class ConfigParserTest {
    @Test
    public void testImportNonexistingProjects() {
       when(controller.getAvailableProjects()).thenReturn(projects);
-      when(spyModel.size()).thenReturn(4);
       doAnswer(new Answer() {
          @Override
          public Object answer(final InvocationOnMock invocation) {
@@ -138,7 +123,6 @@ public class ConfigParserTest {
    @Test
    public void testIndexIsRight() {
       when(controller.getAvailableProjects()).thenReturn(projects);
-      when(spyModel.size()).thenReturn(4);
       doAnswer(new Answer() {
          @Override
          public Object answer(final InvocationOnMock invocation) {
@@ -159,7 +143,6 @@ public class ConfigParserTest {
    @Test
    public void testProject1IsParsedCorrectly() {
       when(controller.getAvailableProjects()).thenReturn(projects);
-      when(spyModel.size()).thenReturn(4);
       doAnswer(new Answer() {
          @Override
          public Object answer(final InvocationOnMock invocation) {
@@ -179,7 +162,6 @@ public class ConfigParserTest {
    @Test
    public void testProject2IsParsedCorrectly() {
       when(controller.getAvailableProjects()).thenReturn(projects);
-      when(spyModel.size()).thenReturn(4);
       doAnswer(new Answer() {
          @Override
          public Object answer(final InvocationOnMock invocation) {
