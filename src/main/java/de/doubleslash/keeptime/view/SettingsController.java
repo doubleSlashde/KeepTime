@@ -75,6 +75,7 @@ public class SettingsController {
                      (int) (hoverBackgroundColor.getValue().getBlue() * 255), 0.51));
                final Alert alert = new Alert(AlertType.WARNING);
                alert.setTitle("Warning!");
+               alert.setHeight(400);
                alert.setHeaderText("color settings wrong!");
                alert.setContentText("The level of opacity on your hover background is to high for Linux.");
 
@@ -86,6 +87,7 @@ public class SettingsController {
                      (int) (defaultBackgroundColor.getValue().getBlue() * 255), 0.51));
                final Alert alert = new Alert(AlertType.WARNING);
                alert.setTitle("Warning!");
+               alert.setHeight(400);
                alert.setHeaderText("color settings wrong!");
                alert.setContentText("The level of opacity on your default background is to high for Linux.");
 
