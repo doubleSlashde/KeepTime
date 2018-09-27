@@ -9,6 +9,8 @@ import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -67,15 +69,27 @@ public class SettingsController {
          LOG.info("Save clicked");
 
          if (System.getProperty("os.name").contains("Linux")) {
-            if (hoverBackgroundColor.getValue().getOpacity() < 0.51) {
-               hoverBackgroundColor.setValue(Color.rgb((int) hoverBackgroundColor.getValue().getRed() * 255,
-                     (int) hoverBackgroundColor.getValue().getGreen() * 255,
-                     (int) hoverBackgroundColor.getValue().getBlue() * 255, 0.51));
+            if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
+               hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
+                     (int) (hoverBackgroundColor.getValue().getGreen() * 255),
+                     (int) (hoverBackgroundColor.getValue().getBlue() * 255), 0.51));
+               final Alert alert = new Alert(AlertType.WARNING);
+               alert.setTitle("Warning!");
+               alert.setHeaderText("color settings wrong!");
+               alert.setContentText("The level of opacity on your hover background is to high for Linux.");
+
+               alert.showAndWait();
             }
-            if (defaultBackgroundColor.getValue().getOpacity() < 0.51) {
-               defaultBackgroundColor.setValue(Color.rgb((int) defaultBackgroundColor.getValue().getRed() * 255,
-                     (int) defaultBackgroundColor.getValue().getGreen() * 255,
-                     (int) defaultBackgroundColor.getValue().getBlue() * 255, 0.51));
+            if (defaultBackgroundColor.getValue().getOpacity() < 0.5) {
+               defaultBackgroundColor.setValue(Color.rgb((int) (defaultBackgroundColor.getValue().getRed() * 255),
+                     (int) (defaultBackgroundColor.getValue().getGreen() * 255),
+                     (int) (defaultBackgroundColor.getValue().getBlue() * 255), 0.51));
+               final Alert alert = new Alert(AlertType.WARNING);
+               alert.setTitle("Warning!");
+               alert.setHeaderText("color settings wrong!");
+               alert.setContentText("The level of opacity on your default background is to high for Linux.");
+
+               alert.showAndWait();
             }
          }
 
