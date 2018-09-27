@@ -169,6 +169,7 @@ public class ViewController {
    private void initialize() throws IOException {
 
       bigTimeLabel.setText("00:00:00");
+      bigTimeLabel.setFont(new Font("Arial", 60));
       allTimeLabel.setText("00:00:00");
       todayAllSeconds.setText("00:00:00");
 
