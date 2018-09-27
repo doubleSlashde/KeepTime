@@ -74,7 +74,7 @@ public class Main extends Application {
          settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
          settings.setHoverFontColor(model.hoverFontColor.get());
          settings.setUseHotkey(false);
-         settings.setDisplayProjectsRight(false);
+         settings.setDisplayProjectsRight(true);
          model.settingsRepository.save(settings);
       } else {
          settings = settingsList.get(0);
