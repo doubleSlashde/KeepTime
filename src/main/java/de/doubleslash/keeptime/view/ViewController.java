@@ -324,14 +324,6 @@ public class ViewController {
             } else {
                borderPane.setRight(null);
                borderPane.setLeft(projectsVBox);
-               if (System.getProperty("os.name").contains("Linux")) {
-                  final Alert warning = new Alert(AlertType.WARNING);
-                  warning.setTitle("No Linux Support");
-                  warning.setHeaderText(null);
-                  warning.setContentText(
-                        "The project list on the left side has no Linux support. Please change your settings so, that your project list is on the right side.");
-                  warning.showAndWait();
-               }
 
             }
          };
