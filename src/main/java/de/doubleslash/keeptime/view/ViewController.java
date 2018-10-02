@@ -119,6 +119,9 @@ public class ViewController {
    private Canvas canvas;
 
    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   final private String RGBA = "rgba(";
+   final private String ARIAL = "Arial";
+   final private String TIME_ZERO = "00:00:00";
 
    boolean pressed = false;
    double startX = -1;
@@ -168,10 +171,10 @@ public class ViewController {
    @FXML
    private void initialize() throws IOException {
 
-      bigTimeLabel.setText("00:00:00");
+      bigTimeLabel.setText(TIME_ZERO);
       bigTimeLabel.setFont(new Font("Arial", 60));
-      allTimeLabel.setText("00:00:00");
-      todayAllSeconds.setText("00:00:00");
+      allTimeLabel.setText(TIME_ZERO);
+      todayAllSeconds.setText(TIME_ZERO);
 
       textArea.setWrapText(true);
       textArea.setEditable(false);
@@ -291,9 +294,9 @@ public class ViewController {
             opacity = .3;
          }
          String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
-               "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+               RGBA + ColorHelper.colorToCssRgba(color) + ")");
          style = changeStyleAttribute(style, "fx-border-color",
-               "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+               RGBA + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
          pane.setStyle(style);
       };
 
@@ -335,7 +338,7 @@ public class ViewController {
          // Setup textarea font color binding
          final Runnable textAreaColorRunnable = () -> {
             final String textAreaStyle = changeStyleAttribute(textArea.getStyle(), "fx-text-fill",
-                  "rgba(" + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
+                  RGBA + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
             textArea.setStyle(textAreaStyle);
          };
          fontColorProperty.addListener((a, b, c) -> {
@@ -597,17 +600,17 @@ public class ViewController {
          gridRow++;
          grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
                gridRow);
-         final Label currentProjectTimeLabel = new Label("00:00:00");
+         final Label currentProjectTimeLabel = new Label(TIME_ZERO);
          grid.add(currentProjectTimeLabel, 1, gridRow);
          gridRow++;
 
          grid.add(new Label("New end and start time:"), 0, gridRow);
-         final Label newEndTimeLabel = new Label("00:00:00");
+         final Label newEndTimeLabel = new Label(TIME_ZERO);
          grid.add(newEndTimeLabel, 1, gridRow);
          gridRow++;
 
          grid.add(new Label("New project duration: " + p.getName()), 0, gridRow);
-         final Label newProjectTimeLabel = new Label("00:00:00");
+         final Label newProjectTimeLabel = new Label(TIME_ZERO);
          grid.add(newProjectTimeLabel, 1, gridRow);
          gridRow++;
 
@@ -778,7 +781,7 @@ public class ViewController {
 
       gcIcon.setStroke(model.taskBarColor.get());
       gcIcon.setTextAlign(TextAlignment.CENTER);
-      gcIcon.setFont(new Font("Arial", 12));
+      gcIcon.setFont(new Font(ARIAL, 12));
       gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
             Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5);
 
