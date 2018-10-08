@@ -32,6 +32,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -172,29 +173,20 @@ public class ViewController {
    @FXML
    private void initialize() throws IOException {
 
-      bigTimeLabel.setText(TIME_ZERO);
-      bigTimeLabel.setFont(new Font(ARIAL, 60));
-      allTimeLabel.setText(TIME_ZERO);
-      todayAllSeconds.setText(TIME_ZERO);
+      setUpTime();
 
-      textArea.setWrapText(true);
-      textArea.setEditable(false);
-      textArea.editableProperty().bind(mouseHoveringProperty);
-
-      textArea.textProperty().addListener((a, b, c) -> {
-         controller.setComment(textArea.getText());
-      });
+      setUpTextArea();
 
       // reposition window if projects are hidden (as anchor is top left)
       mouseHoveringProperty.addListener((a, b, c) -> {
          setProjectWindowVisibleByMouseHover(c);
       });
 
-      minimizeButton.setOnAction((ae) -> {
+      minimizeButton.setOnAction(ae -> {
          mainStage.setIconified(true);
       });
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setOnAction((ae) -> {
+      closeButton.setOnAction(ae -> {
          mainStage.close();
       });
       closeButton.textFillProperty().bind(fontColorProperty);
@@ -203,41 +195,20 @@ public class ViewController {
       addNewProjectButton.setOnAction((ae) -> {
          LOG.info("Add new project clicked");
          // TODO somewhat duplicate dialog of create and edit
-         final Dialog<Project> dialog = new Dialog<>();
-         dialog.setTitle("Create new project");
-         dialog.setHeaderText("Create a new project");
+         final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
-         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+         final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
 
-         final GridPane grid = new GridPane();
-         grid.setHgap(10);
-         grid.setVgap(10);
-         grid.setPadding(new Insets(20, 150, 10, 10));
-
-         grid.add(new Label("Name:"), 0, 0);
-         final TextField projectNameTextField = new TextField();
-         projectNameTextField.setPromptText("Projectname");
-         grid.add(projectNameTextField, 1, 0);
-
-         grid.add(new Label("Color:"), 0, 1);
-         final ColorPicker colorPicker = new ColorPicker();
-         grid.add(colorPicker, 1, 1);
-
-         grid.add(new Label("IsWork:"), 0, 2);
-         final CheckBox isWorkCheckBox = new CheckBox();
-         grid.add(isWorkCheckBox, 1, 2);
-
-         grid.add(new Label("SortIndex:"), 0, 3);
-         final Spinner<Integer> indexSpinner = new Spinner<>();
-         final int availableProjectAmount = model.availableProjects.size();
-         indexSpinner
-               .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
-         grid.add(indexSpinner, 1, 3);
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
          dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
+               final ObservableList<Node> nodes = grid.getChildren();
+               final TextField projectNameTextField = (TextField) nodes.get(1);
+               final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
+               final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
+               final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
                return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
                      indexSpinner.getValue()); // temporary (misused) transfer object for project
             }
@@ -261,34 +232,18 @@ public class ViewController {
          return new Light.Distant(45, 45, color);
       }, fontColorProperty));
 
-      settingsButton.setOnAction((ae) -> {
-         LOG.info("Settings clicked");
-         this.mainStage.setAlwaysOnTop(false);
-         settingsController.update();
-         settingsStage.show();
+      settingsButton.setOnAction(ae -> {
+         settingsClicked();
       });
       settingsButton.setEffect(lighting);
 
       calendarButton.setOnAction((ae) -> {
-         LOG.info("Calendar clicked");
-         this.mainStage.setAlwaysOnTop(false);
-         reportController.update();
-         reportStage.show();
+         calendarClicked();
       });
       calendarButton.setEffect(lighting);
 
       final Runnable updateMainBackgroundColor = () -> {
-         Color color = model.defaultBackgroundColor.get();
-         double opacity = 0;
-         if (mouseHoveringProperty.get()) {
-            color = model.hoverBackgroundColor.get();
-            opacity = .3;
-         }
-         String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
-               RGBA + ColorHelper.colorToCssRgba(color) + ")");
-         style = changeStyleAttribute(style, "fx-border-color",
-               RGBA + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
-         pane.setStyle(style);
+         runUpdateMainBackgroundColor();
       };
 
       mouseHoveringProperty.addListener((a, b, c) -> {
@@ -352,25 +307,7 @@ public class ViewController {
          });
 
          model.availableProjects.addListener((ListChangeListener<Project>) lis -> {
-            while (lis.next()) {
-               if (lis.wasAdded()) {
-                  final List<? extends Project> addedSubList = lis.getAddedSubList();
-                  for (final Project project : addedSubList) {
-                     final Node node = addProjectToProjectList(project);
-                     projectSelectionNodeMap.put(project, node);
-                  }
-               } else if (lis.wasRemoved()) {
-                  final List<? extends Project> removedSubList = lis.getRemoved();
-                  for (final Project project : removedSubList) {
-                     // change to idle if removed project was active
-                     if (project == model.activeWorkItem.get().getProject()) {
-                        changeProject(model.idleProject, 0);
-                     }
-                     final Node remove = projectSelectionNodeMap.remove(project);
-                     availableProjectVbox.getChildren().remove(remove);
-                  }
-               }
-            }
+            setUpAvailableProjectsListener(lis);
          });
 
          model.defaultBackgroundColor.addListener((a, b, c) -> {
@@ -410,37 +347,108 @@ public class ViewController {
 
       // update ui each second
       Interval.registerCallBack(() -> {
-         final LocalDateTime now = LocalDateTime.now();
-         model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
-
-         final long currentWorkSeconds = Duration
-               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-               .getSeconds();
-         activeWorkSecondsProperty.set(currentWorkSeconds);
-         final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
-         final long todaySeconds = controller.calcTodaysSeconds();
-
-         // update all ui labels
-         // TODO do it with bindings (maybe create a viewmodel for this)
-         // bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
-         allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
-         todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
-
-         for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
-            final Label label = elapsedProjectTimeLabelMap.get(p);
-
-            final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject().getId() == p.getId())
-                  .mapToLong(work -> {
-                     return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-                  }).sum();
-            label.setText(DateFormatter.secondsToHHMMSS(seconds));
-            label.setFont(new Font(ARIAL, 12));
-         }
+         final long currentWorkSeconds = doIntervalRegisterCallBack();
 
          updateProjectColorTimeline();
          updateTaskbarIcon(currentWorkSeconds);
       });
 
+   }
+
+   private void settingsClicked() {
+      LOG.info("Settings clicked");
+      this.mainStage.setAlwaysOnTop(false);
+      settingsController.update();
+      settingsStage.show();
+   }
+
+   private void calendarClicked() {
+      LOG.info("Calendar clicked");
+      this.mainStage.setAlwaysOnTop(false);
+      reportController.update();
+      reportStage.show();
+   }
+
+   private void runUpdateMainBackgroundColor() {
+      Color color = model.defaultBackgroundColor.get();
+      double opacity = 0;
+      if (mouseHoveringProperty.get()) {
+         color = model.hoverBackgroundColor.get();
+         opacity = .3;
+      }
+      String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
+            RGBA + ColorHelper.colorToCssRgba(color) + ")");
+      style = changeStyleAttribute(style, "fx-border-color",
+            RGBA + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+      pane.setStyle(style);
+   }
+
+   private void setUpAvailableProjectsListener(final Change<? extends Project> lis) {
+      while (lis.next()) {
+         if (lis.wasAdded()) {
+            final List<? extends Project> addedSubList = lis.getAddedSubList();
+            for (final Project project : addedSubList) {
+               final Node node = addProjectToProjectList(project);
+               projectSelectionNodeMap.put(project, node);
+            }
+         } else if (lis.wasRemoved()) {
+            final List<? extends Project> removedSubList = lis.getRemoved();
+            for (final Project project : removedSubList) {
+               // change to idle if removed project was active
+               if (project == model.activeWorkItem.get().getProject()) {
+                  changeProject(model.idleProject, 0);
+               }
+               final Node remove = projectSelectionNodeMap.remove(project);
+               availableProjectVbox.getChildren().remove(remove);
+            }
+         }
+      }
+   }
+
+   private long doIntervalRegisterCallBack() {
+      final LocalDateTime now = LocalDateTime.now();
+      model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
+
+      final long currentWorkSeconds = Duration
+            .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime()).getSeconds();
+      activeWorkSecondsProperty.set(currentWorkSeconds);
+      final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
+      final long todaySeconds = controller.calcTodaysSeconds();
+
+      // update all ui labels
+      // TODO do it with bindings (maybe create a viewmodel for this)
+      // bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+      allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
+      todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
+
+      for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
+         final Label label = elapsedProjectTimeLabelMap.get(p);
+
+         final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject().getId() == p.getId())
+               .mapToLong(work -> {
+                  return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
+               }).sum();
+         label.setText(DateFormatter.secondsToHHMMSS(seconds));
+         label.setFont(new Font(ARIAL, 12));
+      }
+      return currentWorkSeconds;
+   }
+
+   private void setUpTime() {
+      bigTimeLabel.setText(TIME_ZERO);
+      bigTimeLabel.setFont(new Font(ARIAL, 60));
+      allTimeLabel.setText(TIME_ZERO);
+      todayAllSeconds.setText(TIME_ZERO);
+   }
+
+   private void setUpTextArea() {
+      textArea.setWrapText(true);
+      textArea.setEditable(false);
+      textArea.editableProperty().bind(mouseHoveringProperty);
+
+      textArea.textProperty().addListener((a, b, c) -> {
+         controller.setComment(textArea.getText());
+      });
    }
 
    private void setProjectWindowVisibleByMouseHover(final Boolean c) {
@@ -664,7 +672,7 @@ public class ViewController {
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
-         final Dialog<ButtonType> dialog = setUpEditProjectDialog(p);
+         final Dialog<ButtonType> dialog = setUpDialogButtonType("Edit project", "Edit project '" + p.getName() + "'");
          final GridPane grid = setUpEditProjectGridPane(p);
 
          // TODO disable OK button if no name is set
@@ -734,43 +742,65 @@ public class ViewController {
             indexSpinner.getValue());
    }
 
-   private Label setUpProjectNameLabel(final Label projectNameLabel, final double dimFactor, final Project p) {
-      return projectNameLabel;
+   private Dialog<ButtonType> setUpDialogButtonType(final String title, final String headerText) {
+      final Dialog<ButtonType> dialog = new Dialog<>();
+      dialog.setTitle(title);
+      dialog.setHeaderText(headerText);
+      dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      return dialog;
    }
 
-   private Dialog<ButtonType> setUpEditProjectDialog(final Project p) {
-      final Dialog<ButtonType> dialog = new Dialog<>();
-      dialog.setTitle("Edit project");
-      dialog.setHeaderText("Edit project '" + p.getName() + "'");
+   private Dialog<Project> setUpDialogProject(final String title, final String headerText) {
+      final Dialog<Project> dialog = new Dialog<>();
+      dialog.setTitle(title);
+      dialog.setHeaderText(headerText);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
       return dialog;
    }
 
    private GridPane setUpEditProjectGridPane(final Project p) {
-      final GridPane grid = new GridPane();
+      final GridPane grid = setUpGridPane(p.getName(), p.getColor(), p.isWork());
 
+      final Spinner<Integer> indexSpinner = new Spinner<>();
+      final int availableProjectAmount = model.availableProjects.size();
+      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
+      grid.add(indexSpinner, 1, 3);
+
+      return grid;
+   }
+
+   private GridPane setUpAddNewProjectGridPane(final String projectName, final Color projectColor,
+         final boolean isWork) {
+      final GridPane grid = setUpGridPane(projectName, projectColor, isWork);
+
+      final Spinner<Integer> indexSpinner = new Spinner<>();
+      final int availableProjectAmount = model.availableProjects.size();
+      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
+      grid.add(indexSpinner, 1, 3);
+
+      return grid;
+   }
+
+   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
+      final GridPane grid = new GridPane();
       grid.setHgap(10);
       grid.setVgap(10);
       grid.setPadding(new Insets(20, 150, 10, 10));
 
       grid.add(new Label("Name:"), 0, 0);
-      final TextField projectNameTextField = new TextField(p.getName());
+      final TextField projectNameTextField = new TextField(projectName);
       grid.add(projectNameTextField, 1, 0);
 
       grid.add(new Label("Color:"), 0, 1);
-      final ColorPicker colorPicker = new ColorPicker(p.getColor());
+      final ColorPicker colorPicker = new ColorPicker(projectColor);
       grid.add(colorPicker, 1, 1);
 
       grid.add(new Label("IsWork:"), 0, 2);
       final CheckBox isWorkCheckBox = new CheckBox();
-      isWorkCheckBox.setSelected(p.isWork());
+      isWorkCheckBox.setSelected(isWork);
       grid.add(isWorkCheckBox, 1, 2);
 
       grid.add(new Label("SortIndex:"), 0, 3);
-      final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.availableProjects.size();
-      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
-      grid.add(indexSpinner, 1, 3);
 
       return grid;
    }
