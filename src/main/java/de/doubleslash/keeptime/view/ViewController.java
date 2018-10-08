@@ -119,9 +119,9 @@ public class ViewController {
    private Canvas canvas;
 
    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-   final private String RGBA = "rgba(";
-   final private String ARIAL = "Arial";
-   final private String TIME_ZERO = "00:00:00";
+   private static final String RGBA = "rgba(";
+   private static final String ARIAL = "Arial";
+   private static final String TIME_ZERO = "00:00:00";
 
    boolean pressed = false;
    double startX = -1;
@@ -173,7 +173,7 @@ public class ViewController {
    private void initialize() throws IOException {
 
       bigTimeLabel.setText(TIME_ZERO);
-      bigTimeLabel.setFont(new Font("Arial", 60));
+      bigTimeLabel.setFont(new Font(ARIAL, 60));
       allTimeLabel.setText(TIME_ZERO);
       todayAllSeconds.setText(TIME_ZERO);
 
@@ -187,17 +187,7 @@ public class ViewController {
 
       // reposition window if projects are hidden (as anchor is top left)
       mouseHoveringProperty.addListener((a, b, c) -> {
-         // TODO fix the not so nice jumping..
-         projectsVBox.setManaged(c);
-         final double beforeWidth = mainStage.getWidth();
-         mainStage.sizeToScene();
-         final double afterWidth = mainStage.getWidth();
-         projectsVBox.setVisible(c);
-         final double offset = afterWidth - beforeWidth;
-         if (!model.displayProjectsRight.get()) {
-            // we only need to move the stage if the node on the left is hidden
-            mainStage.setX(mainStage.getX() - offset);
-         }
+         setProjectWindowVisibleByMouseHover(c);
       });
 
       minimizeButton.setOnAction((ae) -> {
@@ -444,13 +434,27 @@ public class ViewController {
                      return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
                   }).sum();
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
-            label.setFont(new Font("Arial", 12));
+            label.setFont(new Font(ARIAL, 12));
          }
 
          updateProjectColorTimeline();
          updateTaskbarIcon(currentWorkSeconds);
       });
 
+   }
+
+   private void setProjectWindowVisibleByMouseHover(final Boolean c) {
+      // TODO fix the not so nice jumping..
+      projectsVBox.setManaged(c);
+      final double beforeWidth = mainStage.getWidth();
+      mainStage.sizeToScene();
+      final double afterWidth = mainStage.getWidth();
+      projectsVBox.setVisible(c);
+      final double offset = afterWidth - beforeWidth;
+      if (!model.displayProjectsRight.get()) {
+         // we only need to move the stage if the node on the left is hidden
+         mainStage.setX(mainStage.getX() - offset);
+      }
    }
 
    private void loadSubStages() {
