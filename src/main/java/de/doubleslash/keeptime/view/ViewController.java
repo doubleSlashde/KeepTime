@@ -676,11 +676,8 @@ public class ViewController {
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
-         Dialog<ButtonType> dialog = new Dialog<>();
-         dialog = setUpEditProjectDialog(p);
-
-         GridPane grid = new GridPane();
-         grid = setUpEditProjectGridPane(p);
+         final Dialog<ButtonType> dialog = setUpEditProjectDialog(p);
+         final GridPane grid = setUpEditProjectGridPane(p);
 
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
@@ -697,6 +694,11 @@ public class ViewController {
             if (buttonType != ButtonType.OK) {
                return;
             }
+            final ObservableList<Node> nodes = grid.getChildren();
+            final TextField projectNameTextField = (TextField) nodes.get(6);
+            final ColorPicker colorPicker = (ColorPicker) nodes.get(4);
+            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(2);
+            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(0);
             controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(),
                   isWorkCheckBox.isSelected(), indexSpinner.getValue());
 
