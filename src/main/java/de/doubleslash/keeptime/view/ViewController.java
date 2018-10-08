@@ -572,24 +572,8 @@ public class ViewController {
          grid.setPadding(new Insets(20, 150, 10, 10));
          int gridRow = 0;
          grid.add(new Label("Minutes to transfer"), 0, gridRow);
-         final Slider slider = new Slider();
-         slider.setMin(0);
-         slider.maxProperty().bind(Bindings.createLongBinding(() -> {
-            final long maxValue = activeWorkSecondsProperty.longValue() / 60;
-            if (maxValue > 0) {
-               slider.setDisable(false);
-               return maxValue;
-            }
-            slider.setDisable(true);
-            return 1l;
-         }, activeWorkSecondsProperty));
-         slider.setValue(0);
-         slider.setShowTickLabels(true);
-         slider.setShowTickMarks(true);
-         slider.setMajorTickUnit(60);
-         slider.setMinorTickCount(58);
-         slider.setBlockIncrement(1);
-         slider.setSnapToTicks(true);
+         final Slider slider = setUpSliderChangeWithTimeMenuItem(activeWorkSecondsProperty);
+
          grid.add(slider, 1, gridRow);
          final Label minutesToTransferLabel = new Label("999 minute(s)");
          grid.add(minutesToTransferLabel, 2, gridRow);
@@ -695,12 +679,7 @@ public class ViewController {
                return;
             }
             final ObservableList<Node> nodes = grid.getChildren();
-            final TextField projectNameTextField = (TextField) nodes.get(1);
-            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-            controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(),
-                  isWorkCheckBox.isSelected(), indexSpinner.getValue());
+            editProject(nodes, p);
 
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
@@ -716,6 +695,43 @@ public class ViewController {
       contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
+   }
+
+   private Slider setUpSliderChangeWithTimeMenuItem(final LongProperty activeWorkSecondsProperty) {
+      final Slider slider = new Slider();
+
+      slider.setMin(0);
+      slider.maxProperty().bind(Bindings.createLongBinding(() -> {
+         final long maxValue = activeWorkSecondsProperty.longValue() / 60;
+         if (maxValue > 0) {
+            slider.setDisable(false);
+            return maxValue;
+         }
+         slider.setDisable(true);
+         return 1l;
+      }, activeWorkSecondsProperty));
+      slider.setValue(0);
+      slider.setShowTickLabels(true);
+      slider.setShowTickMarks(true);
+      slider.setMajorTickUnit(60);
+      slider.setMinorTickCount(58);
+      slider.setBlockIncrement(1);
+      slider.setSnapToTicks(true);
+
+      return slider;
+   }
+
+   private void editProject(final ObservableList<Node> nodes, final Project p) {
+      final TextField projectNameTextField = (TextField) nodes.get(1);
+      final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
+      final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
+      final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
+      controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
+            indexSpinner.getValue());
+   }
+
+   private Label setUpProjectNameLabel(final Label projectNameLabel, final double dimFactor, final Project p) {
+      return projectNameLabel;
    }
 
    private Dialog<ButtonType> setUpEditProjectDialog(final Project p) {
