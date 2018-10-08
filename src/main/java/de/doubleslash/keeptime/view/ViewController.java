@@ -127,7 +127,8 @@ public class ViewController {
    double startX = -1;
 
    class Delta {
-      double x, y;
+      double x;
+      double y;
    }
 
    private final Delta dragDelta = new Delta();
@@ -532,8 +533,6 @@ public class ViewController {
          final MouseButton button = a.getButton();
          if (button == MouseButton.PRIMARY) {
             changeProject(p, 0);
-         } else if (button == MouseButton.SECONDARY) {
-
          }
 
       });
@@ -677,35 +676,11 @@ public class ViewController {
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
-         final Dialog<ButtonType> dialog = new Dialog<>();
-         dialog.setTitle("Edit project");
-         dialog.setHeaderText("Edit project '" + p.getName() + "'");
+         Dialog<ButtonType> dialog = new Dialog<>();
+         dialog = setUpEditProjectDialog(p);
 
-         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-         final GridPane grid = new GridPane();
-         grid.setHgap(10);
-         grid.setVgap(10);
-         grid.setPadding(new Insets(20, 150, 10, 10));
-
-         grid.add(new Label("Name:"), 0, 0);
-         final TextField projectNameTextField = new TextField(p.getName());
-         grid.add(projectNameTextField, 1, 0);
-
-         grid.add(new Label("Color:"), 0, 1);
-         final ColorPicker colorPicker = new ColorPicker(p.getColor());
-         grid.add(colorPicker, 1, 1);
-
-         grid.add(new Label("IsWork:"), 0, 2);
-         final CheckBox isWorkCheckBox = new CheckBox();
-         isWorkCheckBox.setSelected(p.isWork());
-         grid.add(isWorkCheckBox, 1, 2);
-
-         grid.add(new Label("SortIndex:"), 0, 3);
-         final Spinner<Integer> indexSpinner = new Spinner<>();
-         final int availableProjectAmount = model.availableProjects.size();
-         indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
-         grid.add(indexSpinner, 1, 3);
+         GridPane grid = new GridPane();
+         grid = setUpEditProjectGridPane(p);
 
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
@@ -739,6 +714,43 @@ public class ViewController {
       contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
+   }
+
+   private Dialog<ButtonType> setUpEditProjectDialog(final Project p) {
+      final Dialog<ButtonType> dialog = new Dialog<>();
+      dialog.setTitle("Edit project");
+      dialog.setHeaderText("Edit project '" + p.getName() + "'");
+      dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      return dialog;
+   }
+
+   private GridPane setUpEditProjectGridPane(final Project p) {
+      final GridPane grid = new GridPane();
+
+      grid.setHgap(10);
+      grid.setVgap(10);
+      grid.setPadding(new Insets(20, 150, 10, 10));
+
+      grid.add(new Label("Name:"), 0, 0);
+      final TextField projectNameTextField = new TextField(p.getName());
+      grid.add(projectNameTextField, 1, 0);
+
+      grid.add(new Label("Color:"), 0, 1);
+      final ColorPicker colorPicker = new ColorPicker(p.getColor());
+      grid.add(colorPicker, 1, 1);
+
+      grid.add(new Label("IsWork:"), 0, 2);
+      final CheckBox isWorkCheckBox = new CheckBox();
+      isWorkCheckBox.setSelected(p.isWork());
+      grid.add(isWorkCheckBox, 1, 2);
+
+      grid.add(new Label("SortIndex:"), 0, 3);
+      final Spinner<Integer> indexSpinner = new Spinner<>();
+      final int availableProjectAmount = model.availableProjects.size();
+      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
+      grid.add(indexSpinner, 1, 3);
+
+      return grid;
    }
 
    private void realignProjectList() {

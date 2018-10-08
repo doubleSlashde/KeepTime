@@ -55,6 +55,8 @@ public class ReportController {
    private Controller controller;
    private Model model;
 
+   private final String SYSTEM = "System";
+
    @FXML
    private void initialize() {
       LOG.info("Init reportController");
@@ -83,7 +85,7 @@ public class ReportController {
       long currentSeconds = 0;
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
-         projectName.setFont(Font.font("System", FontWeight.BOLD, 15));
+         projectName.setFont(Font.font(SYSTEM, FontWeight.BOLD, 15));
          gridPane.add(projectName, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
@@ -99,7 +101,7 @@ public class ReportController {
          }
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
-         workedTimeLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+         workedTimeLabel.setFont(Font.font(SYSTEM, FontWeight.BOLD, 15));
          gridPane.add(workedTimeLabel, 2, rowIndex);
          rowIndex++;
 
@@ -109,18 +111,18 @@ public class ReportController {
                   .secondsToHHMMSS(DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime()));
 
             final Label commentLabel = new Label(work.getNotes());
-            commentLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            commentLabel.setFont(Font.font(SYSTEM, FontWeight.NORMAL, 15));
             commentLabel.setWrapText(true);
             gridPane.add(commentLabel, 0, rowIndex);
 
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
-            fromTillLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            fromTillLabel.setFont(Font.font(SYSTEM, FontWeight.NORMAL, 15));
             fromTillLabel.setWrapText(true);
             gridPane.add(fromTillLabel, 1, rowIndex);
 
             final Label workedHoursLabel = new Label(workedHours);
-            workedHoursLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            workedHoursLabel.setFont(Font.font(SYSTEM, FontWeight.NORMAL, 15));
             gridPane.add(workedHoursLabel, 2, rowIndex);
 
             rowIndex++;
