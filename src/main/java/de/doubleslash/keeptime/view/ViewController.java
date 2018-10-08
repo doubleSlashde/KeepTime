@@ -695,10 +695,10 @@ public class ViewController {
                return;
             }
             final ObservableList<Node> nodes = grid.getChildren();
-            final TextField projectNameTextField = (TextField) nodes.get(6);
-            final ColorPicker colorPicker = (ColorPicker) nodes.get(4);
-            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(2);
-            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(0);
+            final TextField projectNameTextField = (TextField) nodes.get(1);
+            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
+            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
+            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
             controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(),
                   isWorkCheckBox.isSelected(), indexSpinner.getValue());
 
