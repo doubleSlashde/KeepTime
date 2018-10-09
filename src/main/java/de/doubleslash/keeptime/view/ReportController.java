@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -48,33 +47,31 @@ public class ReportController {
    @FXML
    private ScrollPane scrollPane;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
    private DatePicker datePicker; // for calender element
 
-   private Controller controller;
    private Model model;
 
-   private final String SYSTEM = "System";
+   private static final String SYSTEM = "System";
 
    @FXML
    private void initialize() {
-      LOG.info("Init reportController");
+      log.info("Init reportController");
 
       datePicker = new DatePicker(LocalDate.now());
       datePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
-         LOG.info("Datepicker selected value changed to {}", newvalue);
+         log.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);
       });
    }
 
    private void updateReport(final LocalDate newvalue) {
       currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
-      final List<Work> currentWorkItems = model.workRepository.findByCreationDate(newvalue);
+      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
 
-      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> {
-         return m.getProject();
-      }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
+      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> m.getProject())
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
 
       gridPane.getChildren().clear();
       gridPane.getRowConstraints().clear();
@@ -90,9 +87,8 @@ public class ReportController {
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
 
-         final long todaysWorkSeconds = onlyCurrentProjectWork.stream().mapToLong(work -> {
-            return DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime());
-         }).sum();
+         final long todaysWorkSeconds = onlyCurrentProjectWork.stream()
+               .mapToLong(work -> DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime())).sum();
 
          currentSeconds += todaysWorkSeconds;
          if (project.isWork()) {
@@ -133,25 +129,23 @@ public class ReportController {
       currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
    }
 
-   public void setModelAndController(final Model model, final Controller controller) {
+   public void setModel(final Model model) {
       this.model = model;
-      this.controller = controller;
 
       // HACK to show calendar from datepicker
       // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
       final DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
-      final Callback<DatePicker, DateCell> dayCellFactory = callback -> {
-         return new DateCell() {
-            @Override
-            public void updateItem(final LocalDate item, final boolean empty) {
-               super.updateItem(item, empty);
-               if (model.workRepository.findByCreationDate(item).isEmpty()) {
-                  setDisable(true);
-                  setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
-               }
+      final Callback<DatePicker, DateCell> dayCellFactory = callback -> new DateCell() {
+         @Override
+         public void updateItem(final LocalDate item, final boolean empty) {
+            super.updateItem(item, empty);
+            if (model.getWorkRepository().findByCreationDate(item).isEmpty()) {
+               setDisable(true);
+               setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
             }
-         };
+         }
       };
+
       datePicker.setDayCellFactory(dayCellFactory);
       final Node popupContent = datePickerSkin.getPopupContent();
       topBorderPane.setRight(popupContent);

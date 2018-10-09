@@ -1,4 +1,4 @@
-package de.doubleslash.keeptime.model.persistenceConverter;
+package de.doubleslash.keeptime.model.persistenceconverter;
 
 import javax.persistence.AttributeConverter;
 

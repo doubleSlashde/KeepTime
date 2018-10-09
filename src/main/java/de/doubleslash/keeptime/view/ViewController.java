@@ -121,7 +121,7 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private final Logger log = LoggerFactory.getLogger(this.getClass());
    private static final String RGBA = "rgba(";
    private static final String ARIAL = "Arial";
    private static final String TIME_ZERO = "00:00:00";
@@ -144,7 +144,7 @@ public class ViewController {
       this.controller = controller;
       this.model = model;
 
-      changeProject(model.idleProject, 0); // TODO initialize not here!
+      changeProject(Model.idleProject, 0); // TODO initialize not here!
       updateProjectView();
    }
 
@@ -173,24 +173,18 @@ public class ViewController {
    Map<Project, Node> projectSelectionNodeMap;
 
    @FXML
-   private void initialize() throws IOException {
+   private void initialize() {
 
       setUpTime();
 
       setUpTextArea();
 
       // reposition window if projects are hidden (as anchor is top left)
-      mouseHoveringProperty.addListener((a, b, c) -> {
-         setProjectWindowVisibleByMouseHover(c);
-      });
+      mouseHoveringProperty.addListener((a, b, c) -> setProjectWindowVisibleByMouseHover(c));
 
-      minimizeButton.setOnAction(ae -> {
-         mainStage.setIconified(true);
-      });
+      minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setOnAction(ae -> {
-         mainStage.close();
-      });
+      closeButton.setOnAction(ae -> mainStage.close());
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
@@ -203,23 +197,15 @@ public class ViewController {
          return new Light.Distant(45, 45, color);
       }, fontColorProperty));
 
-      settingsButton.setOnAction(ae -> {
-         settingsClicked();
-      });
+      settingsButton.setOnAction(ae -> settingsClicked());
       settingsButton.setEffect(lighting);
 
-      calendarButton.setOnAction((ae) -> {
-         calendarClicked();
-      });
+      calendarButton.setOnAction(ae -> calendarClicked());
       calendarButton.setEffect(lighting);
 
-      final Runnable updateMainBackgroundColor = () -> {
-         runUpdateMainBackgroundColor();
-      };
+      final Runnable updateMainBackgroundColor = () -> runUpdateMainBackgroundColor();
 
-      mouseHoveringProperty.addListener((a, b, c) -> {
-         updateMainBackgroundColor.run();
-      });
+      mouseHoveringProperty.addListener((a, b, c) -> updateMainBackgroundColor.run());
 
       Platform.runLater(() -> {
          loadSubStages();
@@ -247,9 +233,7 @@ public class ViewController {
 
             }
          };
-         model.displayProjectsRight.addListener((a, oldValue, newValue) -> {
-            displayProjectRightRunnable.run();
-         });
+         model.displayProjectsRight.addListener((a, oldValue, newValue) -> displayProjectRightRunnable.run());
          displayProjectRightRunnable.run();
 
          // Setup textarea font color binding
@@ -258,14 +242,12 @@ public class ViewController {
                   RGBA + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
             textArea.setStyle(textAreaStyle);
          };
-         fontColorProperty.addListener((a, b, c) -> {
-            textAreaColorRunnable.run();
-         });
+         fontColorProperty.addListener((a, b, c) -> textAreaColorRunnable.run());
          textAreaColorRunnable.run();
 
          projectSelectionNodeMap = new HashMap<>(model.availableProjects.size());
 
-         for (final Project project : model.sortedAvailableProjects) {
+         for (final Project project : model.getSortedAvailableProjects()) {
             if (project.isEnabled()) {
                final Node node = addProjectToProjectList(project);
                projectSelectionNodeMap.put(project, node);
@@ -277,44 +259,33 @@ public class ViewController {
             textArea.setText("");
          });
 
-         model.availableProjects.addListener((ListChangeListener<Project>) lis -> {
-            setUpAvailableProjectsListener(lis);
-         });
+         model.availableProjects.addListener((ListChangeListener<Project>) lis -> setUpAvailableProjectsListener(lis));
 
-         model.defaultBackgroundColor.addListener((a, b, c) -> {
-            updateMainBackgroundColor.run();
-         });
-         model.hoverBackgroundColor.addListener((a, b, c) -> {
-            updateMainBackgroundColor.run();
-         });
+         model.defaultBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
+         model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
          updateMainBackgroundColor.run();
       });
 
-      pane.setOnMouseEntered((a) -> {
-         mouseHoveringProperty.set(true);
-      });
+      pane.setOnMouseEntered(a -> mouseHoveringProperty.set(true));
 
-      pane.setOnMouseExited((a) -> {
-         mouseHoveringProperty.set(false);
-      });
+      pane.setOnMouseExited(a -> mouseHoveringProperty.set(false));
 
       // Drag stage
-      pane.setOnMousePressed((mouseEvent) -> {
+      pane.setOnMousePressed(mouseEvent -> {
          // record a delta distance for the drag and drop operation.
          dragDelta.x = mainStage.getX() - mouseEvent.getScreenX();
          dragDelta.y = mainStage.getY() - mouseEvent.getScreenY();
          wasDragged = false;
       });
 
-      pane.setOnMouseDragged((mouseEvent) -> {
+      pane.setOnMouseDragged(mouseEvent -> {
          mainStage.setX(mouseEvent.getScreenX() + dragDelta.x);
          mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
          wasDragged = true;
       });
 
-      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-         return DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get());
-      }, activeWorkSecondsProperty));
+      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(
+            () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
 
       // update ui each second
       Interval.registerCallBack(() -> {
@@ -343,14 +314,14 @@ public class ViewController {
    }
 
    private void settingsClicked() {
-      LOG.info("Settings clicked");
+      log.info("Settings clicked");
       this.mainStage.setAlwaysOnTop(false);
       settingsController.update();
       settingsStage.show();
    }
 
    private void calendarClicked() {
-      LOG.info("Calendar clicked");
+      log.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
       reportController.update();
       reportStage.show();
@@ -383,7 +354,7 @@ public class ViewController {
             for (final Project project : removedSubList) {
                // change to idle if removed project was active
                if (project == model.activeWorkItem.get().getProject()) {
-                  changeProject(model.idleProject, 0);
+                  changeProject(Model.idleProject, 0);
                }
                final Node remove = projectSelectionNodeMap.remove(project);
                availableProjectVbox.getChildren().remove(remove);
@@ -411,8 +382,8 @@ public class ViewController {
       for (final Map.Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
          final Label label = entry.getValue();
 
-         final long seconds = model.pastWorkItems.stream()
-               .filter((work) -> work.getProject().getId() == entry.getKey().getId())
+         final long seconds = model.getPastWorkItems().stream()
+               .filter(work -> work.getProject().getId() == entry.getKey().getId())
                .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
          label.setText(DateFormatter.secondsToHHMMSS(seconds));
          label.setFont(new Font(ARIAL, 12));
@@ -432,9 +403,7 @@ public class ViewController {
       textArea.setEditable(false);
       textArea.editableProperty().bind(mouseHoveringProperty);
 
-      textArea.textProperty().addListener((a, b, c) -> {
-         controller.setComment(textArea.getText());
-      });
+      textArea.textProperty().addListener((a, b, c) -> controller.setComment(textArea.getText()));
    }
 
    private void setProjectWindowVisibleByMouseHover(final Boolean c) {
@@ -455,21 +424,19 @@ public class ViewController {
       try {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
-         final Parent sceneRoot = (Parent) fxmlLoader.load();
+         final Parent sceneRoot = fxmlLoader.load();
          reportController = fxmlLoader.getController();
-         reportController.setModelAndController(model, controller);
+         reportController.setModel(model);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportStage.setScene(new Scene(sceneRoot));
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
-         reportStage.setOnHiding(e -> {
-            this.mainStage.setAlwaysOnTop(true);
-         });
+         reportStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
-         final Parent root1 = (Parent) fxmlLoader2.load();
+         final Parent root1 = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
          settingsController.setModelAndController(model, controller);
          settingsStage = new Stage();
@@ -478,9 +445,7 @@ public class ViewController {
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
          settingsStage.setScene(new Scene(root1));
-         settingsStage.setOnHiding(e -> {
-            this.mainStage.setAlwaysOnTop(true);
-         });
+         settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
          throw new FXMLLoaderException(e);
       }
@@ -499,9 +464,9 @@ public class ViewController {
       loader.setLocation(Resources.getResource(RESOURCE.FXML_PROJECT_LAYOUT));
       Pane projectElement;
       try {
-         projectElement = (Pane) loader.load();
+         projectElement = loader.load();
       } catch (final IOException e1) {
-         LOG.error("Could not load '{}'.", loader.getLocation(), e1);
+         log.error("Could not load '{}'.", loader.getLocation(), e1);
          throw new FXMLLoaderException(e1);
       }
 
@@ -519,11 +484,10 @@ public class ViewController {
       projectNameLabel.setTextFill(dimmedColor);
 
       projectNameLabel.setUserData(p);
-      projectNameLabel.setOnContextMenuRequested(event -> {
-         contextMenu.show(projectNameLabel, event.getScreenX(), event.getScreenY());
-      });
+      projectNameLabel.setOnContextMenuRequested(
+            event -> contextMenu.show(projectNameLabel, event.getScreenX(), event.getScreenY()));
 
-      projectNameLabel.setOnMouseClicked((a) -> {
+      projectNameLabel.setOnMouseClicked(a -> {
          if (wasDragged) {
             return;
          }
@@ -552,7 +516,7 @@ public class ViewController {
       // TODO dialog modality
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
-         LOG.info("Change with time");
+         log.info("Change with time");
          final Dialog<Integer> dialog = new Dialog<>();
          dialog.setTitle("Change project with time transfer");
          dialog.setHeaderText("Choose the time to transfer");
@@ -607,12 +571,8 @@ public class ViewController {
             newEndTimeLabel.setText(
                   DateFormatter.toTimeString(model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
          };
-         activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> {
-            updateLabelsRunnable.run();
-         });
-         slider.valueProperty().addListener((obs, oldValue, newValue) -> {
-            updateLabelsRunnable.run();
-         });
+         activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
+         slider.valueProperty().addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
          vBox.getChildren().add(grid);
 
          dialog.getDialogPane().setContent(vBox);
@@ -627,14 +587,12 @@ public class ViewController {
          final Optional<Integer> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
 
-         result.ifPresent(minusSeconds -> {
-            changeProject(p, minusSeconds);
-         });
+         result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
       deleteMenuItem.setOnAction(e -> {
-         LOG.info("Delete");
+         log.info("Delete");
 
          final Alert alert = new Alert(AlertType.CONFIRMATION);
          alert.setTitle("Delete project");
@@ -657,16 +615,14 @@ public class ViewController {
       final MenuItem editMenuItem = new MenuItem("Edit");
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
-         LOG.info("Edit project");
+         log.info("Edit project");
          final Dialog<ButtonType> dialog = setUpDialogButtonType("Edit project", "Edit project '" + p.getName() + "'");
          final GridPane grid = setUpEditProjectGridPane(p);
 
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
-         dialog.setResultConverter(dialogButton -> {
-            return dialogButton;
-         });
+         dialog.setResultConverter(dialogButton -> dialogButton);
 
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = dialog.showAndWait();
@@ -792,14 +748,14 @@ public class ViewController {
    }
 
    private void realignProjectList() {
-      LOG.debug("Sorting project view");
+      log.debug("Sorting project view");
       final ObservableList<Node> children = availableProjectVbox.getChildren();
       children.clear();
       // TODO changing the model is not ok from here, but the list is not resorted
-      final Comparator<? super Project> comparator = model.sortedAvailableProjects.getComparator();
-      model.sortedAvailableProjects.setComparator(null); // TODO is there a better way?
-      model.sortedAvailableProjects.setComparator(comparator);
-      for (final Project p : model.sortedAvailableProjects) {
+      final Comparator<? super Project> comparator = model.getSortedAvailableProjects().getComparator();
+      model.getSortedAvailableProjects().setComparator(null); // TODO is there a better way?
+      model.getSortedAvailableProjects().setComparator(comparator);
+      for (final Project p : model.getSortedAvailableProjects()) {
          children.add(projectSelectionNodeMap.get(p));
       }
    }
@@ -813,7 +769,7 @@ public class ViewController {
 
       double currentX = 0;
       final long maxSeconds = controller.calcTodaysSeconds();
-      for (final Work w : model.pastWorkItems) {
+      for (final Work w : model.getPastWorkItems()) {
          final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
          final double fillX = (float) workedSeconds / maxSeconds * canvas.getWidth();
          gc.setFill(w.getProject().getColor());
@@ -829,7 +785,7 @@ public class ViewController {
       gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
       gcIcon.fillRect(1, 27, 31, 5);
 
-      gcIcon.setStroke(model.taskBarColor.get());
+      gcIcon.setStroke(Model.TASK_BAR_COLOR.get());
       gcIcon.setTextAlign(TextAlignment.CENTER);
       gcIcon.setFont(new Font(ARIAL, 12));
       gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
@@ -879,7 +835,7 @@ public class ViewController {
 
    @FXML
    public void addNewProject(final ActionEvent ae) {
-      LOG.info("Add new project clicked");
+      log.info("Add new project clicked");
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 

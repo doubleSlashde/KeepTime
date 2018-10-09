@@ -186,7 +186,7 @@ public class ControllerTest {
       Mockito.when(mockedDateProvider.dateNow()).thenReturn(secondProjectDate);
       testee.changeProject(secondProject);
 
-      Mockito.verify(model.workRepository, Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
+      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
          if (savedWork.getProject() != firstProject) {
             return false;
          }
@@ -198,8 +198,8 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("Two project should be in the past work items", model.pastWorkItems.size(), is(2));
-      assertThat("The first project should be the past work project", model.pastWorkItems.get(0).getProject(),
+      assertThat("Two project should be in the past work items", model.getPastWorkItems().size(), is(2));
+      assertThat("The first project should be the past work project", model.getPastWorkItems().get(0).getProject(),
             is(firstProject));
       assertThat("The second project should be the active work project", model.activeWorkItem.get().getProject(),
             is(secondProject));
@@ -221,7 +221,7 @@ public class ControllerTest {
       Mockito.when(mockedDateProvider.dateNow()).thenReturn(secondProjectDate);
       testee.changeProject(secondProject);
 
-      Mockito.verify(model.workRepository, Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
+      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
          if (savedWork.getProject() != firstProject) {
             return false;
          }
@@ -233,8 +233,8 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("One projects should be in the past work items", model.pastWorkItems.size(), is(1));
-      assertThat("The project should be the second work project", model.pastWorkItems.get(0).getProject(),
+      assertThat("One projects should be in the past work items", model.getPastWorkItems().size(), is(1));
+      assertThat("The project should be the second work project", model.getPastWorkItems().get(0).getProject(),
             is(secondProject));
       assertThat("The second project should be the active work project", model.activeWorkItem.get().getProject(),
             is(secondProject));

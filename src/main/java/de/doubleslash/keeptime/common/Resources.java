@@ -30,6 +30,5 @@ public class Resources {
 
    public static URL getResource(final RESOURCE resource) {
       return Resources.class.getResource(resource.getResourceLocation());
-      // return ClassLoader.getSystemResource(resource.getResourceLocation());
    }
 }

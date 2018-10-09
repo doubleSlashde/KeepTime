@@ -62,7 +62,7 @@ public class SettingsController {
    @FXML
    private Label versionLabel;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
    private Model model;
    private Controller controller;
@@ -73,7 +73,7 @@ public class SettingsController {
    private void initialize() {
       versionLabel.setText(Main.VERSION);
       saveButton.setOnAction(ae -> {
-         LOG.info("Save clicked");
+         log.info("Save clicked");
 
          if (System.getProperty("os.name").contains("Linux")) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
@@ -119,25 +119,17 @@ public class SettingsController {
       });
 
       cancelButton.setOnAction(ae -> {
-         LOG.info("Cancel clicked");
+         log.info("Cancel clicked");
          thisStage.close();
       });
 
-      resetHoverBackgroundButton.setOnAction(ae -> {
-         hoverBackgroundColor.setValue(Model.originalHoverBackgroundColor);
-      });
-      resetHoverFontButton.setOnAction(ae -> {
-         hoverFontColor.setValue(Model.originalHoverFontColor);
-      });
-      resetDefaultBackgroundButton.setOnAction(ae -> {
-         defaultBackgroundColor.setValue(Model.originalDefaultBackgroundColor);
-      });
-      resetDefaultFontButton.setOnAction(ae -> {
-         defaultFontColor.setValue(Model.originalDefaultFontColor);
-      });
-      resetTaskBarFontButton.setOnAction(ae -> {
-         taskBarColor.setValue(Model.originalTaskBarFontColor);
-      });
+      resetHoverBackgroundButton
+            .setOnAction(ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
+      resetHoverFontButton.setOnAction(ae -> hoverFontColor.setValue(Model.ORIGINAL_HOVER_Font_COLOR));
+      resetDefaultBackgroundButton
+            .setOnAction(ae -> defaultBackgroundColor.setValue(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR));
+      resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
+      resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
       parseConfigButton.setOnAction(actionEvent -> {
          if (ConfigParser.hasConfigFile(INPUT_FILE)) {
@@ -162,9 +154,9 @@ public class SettingsController {
       defaultBackgroundColor.setValue(model.defaultBackgroundColor.get());
       defaultFontColor.setValue(model.defaultFontColor.get());
 
-      taskBarColor.setValue(model.taskBarColor.get());
+      taskBarColor.setValue(Model.TASK_BAR_COLOR.get());
 
-      useHotkeyCheckBox.setSelected(model.useHotkey.get());
+      useHotkeyCheckBox.setSelected(Model.USE_HOTKEY.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
    }
 

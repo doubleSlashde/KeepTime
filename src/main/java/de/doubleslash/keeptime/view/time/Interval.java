@@ -11,7 +11,7 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 public class Interval {
-   public static List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
+   protected static List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
 
    private static Timeline timelineSession;
    private static LocalDateTime last = LocalDateTime.now();
@@ -31,9 +31,7 @@ public class Interval {
     * only create timeLine if needed
     */
    private static void createTimeLine() {
-      timelineSession = new Timeline(new KeyFrame(Duration.seconds(1), (ae) -> {
-         debounceAndExecuteCallbacks();
-      }));
+      timelineSession = new Timeline(new KeyFrame(Duration.seconds(1), ae -> debounceAndExecuteCallbacks()));
       timelineSession.setCycleCount(Animation.INDEFINITE);
       timelineSession.play();
 

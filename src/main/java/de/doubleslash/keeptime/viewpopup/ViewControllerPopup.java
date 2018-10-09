@@ -1,7 +1,6 @@
-package de.doubleslash.keeptime.viewPopup;
+package de.doubleslash.keeptime.viewpopup;
 
 import java.awt.Point;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -13,7 +12,6 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
@@ -27,7 +25,7 @@ public class ViewControllerPopup {
 
    private static final int LIST_CELL_HEIGHT = 23 + 2;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
    @FXML
    private Pane pane;
@@ -39,8 +37,6 @@ public class ViewControllerPopup {
 
    private Stage stage;
 
-   private Scene scene;
-
    private Controller controller;
    private Model model;
 
@@ -48,7 +44,7 @@ public class ViewControllerPopup {
 
    private void changeProject(final Project item) {
       final String info = String.format("Change project to '{%s}'.", item.getName());
-      LOG.info(info);
+      log.info(info);
 
       // ask for a note for the current project
       final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
@@ -69,16 +65,16 @@ public class ViewControllerPopup {
    }
 
    @FXML
-   private void initialize() throws IOException {
+   private void initialize() {
 
       // TODO the cells do not refresh, if a project was changed
       projectListView.setCellFactory(cb -> returnListCellOfProject());
 
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      final Consumer<Double> updateSize = (height) -> {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("%s%f", "update size ", height));
+      final Consumer<Double> updateSize = height -> {
+         if (log.isDebugEnabled()) {
+            log.debug(String.format("%s%f", "update size ", height));
             projectListView.setPrefHeight(height);
             stage.sizeToScene(); // also update scene size
          }
@@ -88,17 +84,18 @@ public class ViewControllerPopup {
          // TODO do i always have to create a new predicate?
          filteredData.setPredicate(project -> {
             // If filter text is empty, display all persons.
+            boolean returnValue = false;
             if (newValue == null || newValue.isEmpty()) {
-               return true;
+               returnValue = true;
             }
 
             final String lowerCaseFilter = newValue.toLowerCase();
 
             if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               return true; // Filter matches first name.
+               returnValue = true; // Filter matches first name.
             }
 
-            return false; // Does not match.
+            return returnValue; // Does not match.
          });
 
          projectListView.getSelectionModel().selectFirst();
@@ -126,7 +123,7 @@ public class ViewControllerPopup {
          }
       });
       // enter pressed in textfield
-      searchTextField.setOnAction((ev) -> {
+      searchTextField.setOnAction(ev -> {
          final Project selectedItem = projectListView.getSelectionModel().getSelectedItem();
          if (selectedItem != null) {
             changeProject(selectedItem);
@@ -150,9 +147,7 @@ public class ViewControllerPopup {
                setText(null);
 
             } else {
-               setOnMouseClicked((ev) -> {
-                  changeProject(project);
-               });
+               setOnMouseClicked(ev -> changeProject(project));
 
                final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
                setText((isActiveProject ? "* " : "") + project.getName());
@@ -169,13 +164,12 @@ public class ViewControllerPopup {
       this.controller = controller;
       this.model = model;
 
-      filteredData = new FilteredList<>(model.sortedAvailableProjects, p -> true);
+      filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
       projectListView.setItems(filteredData);
    }
 
-   public void setStage(final Stage primaryStage, final Scene scene) {
+   public void setStage(final Stage primaryStage) {
       this.stage = primaryStage;
-      this.scene = scene;
 
       // if we loose focus, hide the stage
       stage.focusedProperty().addListener((a, b, newValue) -> {
@@ -187,7 +181,7 @@ public class ViewControllerPopup {
 
    public void show(final Point mouseLocation) {
       if (!stage.isShowing()) {
-         LOG.info("Showing popup");
+         log.info("Showing popup");
          projectListView.getSelectionModel().select(0);
          projectListView.refresh();
 

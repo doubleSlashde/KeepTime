@@ -20,8 +20,8 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.ViewController;
-import de.doubleslash.keeptime.viewPopup.GlobalScreenListener;
-import de.doubleslash.keeptime.viewPopup.ViewControllerPopup;
+import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
+import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -34,7 +34,7 @@ import javafx.stage.StageStyle;
 @SpringBootApplication
 public class Main extends Application {
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private final Logger log = LoggerFactory.getLogger(this.getClass());
 
    public static final String VERSION = "v0.0.2";
 
@@ -47,7 +47,7 @@ public class Main extends Application {
 
    @Override
    public void init() throws Exception {
-      LOG.info("Starting KeepTime {}", VERSION);
+      log.info("Starting KeepTime {}", VERSION);
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
@@ -60,14 +60,14 @@ public class Main extends Application {
    @Override
    public void start(final Stage primaryStage) throws Exception {
 
-      LOG.debug("Reading configuration");
+      log.debug("Reading configuration");
 
       // TODO there should just be one instance of settings in the repo
-      final List<Settings> settingsList = model.settingsRepository.findAll();
+      final List<Settings> settingsList = model.getSettingsRepository().findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
          settings = new Settings();
-         settings.setTaskBarColor(model.taskBarColor.get());
+         settings.setTaskBarColor(Model.TASK_BAR_COLOR.get());
 
          settings.setDefaultBackgroundColor(model.defaultBackgroundColor.get());
          settings.setDefaultFontColor(model.defaultFontColor.get());
@@ -76,7 +76,7 @@ public class Main extends Application {
          settings.setHoverFontColor(model.hoverFontColor.get());
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(true);
-         model.settingsRepository.save(settings);
+         model.getSettingsRepository().save(settings);
       } else {
          settings = settingsList.get(0);
       }
@@ -85,21 +85,21 @@ public class Main extends Application {
       model.defaultFontColor.set(settings.getDefaultFontColor());
       model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
       model.hoverFontColor.set(settings.getHoverFontColor());
-      model.taskBarColor.set(settings.getTaskBarColor());
-      model.useHotkey.set(settings.isUseHotkey());
+      Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
+      Model.USE_HOTKEY.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
 
-      final List<Work> todaysWorkItems = model.workRepository.findByCreationDate(LocalDate.now());
-      LOG.info("Found {} past work items", todaysWorkItems.size());
-      model.pastWorkItems.addAll(todaysWorkItems);
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
+      log.info("Found {} past work items", todaysWorkItems.size());
+      model.getPastWorkItems().addAll(todaysWorkItems);
 
-      final List<Project> projects = model.projectRepository.findAll();
+      final List<Project> projects = model.getProjectRepository().findAll();
 
-      LOG.debug("Found '{}' projects", projects.size());
+      log.debug("Found '{}' projects", projects.size());
       if (projects.isEmpty()) {
-         LOG.info("Adding default project");
-         projects.add(model.DEFAULT_PROJECT);
-         model.projectRepository.save(model.DEFAULT_PROJECT);
+         log.info("Adding default project");
+         projects.add(Model.DEFAULT_PROJECT);
+         model.getProjectRepository().save(Model.DEFAULT_PROJECT);
       }
 
       model.allProjects.addAll(projects);
@@ -109,11 +109,11 @@ public class Main extends Application {
       // set default project
       final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
       if (findAny.isPresent()) {
-         model.idleProject = findAny.get();
-         LOG.debug("Using project '{}' as default project.", model.idleProject);
+         Model.idleProject = findAny.get();
+         log.debug("Using project '{}' as default project.", Model.idleProject);
       }
 
-      primaryStage.setOnHiding((we) -> {
+      primaryStage.setOnHiding(we -> {
          popupViewStage.close();
          globalScreenListener.register(false); // deregister, as this will keep app running
       });
@@ -121,13 +121,13 @@ public class Main extends Application {
       try {
          initialiseUI(primaryStage);
       } catch (final Exception e) {
-         LOG.error(e.getMessage());
+         log.error(e.getMessage());
       }
 
       try {
          initialisePopupUI(primaryStage);
       } catch (final Exception e) {
-         LOG.error(e.getMessage());
+         log.error(e.getMessage());
       }
    }
 
@@ -137,10 +137,8 @@ public class Main extends Application {
       // TODO register only if it is enabled
       globalScreenListener = new GlobalScreenListener();
       // TODO stop and close stage when main stage is shutdown
-      model.useHotkey.addListener((a, b, newValue) -> {
-         globalScreenListener.register(newValue);
-      });
-      globalScreenListener.register(model.useHotkey.get());
+      Model.USE_HOTKEY.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
+      globalScreenListener.register(Model.USE_HOTKEY.get());
 
       // Platform.setImplicitExit(false); // TODO maybe not needed as other view will be available
       popupViewStage = new Stage();
@@ -158,7 +156,7 @@ public class Main extends Application {
       // Give the controller access to the main app.
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
-      viewControllerPopupController.setStage(popupViewStage, popupScene);
+      viewControllerPopupController.setStage(popupViewStage);
       viewControllerPopupController.setController(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
 
@@ -184,7 +182,7 @@ public class Main extends Application {
          primaryStage.setAlwaysOnTop(true);
          primaryStage.setResizable(false);
 
-         primaryStage.setOnCloseRequest(actionEvent -> LOG.info("On close request"));
+         primaryStage.setOnCloseRequest(actionEvent -> log.info("On close request"));
 
          viewController = loader.getController();
          // Give the controller access to the main app.
@@ -197,7 +195,7 @@ public class Main extends Application {
       } catch (
 
       final Exception e) {
-         LOG.error("Error: " + e.toString(), e);
+         log.error("Error: " + e.toString(), e);
       }
    }
 
