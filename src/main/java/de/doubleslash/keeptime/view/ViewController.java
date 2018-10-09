@@ -32,7 +32,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -203,7 +202,7 @@ public class ViewController {
       calendarButton.setOnAction(ae -> calendarClicked());
       calendarButton.setEffect(lighting);
 
-      final Runnable updateMainBackgroundColor = () -> runUpdateMainBackgroundColor();
+      final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
       mouseHoveringProperty.addListener((a, b, c) -> updateMainBackgroundColor.run());
 
@@ -259,8 +258,7 @@ public class ViewController {
             textArea.setText("");
          });
 
-         model.getAvailableProjects()
-               .addListener((ListChangeListener<Project>) lis -> setUpAvailableProjectsListener(lis));
+         model.getAvailableProjects().addListener(this::setUpAvailableProjectsListener);
 
          Model.DEFAULT_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
          Model.HOVER_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());

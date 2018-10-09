@@ -70,7 +70,7 @@ public class ReportController {
       currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
       final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
 
-      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> m.getProject())
+      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
 
       gridPane.getChildren().clear();

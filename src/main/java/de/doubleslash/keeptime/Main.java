@@ -107,7 +107,7 @@ public class Main extends Application {
             .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
-      final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
+      final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();
       if (findAny.isPresent()) {
          model.setIdleProject(findAny.get());
          log.debug("Using project '{}' as default project.", model.getIdleProject());
