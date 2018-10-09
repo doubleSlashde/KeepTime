@@ -157,7 +157,7 @@ public class Main extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-      viewControllerPopupController.setController(controller, model);
+      viewControllerPopupController.setControllerAndModel(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
 
    }

@@ -49,7 +49,7 @@ public class Model {
    protected static final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
    public static final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
-   public static final long NEEDED_WORK_SECONDS = 60 * 60 * 8; // 8 hours
+   public static final long NEEDED_WORK_SECONDS = (long) (60 * 60 * 8.0); // 8 hours
 
    public static final ObjectProperty<Color> TASK_BAR_COLOR = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
 

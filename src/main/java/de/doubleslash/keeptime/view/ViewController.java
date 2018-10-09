@@ -453,8 +453,7 @@ public class ViewController {
    }
 
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
-      final FXMLLoader fxmlLoader = new FXMLLoader(Resources.getResource(fxmlLayout));
-      return fxmlLoader;
+      return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
 
    private Node addProjectToProjectList(final Project p) {

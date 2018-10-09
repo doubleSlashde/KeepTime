@@ -38,7 +38,6 @@ public class ViewControllerPopup {
    private Stage stage;
 
    private Controller controller;
-   private Model model;
 
    private FilteredList<Project> filteredData;
 
@@ -160,9 +159,8 @@ public class ViewControllerPopup {
 
    }
 
-   public void setController(final Controller controller, final Model model) {
+   public void setControllerAndModel(final Controller controller, final Model model) {
       this.controller = controller;
-      this.model = model;
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
       projectListView.setItems(filteredData);
