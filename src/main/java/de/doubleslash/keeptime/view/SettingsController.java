@@ -63,8 +63,6 @@ public class SettingsController {
    private Label versionLabel;
 
    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-   private Model model;
    private Controller controller;
    private Stage thisStage;
    private static final String INPUT_FILE = "config.xml";
@@ -140,8 +138,7 @@ public class SettingsController {
 
    }
 
-   public void setModelAndController(final Model model, final Controller controller) {
-      this.model = model;
+   public void setController(final Controller controller) {
       this.controller = controller;
 
       update();

@@ -41,13 +41,13 @@ public class Model {
    public static final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
    private Project idleProject = DEFAULT_PROJECT;
 
-   public static final ObservableList<Project> AVAILABLE_PROJECTS = FXCollections.observableArrayList();
-   private final SortedList<Project> sortedAvailableProjects = new SortedList<>(AVAILABLE_PROJECTS,
+   private final ObservableList<Project> availableProjects = FXCollections.observableArrayList();
+   private final SortedList<Project> sortedAvailableProjects = new SortedList<>(availableProjects,
          Comparator.comparing(Project::getIndex));
-   public ObservableList<Project> allProjects = FXCollections.observableArrayList();
+   private ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
    protected static final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
-   public ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
+   public static final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
    public static final long NEEDED_WORK_SECONDS = 60 * 60 * 8; // 8 hours
 
@@ -79,6 +79,10 @@ public class Model {
       this.idleProject = idleProject;
    }
 
+   public void setAllProjects(final ObservableList<Project> allProjects) {
+      this.allProjects = allProjects;
+   }
+
    public WorkRepository getWorkRepository() {
       return workRepository;
    }
@@ -101,5 +105,13 @@ public class Model {
 
    public Project getIdleProject() {
       return idleProject;
+   }
+
+   public ObservableList<Project> getAvailableProjects() {
+      return availableProjects;
+   }
+
+   public ObservableList<Project> getAllProjects() {
+      return allProjects;
    }
 }

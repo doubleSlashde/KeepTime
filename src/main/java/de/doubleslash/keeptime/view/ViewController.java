@@ -245,7 +245,7 @@ public class ViewController {
          fontColorProperty.addListener((a, b, c) -> textAreaColorRunnable.run());
          textAreaColorRunnable.run();
 
-         projectSelectionNodeMap = new HashMap<>(Model.AVAILABLE_PROJECTS.size());
+         projectSelectionNodeMap = new HashMap<>(model.getAvailableProjects().size());
 
          for (final Project project : model.getSortedAvailableProjects()) {
             if (project.isEnabled()) {
@@ -254,12 +254,13 @@ public class ViewController {
             }
          }
 
-         model.activeWorkItem.addListener((a, b, c) -> {
+         Model.activeWorkItem.addListener((a, b, c) -> {
             updateProjectView();
             textArea.setText("");
          });
 
-         Model.AVAILABLE_PROJECTS.addListener((ListChangeListener<Project>) lis -> setUpAvailableProjectsListener(lis));
+         model.getAvailableProjects()
+               .addListener((ListChangeListener<Project>) lis -> setUpAvailableProjectsListener(lis));
 
          Model.DEFAULT_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
          Model.HOVER_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
@@ -353,7 +354,7 @@ public class ViewController {
             final List<? extends Project> removedSubList = lis.getRemoved();
             for (final Project project : removedSubList) {
                // change to idle if removed project was active
-               if (project == model.activeWorkItem.get().getProject()) {
+               if (project == Model.activeWorkItem.get().getProject()) {
                   changeProject(model.getIdleProject(), 0);
                }
                final Node remove = projectSelectionNodeMap.remove(project);
@@ -365,10 +366,10 @@ public class ViewController {
 
    private long doIntervalRegisterCallBack() {
       final LocalDateTime now = LocalDateTime.now();
-      model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
+      Model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
 
       final long currentWorkSeconds = Duration
-            .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime()).getSeconds();
+            .between(Model.activeWorkItem.get().getStartTime(), Model.activeWorkItem.get().getEndTime()).getSeconds();
       activeWorkSecondsProperty.set(currentWorkSeconds);
       final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
       final long todaySeconds = controller.calcTodaysSeconds();
@@ -438,7 +439,7 @@ public class ViewController {
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
          final Parent root1 = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
-         settingsController.setModelAndController(model, controller);
+         settingsController.setController(controller);
          settingsStage = new Stage();
          settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
@@ -543,7 +544,7 @@ public class ViewController {
 
          grid.add(new Label("New time distribution"), 0, gridRow);
          gridRow++;
-         grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
+         grid.add(new Label("Active project duration: " + Model.activeWorkItem.get().getProject().getName()), 0,
                gridRow);
          final Label currentProjectTimeLabel = new Label(TIME_ZERO);
          grid.add(currentProjectTimeLabel, 1, gridRow);
@@ -569,7 +570,7 @@ public class ViewController {
             currentProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsActiveWork));
             newProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsNewWork));
             newEndTimeLabel.setText(
-                  DateFormatter.toTimeString(model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
+                  DateFormatter.toTimeString(Model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
          };
          activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
          slider.valueProperty().addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
@@ -704,7 +705,7 @@ public class ViewController {
       final GridPane grid = setUpGridPane(p.getName(), p.getColor(), p.isWork());
 
       final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = Model.AVAILABLE_PROJECTS.size();
+      final int availableProjectAmount = model.getAvailableProjects().size();
       indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
       grid.add(indexSpinner, 1, 3);
 
@@ -716,7 +717,7 @@ public class ViewController {
       final GridPane grid = setUpGridPane(projectName, projectColor, isWork);
 
       final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = Model.AVAILABLE_PROJECTS.size();
+      final int availableProjectAmount = model.getAvailableProjects().size();
       indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       grid.add(indexSpinner, 1, 3);
 
@@ -782,7 +783,7 @@ public class ViewController {
       final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
 
       gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
-      gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
+      gcIcon.setFill(Model.activeWorkItem.get().getProject().getColor());
       gcIcon.fillRect(1, 27, 31, 5);
 
       gcIcon.setStroke(Model.TASK_BAR_COLOR.get());
@@ -809,7 +810,7 @@ public class ViewController {
    }
 
    private void updateProjectView() {
-      final Project project = model.activeWorkItem.get().getProject();
+      final Project project = Model.activeWorkItem.get().getProject();
       currentProjectLabel.setText(project.getName());
       currentProjectLabel.setUnderline(project.isWork());
       final Circle circle = new Circle(4);

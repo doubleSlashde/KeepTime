@@ -102,9 +102,9 @@ public class Main extends Application {
          model.getProjectRepository().save(Model.DEFAULT_PROJECT);
       }
 
-      model.allProjects.addAll(projects);
-      Model.AVAILABLE_PROJECTS
-            .addAll(model.allProjects.stream().filter(Project::isEnabled).collect(Collectors.toList()));
+      model.getAllProjects().addAll(projects);
+      model.getAvailableProjects()
+            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();

@@ -45,7 +45,7 @@ public class Controller {
    public void changeProject(final Project newProject, final long minusSeconds) {
       // TODO consider day change (clean workRepo, ...)
 
-      final Work currentWork = model.activeWorkItem.get();
+      final Work currentWork = Model.activeWorkItem.get();
 
       final LocalDate dateNow = dateProvider.dateNow();
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
@@ -73,17 +73,17 @@ public class Controller {
          model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
          log.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
-      model.activeWorkItem.set(work);
+      Model.activeWorkItem.set(work);
    }
 
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
          final int index) {
       final Project project = new Project(projectName, projectColor, isWork, index, false);
-      model.allProjects.add(project);
-      Model.AVAILABLE_PROJECTS.add(project);
+      model.getAllProjects().add(project);
+      model.getAvailableProjects().add(project);
 
-      final List<Project> changedProjects = resortProjectIndexes(Model.AVAILABLE_PROJECTS, project,
-            Model.AVAILABLE_PROJECTS.size(), index);
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), project,
+            model.getAvailableProjects().size(), index);
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
    }
@@ -131,9 +131,10 @@ public class Controller {
       p.setEnabled(false); // TODO or can we remove the project? but work references??
       p.setIndex(-1);
 
-      Model.AVAILABLE_PROJECTS.remove(p);
+      model.getAvailableProjects().remove(p);
 
-      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(Model.AVAILABLE_PROJECTS, indexToRemove);
+      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(model.getAvailableProjects(),
+            indexToRemove);
 
       changedProjects.add(p);
       model.getProjectRepository().saveAll(changedProjects);
@@ -149,7 +150,7 @@ public class Controller {
       final int oldIndex = p.getIndex();
       p.setIndex(newIndex);
 
-      final List<Project> changedProjects = resortProjectIndexes(Model.AVAILABLE_PROJECTS, p, oldIndex, newIndex);
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), p, oldIndex, newIndex);
       changedProjects.add(p);
 
       // save all projects which changed index
@@ -225,7 +226,7 @@ public class Controller {
    }
 
    public void setComment(final String notes) {
-      final Work work = model.activeWorkItem.get();
+      final Work work = Model.activeWorkItem.get();
       work.setNotes(notes);
       // TODO when to save to repo?
    }
@@ -238,8 +239,8 @@ public class Controller {
       return model.getPastWorkItems().stream().filter(work -> {
          final Project project = work.getProject();
          // find up to date reference to project
-         final Optional<Project> optionalProject = model.allProjects.stream().filter(p -> p.getId() == project.getId())
-               .findAny();
+         final Optional<Project> optionalProject = model.getAllProjects().stream()
+               .filter(p -> p.getId() == project.getId()).findAny();
          if (optionalProject.isPresent()) {
             return optionalProject.get().isWork();
          }
@@ -257,6 +258,6 @@ public class Controller {
    }
 
    public ObservableList<Project> getAvailableProjects() {
-      return Model.AVAILABLE_PROJECTS;
+      return model.getAvailableProjects();
    }
 }
