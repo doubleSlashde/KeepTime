@@ -80,10 +80,10 @@ public class Controller {
          final int index) {
       final Project project = new Project(projectName, projectColor, isWork, index, false);
       model.allProjects.add(project);
-      model.availableProjects.add(project);
+      Model.AVAILABLE_PROJECTS.add(project);
 
-      final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, project,
-            model.availableProjects.size(), index);
+      final List<Project> changedProjects = resortProjectIndexes(Model.AVAILABLE_PROJECTS, project,
+            Model.AVAILABLE_PROJECTS.size(), index);
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
    }
@@ -105,20 +105,20 @@ public class Controller {
 
       model.getSettingsRepository().save(settings);
 
-      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
-      model.defaultFontColor.set(settings.getDefaultFontColor());
-      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
-      model.hoverFontColor.set(settings.getHoverFontColor());
+      Model.DEFAULT_BACKGROUND_COLOR.set(settings.getDefaultBackgroundColor());
+      Model.DEFAULT_FONT_COLOR.set(settings.getDefaultFontColor());
+      Model.HOVER_BACKGROUND_COLOR.set(settings.getHoverBackgroundColor());
+      Model.HOVER_FONT_COLOR.set(settings.getHoverFontColor());
       Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
       Model.USE_HOTKEY.set(settings.isUseHotkey());
-      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
+      Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
    }
 
    @PreDestroy
    public void shutdown() {
       // XXX Auto-generated method stub
       log.info("Controller shutdown");
-      changeProject(model.idleProject, 0); // TODO get notes from view
+      changeProject(model.getIdleProject(), 0); // TODO get notes from view
    }
 
    public void deleteProject(final Project p) {
@@ -131,9 +131,9 @@ public class Controller {
       p.setEnabled(false); // TODO or can we remove the project? but work references??
       p.setIndex(-1);
 
-      model.availableProjects.remove(p);
+      Model.AVAILABLE_PROJECTS.remove(p);
 
-      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(model.availableProjects, indexToRemove);
+      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(Model.AVAILABLE_PROJECTS, indexToRemove);
 
       changedProjects.add(p);
       model.getProjectRepository().saveAll(changedProjects);
@@ -149,7 +149,7 @@ public class Controller {
       final int oldIndex = p.getIndex();
       p.setIndex(newIndex);
 
-      final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, p, oldIndex, newIndex);
+      final List<Project> changedProjects = resortProjectIndexes(Model.AVAILABLE_PROJECTS, p, oldIndex, newIndex);
       changedProjects.add(p);
 
       // save all projects which changed index
@@ -257,6 +257,6 @@ public class Controller {
    }
 
    public ObservableList<Project> getAvailableProjects() {
-      return this.model.availableProjects;
+      return Model.AVAILABLE_PROJECTS;
    }
 }

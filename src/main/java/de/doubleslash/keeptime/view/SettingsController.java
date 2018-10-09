@@ -148,16 +148,16 @@ public class SettingsController {
    }
 
    void update() {
-      hoverBackgroundColor.setValue(model.hoverBackgroundColor.get());
-      hoverFontColor.setValue(model.hoverFontColor.get());
+      hoverBackgroundColor.setValue(Model.HOVER_BACKGROUND_COLOR.get());
+      hoverFontColor.setValue(Model.HOVER_FONT_COLOR.get());
 
-      defaultBackgroundColor.setValue(model.defaultBackgroundColor.get());
-      defaultFontColor.setValue(model.defaultFontColor.get());
+      defaultBackgroundColor.setValue(Model.DEFAULT_BACKGROUND_COLOR.get());
+      defaultFontColor.setValue(Model.DEFAULT_FONT_COLOR.get());
 
       taskBarColor.setValue(Model.TASK_BAR_COLOR.get());
 
       useHotkeyCheckBox.setSelected(Model.USE_HOTKEY.get());
-      displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
+      displayProjectsRightCheckBox.setSelected(Model.DISPLAY_PROJECTS_RIGHT.get());
    }
 
    public void setStage(final Stage thisStage) {

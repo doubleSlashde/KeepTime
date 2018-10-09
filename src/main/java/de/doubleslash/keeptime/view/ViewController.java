@@ -144,7 +144,7 @@ public class ViewController {
       this.controller = controller;
       this.model = model;
 
-      changeProject(Model.idleProject, 0); // TODO initialize not here!
+      changeProject(model.getIdleProject(), 0); // TODO initialize not here!
       updateProjectView();
    }
 
@@ -209,14 +209,14 @@ public class ViewController {
 
       Platform.runLater(() -> {
          loadSubStages();
-         fontColorProperty.set(model.defaultFontColor.get());
+         fontColorProperty.set(Model.DEFAULT_FONT_COLOR.get());
          fontColorProperty.bind(Bindings.createObjectBinding(() -> {
             if (mouseHoveringProperty.get()) {
-               return model.hoverFontColor.get();
+               return Model.HOVER_FONT_COLOR.get();
             } else {
-               return model.defaultFontColor.get();
+               return Model.DEFAULT_FONT_COLOR.get();
             }
-         }, mouseHoveringProperty, model.defaultFontColor, model.hoverFontColor));
+         }, mouseHoveringProperty, Model.DEFAULT_FONT_COLOR, Model.HOVER_FONT_COLOR));
 
          bigTimeLabel.textFillProperty().bind(fontColorProperty);
          allTimeLabel.textFillProperty().bind(fontColorProperty);
@@ -224,7 +224,7 @@ public class ViewController {
          currentProjectLabel.textFillProperty().bind(fontColorProperty);
 
          final Runnable displayProjectRightRunnable = () -> {
-            if (model.displayProjectsRight.get()) {
+            if (Model.DISPLAY_PROJECTS_RIGHT.get()) {
                borderPane.setLeft(null);
                borderPane.setRight(projectsVBox);
             } else {
@@ -233,7 +233,7 @@ public class ViewController {
 
             }
          };
-         model.displayProjectsRight.addListener((a, oldValue, newValue) -> displayProjectRightRunnable.run());
+         Model.DISPLAY_PROJECTS_RIGHT.addListener((a, oldValue, newValue) -> displayProjectRightRunnable.run());
          displayProjectRightRunnable.run();
 
          // Setup textarea font color binding
@@ -245,7 +245,7 @@ public class ViewController {
          fontColorProperty.addListener((a, b, c) -> textAreaColorRunnable.run());
          textAreaColorRunnable.run();
 
-         projectSelectionNodeMap = new HashMap<>(model.availableProjects.size());
+         projectSelectionNodeMap = new HashMap<>(Model.AVAILABLE_PROJECTS.size());
 
          for (final Project project : model.getSortedAvailableProjects()) {
             if (project.isEnabled()) {
@@ -259,10 +259,10 @@ public class ViewController {
             textArea.setText("");
          });
 
-         model.availableProjects.addListener((ListChangeListener<Project>) lis -> setUpAvailableProjectsListener(lis));
+         Model.AVAILABLE_PROJECTS.addListener((ListChangeListener<Project>) lis -> setUpAvailableProjectsListener(lis));
 
-         model.defaultBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
-         model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
+         Model.DEFAULT_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
+         Model.HOVER_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
          updateMainBackgroundColor.run();
       });
 
@@ -328,10 +328,10 @@ public class ViewController {
    }
 
    private void runUpdateMainBackgroundColor() {
-      Color color = model.defaultBackgroundColor.get();
+      Color color = Model.DEFAULT_BACKGROUND_COLOR.get();
       double opacity = 0;
       if (mouseHoveringProperty.get()) {
-         color = model.hoverBackgroundColor.get();
+         color = Model.HOVER_BACKGROUND_COLOR.get();
          opacity = .3;
       }
       String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
@@ -354,7 +354,7 @@ public class ViewController {
             for (final Project project : removedSubList) {
                // change to idle if removed project was active
                if (project == model.activeWorkItem.get().getProject()) {
-                  changeProject(Model.idleProject, 0);
+                  changeProject(model.getIdleProject(), 0);
                }
                final Node remove = projectSelectionNodeMap.remove(project);
                availableProjectVbox.getChildren().remove(remove);
@@ -414,7 +414,7 @@ public class ViewController {
       final double afterWidth = mainStage.getWidth();
       projectsVBox.setVisible(c);
       final double offset = afterWidth - beforeWidth;
-      if (!model.displayProjectsRight.get()) {
+      if (!Model.DISPLAY_PROJECTS_RIGHT.get()) {
          // we only need to move the stage if the node on the left is hidden
          mainStage.setX(mainStage.getX() - offset);
       }
@@ -704,7 +704,7 @@ public class ViewController {
       final GridPane grid = setUpGridPane(p.getName(), p.getColor(), p.isWork());
 
       final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.availableProjects.size();
+      final int availableProjectAmount = Model.AVAILABLE_PROJECTS.size();
       indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
       grid.add(indexSpinner, 1, 3);
 
@@ -716,7 +716,7 @@ public class ViewController {
       final GridPane grid = setUpGridPane(projectName, projectColor, isWork);
 
       final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.availableProjects.size();
+      final int availableProjectAmount = Model.AVAILABLE_PROJECTS.size();
       indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       grid.add(indexSpinner, 1, 3);
 

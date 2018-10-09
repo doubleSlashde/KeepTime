@@ -69,11 +69,11 @@ public class Main extends Application {
          settings = new Settings();
          settings.setTaskBarColor(Model.TASK_BAR_COLOR.get());
 
-         settings.setDefaultBackgroundColor(model.defaultBackgroundColor.get());
-         settings.setDefaultFontColor(model.defaultFontColor.get());
+         settings.setDefaultBackgroundColor(Model.DEFAULT_BACKGROUND_COLOR.get());
+         settings.setDefaultFontColor(Model.DEFAULT_FONT_COLOR.get());
 
-         settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
-         settings.setHoverFontColor(model.hoverFontColor.get());
+         settings.setHoverBackgroundColor(Model.HOVER_BACKGROUND_COLOR.get());
+         settings.setHoverFontColor(Model.HOVER_FONT_COLOR.get());
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(true);
          model.getSettingsRepository().save(settings);
@@ -81,13 +81,13 @@ public class Main extends Application {
          settings = settingsList.get(0);
       }
 
-      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
-      model.defaultFontColor.set(settings.getDefaultFontColor());
-      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
-      model.hoverFontColor.set(settings.getHoverFontColor());
+      Model.DEFAULT_BACKGROUND_COLOR.set(settings.getDefaultBackgroundColor());
+      Model.DEFAULT_FONT_COLOR.set(settings.getDefaultFontColor());
+      Model.HOVER_BACKGROUND_COLOR.set(settings.getHoverBackgroundColor());
+      Model.HOVER_FONT_COLOR.set(settings.getHoverFontColor());
       Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
       Model.USE_HOTKEY.set(settings.isUseHotkey());
-      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
+      Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
 
       final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
       log.info("Found {} past work items", todaysWorkItems.size());
@@ -103,14 +103,14 @@ public class Main extends Application {
       }
 
       model.allProjects.addAll(projects);
-      model.availableProjects
+      Model.AVAILABLE_PROJECTS
             .addAll(model.allProjects.stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(p -> p.isDefault()).findAny();
       if (findAny.isPresent()) {
-         Model.idleProject = findAny.get();
-         log.debug("Using project '{}' as default project.", Model.idleProject);
+         model.setIdleProject(findAny.get());
+         log.debug("Using project '{}' as default project.", model.getIdleProject());
       }
 
       primaryStage.setOnHiding(we -> {

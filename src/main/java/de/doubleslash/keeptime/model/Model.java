@@ -39,10 +39,10 @@ public class Model {
    public static final Color ORIGINAL_TASK_BAR_FONT_COLOR = Color.BLACK;
 
    public static final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
-   public static Project idleProject = DEFAULT_PROJECT;
+   private Project idleProject = DEFAULT_PROJECT;
 
-   public ObservableList<Project> availableProjects = FXCollections.observableArrayList();
-   private final SortedList<Project> sortedAvailableProjects = new SortedList<>(availableProjects,
+   public static final ObservableList<Project> AVAILABLE_PROJECTS = FXCollections.observableArrayList();
+   private final SortedList<Project> sortedAvailableProjects = new SortedList<>(AVAILABLE_PROJECTS,
          Comparator.comparing(Project::getIndex));
    public ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
@@ -53,12 +53,15 @@ public class Model {
 
    public static final ObjectProperty<Color> TASK_BAR_COLOR = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
 
-   public ObjectProperty<Color> hoverBackgroundColor = new SimpleObjectProperty<>(ORIGINAL_HOVER_BACKGROUND_COLOR);
-   public ObjectProperty<Color> hoverFontColor = new SimpleObjectProperty<>(ORIGINAL_HOVER_Font_COLOR);
-   public ObjectProperty<Color> defaultBackgroundColor = new SimpleObjectProperty<>(ORIGINAL_DEFAULT_BACKGROUND_COLOR);
-   public ObjectProperty<Color> defaultFontColor = new SimpleObjectProperty<>(ORIGINAL_DEFAULT_FONT_COLOR);
+   public static final ObjectProperty<Color> HOVER_BACKGROUND_COLOR = new SimpleObjectProperty<>(
+         ORIGINAL_HOVER_BACKGROUND_COLOR);
+   public static final ObjectProperty<Color> HOVER_FONT_COLOR = new SimpleObjectProperty<>(ORIGINAL_HOVER_Font_COLOR);
+   public static final ObjectProperty<Color> DEFAULT_BACKGROUND_COLOR = new SimpleObjectProperty<>(
+         ORIGINAL_DEFAULT_BACKGROUND_COLOR);
+   public static final ObjectProperty<Color> DEFAULT_FONT_COLOR = new SimpleObjectProperty<>(
+         ORIGINAL_DEFAULT_FONT_COLOR);
    public static final ObjectProperty<Boolean> USE_HOTKEY = new SimpleObjectProperty<>(false);
-   public ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
+   public static final ObjectProperty<Boolean> DISPLAY_PROJECTS_RIGHT = new SimpleObjectProperty<>(false);
 
    public void setWorkRepository(final WorkRepository workRepository) {
       this.workRepository = workRepository;
@@ -70,6 +73,10 @@ public class Model {
 
    public void setSettingsRepository(final SettingsRepository settingsRepository) {
       this.settingsRepository = settingsRepository;
+   }
+
+   public void setIdleProject(final Project idleProject) {
+      this.idleProject = idleProject;
    }
 
    public WorkRepository getWorkRepository() {
@@ -90,5 +97,9 @@ public class Model {
 
    public ObservableList<Work> getPastWorkItems() {
       return pastWorkItems;
+   }
+
+   public Project getIdleProject() {
+      return idleProject;
    }
 }
