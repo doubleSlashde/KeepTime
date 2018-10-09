@@ -195,25 +195,14 @@ public class ViewController {
       addNewProjectButton.setOnAction((ae) -> {
          LOG.info("Add new project clicked");
          // TODO somewhat duplicate dialog of create and edit
-         final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+         Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
          final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
 
          // TODO disable OK button if no name is set
          dialog.getDialogPane().setContent(grid);
 
-         dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-               final ObservableList<Node> nodes = grid.getChildren();
-               final TextField projectNameTextField = (TextField) nodes.get(1);
-               final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-               final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-               final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-               return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
-                     indexSpinner.getValue()); // temporary (misused) transfer object for project
-            }
-            return null;
-         });
+         dialog = dialogResultConverter(dialog, grid);
          mainStage.setAlwaysOnTop(false);
          final Optional<Project> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
@@ -353,6 +342,22 @@ public class ViewController {
          updateTaskbarIcon(currentWorkSeconds);
       });
 
+   }
+
+   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
+      dialog.setResultConverter(dialogButton -> {
+         if (dialogButton == ButtonType.OK) {
+            final ObservableList<Node> nodes = grid.getChildren();
+            final TextField projectNameTextField = (TextField) nodes.get(1);
+            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
+            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
+            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
+            return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
+                  indexSpinner.getValue()); // temporary (misused) transfer object for project
+         }
+         return null;
+      });
+      return dialog;
    }
 
    private void settingsClicked() {
