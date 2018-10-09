@@ -9,11 +9,15 @@ public class DateFormatter {
    private static DateTimeFormatter dayDateFormatter = DateTimeFormatter.ofPattern("eeee dd.MM.yyyy");
    private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+   private DateFormatter() {
+      throw new IllegalStateException("Utility class: DateFormatter");
+   }
+
    public static String secondsToHHMMSS(final long currentWorkSeconds) {
       final int hours = (int) (currentWorkSeconds / 3600);
       final int minutes = (int) ((currentWorkSeconds % 3600) / 60);
 
-      final int sec = (int) (((currentWorkSeconds % 3600) % 60));
+      final int sec = (int) (currentWorkSeconds % 3600 % 60);
 
       final String a = (hours > 9 ? hours : "0" + hours) + ":" + (minutes > 9 ? minutes : "0" + minutes) + ":"
             + (sec > 9 ? sec : "0" + sec);

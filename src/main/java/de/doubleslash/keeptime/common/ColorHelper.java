@@ -4,6 +4,10 @@ import javafx.scene.paint.Color;
 
 public class ColorHelper {
 
+   private ColorHelper() {
+      throw new IllegalStateException("Utility class: ColorHelper");
+   }
+
    public static Color randomColor() {
       return Color.BLACK;
    }

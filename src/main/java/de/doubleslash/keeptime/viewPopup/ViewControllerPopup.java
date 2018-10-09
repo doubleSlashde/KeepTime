@@ -12,7 +12,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
@@ -21,10 +20,8 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 public class ViewControllerPopup {
 
@@ -50,7 +47,8 @@ public class ViewControllerPopup {
    private FilteredList<Project> filteredData;
 
    private void changeProject(final Project item) {
-      LOG.info("Change project to '" + item.getName() + "'.");
+      final String info = String.format("Change project to '{%s}'.", item.getName());
+      LOG.info(info);
 
       // ask for a note for the current project
       final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
@@ -74,39 +72,16 @@ public class ViewControllerPopup {
    private void initialize() throws IOException {
 
       // TODO the cells do not refresh, if a project was changed
-      projectListView.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
-         @Override
-         public ListCell<Project> call(final ListView<Project> list) {
-            return new ListCell<Project>() {
-               @Override
-               protected void updateItem(final Project project, final boolean empty) {
-                  super.updateItem(project, empty);
-
-                  if (project == null || empty) {
-                     setText(null);
-                     // setPrefHeight(0);
-                  } else {
-                     setOnMouseClicked((ev) -> {
-                        changeProject(project);
-                     });
-                     // setPrefHeight(24);
-                     final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
-                     setText((isActiveProject ? "* " : "") + project.getName());
-                     setTextFill(project.getColor());
-                     setUnderline(project.isWork());
-                  }
-               }
-
-            };
-         }
-      });
+      projectListView.setCellFactory(cb -> returnListCellOfProject());
 
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
       final Consumer<Double> updateSize = (height) -> {
-         LOG.debug("update size" + height);
-         projectListView.setPrefHeight(height);
-         stage.sizeToScene(); // also update scene size
+         if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("%s%f", "update size ", height));
+            projectListView.setPrefHeight(height);
+            stage.sizeToScene(); // also update scene size
+         }
       };
 
       searchTextField.textProperty().addListener((a, b, newValue) -> {
@@ -130,27 +105,24 @@ public class ViewControllerPopup {
          updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
       });
 
-      searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-         @Override
-         public void handle(final KeyEvent event) {
-            final MultipleSelectionModel<Project> selectionModel = projectListView.getSelectionModel();
-            final int selectedIndex = selectionModel.getSelectedIndex();
-            switch (event.getCode()) {
-            case UP:
-               selectionModel.select(selectedIndex - 1);
-               event.consume();
-               break;
-            case DOWN:
-               selectionModel.select(selectedIndex + 1);
-               event.consume();
-               break;
-            case ESCAPE:
-               hide();
-               break;
-            default:
-               break;
+      searchTextField.setOnKeyPressed(eh -> {
+         final MultipleSelectionModel<Project> selectionModel = projectListView.getSelectionModel();
+         final int selectedIndex = selectionModel.getSelectedIndex();
+         switch (eh.getCode()) {
+         case UP:
+            selectionModel.select(selectedIndex - 1);
+            eh.consume();
+            break;
+         case DOWN:
+            selectionModel.select(selectedIndex + 1);
+            eh.consume();
+            break;
+         case ESCAPE:
+            hide();
+            break;
+         default:
+            break;
 
-            }
          }
       });
       // enter pressed in textfield
@@ -163,6 +135,33 @@ public class ViewControllerPopup {
 
       projectListView.getSelectionModel().selectFirst();
       projectListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+   }
+
+   public ListCell<Project> returnListCellOfProject() {
+
+      return new ListCell<Project>() {
+
+         @Override
+         protected void updateItem(final Project project, final boolean empty) {
+            super.updateItem(project, empty);
+
+            if (project == null || empty) {
+               setText(null);
+
+            } else {
+               setOnMouseClicked((ev) -> {
+                  changeProject(project);
+               });
+
+               final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
+               setText((isActiveProject ? "* " : "") + project.getName());
+               setTextFill(project.getColor());
+               setUnderline(project.isWork());
+            }
+         }
+
+      };
 
    }
 

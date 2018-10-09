@@ -23,7 +23,6 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewPopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewPopup.ViewControllerPopup;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,7 +30,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 @SpringBootApplication
 public class Main extends Application {
@@ -116,29 +114,20 @@ public class Main extends Application {
       }
 
       primaryStage.setOnHiding((we) -> {
-         // shutdown();
          popupViewStage.close();
          globalScreenListener.register(false); // deregister, as this will keep app running
-      });
-
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-         @Override
-         public void run() {
-            // TODO this does not work - spring uses own hooks and may already be shutdown
-            // shutdown();
-         }
       });
 
       try {
          initialiseUI(primaryStage);
       } catch (final Exception e) {
-         e.printStackTrace();
+         LOG.error(e.getMessage());
       }
 
       try {
          initialisePopupUI(primaryStage);
       } catch (final Exception e) {
-         e.printStackTrace();
+         LOG.error(e.getMessage());
       }
    }
 
@@ -175,13 +164,6 @@ public class Main extends Application {
 
    }
 
-   private void shutdown() {
-      LOG.info("Shutting down");
-      // viewController.changeProject(model.idleProject, 0); // TODO not so nice (view has the comments for the current
-      // // job)
-      controller.shutdown();
-   }
-
    ViewController viewController;
 
    private void initialiseUI(final Stage primaryStage) {
@@ -197,35 +179,25 @@ public class Main extends Application {
          // Show the scene containing the root layout.
          final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
-         // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
-
          primaryStage.setTitle("KeepTime");
          primaryStage.setScene(mainScene);
          primaryStage.setAlwaysOnTop(true);
          primaryStage.setResizable(false);
 
-         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(final WindowEvent event) {
-               LOG.info("On close request");
-               // shutdown();
-               // Platform.exit();
-            }
-         });
+         primaryStage.setOnCloseRequest(actionEvent -> LOG.info("On close request"));
 
          viewController = loader.getController();
          // Give the controller access to the main app.
          viewController.setStage(primaryStage);
 
-         // controller = springContext.getBean(Controller.class, model, new RealDateProvider());
-
          viewController.setController(controller, model);
 
          primaryStage.show();
 
-      } catch (final Exception e) {
+      } catch (
+
+      final Exception e) {
          LOG.error("Error: " + e.toString(), e);
-         e.printStackTrace();
       }
    }
 

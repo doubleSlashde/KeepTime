@@ -103,10 +103,14 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseInput
    }
 
    @Override
-   public void nativeKeyTyped(final NativeKeyEvent e) {}
+   public void nativeKeyTyped(final NativeKeyEvent e) {
+      // Do nothing because ... I have no clue. Nico what is this?
+   }
 
    @Override
-   public void nativeMouseClicked(final NativeMouseEvent e) {}
+   public void nativeMouseClicked(final NativeMouseEvent e) {
+      // And here the same. I don't know. Nico you can change these :D
+   }
 
    @Override
    public void nativeMousePressed(final NativeMouseEvent nativeEvent) {

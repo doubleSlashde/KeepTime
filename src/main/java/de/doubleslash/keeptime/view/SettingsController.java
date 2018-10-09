@@ -9,8 +9,6 @@ import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -141,13 +139,10 @@ public class SettingsController {
          taskBarColor.setValue(Model.originalTaskBarFontColor);
       });
 
-      parseConfigButton.setOnAction(new EventHandler<ActionEvent>() {
-         @Override
-         public void handle(final ActionEvent actionEvent) {
-            if (ConfigParser.hasConfigFile(INPUT_FILE)) {
-               final ConfigParser parser = new ConfigParser(controller);
-               parser.parseConfig(new File(INPUT_FILE));
-            }
+      parseConfigButton.setOnAction(actionEvent -> {
+         if (ConfigParser.hasConfigFile(INPUT_FILE)) {
+            final ConfigParser parser = new ConfigParser(controller);
+            parser.parseConfig(new File(INPUT_FILE));
          }
       });
 

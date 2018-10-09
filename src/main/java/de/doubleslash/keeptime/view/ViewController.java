@@ -19,6 +19,7 @@ import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -35,6 +36,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -192,26 +194,6 @@ public class ViewController {
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
-      addNewProjectButton.setOnAction((ae) -> {
-         LOG.info("Add new project clicked");
-         // TODO somewhat duplicate dialog of create and edit
-         Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
-
-         final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
-
-         // TODO disable OK button if no name is set
-         dialog.getDialogPane().setContent(grid);
-
-         dialog = dialogResultConverter(dialog, grid);
-         mainStage.setAlwaysOnTop(false);
-         final Optional<Project> result = dialog.showAndWait();
-         mainStage.setAlwaysOnTop(true);
-
-         result.ifPresent(project -> {
-            controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
-            realignProjectList();
-         });
-      });
 
       // Add a light to colorize buttons
       // TODO does this go nicer?
@@ -422,17 +404,16 @@ public class ViewController {
 
       // update all ui labels
       // TODO do it with bindings (maybe create a viewmodel for this)
-      // bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+
       allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
       todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
 
-      for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
-         final Label label = elapsedProjectTimeLabelMap.get(p);
+      for (final Map.Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
+         final Label label = entry.getValue();
 
-         final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject().getId() == p.getId())
-               .mapToLong(work -> {
-                  return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-               }).sum();
+         final long seconds = model.pastWorkItems.stream()
+               .filter((work) -> work.getProject().getId() == entry.getKey().getId())
+               .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
          label.setText(DateFormatter.secondsToHHMMSS(seconds));
          label.setFont(new Font(ARIAL, 12));
       }
@@ -501,7 +482,7 @@ public class ViewController {
             this.mainStage.setAlwaysOnTop(true);
          });
       } catch (final IOException e) {
-         throw new RuntimeException(e);
+         throw new FXMLLoaderException(e);
       }
    }
 
@@ -521,7 +502,7 @@ public class ViewController {
          projectElement = (Pane) loader.load();
       } catch (final IOException e1) {
          LOG.error("Could not load '{}'.", loader.getLocation(), e1);
-         throw new RuntimeException(e1);
+         throw new FXMLLoaderException(e1);
       }
 
       final Label projectNameLabel = (Label) projectElement.getChildren().get(0);
@@ -546,7 +527,7 @@ public class ViewController {
          if (wasDragged) {
             return;
          }
-         // a.consume();
+
          final MouseButton button = a.getButton();
          if (button == MouseButton.PRIMARY) {
             changeProject(p, 0);
@@ -558,13 +539,13 @@ public class ViewController {
          final Bloom bloom = new Bloom();
          bloom.setThreshold(0.3);
          projectNameLabel.setEffect(bloom);
-         // projectNameLabel.setUnderline(true);
+
       });
       projectNameLabel.setOnMouseExited(ae -> {
          projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor, p.getColor().getGreen() * dimFactor,
                p.getColor().getBlue() * dimFactor, 1));
          projectNameLabel.setEffect(null);
-         // projectNameLabel.setUnderline(false);
+
       });
 
       availableProjectVbox.getChildren().add(projectElement);
@@ -852,7 +833,7 @@ public class ViewController {
       gcIcon.setTextAlign(TextAlignment.CENTER);
       gcIcon.setFont(new Font(ARIAL, 12));
       gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
-            Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5);
+            Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5.0);
 
       final SnapshotParameters snapshotParameters = new SnapshotParameters();
       snapshotParameters.setFill(Color.TRANSPARENT);
@@ -894,6 +875,28 @@ public class ViewController {
 
    public void setStage(final Stage primaryStage) {
       this.mainStage = primaryStage;
+   }
+
+   @FXML
+   public void addNewProject(final ActionEvent ae) {
+      LOG.info("Add new project clicked");
+      // TODO somewhat duplicate dialog of create and edit
+      final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+
+      final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
+
+      // TODO disable OK button if no name is set
+      dialog.getDialogPane().setContent(grid);
+
+      dialogResultConverter(dialog, grid);
+      mainStage.setAlwaysOnTop(false);
+      final Optional<Project> result = dialog.showAndWait();
+      mainStage.setAlwaysOnTop(true);
+
+      result.ifPresent(project -> {
+         controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
+         realignProjectList();
+      });
    }
 
 }

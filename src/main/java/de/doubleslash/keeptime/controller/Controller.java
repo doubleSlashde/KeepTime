@@ -51,7 +51,6 @@ public class Controller {
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       if (currentWork != null) {
          currentWork.setEndTime(now);
-         // currentWork.setNotes(notes);
          if (currentWork.getNotes().isEmpty()) {
             currentWork.setNotes("- No notes -");
          }
@@ -197,7 +196,6 @@ public class Controller {
          }
 
          final int newCurrentIndex = currentIndex + adjustOffset;
-         // System.out.println("Moving index '" + currentIndex + "' to '" + newCurrentIndex + "'.");
          project.setIndex(newCurrentIndex);
          changedProjects.add(project);
       }
