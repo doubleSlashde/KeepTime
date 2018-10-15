@@ -100,13 +100,13 @@
                      <children>
                         <HBox spacing="10.0">
                            <children>
-                              <Label text="Hotkey" />
-                              <Label alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefWidth="100.0" text="(global keylogger!)" />
+                              <Label fx:id="hotkeyLabel" text="Hotkey" />
+                              <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefWidth="100.0" text="(global keylogger!)" />
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
                            <children>
-                              <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Use Hotkey" />
+                              <Label fx:id="useHotkeyLabel" alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Use Hotkey" />
                               <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)" />
                            </children>
                         </HBox>

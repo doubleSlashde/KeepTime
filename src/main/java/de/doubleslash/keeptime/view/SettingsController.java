@@ -61,6 +61,15 @@ public class SettingsController {
 
    @FXML
    private Label versionLabel;
+   
+   @FXML
+   private Label useHotkeyLabel;
+   
+   @FXML
+   private Label hotkeyLabel;
+   
+   @FXML
+   private Label globalKeyloggerLabel;
 
    private final Logger log = LoggerFactory.getLogger(this.getClass());
    private Controller controller;
@@ -69,6 +78,13 @@ public class SettingsController {
 
    @FXML
    private void initialize() {
+	   if(System.getProperty("os.name").contains("Linux")) {
+	   
+	   useHotkeyCheckBox.setVisible(false);
+	   useHotkeyLabel.setVisible(false);
+	   hotkeyLabel.setVisible(false);
+	   globalKeyloggerLabel.setVisible(false);
+	   }
       versionLabel.setText(Main.VERSION);
       saveButton.setOnAction(ae -> {
          log.info("Save clicked");
