@@ -91,7 +91,7 @@ public class Controller {
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit) {
+         final boolean useHotkey, final boolean displayProjectsRight) {
       // TODO create holder for all the properties (or reuse Settings.class?)
       final Settings settings = model.settingsRepository.findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
@@ -103,7 +103,6 @@ public class Controller {
       settings.setHoverFontColor(hoverFontColor);
       settings.setUseHotkey(useHotkey);
       settings.setDisplayProjectsRight(displayProjectsRight);
-      settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
 
       model.settingsRepository.save(settings);
 
@@ -114,7 +113,6 @@ public class Controller {
       model.taskBarColor.set(settings.getTaskBarColor());
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
-      model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
    }
 
    @PreDestroy
@@ -163,13 +161,13 @@ public class Controller {
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                          list of all projects to adapt the indexes for
     * @param changedProject
-    *           the project which has changed which already has the new index
+    *                          the project which has changed which already has the new index
     * @param oldIndex
-    *           the old index of the changed project
+    *                          the old index of the changed project
     * @param newIndex
-    *           the new index of the changed project (which the projects also already has)
+    *                          the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -211,9 +209,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                        list of all projects to adapt the indexes for
     * @param removedIndex
-    *           the index which has been removed
+    *                        the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {

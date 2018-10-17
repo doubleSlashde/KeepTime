@@ -59,5 +59,5 @@ public class Model {
    public ObjectProperty<Color> defaultFontColor = new SimpleObjectProperty<>(originalDefaultFontColor);
    public ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
    public ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
-   public ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
+
 }
