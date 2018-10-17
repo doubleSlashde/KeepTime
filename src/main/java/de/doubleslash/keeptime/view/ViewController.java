@@ -182,12 +182,17 @@ public class ViewController {
 
       // reposition window if projects are hidden (as anchor is top left)
       mouseHoveringProperty.addListener((a, b, c) -> {
-         if (!model.hideProjectsOnMouseExit.get()) {
-            setProjectListVisible(true);
-            return;
+         // TODO fix the not so nice jumping..
+         projectsVBox.setManaged(c);
+         final double beforeWidth = mainStage.getWidth();
+         mainStage.sizeToScene();
+         final double afterWidth = mainStage.getWidth();
+         projectsVBox.setVisible(c);
+         final double offset = afterWidth - beforeWidth;
+         if (!model.displayProjectsRight.get()) {
+            // we only need to move the stage if the node on the left is hidden
+            mainStage.setX(mainStage.getX() - offset);
          }
-
-         setProjectListVisible(c);
       });
 
       minimizeButton.setOnAction((ae) -> {
@@ -440,20 +445,6 @@ public class ViewController {
          updateTaskbarIcon(currentWorkSeconds);
       });
 
-   }
-
-   private void setProjectListVisible(final Boolean c) {
-      // TODO fix the not so nice jumping..
-      projectsVBox.setManaged(c);
-      final double beforeWidth = mainStage.getWidth();
-      mainStage.sizeToScene();
-      final double afterWidth = mainStage.getWidth();
-      projectsVBox.setVisible(c);
-      final double offset = afterWidth - beforeWidth;
-      if (!model.displayProjectsRight.get()) {
-         // we only need to move the stage if the node on the left is hidden
-         mainStage.setX(mainStage.getX() - offset);
-      }
    }
 
    private void loadSubStages() {
