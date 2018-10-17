@@ -41,6 +41,8 @@ public class Settings {
 
    private boolean displayProjectsRight;
 
+   private boolean hideProjectsOnMouseExit;
+
    public long getId() {
       return id;
    }
@@ -99,6 +101,14 @@ public class Settings {
 
    public void setDisplayProjectsRight(final boolean displayProjectsRight) {
       this.displayProjectsRight = displayProjectsRight;
+   }
+
+   public boolean isHideProjectsOnMouseExit() {
+      return hideProjectsOnMouseExit;
+   }
+
+   public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
+      this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
    }
 
 }
