@@ -78,6 +78,7 @@ public class Main extends Application {
          settings.setHoverFontColor(model.hoverFontColor.get());
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
+         settings.setHideProjectsOnMouseExit(true);
          model.settingsRepository.save(settings);
       } else {
          settings = settingsList.get(0);
@@ -90,6 +91,7 @@ public class Main extends Application {
       model.taskBarColor.set(settings.getTaskBarColor());
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
+      model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
 
       final List<Work> todaysWorkItems = model.workRepository.findByCreationDate(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());

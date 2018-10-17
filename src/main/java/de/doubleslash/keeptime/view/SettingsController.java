@@ -47,6 +47,8 @@ public class SettingsController {
    private CheckBox useHotkeyCheckBox;
    @FXML
    private CheckBox displayProjectsRightCheckBox;
+   @FXML
+   private CheckBox hideProjectsOnMouseExitCheckBox;
 
    @FXML
    private Button saveButton;
@@ -75,7 +77,8 @@ public class SettingsController {
          LOG.info("Save clicked");
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
-               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected());
+               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
+               hideProjectsOnMouseExitCheckBox.isSelected());
          thisStage.close();
       });
 
@@ -130,6 +133,7 @@ public class SettingsController {
 
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
+      hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
    }
 
    public void setStage(final Stage thisStage) {
