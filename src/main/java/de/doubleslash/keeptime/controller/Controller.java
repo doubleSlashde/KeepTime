@@ -26,7 +26,7 @@ import javafx.scene.paint.Color;
 @Service
 public class Controller {
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
    private final Model model;
 

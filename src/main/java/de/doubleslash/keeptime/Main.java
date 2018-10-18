@@ -44,7 +44,7 @@ import javafx.stage.WindowEvent;
 @SpringBootApplication
 public class Main extends Application {
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
    public static final String VERSION = "v0.0.2";
 

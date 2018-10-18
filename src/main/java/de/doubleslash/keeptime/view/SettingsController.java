@@ -62,7 +62,7 @@ public class SettingsController {
    @FXML
    private Label versionLabel;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
    private Model model;
    private Controller controller;

@@ -79,7 +79,7 @@ import javafx.stage.Stage;
 
 @Component
 public class ViewController {
-   private static final String _00_00_00 = "00:00:00";
+   private static final String TIME_00_00_00 = "00:00:00";
    @FXML
    private Pane pane;
    @FXML
@@ -119,7 +119,7 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
 
    private class Delta {
       double x;
@@ -167,9 +167,9 @@ public class ViewController {
    @FXML
    private void initialize() throws IOException {
 
-      bigTimeLabel.setText(_00_00_00);
-      allTimeLabel.setText(_00_00_00);
-      todayAllSeconds.setText(_00_00_00);
+      bigTimeLabel.setText(TIME_00_00_00);
+      allTimeLabel.setText(TIME_00_00_00);
+      todayAllSeconds.setText(TIME_00_00_00);
 
       textArea.setWrapText(true);
       textArea.setEditable(false);
@@ -599,17 +599,17 @@ public class ViewController {
          gridRow++;
          grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
                gridRow);
-         final Label currentProjectTimeLabel = new Label(_00_00_00);
+         final Label currentProjectTimeLabel = new Label(TIME_00_00_00);
          grid.add(currentProjectTimeLabel, 1, gridRow);
          gridRow++;
 
          grid.add(new Label("New end and start time:"), 0, gridRow);
-         final Label newEndTimeLabel = new Label(_00_00_00);
+         final Label newEndTimeLabel = new Label(TIME_00_00_00);
          grid.add(newEndTimeLabel, 1, gridRow);
          gridRow++;
 
          grid.add(new Label("New project duration: " + p.getName()), 0, gridRow);
-         final Label newProjectTimeLabel = new Label(_00_00_00);
+         final Label newProjectTimeLabel = new Label(TIME_00_00_00);
          grid.add(newProjectTimeLabel, 1, gridRow);
          gridRow++;
 

@@ -30,7 +30,7 @@ public class ViewControllerPopup {
 
    private static final int LIST_CELL_HEIGHT = 23 + 2;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(ViewControllerPopup.class);
 
    @FXML
    private Pane pane;
