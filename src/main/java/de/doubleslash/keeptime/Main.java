@@ -47,6 +47,10 @@ public class Main extends Application {
    private Model model;
    private Controller controller;
 
+   private ViewController viewController;
+
+   private GlobalScreenListener globalScreenListener;
+
    @Override
    public void init() throws Exception {
       LOG.info("Starting KeepTime {}", VERSION);
@@ -64,7 +68,6 @@ public class Main extends Application {
 
       LOG.debug("Reading configuration");
 
-      // TODO there should just be one instance of settings in the repo
       final List<Settings> settingsList = model.settingsRepository.findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
@@ -118,17 +121,8 @@ public class Main extends Application {
       }
 
       primaryStage.setOnHiding((we) -> {
-         // shutdown();
          popupViewStage.close();
-         globalScreenListener.register(false); // deregister, as this will keep app running
-      });
-
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-         @Override
-         public void run() {
-            // TODO this does not work - spring uses own hooks and may already be shutdown
-            // shutdown();
-         }
+         globalScreenListener.shutdown(); // deregister, as this will keep app running
       });
 
       try {
@@ -143,8 +137,6 @@ public class Main extends Application {
          e.printStackTrace();
       }
    }
-
-   GlobalScreenListener globalScreenListener;
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
       // TODO register only if it is enabled
@@ -174,17 +166,7 @@ public class Main extends Application {
       viewControllerPopupController.setStage(popupViewStage, popupScene);
       viewControllerPopupController.setController(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
-
    }
-
-   private void shutdown() {
-      LOG.info("Shutting down");
-      // viewController.changeProject(model.idleProject, 0); // TODO not so nice (view has the comments for the current
-      // // job)
-      controller.shutdown();
-   }
-
-   ViewController viewController;
 
    private void initialiseUI(final Stage primaryStage) {
       try {
@@ -210,17 +192,12 @@ public class Main extends Application {
             @Override
             public void handle(final WindowEvent event) {
                LOG.info("On close request");
-               // shutdown();
-               // Platform.exit();
             }
          });
 
          viewController = loader.getController();
          // Give the controller access to the main app.
          viewController.setStage(primaryStage);
-
-         // controller = springContext.getBean(Controller.class, model, new RealDateProvider());
-
          viewController.setController(controller, model);
 
          primaryStage.show();
