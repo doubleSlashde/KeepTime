@@ -49,6 +49,8 @@ public class SettingsController {
    private CheckBox useHotkeyCheckBox;
    @FXML
    private CheckBox displayProjectsRightCheckBox;
+   @FXML
+   private CheckBox hideProjectsOnMouseExitCheckBox;
 
    @FXML
    private Button saveButton;
@@ -69,7 +71,8 @@ public class SettingsController {
    @FXML
    private Label globalKeyloggerLabel;
 
-   private final Logger log = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
+
    private Controller controller;
    private Stage thisStage;
    private static final String INPUT_FILE = "config.xml";
@@ -86,7 +89,7 @@ public class SettingsController {
 
       versionLabel.setText(Main.VERSION);
       saveButton.setOnAction(ae -> {
-         log.info("Save clicked");
+         LOG.info("Save clicked");
 
          if (System.getProperty("os.name").contains("Linux")) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
@@ -127,12 +130,13 @@ public class SettingsController {
 
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
-               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected());
+               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
+               hideProjectsOnMouseExitCheckBox.isSelected());
          thisStage.close();
       });
 
       cancelButton.setOnAction(ae -> {
-         log.info("Cancel clicked");
+         LOG.info("Cancel clicked");
          thisStage.close();
       });
 
@@ -170,6 +174,7 @@ public class SettingsController {
 
       useHotkeyCheckBox.setSelected(Model.USE_HOTKEY.get());
       displayProjectsRightCheckBox.setSelected(Model.DISPLAY_PROJECTS_RIGHT.get());
+      hideProjectsOnMouseExitCheckBox.setSelected(Model.HIDE_PROJECTS_ON_MOUSE_EXIT.get());
    }
 
    public void setStage(final Stage thisStage) {

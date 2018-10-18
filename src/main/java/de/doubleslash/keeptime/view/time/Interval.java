@@ -11,7 +11,8 @@ import javafx.animation.Timeline;
 import javafx.util.Duration;
 
 public class Interval {
-   protected static List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
+
+   private static final List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
 
    private static Timeline timelineSession;
    private static LocalDateTime last = LocalDateTime.now();

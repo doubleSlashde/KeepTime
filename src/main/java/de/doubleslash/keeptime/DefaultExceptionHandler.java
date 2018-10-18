@@ -12,21 +12,21 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultExceptionHandler implements UncaughtExceptionHandler {
 
-   private final Logger log = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
    @Override
    public void uncaughtException(final Thread t, final Throwable e) {
-      log.error("Uncaught exception on thread '{}'.", t, e);
+      LOG.error("Uncaught exception on thread '{}'.", t, e);
    }
 
    /**
     * Registers this class as default uncaught exception handler
     */
    public void register() {
-      log.debug("Registering uncaught exception handler");
+      LOG.debug("Registering uncaught exception handler");
       final UncaughtExceptionHandler defaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
       if (defaultUncaughtExceptionHandler != null) {
-         log.warn("Uncaught exception handler was already set ('{}'). Overwritting.", defaultUncaughtExceptionHandler);
+         LOG.warn("Uncaught exception handler was already set ('{}'). Overwritting.", defaultUncaughtExceptionHandler);
       }
       Thread.setDefaultUncaughtExceptionHandler(this);
    }

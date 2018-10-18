@@ -49,8 +49,6 @@ public class Model {
    protected static final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
    public static final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
-   public static final long NEEDED_WORK_SECONDS = (long) (60 * 60 * 8.0); // 8 hours
-
    public static final ObjectProperty<Color> TASK_BAR_COLOR = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
 
    public static final ObjectProperty<Color> HOVER_BACKGROUND_COLOR = new SimpleObjectProperty<>(
@@ -62,6 +60,7 @@ public class Model {
          ORIGINAL_DEFAULT_FONT_COLOR);
    public static final ObjectProperty<Boolean> USE_HOTKEY = new SimpleObjectProperty<>(false);
    public static final ObjectProperty<Boolean> DISPLAY_PROJECTS_RIGHT = new SimpleObjectProperty<>(false);
+   public static final ObjectProperty<Boolean> HIDE_PROJECTS_ON_MOUSE_EXIT = new SimpleObjectProperty<>(true);
 
    public void setWorkRepository(final WorkRepository workRepository) {
       this.workRepository = workRepository;

@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -74,13 +75,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 @Component
 public class ViewController {
+   private static final String TIME_ZERO = "00:00:00";
+
    @FXML
    private Pane pane;
    @FXML
@@ -120,15 +122,9 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
-   private final Logger log = LoggerFactory.getLogger(this.getClass());
-   private static final String RGBA = "rgba(";
-   private static final String ARIAL = "Arial";
-   private static final String TIME_ZERO = "00:00:00";
+   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
 
-   boolean pressed = false;
-   double startX = -1;
-
-   class Delta {
+   private class Delta {
       double x;
       double y;
    }
@@ -153,23 +149,23 @@ public class ViewController {
       textArea.setText("");
    }
 
-   Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
+   private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
 
-   boolean wasDragged = false;
+   private boolean wasDragged = false;
 
-   Canvas taskbarCanvas = new Canvas(32, 32);
+   private final Canvas taskbarCanvas = new Canvas(32, 32);
 
-   BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
-   LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
-   ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
+   private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
+   private final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
+   private final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
 
-   Stage reportStage;
-   ReportController reportController;
+   private Stage reportStage;
+   private ReportController reportController;
 
-   Stage settingsStage;
-   SettingsController settingsController;
+   private Stage settingsStage;
+   private SettingsController settingsController;
 
-   Map<Project, Node> projectSelectionNodeMap;
+   private Map<Project, Node> projectSelectionNodeMap;
 
    @FXML
    private void initialize() {
@@ -179,7 +175,14 @@ public class ViewController {
       setUpTextArea();
 
       // reposition window if projects are hidden (as anchor is top left)
-      mouseHoveringProperty.addListener((a, b, c) -> setProjectWindowVisibleByMouseHover(c));
+      mouseHoveringProperty.addListener((a, b, c) -> {
+         if (!Model.HIDE_PROJECTS_ON_MOUSE_EXIT.get()) {
+            setProjectListVisible(true);
+            return;
+         }
+
+         setProjectListVisible(c);
+      });
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
@@ -238,7 +241,7 @@ public class ViewController {
          // Setup textarea font color binding
          final Runnable textAreaColorRunnable = () -> {
             final String textAreaStyle = changeStyleAttribute(textArea.getStyle(), "fx-text-fill",
-                  RGBA + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
+                  "rgba(" + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
             textArea.setStyle(textAreaStyle);
          };
          fontColorProperty.addListener((a, b, c) -> textAreaColorRunnable.run());
@@ -288,7 +291,30 @@ public class ViewController {
 
       // update ui each second
       Interval.registerCallBack(() -> {
-         final long currentWorkSeconds = doIntervalRegisterCallBack();
+         final LocalDateTime now = LocalDateTime.now();
+         model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
+
+         final long currentWorkSeconds = Duration
+               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
+               .getSeconds();
+         activeWorkSecondsProperty.set(currentWorkSeconds);
+         final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
+         final long todaySeconds = controller.calcTodaysSeconds();
+
+         // update all ui labels
+         allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
+         todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
+
+         for (final Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
+            final Project p = entry.getKey();
+            final Label label = entry.getValue();
+
+            final long seconds = model.getPastWorkItems().stream()
+                  .filter((work) -> work.getProject().getId() == p.getId()).mapToLong(work -> {
+                     return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
+                  }).sum();
+            label.setText(DateFormatter.secondsToHHMMSS(seconds));
+         }
 
          updateProjectColorTimeline();
          updateTaskbarIcon(currentWorkSeconds);
@@ -313,14 +339,14 @@ public class ViewController {
    }
 
    private void settingsClicked() {
-      log.info("Settings clicked");
+      LOG.info("Settings clicked");
       this.mainStage.setAlwaysOnTop(false);
       settingsController.update();
       settingsStage.show();
    }
 
    private void calendarClicked() {
-      log.info("Calendar clicked");
+      LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
       reportController.update();
       reportStage.show();
@@ -334,9 +360,9 @@ public class ViewController {
          opacity = .3;
       }
       String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
-            RGBA + ColorHelper.colorToCssRgba(color) + ")");
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
       style = changeStyleAttribute(style, "fx-border-color",
-            RGBA + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+            "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
       pane.setStyle(style);
    }
 
@@ -362,37 +388,8 @@ public class ViewController {
       }
    }
 
-   private long doIntervalRegisterCallBack() {
-      final LocalDateTime now = LocalDateTime.now();
-      Model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
-
-      final long currentWorkSeconds = Duration
-            .between(Model.activeWorkItem.get().getStartTime(), Model.activeWorkItem.get().getEndTime()).getSeconds();
-      activeWorkSecondsProperty.set(currentWorkSeconds);
-      final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
-      final long todaySeconds = controller.calcTodaysSeconds();
-
-      // update all ui labels
-      // TODO do it with bindings (maybe create a viewmodel for this)
-
-      allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
-      todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
-
-      for (final Map.Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
-         final Label label = entry.getValue();
-
-         final long seconds = model.getPastWorkItems().stream()
-               .filter(work -> work.getProject().getId() == entry.getKey().getId())
-               .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
-         label.setText(DateFormatter.secondsToHHMMSS(seconds));
-         label.setFont(new Font(ARIAL, 12));
-      }
-      return currentWorkSeconds;
-   }
-
    private void setUpTime() {
       bigTimeLabel.setText(TIME_ZERO);
-      bigTimeLabel.setFont(new Font(ARIAL, 60));
       allTimeLabel.setText(TIME_ZERO);
       todayAllSeconds.setText(TIME_ZERO);
    }
@@ -405,16 +402,16 @@ public class ViewController {
       textArea.textProperty().addListener((a, b, c) -> controller.setComment(textArea.getText()));
    }
 
-   private void setProjectWindowVisibleByMouseHover(final Boolean c) {
-      // TODO fix the not so nice jumping..
-      projectsVBox.setManaged(c);
+   private void setProjectListVisible(final boolean showProjectList) {
+      projectsVBox.setManaged(showProjectList);
       final double beforeWidth = mainStage.getWidth();
       mainStage.sizeToScene();
       final double afterWidth = mainStage.getWidth();
-      projectsVBox.setVisible(c);
+      projectsVBox.setVisible(showProjectList);
       final double offset = afterWidth - beforeWidth;
       if (!Model.DISPLAY_PROJECTS_RIGHT.get()) {
          // we only need to move the stage if the node on the left is hidden
+         // not sure how we can prevent the jumping
          mainStage.setX(mainStage.getX() - offset);
       }
    }
@@ -446,6 +443,7 @@ public class ViewController {
          settingsStage.setScene(new Scene(root1));
          settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
+         LOG.error("Error while initialising report or settings stage", e);
          throw new FXMLLoaderException(e);
       }
    }
@@ -464,7 +462,7 @@ public class ViewController {
       try {
          projectElement = loader.load();
       } catch (final IOException e1) {
-         log.error("Could not load '{}'.", loader.getLocation(), e1);
+         LOG.error("Could not load '{}'.", loader.getLocation(), e1);
          throw new FXMLLoaderException(e1);
       }
 
@@ -501,20 +499,18 @@ public class ViewController {
          final Bloom bloom = new Bloom();
          bloom.setThreshold(0.3);
          projectNameLabel.setEffect(bloom);
-
       });
       projectNameLabel.setOnMouseExited(ae -> {
          projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor, p.getColor().getGreen() * dimFactor,
                p.getColor().getBlue() * dimFactor, 1));
          projectNameLabel.setEffect(null);
-
       });
 
       availableProjectVbox.getChildren().add(projectElement);
-      // TODO dialog modality
+
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
-         log.info("Change with time");
+         LOG.info("Change with time");
          final Dialog<Integer> dialog = new Dialog<>();
          dialog.setTitle("Change project with time transfer");
          dialog.setHeaderText("Choose the time to transfer");
@@ -590,7 +586,7 @@ public class ViewController {
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
       deleteMenuItem.setOnAction(e -> {
-         log.info("Delete");
+         LOG.info("Delete");
 
          final Alert alert = new Alert(AlertType.CONFIRMATION);
          alert.setTitle("Delete project");
@@ -613,7 +609,7 @@ public class ViewController {
       final MenuItem editMenuItem = new MenuItem("Edit");
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
-         log.info("Edit project");
+         LOG.info("Edit project");
          final Dialog<ButtonType> dialog = setUpDialogButtonType("Edit project", "Edit project '" + p.getName() + "'");
          final GridPane grid = setUpEditProjectGridPane(p);
 
@@ -746,7 +742,7 @@ public class ViewController {
    }
 
    private void realignProjectList() {
-      log.debug("Sorting project view");
+      LOG.debug("Sorting project view");
       final ObservableList<Node> children = availableProjectVbox.getChildren();
       children.clear();
       // TODO changing the model is not ok from here, but the list is not resorted
@@ -785,7 +781,6 @@ public class ViewController {
 
       gcIcon.setStroke(Model.TASK_BAR_COLOR.get());
       gcIcon.setTextAlign(TextAlignment.CENTER);
-      gcIcon.setFont(new Font(ARIAL, 12));
       gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
             Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5.0);
 
@@ -833,7 +828,7 @@ public class ViewController {
 
    @FXML
    public void addNewProject(final ActionEvent ae) {
-      log.info("Add new project clicked");
+      LOG.info("Add new project clicked");
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 

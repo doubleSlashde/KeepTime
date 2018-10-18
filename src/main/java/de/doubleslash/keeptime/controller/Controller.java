@@ -26,7 +26,7 @@ import javafx.scene.paint.Color;
 @Service
 public class Controller {
 
-   private final Logger log = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
    private final Model model;
 
@@ -43,8 +43,6 @@ public class Controller {
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      // TODO consider day change (clean workRepo, ...)
-
       final Work currentWork = Model.activeWorkItem.get();
 
       final LocalDate dateNow = dateProvider.dateNow();
@@ -57,7 +55,8 @@ public class Controller {
 
          final String time = DateFormatter
                .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
-         log.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
+
+         LOG.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
                currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
          // Save in db
@@ -66,12 +65,13 @@ public class Controller {
 
       // Start new work
       final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
+
       model.getPastWorkItems().add(work);
       if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
-         log.info("Removing projects with other creation date than today '{}' from list.", dateNow);
+         LOG.info("Removing projects with other creation date than today '{}' from list.", dateNow);
          final int sizeBefore = model.getPastWorkItems().size();
          model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
-         log.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
+         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
       Model.activeWorkItem.set(work);
    }
@@ -90,7 +90,7 @@ public class Controller {
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey, final boolean displayProjectsRight) {
+         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit) {
       // TODO create holder for all the properties (or reuse Settings.class?)
       final Settings settings = model.getSettingsRepository().findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
@@ -102,6 +102,7 @@ public class Controller {
       settings.setHoverFontColor(hoverFontColor);
       settings.setUseHotkey(useHotkey);
       settings.setDisplayProjectsRight(displayProjectsRight);
+      settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
 
       model.getSettingsRepository().save(settings);
 
@@ -112,23 +113,25 @@ public class Controller {
       Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
       Model.USE_HOTKEY.set(settings.isUseHotkey());
       Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
+      Model.HIDE_PROJECTS_ON_MOUSE_EXIT.set(settings.isHideProjectsOnMouseExit());
    }
 
    @PreDestroy
    public void shutdown() {
-      // XXX Auto-generated method stub
-      log.info("Controller shutdown");
-      changeProject(model.getIdleProject(), 0); // TODO get notes from view
+      LOG.info("Controller shutdown");
+      changeProject(model.getIdleProject(), 0);
    }
 
    public void deleteProject(final Project p) {
       if (p.isDefault()) {
-         log.error("You cannot delete the default project. Tried to delete project '{}'", p);
+         LOG.error("You cannot delete the default project. Tried to delete project '{}'", p);
          return;
       }
-      log.info("Disabeling project '{}'.", p);
+      LOG.info("Disabeling project '{}'.", p);
+
       final int indexToRemove = p.getIndex();
-      p.setEnabled(false); // TODO or can we remove the project? but work references??
+      p.setEnabled(false); // we don't delete it because of the referenced work
+                           // items
       p.setIndex(-1);
 
       model.getAvailableProjects().remove(p);
@@ -142,7 +145,7 @@ public class Controller {
 
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
          final int newIndex) {
-      log.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+      LOG.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
 
       p.setName(newName);
       p.setColor(newColor);
@@ -161,13 +164,13 @@ public class Controller {
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *                          list of all projects to adapt the indexes for
+    *           list of all projects to adapt the indexes for
     * @param changedProject
-    *                          the project which has changed which already has the new index
+    *           the project which has changed which already has the new index
     * @param oldIndex
-    *                          the old index of the changed project
+    *           the old index of the changed project
     * @param newIndex
-    *                          the new index of the changed project (which the projects also already has)
+    *           the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -204,9 +207,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *                        list of all projects to adapt the indexes for
+    *           list of all projects to adapt the indexes for
     * @param removedIndex
-    *                        the index which has been removed
+    *           the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {
@@ -228,7 +231,6 @@ public class Controller {
    public void setComment(final String notes) {
       final Work work = Model.activeWorkItem.get();
       work.setNotes(notes);
-      // TODO when to save to repo?
    }
 
    /**

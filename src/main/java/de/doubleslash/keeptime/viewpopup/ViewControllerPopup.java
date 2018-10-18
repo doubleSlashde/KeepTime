@@ -25,7 +25,7 @@ public class ViewControllerPopup {
 
    private static final int LIST_CELL_HEIGHT = 23 + 2;
 
-   private final Logger log = LoggerFactory.getLogger(this.getClass().getName());
+   private static final Logger LOG = LoggerFactory.getLogger(ViewControllerPopup.class);
 
    @FXML
    private Pane pane;
@@ -42,8 +42,7 @@ public class ViewControllerPopup {
    private FilteredList<Project> filteredData;
 
    private void changeProject(final Project item) {
-      final String info = String.format("Change project to '{%s}'.", item.getName());
-      log.info(info);
+      LOG.info("Change project to '{}'.", item.getName());
 
       // ask for a note for the current project
       final TextInputDialog dialog = new TextInputDialog(Model.activeWorkItem.get().getNotes());
@@ -72,8 +71,8 @@ public class ViewControllerPopup {
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
       final Consumer<Double> updateSize = height -> {
-         if (log.isDebugEnabled()) {
-            log.debug(String.format("%s%f", "update size ", height));
+         if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("%s%f", "update size ", height));
             projectListView.setPrefHeight(height);
             stage.sizeToScene(); // also update scene size
          }
@@ -179,7 +178,7 @@ public class ViewControllerPopup {
 
    public void show(final Point mouseLocation) {
       if (!stage.isShowing()) {
-         log.info("Showing popup");
+         LOG.info("Showing popup");
          projectListView.getSelectionModel().select(0);
          projectListView.refresh();
 

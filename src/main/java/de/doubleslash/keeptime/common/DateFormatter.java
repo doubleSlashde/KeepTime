@@ -19,8 +19,12 @@ public class DateFormatter {
 
       final int sec = (int) (currentWorkSeconds % 3600 % 60);
 
-      return (hours > 9 ? hours : "0" + hours) + ":" + (minutes > 9 ? minutes : "0" + minutes) + ":"
-            + (sec > 9 ? sec : "0" + sec);
+      final Object hoursString = hours > 9 ? hours : "0" + hours;
+      final Object minutesString = minutes > 9 ? minutes : "0" + minutes;
+      final Object secondsString = sec > 9 ? sec : "0" + sec;
+
+      final String timeString = hoursString + ":" + minutesString + ":" + secondsString;
+      return timeString;
    }
 
    public static long getSecondsBewtween(final LocalDateTime startDate, final LocalDateTime endDate) {

@@ -4,6 +4,10 @@ import java.net.URL;
 
 public class Resources {
 
+   private Resources() {
+      throw new IllegalStateException("Utility class");
+   }
+
    public enum RESOURCE {
       /** LAYOUTS **/
       // main
