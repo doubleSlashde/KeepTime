@@ -224,7 +224,7 @@ public class Main extends Application {
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
-      // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+      // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
 
       primaryStage.setTitle("KeepTime");
       primaryStage.setScene(mainScene);

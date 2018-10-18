@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -423,8 +424,9 @@ public class ViewController {
          allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
          todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
 
-         for (final Project p : elapsedProjectTimeLabelMap.keySet()) {
-            final Label label = elapsedProjectTimeLabelMap.get(p);
+         for (final Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
+            final Project p = entry.getKey();
+            final Label label = entry.getValue();
 
             final long seconds = model.pastWorkItems.stream().filter((work) -> work.getProject().getId() == p.getId())
                   .mapToLong(work -> {
@@ -533,8 +535,6 @@ public class ViewController {
          final MouseButton button = a.getButton();
          if (button == MouseButton.PRIMARY) {
             changeProject(p, 0);
-         } else if (button == MouseButton.SECONDARY) {
-
          }
 
       });
