@@ -79,6 +79,7 @@ import javafx.stage.Stage;
 
 @Component
 public class ViewController {
+   private static final String _00_00_00 = "00:00:00";
    @FXML
    private Pane pane;
    @FXML
@@ -120,11 +121,9 @@ public class ViewController {
 
    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-   boolean pressed = false;
-   double startX = -1;
-
-   class Delta {
-      double x, y;
+   private class Delta {
+      double x;
+      double y;
    }
 
    private final Delta dragDelta = new Delta();
@@ -168,9 +167,9 @@ public class ViewController {
    @FXML
    private void initialize() throws IOException {
 
-      bigTimeLabel.setText("00:00:00");
-      allTimeLabel.setText("00:00:00");
-      todayAllSeconds.setText("00:00:00");
+      bigTimeLabel.setText(_00_00_00);
+      allTimeLabel.setText(_00_00_00);
+      todayAllSeconds.setText(_00_00_00);
 
       textArea.setWrapText(true);
       textArea.setEditable(false);
@@ -411,7 +410,7 @@ public class ViewController {
       // update ui each second
       Interval.registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
-         model.activeWorkItem.get().setEndTime(now); // TODO not good to change model
+         model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
          final long currentWorkSeconds = Duration
                .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
@@ -421,8 +420,6 @@ public class ViewController {
          final long todaySeconds = controller.calcTodaysSeconds();
 
          // update all ui labels
-         // TODO do it with bindings (maybe create a viewmodel for this)
-         // bigTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
          allTimeLabel.setText(DateFormatter.secondsToHHMMSS(todayWorkingSeconds));
          todayAllSeconds.setText(DateFormatter.secondsToHHMMSS(todaySeconds));
 
@@ -443,7 +440,6 @@ public class ViewController {
    }
 
    private void setProjectListVisible(final Boolean c) {
-      // TODO fix the not so nice jumping..
       projectsVBox.setManaged(c);
       final double beforeWidth = mainStage.getWidth();
       mainStage.sizeToScene();
@@ -452,6 +448,7 @@ public class ViewController {
       final double offset = afterWidth - beforeWidth;
       if (!model.displayProjectsRight.get()) {
          // we only need to move the stage if the node on the left is hidden
+         // not sure how we can prevent the jumping
          mainStage.setX(mainStage.getX() - offset);
       }
    }
@@ -487,6 +484,7 @@ public class ViewController {
             this.mainStage.setAlwaysOnTop(true);
          });
       } catch (final IOException e) {
+         LOG.error("Error while initialising report or settings stage", e);
          throw new RuntimeException(e);
       }
    }
@@ -532,7 +530,6 @@ public class ViewController {
          if (wasDragged) {
             return;
          }
-         // a.consume();
          final MouseButton button = a.getButton();
          if (button == MouseButton.PRIMARY) {
             changeProject(p, 0);
@@ -546,17 +543,15 @@ public class ViewController {
          final Bloom bloom = new Bloom();
          bloom.setThreshold(0.3);
          projectNameLabel.setEffect(bloom);
-         // projectNameLabel.setUnderline(true);
       });
       projectNameLabel.setOnMouseExited(ae -> {
          projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor, p.getColor().getGreen() * dimFactor,
                p.getColor().getBlue() * dimFactor, 1));
          projectNameLabel.setEffect(null);
-         // projectNameLabel.setUnderline(false);
       });
 
       availableProjectVbox.getChildren().add(projectElement);
-      // TODO dialog modality
+
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
          LOG.info("Change with time");
@@ -604,17 +599,17 @@ public class ViewController {
          gridRow++;
          grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
                gridRow);
-         final Label currentProjectTimeLabel = new Label("00:00:00");
+         final Label currentProjectTimeLabel = new Label(_00_00_00);
          grid.add(currentProjectTimeLabel, 1, gridRow);
          gridRow++;
 
          grid.add(new Label("New end and start time:"), 0, gridRow);
-         final Label newEndTimeLabel = new Label("00:00:00");
+         final Label newEndTimeLabel = new Label(_00_00_00);
          grid.add(newEndTimeLabel, 1, gridRow);
          gridRow++;
 
          grid.add(new Label("New project duration: " + p.getName()), 0, gridRow);
-         final Label newProjectTimeLabel = new Label("00:00:00");
+         final Label newProjectTimeLabel = new Label(_00_00_00);
          grid.add(newProjectTimeLabel, 1, gridRow);
          gridRow++;
 
@@ -749,7 +744,7 @@ public class ViewController {
       LOG.debug("Sorting project view");
       final ObservableList<Node> children = availableProjectVbox.getChildren();
       children.clear();
-      // TODO changing the model is not ok from here, but the list is not resorted
+      // FIXME changing the model is not ok from here, but the list is not resorted
       final Comparator<? super Project> comparator = model.sortedAvailableProjects.getComparator();
       model.sortedAvailableProjects.setComparator(null); // TODO is there a better way?
       model.sortedAvailableProjects.setComparator(comparator);

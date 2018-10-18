@@ -49,8 +49,6 @@ public class Model {
    public ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
    public ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
-   public long neededWorkSeconds = 60 * 60 * 8; // 8 hours
-
    public ObjectProperty<Color> taskBarColor = new SimpleObjectProperty<>(originalTaskBarFontColor);
 
    public ObjectProperty<Color> hoverBackgroundColor = new SimpleObjectProperty<>(originalHoverBackgroundColor);

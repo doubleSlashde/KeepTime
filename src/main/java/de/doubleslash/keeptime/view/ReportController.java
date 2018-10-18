@@ -76,7 +76,6 @@ public class ReportController {
 
       gridPane.getChildren().clear();
       gridPane.getRowConstraints().clear();
-      // gridPane.getColumnConstraints().clear();
 
       int rowIndex = 0;
       long currentWorkSeconds = 0;
