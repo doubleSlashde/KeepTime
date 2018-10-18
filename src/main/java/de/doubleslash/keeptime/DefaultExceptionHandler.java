@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultExceptionHandler implements UncaughtExceptionHandler {
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
    @Override
    public void uncaughtException(final Thread t, final Throwable e) {

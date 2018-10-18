@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import de.doubleslash.keeptime.common.DateFormatter;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -15,12 +12,14 @@ import javafx.util.Duration;
 
 public class Interval {
 
-   private final static Logger LOG = LoggerFactory.getLogger(Interval.class);
-
-   public static List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
+   private static final List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
 
    private static Timeline timelineSession;
    private static LocalDateTime last = LocalDateTime.now();
+
+   private Interval() {
+      throw new IllegalStateException("Utility class");
+   }
 
    public static void registerCallBack(final CallBackListener cbl) {
       if (timelineSession == null) {
@@ -47,7 +46,6 @@ public class Interval {
       final int nanoBetween = java.time.Duration.between(last, now).abs().getNano();
 
       // ignore callbacks faster than ~1 second (can happen if we were in standby)
-      // Log.debug("{} - {} = {}.{}", now, last, secondsBewtween, nanoBetween);
       if (secondsBewtween >= 1 || nanoBetween > 900000000) {
          callBackListeners.forEach(CallBackListener::call);
          last = now;

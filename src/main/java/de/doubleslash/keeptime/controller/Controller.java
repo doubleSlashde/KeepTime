@@ -26,7 +26,7 @@ import javafx.scene.paint.Color;
 @Service
 public class Controller {
 
-   private final Logger Log = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
    private final Model model;
 
@@ -43,22 +43,20 @@ public class Controller {
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      // TODO consider day change (clean workRepo, ...)
-
       final Work currentWork = model.activeWorkItem.get();
 
       final LocalDate dateNow = dateProvider.dateNow();
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       if (currentWork != null) {
          currentWork.setEndTime(now);
-         // currentWork.setNotes(notes);
+
          if (currentWork.getNotes().isEmpty()) {
             currentWork.setNotes("- No notes -");
          }
 
          final String time = DateFormatter
                .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
-         Log.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
+         LOG.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
                currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
          // Save in db
@@ -68,11 +66,13 @@ public class Controller {
       // Start new work
       final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
       model.pastWorkItems.add(work);
+
+      // test if the day has changed
       if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
-         Log.info("Removing projects with other creation date than today '{}' from list.", dateNow);
+         LOG.info("Removing projects with other creation date than today '{}' from list.", dateNow);
          final int sizeBefore = model.pastWorkItems.size();
          model.pastWorkItems.removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
-         Log.debug("Removed '{}' work items from past work items.", sizeBefore - model.pastWorkItems.size());
+         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.pastWorkItems.size());
       }
       model.activeWorkItem.set(work);
    }
@@ -119,19 +119,18 @@ public class Controller {
 
    @PreDestroy
    public void shutdown() {
-      // XXX Auto-generated method stub
-      Log.info("Controller shutdown");
-      changeProject(model.idleProject, 0); // TODO get notes from view
+      LOG.info("Controller shutdown");
+      changeProject(model.idleProject, 0);
    }
 
    public void deleteProject(final Project p) {
       if (p.isDefault()) {
-         Log.error("You cannot delete the default project. Tried to delete project '{}'", p);
+         LOG.error("You cannot delete the default project. Tried to delete project '{}'", p);
          return;
       }
-      Log.info("Disabeling project '{}'.", p);
+      LOG.info("Disabeling project '{}'.", p);
       final int indexToRemove = p.getIndex();
-      p.setEnabled(false); // TODO or can we remove the project? but work references??
+      p.setEnabled(false); // we don't delete it because of the referenced work items
       p.setIndex(-1);
 
       model.availableProjects.remove(p);
@@ -144,7 +143,7 @@ public class Controller {
 
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
          final int newIndex) {
-      Log.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+      LOG.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
 
       p.setName(newName);
       p.setColor(newColor);
@@ -199,7 +198,6 @@ public class Controller {
          }
 
          final int newCurrentIndex = currentIndex + adjustOffset;
-         // System.out.println("Moving index '" + currentIndex + "' to '" + newCurrentIndex + "'.");
          project.setIndex(newCurrentIndex);
          changedProjects.add(project);
       }
@@ -235,7 +233,6 @@ public class Controller {
    public void setComment(final String notes) {
       final Work work = model.activeWorkItem.get();
       work.setNotes(notes);
-      // TODO when to save to repo?
    }
 
    /**

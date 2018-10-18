@@ -4,6 +4,10 @@ import java.net.URL;
 
 public class Resources {
 
+   private Resources() {
+      throw new IllegalStateException("Utility class");
+   }
+
    public enum RESOURCE {
       /** LAYOUTS **/
       // main
@@ -30,6 +34,5 @@ public class Resources {
 
    public static URL getResource(final RESOURCE resource) {
       return Resources.class.getResource(resource.getResourceLocation());
-      // return ClassLoader.getSystemResource(resource.getResourceLocation());
    }
 }

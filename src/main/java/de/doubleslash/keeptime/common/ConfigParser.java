@@ -17,7 +17,7 @@ import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;
 
 public class ConfigParser {
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(ConfigParser.class);
 
    private final Controller controller;
 
