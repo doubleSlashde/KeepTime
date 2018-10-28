@@ -38,7 +38,7 @@ public class Model {
 
    public static final Color originalTaskBarFontColor = Color.BLACK;
 
-   public final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
+   public static final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
    public Project idleProject = DEFAULT_PROJECT;
 
    public ObservableList<Project> availableProjects = FXCollections.observableArrayList();
@@ -49,8 +49,6 @@ public class Model {
    public ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
    public ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
-   public long neededWorkSeconds = 60 * 60 * 8; // 8 hours
-
    public ObjectProperty<Color> taskBarColor = new SimpleObjectProperty<>(originalTaskBarFontColor);
 
    public ObjectProperty<Color> hoverBackgroundColor = new SimpleObjectProperty<>(originalHoverBackgroundColor);
@@ -59,5 +57,5 @@ public class Model {
    public ObjectProperty<Color> defaultFontColor = new SimpleObjectProperty<>(originalDefaultFontColor);
    public ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
    public ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
-
+   public ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
 }

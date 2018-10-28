@@ -1,0 +1,4 @@
+.menuBorder {
+	-fx-border-color: rgba(180,180,180,1);
+	-fx-padding: 2px;
+}

@@ -48,7 +48,7 @@ public class ReportController {
    @FXML
    private ScrollPane scrollPane;
 
-   private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+   private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private DatePicker datePicker; // for calender element
 
@@ -76,14 +76,14 @@ public class ReportController {
 
       gridPane.getChildren().clear();
       gridPane.getRowConstraints().clear();
-      // gridPane.getColumnConstraints().clear();
 
       int rowIndex = 0;
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
-         projectName.setFont(Font.font("System", FontWeight.BOLD, 15));
+         final Font labelFont = Font.font("System", FontWeight.BOLD, 15);
+         projectName.setFont(labelFont);
          gridPane.add(projectName, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
@@ -99,7 +99,7 @@ public class ReportController {
          }
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
-         workedTimeLabel.setFont(Font.font("System", FontWeight.BOLD, 15));
+         workedTimeLabel.setFont(labelFont);
          gridPane.add(workedTimeLabel, 2, rowIndex);
          rowIndex++;
 
