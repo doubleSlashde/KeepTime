@@ -17,7 +17,7 @@ Main view (when you hover over the app):\
 **You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved to database.**
 
 # Install
-Download and execute .jar file (see [releases](https://github.com/doubleSlashde/KeepTime/releases)). The start may take up to one minute. You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
+Download the .jar and .bat file and execute the .bat (see [releases](https://github.com/doubleSlashde/KeepTime/releases)). The start may take up to one minute. You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
 It is recommended to run the application at windows start so you do not forget to track your time. To do this follow these steps:
 * Copy the keeptime.bat file from this repo next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. Close the app
 * Open the autostart folder: Press *Windows+R*, execute *shell:startup*
