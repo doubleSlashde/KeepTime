@@ -19,9 +19,11 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -30,6 +32,10 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 
 public class ReportController {
+
+   public static final String NOTE_DELIMETER = "; ";
+
+   public static final String EMPTY_NOTE = "- No notes -";
 
    private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #BBBBBB;";
 
@@ -59,23 +65,23 @@ public class ReportController {
    private void initialize() {
       LOG.info("Init reportController");
 
-      datePicker = new DatePicker(LocalDate.now());
-      datePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
+      this.datePicker = new DatePicker(LocalDate.now());
+      this.datePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
          LOG.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);
       });
    }
 
    private void updateReport(final LocalDate newvalue) {
-      currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
-      final List<Work> currentWorkItems = model.workRepository.findByCreationDate(newvalue);
+      this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
+      final List<Work> currentWorkItems = this.model.workRepository.findByCreationDate(newvalue);
 
       final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> {
          return m.getProject();
       }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
 
-      gridPane.getChildren().clear();
-      gridPane.getRowConstraints().clear();
+      this.gridPane.getChildren().clear();
+      this.gridPane.getRowConstraints().clear();
 
       int rowIndex = 0;
       long currentWorkSeconds = 0;
@@ -84,7 +90,7 @@ public class ReportController {
          final Label projectName = new Label(project.getName());
          final Font labelFont = Font.font("System", FontWeight.BOLD, 15);
          projectName.setFont(labelFont);
-         gridPane.add(projectName, 0, rowIndex);
+         this.gridPane.add(projectName, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
@@ -100,36 +106,48 @@ public class ReportController {
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
          workedTimeLabel.setFont(labelFont);
-         gridPane.add(workedTimeLabel, 2, rowIndex);
+         this.gridPane.add(workedTimeLabel, 2, rowIndex);
+
+         // text will be set later
+         final TextArea textArea = new TextArea();
+         textArea.setMaxHeight(20);
+         textArea.setFont(Font.font("System", FontWeight.NORMAL, 15));
+         textArea.setWrapText(true);
+         this.gridPane.add(textArea, 1, rowIndex);
+
          rowIndex++;
 
+         final ProjectReport pr = new ProjectReport(onlyCurrentProjectWork.size());
          for (int j = 0; j < onlyCurrentProjectWork.size(); j++) {
             final Work work = onlyCurrentProjectWork.get(j);
             final String workedHours = DateFormatter
                   .secondsToHHMMSS(DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime()));
 
-            final Label commentLabel = new Label(work.getNotes());
+            final String currentWorkNote = work.getNotes();
+            pr.appendToWorkNotes(currentWorkNote);
+            final Label commentLabel = new Label(currentWorkNote);
             commentLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
             commentLabel.setWrapText(true);
-            gridPane.add(commentLabel, 0, rowIndex);
+            this.gridPane.add(commentLabel, 0, rowIndex);
 
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
             fromTillLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
             fromTillLabel.setWrapText(true);
-            gridPane.add(fromTillLabel, 1, rowIndex);
+            this.gridPane.add(fromTillLabel, 1, rowIndex);
 
             final Label workedHoursLabel = new Label(workedHours);
             workedHoursLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
-            gridPane.add(workedHoursLabel, 2, rowIndex);
+            this.gridPane.add(workedHoursLabel, 2, rowIndex);
 
             rowIndex++;
          }
+         textArea.setText(pr.getNotes(true));
       }
-      scrollPane.setVvalue(0); // scroll to the top
+      this.scrollPane.setVvalue(0); // scroll to the top
 
-      currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
-      currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+      this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
+      this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
    }
 
    public void setModelAndController(final Model model, final Controller controller) {
@@ -138,7 +156,7 @@ public class ReportController {
 
       // HACK to show calendar from datepicker
       // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
-      final DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
+      final DatePickerSkin datePickerSkin = new DatePickerSkin(this.datePicker);
       final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
          @Override
          public DateCell call(final DatePicker datePicker) {
@@ -154,12 +172,12 @@ public class ReportController {
             };
          }
       };
-      datePicker.setDayCellFactory(dayCellFactory);
+      this.datePicker.setDayCellFactory(dayCellFactory);
       final Node popupContent = datePickerSkin.getPopupContent();
-      topBorderPane.setRight(popupContent);
+      this.topBorderPane.setRight(popupContent);
    }
 
    public void update() {
-      updateReport(datePicker.getValue());
+      updateReport(this.datePicker.getValue());
    }
 }
