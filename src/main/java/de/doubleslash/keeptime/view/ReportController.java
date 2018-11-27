@@ -12,11 +12,14 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
+import antlr.debug.Event;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -24,6 +27,9 @@ import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -109,11 +115,15 @@ public class ReportController {
          this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
+         /*
          final TextArea textArea = new TextArea();
          textArea.setMaxHeight(20);
          textArea.setFont(Font.font("System", FontWeight.NORMAL, 15));
          textArea.setWrapText(true);
          this.gridPane.add(textArea, 1, rowIndex);
+         */
+         final Button bProjectReport = createProjectReport();
+         this.gridPane.add(bProjectReport, 1, rowIndex);
 
          rowIndex++;
 
@@ -142,12 +152,35 @@ public class ReportController {
 
             rowIndex++;
          }
-         textArea.setText(pr.getNotes(true));
+         // textArea.setText(pr.getNotes(true));
+         bProjectReport.setUserData(pr.getNotes(true));
       }
       this.scrollPane.setVvalue(0); // scroll to the top
 
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+   }
+
+   private Button createProjectReport() {
+      final Button bProjectReport = new Button("Copy to clipboard");
+      final EventHandler<ActionEvent> eventListener = new EventHandler<ActionEvent>() {
+
+         @Override
+         public void handle(final ActionEvent event) {
+            final Object source = event.getSource();
+            final Button btn = (Button) source;
+            final Object userData = btn.getUserData();
+            final String notes = (String) userData;
+
+            final Clipboard clipboard = Clipboard.getSystemClipboard();
+            final ClipboardContent content = new ClipboardContent();
+            content.putString(notes);
+            clipboard.setContent(content);
+         }
+
+      };
+      bProjectReport.setOnAction(eventListener);
+      return bProjectReport;
    }
 
    public void setModelAndController(final Model model, final Controller controller) {
