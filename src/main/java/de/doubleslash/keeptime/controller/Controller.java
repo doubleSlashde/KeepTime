@@ -45,8 +45,8 @@ public class Controller {
    public void changeProject(final Project newProject, final long minusSeconds) {
       final Work currentWork = Model.activeWorkItem.get();
 
-      final LocalDate dateNow = dateProvider.dateNow();
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
+      final LocalDate dateNow = now.toLocalDate();
       if (currentWork != null) {
          currentWork.setEndTime(now);
          if (currentWork.getNotes().isEmpty()) {

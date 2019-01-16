@@ -3,7 +3,6 @@ package de.doubleslash.keeptime.controller;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -173,17 +172,13 @@ public class ControllerTest {
    @Test
    public void changeProjectSameDayTest() {
       final LocalDateTime firstProjectDateTime = LocalDateTime.now();
-      final LocalDate firstProjectDate = firstProjectDateTime.toLocalDate();
       final LocalDateTime secondProjectDateTime = LocalDateTime.now();
-      final LocalDate secondProjectDate = firstProjectDateTime.toLocalDate();
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      Mockito.when(mockedDateProvider.dateNow()).thenReturn(firstProjectDate);
       final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
       final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
-      Mockito.when(mockedDateProvider.dateNow()).thenReturn(secondProjectDate);
       testee.changeProject(secondProject);
 
       Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
@@ -208,17 +203,13 @@ public class ControllerTest {
    @Test
    public void changeProjectOtherDayTest() {
       final LocalDateTime firstProjectDateTime = LocalDateTime.now();
-      final LocalDate firstProjectDate = firstProjectDateTime.toLocalDate();
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
-      final LocalDate secondProjectDate = secondProjectDateTime.toLocalDate();
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      Mockito.when(mockedDateProvider.dateNow()).thenReturn(firstProjectDate);
       final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
       final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
-      Mockito.when(mockedDateProvider.dateNow()).thenReturn(secondProjectDate);
       testee.changeProject(secondProject);
 
       Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
@@ -233,11 +224,48 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("One projects should be in the past work items", model.getPastWorkItems().size(), is(1));
-      assertThat("The project should be the second work project", model.getPastWorkItems().get(0).getProject(),
+      assertThat("'1st project' should be in the past work items", model.getPastWorkItems().size(), is(1));
+      assertThat("The project should be  '2ndProject'", model.getPastWorkItems().get(0).getProject(),
             is(secondProject));
-      assertThat("The second project should be the active work project", model.activeWorkItem.get().getProject(),
+      assertThat("'2ndProject' should be the active work project", model.activeWorkItem.get().getProject(),
             is(secondProject));
+   }
+
+   @Test
+   public void changeProjectOtherDayWithTimeTest() {
+      final LocalDateTime firstProjectDateTime = LocalDateTime.of(2018, 02, 14, 14, 0);
+      final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
+
+      Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
+      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
+      testee.changeProject(firstProject);
+      Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
+      testee.changeProject(secondProject, 23 * 60 * 60); // change with -23 hours
+
+      final LocalDateTime firstProjectPlusOneHour = firstProjectDateTime.plusHours(1);
+      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(Mockito.argThat((final Work savedWork) -> {
+         if (savedWork.getProject() != firstProject) {
+            return false;
+         }
+         if (!savedWork.getStartTime().equals(firstProjectDateTime)) {
+            return false;
+         }
+         if (!savedWork.getEndTime().equals(firstProjectPlusOneHour)) {
+            return false;
+         }
+         return true;
+      }));
+
+      assertThat("Two projects should be in the past work items", model.getPastWorkItems().size(), is(2));
+      assertThat("The first project should be '1st Project'", model.getPastWorkItems().get(0).getProject(),
+            is(firstProject));
+      assertThat("The second project should be '2ndProject'", model.getPastWorkItems().get(1).getProject(),
+            is(secondProject));
+      final Work work = model.activeWorkItem.get();
+      assertThat("'2ndProject' should be the active work project", work.getProject(), is(secondProject));
+      assertThat(work.getCreationDate(), is(firstProjectDateTime.toLocalDate()));
+      assertThat(work.getStartTime(), is(firstProjectPlusOneHour));
    }
 
 }
