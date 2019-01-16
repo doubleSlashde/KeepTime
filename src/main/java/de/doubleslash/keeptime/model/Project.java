@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import de.doubleslash.keeptime.model.persistenceConverter.ColorConverter;
+import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import javafx.scene.paint.Color;
 
 @Entity

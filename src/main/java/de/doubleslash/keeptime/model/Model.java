@@ -17,9 +17,9 @@ import javafx.scene.paint.Color;
 
 @Component
 public class Model {
-   public ProjectRepository projectRepository;
-   public WorkRepository workRepository;
-   public SettingsRepository settingsRepository;
+   private ProjectRepository projectRepository;
+   private WorkRepository workRepository;
+   private SettingsRepository settingsRepository;
 
    @Autowired
    public Model(final ProjectRepository projectRepository, final WorkRepository workRepository,
@@ -30,32 +30,87 @@ public class Model {
       this.settingsRepository = settingsRepository;
    }
 
-   public static final Color originalHoverBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., .7);
+   public static final Color ORIGINAL_HOVER_BACKGROUND_COLOR = new Color(54 / 255., 143 / 255., 179 / 255., .7);
 
-   public static final Color originalHoverFontColor = Color.BLACK;
-   public static final Color originalDefaultBackgroundColor = new Color(54 / 255., 143 / 255., 179 / 255., .7);
-   public static final Color originalDefaultFontColor = Color.BLACK;
+   public static final Color ORIGINAL_HOVER_Font_COLOR = Color.BLACK;
+   public static final Color ORIGINAL_DEFAULT_BACKGROUND_COLOR = new Color(54 / 255., 143 / 255., 179 / 255., .7);
+   public static final Color ORIGINAL_DEFAULT_FONT_COLOR = Color.BLACK;
 
-   public static final Color originalTaskBarFontColor = Color.BLACK;
+   public static final Color ORIGINAL_TASK_BAR_FONT_COLOR = Color.BLACK;
 
    public static final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
-   public Project idleProject = DEFAULT_PROJECT;
+   private Project idleProject = DEFAULT_PROJECT;
 
-   public ObservableList<Project> availableProjects = FXCollections.observableArrayList();
-   public SortedList<Project> sortedAvailableProjects = new SortedList<>(availableProjects,
+   private final ObservableList<Project> availableProjects = FXCollections.observableArrayList();
+   private final SortedList<Project> sortedAvailableProjects = new SortedList<>(availableProjects,
          Comparator.comparing(Project::getIndex));
-   public ObservableList<Project> allProjects = FXCollections.observableArrayList();
+   private ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
-   public ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
-   public ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
+   protected static final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
+   public static final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
-   public ObjectProperty<Color> taskBarColor = new SimpleObjectProperty<>(originalTaskBarFontColor);
+   public static final ObjectProperty<Color> TASK_BAR_COLOR = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
 
-   public ObjectProperty<Color> hoverBackgroundColor = new SimpleObjectProperty<>(originalHoverBackgroundColor);
-   public ObjectProperty<Color> hoverFontColor = new SimpleObjectProperty<>(originalHoverFontColor);
-   public ObjectProperty<Color> defaultBackgroundColor = new SimpleObjectProperty<>(originalDefaultBackgroundColor);
-   public ObjectProperty<Color> defaultFontColor = new SimpleObjectProperty<>(originalDefaultFontColor);
-   public ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
-   public ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
-   public ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
+   public static final ObjectProperty<Color> HOVER_BACKGROUND_COLOR = new SimpleObjectProperty<>(
+         ORIGINAL_HOVER_BACKGROUND_COLOR);
+   public static final ObjectProperty<Color> HOVER_FONT_COLOR = new SimpleObjectProperty<>(ORIGINAL_HOVER_Font_COLOR);
+   public static final ObjectProperty<Color> DEFAULT_BACKGROUND_COLOR = new SimpleObjectProperty<>(
+         ORIGINAL_DEFAULT_BACKGROUND_COLOR);
+   public static final ObjectProperty<Color> DEFAULT_FONT_COLOR = new SimpleObjectProperty<>(
+         ORIGINAL_DEFAULT_FONT_COLOR);
+   public static final ObjectProperty<Boolean> USE_HOTKEY = new SimpleObjectProperty<>(false);
+   public static final ObjectProperty<Boolean> DISPLAY_PROJECTS_RIGHT = new SimpleObjectProperty<>(false);
+   public static final ObjectProperty<Boolean> HIDE_PROJECTS_ON_MOUSE_EXIT = new SimpleObjectProperty<>(true);
+
+   public void setWorkRepository(final WorkRepository workRepository) {
+      this.workRepository = workRepository;
+   }
+
+   public void setProjectRepository(final ProjectRepository projectRepository) {
+      this.projectRepository = projectRepository;
+   }
+
+   public void setSettingsRepository(final SettingsRepository settingsRepository) {
+      this.settingsRepository = settingsRepository;
+   }
+
+   public void setIdleProject(final Project idleProject) {
+      this.idleProject = idleProject;
+   }
+
+   public void setAllProjects(final ObservableList<Project> allProjects) {
+      this.allProjects = allProjects;
+   }
+
+   public WorkRepository getWorkRepository() {
+      return workRepository;
+   }
+
+   public SortedList<Project> getSortedAvailableProjects() {
+      return sortedAvailableProjects;
+   }
+
+   public ProjectRepository getProjectRepository() {
+      return projectRepository;
+   }
+
+   public SettingsRepository getSettingsRepository() {
+      return settingsRepository;
+   }
+
+   public ObservableList<Work> getPastWorkItems() {
+      return pastWorkItems;
+   }
+
+   public Project getIdleProject() {
+      return idleProject;
+   }
+
+   public ObservableList<Project> getAvailableProjects() {
+      return availableProjects;
+   }
+
+   public ObservableList<Project> getAllProjects() {
+      return allProjects;
+   }
 }

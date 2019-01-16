@@ -15,13 +15,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
+<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
    <children>
       <BorderPane fx:id="borderPane" layoutX="5.0" layoutY="-15.0">
          <center>
             <Group>
                <children>
-                  <Label fx:id="currentProjectLabel" alignment="CENTER" layoutX="4.0" layoutY="108.0" prefHeight="2.0" prefWidth="286.0" text="Kardex">
+                  <Label fx:id="currentProjectLabel" alignment="CENTER" layoutX="4.0" layoutY="108.0" prefHeight="2.0" prefWidth="286.0" text="Peter Lustig">
                      <font>
                         <Font size="29.0" />
                      </font>
@@ -90,7 +90,7 @@
                         <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" prefWidth="130.0" />
                      </content>
                   </ScrollPane>
-                  <Button fx:id="addNewProjectButton" minHeight="-Infinity" mnemonicParsing="false" prefHeight="23.0" prefWidth="115.0" stylesheets="@application.css" text="+ Add new project" />
+                  <Button fx:id="addNewProjectButton" minHeight="-Infinity" mnemonicParsing="false" onAction="#addNewProject" prefHeight="23.0" prefWidth="115.0" stylesheets="@application.css" text="+ Add new project" />
                </children>
                <BorderPane.margin>
                   <Insets top="20.0" />
