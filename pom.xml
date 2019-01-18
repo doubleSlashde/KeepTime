@@ -78,14 +78,36 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
       <!-- needed for mvn site - see https://stackoverflow.com/a/51099913 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
         <version>3.7.1</version>
       </plugin>
+
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>4.0.1</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        <configuration>
+          <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
+          <failBuildOnCVSS>8</failBuildOnCVSS>
+          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
+        </configuration>
+      </plugin>
+
     </plugins>
-  </build>
-
-
+  </reporting>
 </project>
