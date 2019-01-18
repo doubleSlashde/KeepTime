@@ -41,7 +41,7 @@ public class ProjectReport {
    }
 
    public String getNotes(final boolean addNumberOfNotes) {
-      if (addNumberOfNotes) {
+      if (addNumberOfNotes && this.numberOfNotes > 1) {
          return Integer.toString(this.numberOfNotes) + " Notes: " + this.sb.toString();
       } else {
          return this.sb.toString();
