@@ -1,5 +1,5 @@
 package de.doubleslash.keeptime.view;
-
+G
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -57,6 +57,15 @@ public class ProjectReportTest {
       this.uut.appendToWorkNotes(ReportController.EMPTY_NOTE);
       this.uut.appendToWorkNotes(ReportController.EMPTY_NOTE);
       final String expected = "4 Notes: note 1; note 2";
+      assertEquals(expected, this.uut.getNotes(true));
+   }
+
+   @Test
+   public void testAppendToWorkNotesAddNumberOfNotes_OnlyOneNote() {
+      this.uut = new ProjectReport(1);
+      this.uut.appendToWorkNotes("note 1");
+      // final String expected = "1 Notes: note 1";
+      final String expected = "note 1";
       assertEquals(expected, this.uut.getNotes(true));
    }
 
