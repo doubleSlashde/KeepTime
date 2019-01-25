@@ -32,9 +32,7 @@ public class Interval {
     * only create timeLine if needed
     */
    private static void createTimeLine() {
-      timelineSession = new Timeline(new KeyFrame(Duration.seconds(1), (ae) -> {
-         debounceAndExecuteCallbacks();
-      }));
+      timelineSession = new Timeline(new KeyFrame(Duration.seconds(1), ae -> debounceAndExecuteCallbacks()));
       timelineSession.setCycleCount(Animation.INDEFINITE);
       timelineSession.play();
 

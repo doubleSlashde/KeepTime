@@ -22,8 +22,8 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.ViewController;
-import de.doubleslash.keeptime.viewPopup.GlobalScreenListener;
-import de.doubleslash.keeptime.viewPopup.ViewControllerPopup;
+import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
+import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -46,7 +46,7 @@ public class Main extends Application {
 
    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-   public static final String VERSION = "v1.0.0";
+   public static final String VERSION = "v1.0.1b";
 
    private ConfigurableApplicationContext springContext;
 
@@ -116,31 +116,31 @@ public class Main extends Application {
 
       readSettings();
 
-      final List<Work> todaysWorkItems = model.workRepository.findByCreationDate(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
-      model.pastWorkItems.addAll(todaysWorkItems);
+      model.getPastWorkItems().addAll(todaysWorkItems);
 
-      final List<Project> projects = model.projectRepository.findAll();
+      final List<Project> projects = model.getProjectRepository().findAll();
 
       LOG.debug("Found '{}' projects", projects.size());
       if (projects.isEmpty()) {
          LOG.info("Adding default project");
-         projects.add(model.DEFAULT_PROJECT);
-         model.projectRepository.save(model.DEFAULT_PROJECT);
+         projects.add(Model.DEFAULT_PROJECT);
+         model.getProjectRepository().save(Model.DEFAULT_PROJECT);
       }
 
-      model.allProjects.addAll(projects);
-      model.availableProjects
-            .addAll(model.allProjects.stream().filter(Project::isEnabled).collect(Collectors.toList()));
+      model.getAllProjects().addAll(projects);
+      model.getAvailableProjects()
+            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();
       if (findAny.isPresent()) {
-         model.idleProject = findAny.get();
-         LOG.debug("Using project '{}' as default project.", model.idleProject);
+         model.setIdleProject(findAny.get());
+         LOG.debug("Using project '{}' as default project.", model.getIdleProject());
       }
 
-      primaryStage.setOnHiding((we) -> {
+      primaryStage.setOnHiding(we -> {
          popupViewStage.close();
          globalScreenListener.shutdown(); // deregister, as this will keep app running
       });
@@ -152,44 +152,42 @@ public class Main extends Application {
    private void readSettings() {
       LOG.debug("Reading configuration");
 
-      final List<Settings> settingsList = model.settingsRepository.findAll();
+      final List<Settings> settingsList = model.getSettingsRepository().findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
          settings = new Settings();
-         settings.setTaskBarColor(model.taskBarColor.get());
+         settings.setTaskBarColor(Model.TASK_BAR_COLOR.get());
 
-         settings.setDefaultBackgroundColor(model.defaultBackgroundColor.get());
-         settings.setDefaultFontColor(model.defaultFontColor.get());
+         settings.setDefaultBackgroundColor(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
+         settings.setDefaultFontColor(Model.ORIGINAL_DEFAULT_FONT_COLOR);
 
-         settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
-         settings.setHoverFontColor(model.hoverFontColor.get());
+         settings.setHoverBackgroundColor(Model.ORIGINAL_HOVER_BACKGROUND_COLOR);
+         settings.setHoverFontColor(Model.ORIGINAL_HOVER_Font_COLOR);
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
          settings.setHideProjectsOnMouseExit(true);
-         model.settingsRepository.save(settings);
+         model.getSettingsRepository().save(settings);
       } else {
          settings = settingsList.get(0);
       }
 
-      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
-      model.defaultFontColor.set(settings.getDefaultFontColor());
-      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
-      model.hoverFontColor.set(settings.getHoverFontColor());
-      model.taskBarColor.set(settings.getTaskBarColor());
-      model.useHotkey.set(settings.isUseHotkey());
-      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
-      model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      Model.DEFAULT_BACKGROUND_COLOR.set(settings.getDefaultBackgroundColor());
+      Model.DEFAULT_FONT_COLOR.set(settings.getDefaultFontColor());
+      Model.HOVER_BACKGROUND_COLOR.set(settings.getHoverBackgroundColor());
+      Model.HOVER_FONT_COLOR.set(settings.getHoverFontColor());
+      Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
+      Model.USE_HOTKEY.set(settings.isUseHotkey());
+      Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
+      Model.HIDE_PROJECTS_ON_MOUSE_EXIT.set(settings.isHideProjectsOnMouseExit());
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising popup UI.");
 
       globalScreenListener = new GlobalScreenListener();
-      // stop and close stage when main stage is shutdown
-      model.useHotkey.addListener((a, b, newValue) -> {
-         globalScreenListener.register(newValue);
-      });
-      globalScreenListener.register(model.useHotkey.get());
+
+      Model.USE_HOTKEY.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
+      globalScreenListener.register(Model.USE_HOTKEY.get());
 
       popupViewStage = new Stage();
       popupViewStage.initOwner(primaryStage);
@@ -206,8 +204,8 @@ public class Main extends Application {
       // Give the controller access to the main app.
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
-      viewControllerPopupController.setStage(popupViewStage, popupScene);
-      viewControllerPopupController.setController(controller, model);
+      viewControllerPopupController.setStage(popupViewStage);
+      viewControllerPopupController.setControllerAndModel(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
    }
 
@@ -237,13 +235,12 @@ public class Main extends Application {
             LOG.info("On close request");
          }
       });
-
+      primaryStage.show();
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
       viewController.setController(controller, model);
 
-      primaryStage.show();
    }
 
    @Override

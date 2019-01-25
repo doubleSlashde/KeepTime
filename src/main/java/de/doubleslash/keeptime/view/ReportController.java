@@ -12,9 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
-import antlr.debug.Event;
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -26,11 +24,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
@@ -64,7 +60,6 @@ public class ReportController {
 
    private DatePicker datePicker; // for calender element
 
-   private Controller controller;
    private Model model;
 
    @FXML
@@ -80,11 +75,10 @@ public class ReportController {
 
    private void updateReport(final LocalDate newvalue) {
       this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
-      final List<Work> currentWorkItems = this.model.workRepository.findByCreationDate(newvalue);
+      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
 
-      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(m -> {
-         return m.getProject();
-      }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
+      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
 
       this.gridPane.getChildren().clear();
       this.gridPane.getRowConstraints().clear();
@@ -92,18 +86,19 @@ public class ReportController {
       int rowIndex = 0;
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
+      final Font labelFontBold = Font.font("System", FontWeight.BOLD, 15);
+      final Font labelFontNormal = Font.font("System", FontWeight.NORMAL, 15);
+
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
-         final Font labelFont = Font.font("System", FontWeight.BOLD, 15);
-         projectName.setFont(labelFont);
+         projectName.setFont(labelFontBold);
          this.gridPane.add(projectName, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
 
-         final long todaysWorkSeconds = onlyCurrentProjectWork.stream().mapToLong(work -> {
-            return DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime());
-         }).sum();
+         final long todaysWorkSeconds = onlyCurrentProjectWork.stream()
+               .mapToLong(work -> DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime())).sum();
 
          currentSeconds += todaysWorkSeconds;
          if (project.isWork()) {
@@ -111,17 +106,14 @@ public class ReportController {
          }
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
-         workedTimeLabel.setFont(labelFont);
+         workedTimeLabel.setFont(labelFontBold);
          this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
          /*
-         final TextArea textArea = new TextArea();
-         textArea.setMaxHeight(20);
-         textArea.setFont(Font.font("System", FontWeight.NORMAL, 15));
-         textArea.setWrapText(true);
-         this.gridPane.add(textArea, 1, rowIndex);
-         */
+          * final TextArea textArea = new TextArea(); textArea.setMaxHeight(20); textArea.setFont(Font.font("System",
+          * FontWeight.NORMAL, 15)); textArea.setWrapText(true); this.gridPane.add(textArea, 1, rowIndex);
+          */
          final Button bProjectReport = createProjectReport();
          this.gridPane.add(bProjectReport, 1, rowIndex);
 
@@ -136,18 +128,18 @@ public class ReportController {
             final String currentWorkNote = work.getNotes();
             pr.appendToWorkNotes(currentWorkNote);
             final Label commentLabel = new Label(currentWorkNote);
-            commentLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            commentLabel.setFont(labelFontNormal);
             commentLabel.setWrapText(true);
             this.gridPane.add(commentLabel, 0, rowIndex);
 
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
-            fromTillLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            fromTillLabel.setFont(labelFontNormal);
             fromTillLabel.setWrapText(true);
             this.gridPane.add(fromTillLabel, 1, rowIndex);
 
             final Label workedHoursLabel = new Label(workedHours);
-            workedHoursLabel.setFont(Font.font("System", FontWeight.NORMAL, 15));
+            workedHoursLabel.setFont(labelFontNormal);
             this.gridPane.add(workedHoursLabel, 2, rowIndex);
 
             rowIndex++;
@@ -183,28 +175,23 @@ public class ReportController {
       return bProjectReport;
    }
 
-   public void setModelAndController(final Model model, final Controller controller) {
+   public void setModel(final Model model) {
       this.model = model;
-      this.controller = controller;
 
       // HACK to show calendar from datepicker
       // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
-      final DatePickerSkin datePickerSkin = new DatePickerSkin(this.datePicker);
-      final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
+      final DatePickerSkin datePickerSkin = new DatePickerSkin(datePicker);
+      final Callback<DatePicker, DateCell> dayCellFactory = callback -> new DateCell() {
          @Override
-         public DateCell call(final DatePicker datePicker) {
-            return new DateCell() {
-               @Override
-               public void updateItem(final LocalDate item, final boolean empty) {
-                  super.updateItem(item, empty);
-                  if (model.workRepository.findByCreationDate(item).isEmpty()) {
-                     setDisable(true);
-                     setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
-                  }
-               }
-            };
+         public void updateItem(final LocalDate item, final boolean empty) {
+            super.updateItem(item, empty);
+            if (model.getWorkRepository().findByCreationDate(item).isEmpty()) {
+               setDisable(true);
+               setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
+            }
          }
       };
+
       this.datePicker.setDayCellFactory(dayCellFactory);
       final Node popupContent = datePickerSkin.getPopupContent();
       this.topBorderPane.setRight(popupContent);
