@@ -1,5 +1,5 @@
 package de.doubleslash.keeptime.view;
-G
+
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
