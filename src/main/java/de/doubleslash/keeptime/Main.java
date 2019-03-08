@@ -37,6 +37,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -73,6 +74,14 @@ public class Main extends Application {
 
    @Override
    public void start(final Stage primaryStage) {
+	  LOG.info("Load custom font");
+	  try {
+		 LOG.info(Resources.getResource(RESOURCE.FONT).toString());
+		 Font.loadFont(Resources.getResource(RESOURCE.FONT).toExternalForm(), 12);
+	  } catch(final Exception e) {
+		 LOG.error("There was an error while loading the custom font", e);
+	  }
+	  
       LOG.info("Initialising the UI");
       try {
          initUI(primaryStage);

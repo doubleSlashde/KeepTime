@@ -9,6 +9,8 @@ public class Resources {
    }
 
    public enum RESOURCE {
+	  FONT("/MuktaVaani-Regular.ttf"),
+	   
       /** LAYOUTS **/
       // main
       FXML_VIEW_LAYOUT("/ViewLayout.fxml"),

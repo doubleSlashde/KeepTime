@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
@@ -15,7 +23,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
+<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01); -fx-font-family: Mukta Vaani;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
    <children>
       <BorderPane fx:id="borderPane" layoutX="5.0" layoutY="-15.0">
          <center>
@@ -28,7 +36,7 @@
                   </Label>
                   <Label fx:id="bigTimeLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="113.0" prefWidth="294.0" text="01:02:23" textAlignment="CENTER">
                      <font>
-                        <Font size="78.0" />
+                        <Font name="Mukta Vaani Regular" size="67.0" />
                      </font>
                   </Label>
                   <BorderPane layoutX="4.0" layoutY="86.0" prefHeight="36.0" prefWidth="286.0">
