@@ -9,18 +9,21 @@ public class Resources {
    }
 
    public enum RESOURCE {
-	  FONT("/MuktaVaani-Regular.ttf"),
+      /** FONTS **/
+	  FONT_BOLD("/font/OpenSans-Bold.ttf"),
+      FONT_SEMI_BOLD("/font/OpenSans-SemiBold.ttf"),
+      FONT_REGULAR("/font/OpenSans-Regular.ttf"),
 	   
       /** LAYOUTS **/
       // main
-      FXML_VIEW_LAYOUT("/ViewLayout.fxml"),
-      FXML_PROJECT_LAYOUT("/ProjectDetailLayout.fxml"),
-      FXML_SETTINGS("/settings.fxml"),
-      FXML_VIEW_POPUP_LAYOUT("/ViewLayoutPopup.fxml"),
+      FXML_VIEW_LAYOUT("/layouts/ViewLayout.fxml"),
+      FXML_PROJECT_LAYOUT("/layouts/ProjectDetailLayout.fxml"),
+      FXML_SETTINGS("/layouts/settings.fxml"),
+      FXML_VIEW_POPUP_LAYOUT("/layouts/ViewLayoutPopup.fxml"),
 
       // icon
-      ICON_MAIN("/icon.png"),
-      FXML_REPORT("/report.fxml"),
+      ICON_MAIN("/icons/icon.png"),
+      FXML_REPORT("/layouts/report.fxml"),
 
       ;
       String resourceLocation;

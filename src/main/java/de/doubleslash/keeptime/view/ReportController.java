@@ -86,8 +86,8 @@ public class ReportController {
       int rowIndex = 0;
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
-      final Font labelFontBold = Font.font("System", FontWeight.BOLD, 15);
-      final Font labelFontNormal = Font.font("System", FontWeight.NORMAL, 15);
+      final Font labelFontBold = Font.font("Open Sans", FontWeight.BOLD, 15);
+      final Font labelFontNormal = Font.font("Open Sans", FontWeight.NORMAL, 15);
 
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
@@ -110,10 +110,6 @@ public class ReportController {
          this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
-         /*
-          * final TextArea textArea = new TextArea(); textArea.setMaxHeight(20); textArea.setFont(Font.font("System",
-          * FontWeight.NORMAL, 15)); textArea.setWrapText(true); this.gridPane.add(textArea, 1, rowIndex);
-          */
          final Button bProjectReport = createProjectReport();
          this.gridPane.add(bProjectReport, 1, rowIndex);
 

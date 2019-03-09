@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,17 +75,9 @@ public class Main extends Application {
 
    @Override
    public void start(final Stage primaryStage) {
-	  LOG.info("Load custom font");
-	  try {
-		 LOG.info(Resources.getResource(RESOURCE.FONT).toString());
-		 Font.loadFont(Resources.getResource(RESOURCE.FONT).toExternalForm(), 12);
-	  } catch(final Exception e) {
-		 LOG.error("There was an error while loading the custom font", e);
-	  }
-	  
       LOG.info("Initialising the UI");
       try {
-         initUI(primaryStage);
+         initialiseApplication(primaryStage);
          LOG.info("UI successfully initialised.");
       } catch (final Exception e) {
          LOG.error("There was an error while initialising the UI", e);
@@ -121,8 +114,23 @@ public class Main extends Application {
       }
    }
 
-   private void initUI(final Stage primaryStage) throws Exception {
+   private void loadFonts() {
+      List<RESOURCE> fontResources = Arrays.asList(
+               RESOURCE.FONT_BOLD,
+               RESOURCE.FONT_SEMI_BOLD,
+               RESOURCE.FONT_REGULAR
+      );
+      LOG.info("Loading fonts '{}'", fontResources);
 
+      for (RESOURCE fontResource: fontResources) {
+         LOG.info("Loading font '{}'", fontResource);
+         Font font = Font.loadFont(Resources.getResource(fontResource).toExternalForm(), 12);
+         LOG.info("Font with name '{}' loaded.", font.getName());
+      }
+   }
+
+   private void initialiseApplication(final Stage primaryStage) throws Exception {
+      loadFonts();
       readSettings();
 
       final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
