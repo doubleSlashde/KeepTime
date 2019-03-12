@@ -83,9 +83,13 @@ public class SettingsController {
 
       if (System.getProperty("os.name").contains("Linux")) {
     	 LOG.info("OS: " + System.getProperty("os.name"));
+    	 LOG.debug("useHotkeyCheckBox");
          useHotkeyCheckBox.setVisible(false);
+         LOG.debug("useHotkeyLabel");
          useHotkeyLabel.setVisible(false);
+         LOG.debug("hotKeyLabel");
          hotkeyLabel.setVisible(false);
+         LOG.debug("globalKeyloggerLabel");
          globalKeyloggerLabel.setVisible(false);
       }
 
