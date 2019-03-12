@@ -90,13 +90,6 @@ public class SettingsController {
     		 LOG.warn("useHotkeyCheckBox is null");
     	 }
     	 
-    	 if(useHotkeyLabel != null) {
-    		 LOG.debug("useHotkeyLabel is initialized");
-    		 useHotkeyLabel.setDisable(true);
-    	 } else {
-    		 LOG.warn("useHotkeyLabel is null");
-    	 }
-    	 
     	 if(hotkeyLabel != null) {
     		 LOG.debug("hotkeyLabel is initialized");
     		 hotkeyLabel.setDisable(true);
