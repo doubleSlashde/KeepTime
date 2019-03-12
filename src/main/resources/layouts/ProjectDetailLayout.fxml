@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.Pane?>
-
 <?import javafx.scene.text.Font?>
-<Pane minHeight="-Infinity" prefHeight="14.0" prefWidth="114.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+
+<Pane minHeight="-Infinity" prefHeight="14.0" prefWidth="130.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label prefWidth="70.0" text="Projectname">
+      <Label prefWidth="72.0" text="Projectname">
          <font>
-            <Font name="Open Sans" size="12.0" />
+            <Font name="Open Sans Regular" size="12.0" />
          </font>
       </Label>
-      <Label layoutX="69.0" prefWidth="60.0" text="00:00:00">
+      <Label layoutX="75.0" prefHeight="17.0" prefWidth="52.0" text="00:00:00">
          <font>
-            <Font name="Open Sans" size="12.0" />
+            <Font name="Open Sans Regular" size="12.0" />
          </font>
       </Label>
    </children>

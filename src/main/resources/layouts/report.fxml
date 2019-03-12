@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -12,7 +17,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ReportController">
+<AnchorPane prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ReportController">
    <children>
       <VBox>
          <children>
@@ -22,43 +27,43 @@
                      <children>
                         <Label text="Report">
                            <font>
-                              <Font name="System Bold" size="35.0" />
+                              <Font name="Open Sans Bold" size="35.0" />
                            </font>
                         </Label>
                         <Label layoutX="10.0" layoutY="10.0" text="Daily report">
                            <font>
-                              <Font size="20.0" />
+                              <Font name="Open Sans Regular" size="20.0" />
                            </font>
                         </Label>
                         <Label fx:id="currentDayLabel" text="Tuesday 05.07.2018">
                            <font>
-                              <Font name="System Bold" size="17.0" />
+                              <Font name="Open Sans Bold" size="17.0" />
                            </font>
                         </Label>
                         <HBox spacing="10.0">
                            <children>
-                              <Label prefWidth="100.0" text="Present time:">
+                              <Label prefWidth="110.0" text="Present time:">
                                  <font>
-                                    <Font size="17.0" />
+                                    <Font name="Open Sans Regular" size="17.0" />
                                  </font>
                               </Label>
                               <Label fx:id="currentDayTimeLabel" text="99:99:99">
                                  <font>
-                                    <Font size="17.0" />
+                                    <Font name="Open Sans Regular" size="17.0" />
                                  </font>
                               </Label>
                            </children>
                         </HBox>
                         <HBox spacing="10.0">
                            <children>
-                              <Label prefWidth="100.0" text="Work time:">
+                              <Label prefWidth="110.0" text="Work time:">
                                  <font>
-                                    <Font size="17.0" />
+                                    <Font name="Open Sans Regular" size="17.0" />
                                  </font>
                               </Label>
                               <Label fx:id="currentDayWorkTimeLabel" text="99:99:99">
                                  <font>
-                                    <Font size="17.0" />
+                                    <Font name="Open Sans Regular" size="17.0" />
                                  </font>
                               </Label>
                            </children>
@@ -72,7 +77,7 @@
             </BorderPane>
             <Label text="Notes:">
                <font>
-                  <Font size="16.0" />
+                  <Font name="Open Sans Regular" size="16.0" />
                </font>
             </Label>
             <ScrollPane fx:id="scrollPane" prefHeight="300.0" prefWidth="500.0">
@@ -93,12 +98,12 @@
                      <children>
                         <Label text="99:99:99" GridPane.columnIndex="2" GridPane.rowIndex="1">
                            <font>
-                              <Font name="System Bold" size="15.0" />
+                              <Font name="Open Sans Bold" size="15.0" />
                            </font>
                         </Label>
                         <Label layoutX="375.0" layoutY="39.0" text="99:99:99 - 99:99:99" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <font>
-                              <Font size="15.0" />
+                              <Font name="Open Sans Regular" size="15.0" />
                            </font>
                         </Label>
                      </children>
