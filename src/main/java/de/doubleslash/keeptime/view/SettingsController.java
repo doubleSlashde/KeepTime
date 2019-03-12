@@ -85,10 +85,29 @@ public class SettingsController {
       versionLabel.setText(Main.VERSION);
       
       if(System.getProperty("os.name").contains("Linux")) {
-    	  useHotkeyCheckBox.setDisable(true);
-    	  useHotkeyLabel.setDisable(true);
-    	  hotkeyLabel.setDisable(true);
-    	  globalKeyloggerLabel.setDisable(true);
+    	  if(useHotkeyCheckBox != null) {
+    		  useHotkeyCheckBox.setDisable(true);
+    	  } else {
+    		  LOG.warn("useHotkeyCheckBox is null");
+    	  }
+    	  
+    	  if(useHotkeyLabel != null) {
+    		  useHotkeyLabel.setDisable(true);
+    	  } else {
+    		  LOG.warn("useHotkeyLabel is null");
+    	  }
+    	  
+    	  if(hotkeyLabel != null) {
+    		  hotkeyLabel.setDisable(true);
+    	  } else {
+    		  LOG.warn("hotkeyLabel is null");
+    	  }
+    	  
+    	  if(globalKeyloggerLabel != null) {
+    		  globalKeyloggerLabel.setDisable(true);
+    	  } else {
+    		  LOG.warn("globalKeyloggerLabel is null");
+    	  }
       }
       
       LOG.debug("saveButton.setOnAction");
