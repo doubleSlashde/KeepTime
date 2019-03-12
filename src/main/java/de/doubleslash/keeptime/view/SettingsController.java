@@ -65,8 +65,6 @@ public class SettingsController {
    private Label versionLabel;
 
    @FXML
-   private Label useHotkeyLabel;
-   @FXML
    private Label hotkeyLabel;
    @FXML
    private Label globalKeyloggerLabel;
