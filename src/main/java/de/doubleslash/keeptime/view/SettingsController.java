@@ -85,8 +85,6 @@ public class SettingsController {
     	 LOG.info("OS: " + System.getProperty("os.name"));
     	 LOG.debug("useHotkeyCheckBox");
          useHotkeyCheckBox.setVisible(false);
-         LOG.debug("useHotkeyLabel");
-         useHotkeyLabel.setVisible(false);
          LOG.debug("hotKeyLabel");
          hotkeyLabel.setVisible(false);
          LOG.debug("globalKeyloggerLabel");
