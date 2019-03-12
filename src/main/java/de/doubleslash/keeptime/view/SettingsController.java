@@ -89,8 +89,10 @@ public class SettingsController {
          globalKeyloggerLabel.setVisible(false);
       }
 
-      
+      LOG.debug("set versionLabel text");
       versionLabel.setText(Main.VERSION);
+      
+      LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
@@ -138,11 +140,13 @@ public class SettingsController {
          thisStage.close();
       });
 
+      LOG.debug("cancelButton.setOnAction");
       cancelButton.setOnAction(ae -> {
          LOG.info("Cancel clicked");
          thisStage.close();
       });
 
+      LOG.debug("reset*Button.setOnAction");
       resetHoverBackgroundButton
             .setOnAction(ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
       resetHoverFontButton.setOnAction(ae -> hoverFontColor.setValue(Model.ORIGINAL_HOVER_Font_COLOR));
@@ -151,6 +155,7 @@ public class SettingsController {
       resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
+      LOG.debug("parseConfigButton.setOnAction");
       parseConfigButton.setOnAction(actionEvent -> {
          if (ConfigParser.hasConfigFile(INPUT_FILE)) {
             final ConfigParser parser = new ConfigParser(controller);
