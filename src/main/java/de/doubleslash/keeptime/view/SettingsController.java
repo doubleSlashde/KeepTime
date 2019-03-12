@@ -80,17 +80,7 @@ public class SettingsController {
    @FXML
    private void initialize() {
 	  LOG.debug("start init");
-
-      if (System.getProperty("os.name").contains("Linux")) {
-    	 LOG.info("OS: " + System.getProperty("os.name"));
-    	 LOG.debug("useHotkeyCheckBox");
-         useHotkeyCheckBox.setVisible(false);
-         LOG.debug("hotKeyLabel");
-         hotkeyLabel.setVisible(false);
-         LOG.debug("globalKeyloggerLabel");
-         globalKeyloggerLabel.setVisible(false);
-      }
-
+	  LOG.info("OS: {}", System.getProperty("os.name"));
       LOG.debug("set versionLabel text");
       versionLabel.setText(Main.VERSION);
       
