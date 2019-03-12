@@ -23,7 +23,7 @@
          <children>
             <VBox spacing="10.0">
                <children>
-                  <VBox styleClass="menuBorder">
+                  <VBox prefHeight="185.0" prefWidth="257.0" styleClass="menuBorder">
                      <children>
                         <Group>
                            <children>
@@ -31,21 +31,33 @@
                                  <children>
                                     <Label text="Default">
                                        <font>
-                                          <Font name="System Bold" size="12.0" />
+                                          <Font name="Open Sans Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Background" />
+                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Background">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Label>
                                           <ColorPicker fx:id="defaultBackgroundColor" />
-                                          <Button fx:id="resetDefaultBackgroundButton" mnemonicParsing="false" text="Reset" />
+                                          <Button fx:id="resetDefaultBackgroundButton" mnemonicParsing="false" text="Reset">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Label>
                                           <ColorPicker fx:id="defaultFontColor" />
-                                          <Button fx:id="resetDefaultFontButton" mnemonicParsing="false" text="Reset" />
+                                          <Button fx:id="resetDefaultFontButton" mnemonicParsing="false" text="Reset">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                  </children>
@@ -58,21 +70,33 @@
                                  <children>
                                     <Label text="Hover">
                                        <font>
-                                          <Font name="System Bold" size="12.0" />
+                                          <Font name="Open Sans Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background" />
+                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefHeight="17.0" prefWidth="100.0" text="Background">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Label>
                                           <ColorPicker fx:id="hoverBackgroundColor" />
-                                          <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" text="Reset" />
+                                          <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" text="Reset">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Label>
                                           <ColorPicker fx:id="hoverFontColor" />
-                                          <Button fx:id="resetHoverFontButton" mnemonicParsing="false" text="Reset" />
+                                          <Button fx:id="resetHoverFontButton" mnemonicParsing="false" text="Reset">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                  </children>
@@ -85,14 +109,20 @@
                                  <children>
                                     <Label text="Taskbar">
                                        <font>
-                                          <Font name="System Bold" size="12.0" />
+                                          <Font name="Open Sans Bold" size="12.0" />
                                        </font>
                                     </Label>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
+                                          <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Label>
                                           <ColorPicker fx:id="taskBarColor" />
-                                          <Button fx:id="resetTaskBarFontButton" mnemonicParsing="false" text="Reset" />
+                                          <Button fx:id="resetTaskBarFontButton" mnemonicParsing="false" text="Reset">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Button>
                                        </children>
                                     </HBox>
                                  </children>
@@ -111,19 +141,25 @@
                                        <children>
                                           <Label text="Layout">
                                              <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Open Sans Bold" size="12.0" />
                                              </font>
                                           </Label>
                                        </children>
                                     </HBox>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" text="Display projects on the right" />
+                                          <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" text="Display projects on the right">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></CheckBox>
                                        </children>
                                     </HBox>
                                     <HBox layoutX="10.0" layoutY="27.0" spacing="10.0">
                                        <children>
-                                          <CheckBox fx:id="hideProjectsOnMouseExitCheckBox" mnemonicParsing="false" text="Hide projects on mouse leave" />
+                                          <CheckBox fx:id="hideProjectsOnMouseExitCheckBox" mnemonicParsing="false" text="Hide projects on mouse leave">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></CheckBox>
                                        </children>
                                     </HBox>
                                  </children>
@@ -142,15 +178,21 @@
                                        <children>
                                           <Label fx:id="hotkeyLabel" text="Hotkey">
                                              <font>
-                                                <Font name="System Bold" size="12.0" />
+                                                <Font name="Open Sans Bold" size="12.0" />
                                              </font>
                                           </Label>
-                                          <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefWidth="100.0" text="(global keylogger!)" />
+                                          <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefHeight="17.0" prefWidth="106.0" text="(global keylogger!)">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></Label>
                                        </children>
                                     </HBox>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)" />
+                                          <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font></CheckBox>
                                        </children>
                                     </HBox>
                                  </children>
@@ -161,9 +203,18 @@
                   </VBox>
                   <HBox spacing="10.0">
                      <children>
-                        <Button fx:id="saveButton" mnemonicParsing="false" text="Save" />
-                        <Button fx:id="cancelButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel" />
-                        <Button fx:id="parseConfigButton" mnemonicParsing="false" text="parse config.xml" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" text="Save">
+                           <font>
+                              <Font name="Open Sans Regular" size="12.0" />
+                           </font></Button>
+                        <Button fx:id="cancelButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel">
+                           <font>
+                              <Font name="Open Sans Regular" size="12.0" />
+                           </font></Button>
+                        <Button fx:id="parseConfigButton" mnemonicParsing="false" text="parse config.xml">
+                           <font>
+                              <Font name="Open Sans Regular" size="12.0" />
+                           </font></Button>
                      </children>
                   </HBox>
                </children>
@@ -173,6 +224,9 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
       </VBox>
-      <Label fx:id="versionLabel" alignment="CENTER_RIGHT" disable="true" layoutX="260.0" layoutY="330.0" prefHeight="17.0" prefWidth="52.0" text="v1.0.0" />
+      <Label fx:id="versionLabel" alignment="CENTER_RIGHT" disable="true" layoutX="260.0" layoutY="330.0" prefHeight="17.0" prefWidth="52.0" text="v1.0.0">
+         <font>
+            <Font name="Open Sans Regular" size="12.0" />
+         </font></Label>
    </children>
 </AnchorPane>
