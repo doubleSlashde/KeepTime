@@ -79,14 +79,17 @@ public class SettingsController {
 
    @FXML
    private void initialize() {
+	  LOG.debug("start init");
 
       if (System.getProperty("os.name").contains("Linux")) {
+    	 LOG.info("OS: " + System.getProperty("os.name"));
          useHotkeyCheckBox.setVisible(false);
          useHotkeyLabel.setVisible(false);
          hotkeyLabel.setVisible(false);
          globalKeyloggerLabel.setVisible(false);
       }
 
+      
       versionLabel.setText(Main.VERSION);
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
