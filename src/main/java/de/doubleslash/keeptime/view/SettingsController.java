@@ -84,6 +84,13 @@ public class SettingsController {
       LOG.debug("set versionLabel text");
       versionLabel.setText(Main.VERSION);
       
+      if(System.getProperty("os.name").contains("Linux")) {
+    	  useHotkeyCheckBox.setDisable(true);
+    	  useHotkeyLabel.setDisable(true);
+    	  hotkeyLabel.setDisable(true);
+    	  globalKeyloggerLabel.setDisable(true);
+      }
+      
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
