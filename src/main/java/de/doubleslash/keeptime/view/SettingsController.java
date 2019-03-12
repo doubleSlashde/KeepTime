@@ -84,6 +84,36 @@ public class SettingsController {
       LOG.debug("set versionLabel text");
       versionLabel.setText(Main.VERSION);
       
+      if (System.getProperty("os.name").contains("Linux")) {
+    	 if(useHotkeyCheckBox != null) {
+    		 LOG.debug("useHotkeyCheckBox is initialized");
+    		 useHotkeyCheckBox.setDisable(true);
+    	 } else {
+    		 LOG.warn("useHotkeyCheckBox is null");
+    	 }
+    	 
+    	 if(useHotkeyLabel != null) {
+    		 LOG.debug("useHotkeyLabel is initialized");
+    		 useHotkeyLabel.setDisable(true);
+    	 } else {
+    		 LOG.warn("useHotkeyLabel is null");
+    	 }
+    	 
+    	 if(hotkeyLabel != null) {
+    		 LOG.debug("hotkeyLabel is initialized");
+    		 hotkeyLabel.setDisable(true);
+    	 } else {
+    		 LOG.warn("hotkeyLabel is null");
+    	 }
+      	 
+    	 if(globalKeyloggerLabel != null) {
+    		 LOG.debug("globalKeyloggerLabel is initialized");
+    		 globalKeyloggerLabel.setDisable(true);
+    	 } else {
+    		 LOG.warn("globalKeyloggerLabel is null");
+    	 }
+      }
+      
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
@@ -156,13 +186,6 @@ public class SettingsController {
             parser.parseConfig(new File(INPUT_FILE));
          }
       });
-
-      if (System.getProperty("os.name").contains("Linux")) {
-     	 useHotkeyCheckBox.setDisable(true);
-     	 useHotkeyLabel.setDisable(true);
-     	 hotkeyLabel.setDisable(true);
-     	 globalKeyloggerLabel.setDisable(true);
-      }
    }
 
    public void setController(final Controller controller) {
