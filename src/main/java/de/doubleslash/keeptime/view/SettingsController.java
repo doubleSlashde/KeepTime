@@ -130,6 +130,8 @@ public class SettingsController {
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected());
          thisStage.close();
+         
+         
       });
 
       LOG.debug("cancelButton.setOnAction");
@@ -155,6 +157,12 @@ public class SettingsController {
          }
       });
 
+      if (System.getProperty("os.name").contains("Linux")) {
+     	 useHotkeyCheckBox.setDisable(true);
+     	 useHotkeyLabel.setDisable(true);
+     	 hotkeyLabel.setDisable(true);
+     	 globalKeyloggerLabel.setDisable(true);
+      }
    }
 
    public void setController(final Controller controller) {
