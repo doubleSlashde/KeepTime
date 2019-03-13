@@ -54,6 +54,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -75,6 +76,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -723,19 +725,32 @@ public class ViewController {
       grid.setVgap(10);
       grid.setPadding(new Insets(20, 150, 10, 10));
 
-      grid.add(new Label("Name:"), 0, 0);
+      Label nameLabel = new Label("Name:");
+      nameLabel.setFont(Font.font("Open Sans Regular"));
+      grid.add(nameLabel, 0, 0);
+      
       final TextField projectNameTextField = new TextField(projectName);
+      projectNameTextField.setFont(Font.font("Open Sans Regular"));
       grid.add(projectNameTextField, 1, 0);
 
-      grid.add(new Label("Color:"), 0, 1);
+      Label colorLabel = new Label("Color:");
+      colorLabel.setFont(Font.font("Open Sans Regular"));
+      grid.add(colorLabel, 0, 1);
+      
       final ColorPicker colorPicker = new ColorPicker(projectColor);
       grid.add(colorPicker, 1, 1);
 
-      grid.add(new Label("IsWork:"), 0, 2);
+      Label isWorkLabel = new Label("IsWork:");
+      isWorkLabel.setFont(Font.font("Open Sans Regular"));
+      grid.add(isWorkLabel, 0, 2);
+      
       final CheckBox isWorkCheckBox = new CheckBox();
       isWorkCheckBox.setSelected(isWork);
+      isWorkCheckBox.setFont(Font.font("Open Sans Regular"));
       grid.add(isWorkCheckBox, 1, 2);
 
+      Label sortIndex = new Label("SortIndex:");
+      sortIndex.setFont(Font.font("Open Sans Regular"));
       grid.add(new Label("SortIndex:"), 0, 3);
 
       return grid;

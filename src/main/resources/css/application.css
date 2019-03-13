@@ -1,4 +1,8 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+.root {
+	-fx-font-family: "Open Sans Regular"
+}
+
 .text-area {
 	-fx-text-fill: rgba(1,1,1,.5);
     -fx-background-color: rgba(0,0,0,0);
