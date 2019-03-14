@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
+import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -86,12 +87,10 @@ public class ReportController {
       int rowIndex = 0;
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
-      final Font labelFontBold = Font.font("Open Sans", FontWeight.BOLD, 15);
-      final Font labelFontNormal = Font.font("Open Sans", FontWeight.NORMAL, 15);
 
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
-         projectName.setFont(labelFontBold);
+         projectName.setFont(FontProvider.getBoldFont());
          this.gridPane.add(projectName, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
@@ -106,7 +105,7 @@ public class ReportController {
          }
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
-         workedTimeLabel.setFont(labelFontBold);
+         workedTimeLabel.setFont(FontProvider.getBoldFont());
          this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
@@ -124,18 +123,18 @@ public class ReportController {
             final String currentWorkNote = work.getNotes();
             pr.appendToWorkNotes(currentWorkNote);
             final Label commentLabel = new Label(currentWorkNote);
-            commentLabel.setFont(labelFontNormal);
+            commentLabel.setFont(FontProvider.getDefaultFont());
             commentLabel.setWrapText(true);
             this.gridPane.add(commentLabel, 0, rowIndex);
 
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
-            fromTillLabel.setFont(labelFontNormal);
+            fromTillLabel.setFont(FontProvider.getDefaultFont());
             fromTillLabel.setWrapText(true);
             this.gridPane.add(fromTillLabel, 1, rowIndex);
 
             final Label workedHoursLabel = new Label(workedHours);
-            workedHoursLabel.setFont(labelFontNormal);
+            workedHoursLabel.setFont(FontProvider.getDefaultFont());
             this.gridPane.add(workedHoursLabel, 2, rowIndex);
 
             rowIndex++;

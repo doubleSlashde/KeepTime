@@ -20,10 +20,10 @@ public class Resources {
       FXML_PROJECT_LAYOUT("/layouts/ProjectDetailLayout.fxml"),
       FXML_SETTINGS("/layouts/settings.fxml"),
       FXML_VIEW_POPUP_LAYOUT("/layouts/ViewLayoutPopup.fxml"),
+      FXML_REPORT("/layouts/report.fxml"),
 
       // icon
       ICON_MAIN("/icons/icon.png"),
-      FXML_REPORT("/layouts/report.fxml"),
 
       ;
       String resourceLocation;
