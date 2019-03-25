@@ -20,7 +20,7 @@ public class BrowserHelper {
          }
       } else if (System.getProperty("os.name").contains("Linux")) {
          try {
-            rt.exec("xgd-open " + url);
+            rt.exec("xdg-open " + url);
          } catch (final Exception e) {
             LOG.error(e.getMessage());
          }
