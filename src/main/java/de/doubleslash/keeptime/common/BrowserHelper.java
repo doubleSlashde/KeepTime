@@ -14,7 +14,7 @@ public class BrowserHelper {
       final Runtime rt = Runtime.getRuntime();
       if (System.getProperty("os.name").contains("Windows")) {
          try {
-            rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+            rt.exec("rundll32 start " + url);
          } catch (final Exception e) {
             LOG.error(e.getMessage());
          }
@@ -31,5 +31,10 @@ public class BrowserHelper {
             LOG.error(e.getMessage());
          }
       }
+   }
+
+   public static void openFileInEditor(final String path) {
+      final Runtime rt = Runtime.getRuntime();
+
    }
 }
