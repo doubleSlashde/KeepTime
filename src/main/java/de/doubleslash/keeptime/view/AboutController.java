@@ -83,12 +83,9 @@ public class AboutController {
             if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                final LicenceTableRow clickedRow = row.getItem();
                final String license = clickedRow.getLicense();
-               LOG.debug("License file name: " + license + ".txt");
-               LOG.debug("full path: " + LICENSE_PATH + license + ".txt");
-               LOG.debug(AboutController.class.getResource(LICENSE_PATH + license + ".txt").toString());
-               LOG.debug(
-                     AboutController.class.getResource(LICENSE_PATH + license + ".txt").toExternalForm().toString());
-               BrowserHelper.openURL(AboutController.class.getResource(LICENSE_PATH + license + ".txt").toString());
+               LOG.debug("License file name: {}.txt", license);
+
+               BrowserHelper.openURL("");
             }
          });
          return row;

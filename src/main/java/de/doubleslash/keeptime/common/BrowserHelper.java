@@ -20,22 +20,7 @@ public class BrowserHelper {
          }
       } else if (System.getProperty("os.name").contains("Linux")) {
          try {
-            final String[] browsers = {
-                  "epiphany", "firefox", "mozilla", "konqueror", "netscape", "opera", "links", "lynx"
-            };
-
-            final StringBuilder cmd = new StringBuilder();
-            for (int i = 0; i < browsers.length; i++) {
-               if (i == 0) {
-                  cmd.append(String.format("%s \"%s\"", browsers[i], url));
-               } else {
-                  cmd.append(String.format(" || %s \"%s\"", browsers[i], url));
-               }
-            }
-
-            rt.exec(new String[] {
-                  "sh", "-c", cmd.toString()
-            });
+            rt.exec("xgd-open " + url);
          } catch (final Exception e) {
             LOG.error(e.getMessage());
          }
