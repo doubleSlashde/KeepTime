@@ -1,15 +1,21 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.ConfigParser;
+import de.doubleslash.keeptime.common.Resources;
+import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -18,9 +24,15 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class SettingsController {
+   AboutController aboutController;
+   Stage aboutStage;
+
+   private static final String OS_NAME = "os.name";
+
    @FXML
    private ColorPicker hoverBackgroundColor;
    @FXML
@@ -62,6 +74,9 @@ public class SettingsController {
    private Button parseConfigButton;
 
    @FXML
+   private Button aboutButton;
+
+   @FXML
    private Label versionLabel;
 
    @FXML
@@ -77,39 +92,42 @@ public class SettingsController {
 
    @FXML
    private void initialize() {
-	  LOG.debug("start init");
-	  LOG.info("OS: {}", System.getProperty("os.name"));
+      LOG.debug("start init");
+      LOG.info("OS: {}", System.getProperty(OS_NAME));
       LOG.debug("set versionLabel text");
+      LOG.debug("load substages");
+      loadSubStages();
+      LOG.debug("set version label text");
       versionLabel.setText(Main.VERSION);
-      
-      if (System.getProperty("os.name").contains("Linux")) {
-    	 if(useHotkeyCheckBox != null) {
-    		 LOG.debug("useHotkeyCheckBox is initialized");
-    		 useHotkeyCheckBox.setDisable(true);
-    	 } else {
-    		 LOG.warn("useHotkeyCheckBox is null");
-    	 }
-    	 
-    	 if(hotkeyLabel != null) {
-    		 LOG.debug("hotkeyLabel is initialized");
-    		 hotkeyLabel.setDisable(true);
-    	 } else {
-    		 LOG.warn("hotkeyLabel is null");
-    	 }
-      	 
-    	 if(globalKeyloggerLabel != null) {
-    		 LOG.debug("globalKeyloggerLabel is initialized");
-    		 globalKeyloggerLabel.setDisable(true);
-    	 } else {
-    		 LOG.warn("globalKeyloggerLabel is null");
-    	 }
+
+      if (System.getProperty(OS_NAME).contains("Linux")) {
+         if (useHotkeyCheckBox != null) {
+            LOG.debug("useHotkeyCheckBox is initialized");
+            useHotkeyCheckBox.setDisable(true);
+         } else {
+            LOG.warn("useHotkeyCheckBox is null");
+         }
+
+         if (hotkeyLabel != null) {
+            LOG.debug("hotkeyLabel is initialized");
+            hotkeyLabel.setDisable(true);
+         } else {
+            LOG.warn("hotkeyLabel is null");
+         }
+
+         if (globalKeyloggerLabel != null) {
+            LOG.debug("globalKeyloggerLabel is initialized");
+            globalKeyloggerLabel.setDisable(true);
+         } else {
+            LOG.warn("globalKeyloggerLabel is null");
+         }
       }
-      
+
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         if (System.getProperty("os.name").contains("Linux")) {
+         if (System.getProperty(OS_NAME).contains("Linux")) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
                hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
                      (int) (hoverBackgroundColor.getValue().getGreen() * 255),
@@ -151,8 +169,7 @@ public class SettingsController {
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected());
          thisStage.close();
-         
-         
+
       });
 
       LOG.debug("cancelButton.setOnAction");
@@ -176,6 +193,12 @@ public class SettingsController {
             final ConfigParser parser = new ConfigParser(controller);
             parser.parseConfig(new File(INPUT_FILE));
          }
+      });
+
+      LOG.debug("reportBugButton.setOnAction");
+      aboutButton.setOnAction(ae -> {
+         LOG.info("About clicked");
+         aboutStage.show();
       });
    }
 
@@ -201,5 +224,38 @@ public class SettingsController {
 
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
+   }
+
+   private void loadSubStages() {
+      try {
+         // About stage
+         LOG.debug("load about.fxml");
+         final FXMLLoader fxmlLoader3 = createFXMLLoader(RESOURCE.FXML_ABOUT);
+         LOG.debug("load root");
+         final Parent rootAbout = fxmlLoader3.load();
+         LOG.debug("get controller class");
+         aboutController = fxmlLoader3.getController();
+         LOG.debug("set stage");
+         aboutStage = new Stage();
+         aboutStage.initModality(Modality.APPLICATION_MODAL);
+         aboutStage.setTitle("About KeepTime");
+         aboutStage.setResizable(false);
+         aboutStage.setScene(new Scene(rootAbout));
+         aboutStage.setOnHiding(e -> this.thisStage.setAlwaysOnTop(true));
+         aboutStage.setOnShowing(e -> {
+            this.thisStage.setAlwaysOnTop(false);
+            aboutStage.setAlwaysOnTop(true);
+         });
+
+         LOG.debug("done setting up stage");
+      } catch (final IOException e1) {
+         // TODO Auto-generated catch block
+         LOG.error(e1.getMessage());
+      }
+
+   }
+
+   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
+      return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
 }

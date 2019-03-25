@@ -115,16 +115,13 @@ public class Main extends Application {
    }
 
    private void loadFonts() {
-      List<RESOURCE> fontResources = Arrays.asList(
-               RESOURCE.FONT_BOLD,
-               RESOURCE.FONT_SEMI_BOLD,
-               RESOURCE.FONT_REGULAR
-      );
+      final List<RESOURCE> fontResources = Arrays.asList(RESOURCE.FONT_BOLD, RESOURCE.FONT_SEMI_BOLD,
+            RESOURCE.FONT_REGULAR);
       LOG.info("Loading fonts '{}'", fontResources);
 
-      for (RESOURCE fontResource: fontResources) {
+      for (final RESOURCE fontResource : fontResources) {
          LOG.info("Loading font '{}'", fontResource);
-         Font font = Font.loadFont(Resources.getResource(fontResource).toExternalForm(), 12);
+         final Font font = Font.loadFont(Resources.getResource(fontResource).toExternalForm(), 12);
          LOG.info("Font with name '{}' loaded.", font.getName());
       }
    }

@@ -55,7 +55,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -77,7 +76,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -167,6 +165,9 @@ public class ViewController {
 
    private Stage settingsStage;
    private SettingsController settingsController;
+
+   private Stage aboutStage;
+   private AboutController aboutController;
 
    private Map<Project, Node> projectSelectionNodeMap;
 
@@ -726,31 +727,31 @@ public class ViewController {
       grid.setVgap(10);
       grid.setPadding(new Insets(20, 150, 10, 10));
 
-      Label nameLabel = new Label("Name:");
+      final Label nameLabel = new Label("Name:");
       nameLabel.setFont(FontProvider.getDefaultFont());
       grid.add(nameLabel, 0, 0);
-      
+
       final TextField projectNameTextField = new TextField(projectName);
       projectNameTextField.setFont(FontProvider.getDefaultFont());
       grid.add(projectNameTextField, 1, 0);
 
-      Label colorLabel = new Label("Color:");
+      final Label colorLabel = new Label("Color:");
       colorLabel.setFont(FontProvider.getDefaultFont());
       grid.add(colorLabel, 0, 1);
-      
+
       final ColorPicker colorPicker = new ColorPicker(projectColor);
       grid.add(colorPicker, 1, 1);
 
-      Label isWorkLabel = new Label("IsWork:");
+      final Label isWorkLabel = new Label("IsWork:");
       isWorkLabel.setFont(FontProvider.getDefaultFont());
       grid.add(isWorkLabel, 0, 2);
-      
+
       final CheckBox isWorkCheckBox = new CheckBox();
       isWorkCheckBox.setSelected(isWork);
       isWorkCheckBox.setFont(FontProvider.getDefaultFont());
       grid.add(isWorkCheckBox, 1, 2);
 
-      Label sortIndex = new Label("SortIndex:");
+      final Label sortIndex = new Label("SortIndex:");
       sortIndex.setFont(FontProvider.getDefaultFont());
       grid.add(new Label("SortIndex:"), 0, 3);
 

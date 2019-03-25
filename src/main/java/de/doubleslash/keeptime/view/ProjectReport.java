@@ -1,12 +1,12 @@
 package de.doubleslash.keeptime.view;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import static de.doubleslash.keeptime.view.ReportController.EMPTY_NOTE;
 import static de.doubleslash.keeptime.view.ReportController.NOTE_DELIMETER;
 
 import java.lang.invoke.MethodHandles;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProjectReport {
 

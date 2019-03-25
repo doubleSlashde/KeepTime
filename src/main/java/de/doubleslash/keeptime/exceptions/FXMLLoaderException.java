@@ -6,22 +6,23 @@ public class FXMLLoaderException extends RuntimeException {
       // XXX Auto-generated constructor stub
    }
 
-   public FXMLLoaderException(String message) {
+   public FXMLLoaderException(final String message) {
       super(message);
       // XXX Auto-generated constructor stub
    }
 
-   public FXMLLoaderException(Throwable cause) {
+   public FXMLLoaderException(final Throwable cause) {
       super(cause);
       // XXX Auto-generated constructor stub
    }
 
-   public FXMLLoaderException(String message, Throwable cause) {
+   public FXMLLoaderException(final String message, final Throwable cause) {
       super(message, cause);
       // XXX Auto-generated constructor stub
    }
 
-   public FXMLLoaderException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+   public FXMLLoaderException(final String message, final Throwable cause, final boolean enableSuppression,
+         final boolean writableStackTrace) {
       super(message, cause, enableSuppression, writableStackTrace);
       // XXX Auto-generated constructor stub
    }

@@ -164,13 +164,13 @@ public class Controller {
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                          list of all projects to adapt the indexes for
     * @param changedProject
-    *           the project which has changed which already has the new index
+    *                          the project which has changed which already has the new index
     * @param oldIndex
-    *           the old index of the changed project
+    *                          the old index of the changed project
     * @param newIndex
-    *           the new index of the changed project (which the projects also already has)
+    *                          the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -207,9 +207,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                        list of all projects to adapt the indexes for
     * @param removedIndex
-    *           the index which has been removed
+    *                        the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {

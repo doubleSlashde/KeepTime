@@ -10,10 +10,10 @@ public class Resources {
 
    public enum RESOURCE {
       /** FONTS **/
-	  FONT_BOLD("/font/OpenSans-Bold.ttf"),
+      FONT_BOLD("/font/OpenSans-Bold.ttf"),
       FONT_SEMI_BOLD("/font/OpenSans-SemiBold.ttf"),
       FONT_REGULAR("/font/OpenSans-Regular.ttf"),
-	   
+
       /** LAYOUTS **/
       // main
       FXML_VIEW_LAYOUT("/layouts/ViewLayout.fxml"),
@@ -21,6 +21,7 @@ public class Resources {
       FXML_SETTINGS("/layouts/settings.fxml"),
       FXML_VIEW_POPUP_LAYOUT("/layouts/ViewLayoutPopup.fxml"),
       FXML_REPORT("/layouts/report.fxml"),
+      FXML_ABOUT("/layouts/about.fxml"),
 
       // icon
       ICON_MAIN("/icons/icon.png"),
