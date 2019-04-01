@@ -1,10 +1,12 @@
 package de.doubleslash.keeptime.model;
 
+import de.doubleslash.keeptime.common.Licenses;
+
 public class LicenceTableRow {
    private String name;
-   private String license;
+   private Licenses license;
 
-   public LicenceTableRow(final String softwareName, final String licenceName) {
+   public LicenceTableRow(final String softwareName, final Licenses licenceName) {
       this.license = licenceName;
       this.name = softwareName;
    }
@@ -17,11 +19,11 @@ public class LicenceTableRow {
       this.name = name;
    }
 
-   public String getLicense() {
+   public Licenses getLicense() {
       return license;
    }
 
-   public void setLicense(final String license) {
+   public void setLicense(final Licenses license) {
       this.license = license;
    }
 }

@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.BrowserHelper;
+import de.doubleslash.keeptime.common.FileOpenHelper;
+import de.doubleslash.keeptime.common.Licenses;
 import de.doubleslash.keeptime.model.LicenceTableRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,13 +25,8 @@ public class AboutController {
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = "/issues";
 
-   private static final String APACHE_LICENSE_NAME = "Apache License 2.0";
-   private static final String GPL_LICENSE_NAME = "GPL 3.0";
-
-   private static final String LICENSE_PATH = "/licenses/";
-
-   TableColumn<LicenceTableRow, String> nameColumn;
-   TableColumn<LicenceTableRow, String> licenseColumn;
+   private final FileOpenHelper fileOpen = new FileOpenHelper();
+   private final BrowserHelper browserOpen = new BrowserHelper();
 
    @FXML
    private Hyperlink gitHubHyperlink;
@@ -52,23 +49,18 @@ public class AboutController {
 
       LOG.debug("set up table");
       // name column
+      TableColumn<LicenceTableRow, String> nameColumn;
       nameColumn = new TableColumn<>("Name");
       nameColumn.setMinWidth(100);
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
       // licenseColumn
+      TableColumn<LicenceTableRow, Licenses> licenseColumn;
       licenseColumn = new TableColumn<>("License");
       licenseColumn.setMinWidth(200);
       licenseColumn.setCellValueFactory(new PropertyValueFactory<>("license"));
 
-      final ObservableList<LicenceTableRow> licenses = FXCollections.observableArrayList();
-      licenses.add(new LicenceTableRow("jnativehook", "GNU General Public License (GPL), Version 3.0"));
-      licenses.add(new LicenceTableRow("jnativehook", "GNU Lesser General Public License (LGPL), Version 3.0"));
-      licenses.add(new LicenceTableRow("commons-lang3", "Apache License, Version 2.0"));
-      licenses.add(new LicenceTableRow("flyway-maven-plugin", "Apache License, Version 2.0"));
-      licenses.add(new LicenceTableRow("spring-boot-starter-data-jpa", "Apache License, Version 2.0"));
-      licenses.add(new LicenceTableRow("mockito-core", "The MIT License"));
-      licenses.add(new LicenceTableRow("h2", "EPL 1.0"));
+      final ObservableList<LicenceTableRow> licenses = loadRows();
 
       licenseTableView.setItems(licenses);
 
@@ -82,10 +74,10 @@ public class AboutController {
          row.setOnMouseClicked(event -> {
             if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                final LicenceTableRow clickedRow = row.getItem();
-               final String license = clickedRow.getLicense();
-               LOG.debug("License file name: {}.txt", license);
+               final Licenses license = clickedRow.getLicense();
+               LOG.debug("License file name: {}", license.getPath());
 
-               BrowserHelper.openURL("");
+               fileOpen.openFile(license.getPath());
             }
          });
          return row;
@@ -94,26 +86,27 @@ public class AboutController {
       LOG.debug("hyperlink setonaction");
       gitHubHyperlink.setOnAction(ae -> {
          LOG.debug("hyperlink clicked");
-         BrowserHelper.openURL("C:/Users/mplieske/Documents/haha.txt");
+         browserOpen.openURL(GITHUB_PAGE);
       });
 
       LOG.debug("roportbugbutton setonaction");
       reportBugButton.setOnAction(ae -> {
          LOG.info("Clicked reportBugButton");
-         BrowserHelper.openURL(GITHUB_PAGE + GITHUB_ISSUE_PAGE);
+         browserOpen.openURL(GITHUB_PAGE + GITHUB_ISSUE_PAGE);
       });
    }
 
    public ObservableList<LicenceTableRow> loadRows() {
       final ObservableList<LicenceTableRow> rows = FXCollections.observableArrayList();
 
-      rows.add(new LicenceTableRow("KeepTime", GPL_LICENSE_NAME));
-      rows.add(new LicenceTableRow("jnativehook", GPL_LICENSE_NAME));
-      rows.add(new LicenceTableRow("commons-lang3", APACHE_LICENSE_NAME));
-      rows.add(new LicenceTableRow("flyway-maven-plugin", APACHE_LICENSE_NAME));
-      rows.add(new LicenceTableRow("spring-boot-starter-data-jpa", APACHE_LICENSE_NAME));
-      rows.add(new LicenceTableRow("mockito-core", "MIT License"));
-      rows.add(new LicenceTableRow("h2", "EPL 1.0"));
+      rows.add(new LicenceTableRow("KeepTime", Licenses.GPLV3));
+      rows.add(new LicenceTableRow("jnativehook", Licenses.GPLV3));
+      rows.add(new LicenceTableRow("jnativehook", Licenses.LGPLV3));
+      rows.add(new LicenceTableRow("commons-lang3", Licenses.APACHEV2));
+      rows.add(new LicenceTableRow("flyway-maven-plugin", Licenses.APACHEV2));
+      rows.add(new LicenceTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
+      rows.add(new LicenceTableRow("mockito-core", Licenses.MIT));
+      rows.add(new LicenceTableRow("h2", Licenses.EPLV1));
 
       return rows;
    }

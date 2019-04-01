@@ -69,7 +69,14 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.8</version>
     </dependency>
-
+    
+    <!-- maven assembly plugin -->
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <version>3.1.1</version>
+      <type>maven-plugin</type>
+    </dependency>
   </dependencies>
 
   <build>
@@ -78,6 +85,26 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions> 
+          <execution>
+            <id>create-keeptime-zip</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>./assembly.xml</descriptor>
+              </descriptors>
+              <finalName>keeptime</finalName>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      
     </plugins>
   </build>
 
@@ -107,7 +134,6 @@
           <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
         </configuration>
       </plugin>
-
     </plugins>
   </reporting>
 </project>
