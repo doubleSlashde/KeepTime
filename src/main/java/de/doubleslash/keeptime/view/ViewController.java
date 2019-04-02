@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.ColorTimeLine;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -23,7 +24,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.time.Interval;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -316,7 +316,8 @@ public class ViewController {
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
-         updateProjectColorTimeline();
+         final ColorTimeLine mainColorTimeLine = new ColorTimeLine(canvas, model, controller);
+         mainColorTimeLine.update();
          updateTaskbarIcon(currentWorkSeconds);
       });
 
@@ -751,24 +752,6 @@ public class ViewController {
       model.getSortedAvailableProjects().setComparator(comparator);
       for (final Project p : model.getSortedAvailableProjects()) {
          children.add(projectSelectionNodeMap.get(p));
-      }
-   }
-
-   private void updateProjectColorTimeline() {
-      final GraphicsContext gc = canvas.getGraphicsContext2D();
-
-      gc.setFill(new Color(.3, .3, .3, .3));
-      gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-      gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-      double currentX = 0;
-      final long maxSeconds = controller.calcTodaysSeconds();
-      for (final Work w : model.getPastWorkItems()) {
-         final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
-         final double fillX = (float) workedSeconds / maxSeconds * canvas.getWidth();
-         gc.setFill(w.getProject().getColor());
-         gc.fillRect(currentX, 0, fillX, canvas.getHeight());
-         currentX += fillX;
       }
    }
 
