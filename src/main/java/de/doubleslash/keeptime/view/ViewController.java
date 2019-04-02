@@ -449,7 +449,7 @@ public class ViewController {
          settingsStage.setScene(new Scene(root1));
          settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
-         LOG.error("Error while initialising report or settings stage", e);
+         LOG.error("Error while loading sub stage");
          throw new FXMLLoaderException(e);
       }
    }

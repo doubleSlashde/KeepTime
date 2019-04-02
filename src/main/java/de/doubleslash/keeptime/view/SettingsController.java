@@ -8,7 +8,6 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -79,9 +78,6 @@ public class SettingsController {
    private Button aboutButton;
 
    @FXML
-   private Label versionLabel;
-
-   @FXML
    private Label hotkeyLabel;
    @FXML
    private Label globalKeyloggerLabel;
@@ -100,7 +96,6 @@ public class SettingsController {
       LOG.debug("load substages");
       loadSubStages();
       LOG.debug("set version label text");
-      versionLabel.setText(Main.VERSION);
 
       if (System.getProperty(OS_NAME).contains("Linux")) {
          if (useHotkeyCheckBox != null) {
