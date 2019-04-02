@@ -23,7 +23,7 @@ import javafx.scene.input.MouseButton;
 public class AboutController {
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
-   private static final String GITHUB_ISSUE_PAGE = "/issues";
+   private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
 
    private final FileOpenHelper fileOpen = new FileOpenHelper();
    private final BrowserHelper browserOpen = new BrowserHelper();
@@ -51,14 +51,14 @@ public class AboutController {
       // name column
       TableColumn<LicenceTableRow, String> nameColumn;
       nameColumn = new TableColumn<>("Name");
-      nameColumn.setMinWidth(100);
+      nameColumn.setMinWidth(160);
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
       // licenseColumn
-      TableColumn<LicenceTableRow, Licenses> licenseColumn;
+      TableColumn<LicenceTableRow, String> licenseColumn;
       licenseColumn = new TableColumn<>("License");
-      licenseColumn.setMinWidth(200);
-      licenseColumn.setCellValueFactory(new PropertyValueFactory<>("license"));
+      licenseColumn.setMinWidth(260);
+      licenseColumn.setCellValueFactory(new PropertyValueFactory<>("licenseName"));
 
       final ObservableList<LicenceTableRow> licenses = loadRows();
 
@@ -75,7 +75,7 @@ public class AboutController {
             if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
                final LicenceTableRow clickedRow = row.getItem();
                final Licenses license = clickedRow.getLicense();
-               LOG.debug("License file name: {}", license.getPath());
+               LOG.debug("License file name: {}", license);
 
                fileOpen.openFile(license.getPath());
             }
@@ -92,7 +92,7 @@ public class AboutController {
       LOG.debug("roportbugbutton setonaction");
       reportBugButton.setOnAction(ae -> {
          LOG.info("Clicked reportBugButton");
-         browserOpen.openURL(GITHUB_PAGE + GITHUB_ISSUE_PAGE);
+         browserOpen.openURL(GITHUB_ISSUE_PAGE);
       });
    }
 
