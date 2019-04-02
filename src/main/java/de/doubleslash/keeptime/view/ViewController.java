@@ -136,7 +136,7 @@ public class ViewController {
 
    private Stage mainStage;
    private Controller controller;
-   private Model model;
+   private static Model model;
 
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
@@ -198,7 +198,7 @@ public class ViewController {
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
 
       // Add a light to colorize buttons
-      // TODO does this go nicer?
+      // TODO is there a nicer way for this?
       final Lighting lighting = new Lighting();
       lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
          final Color color = fontColorProperty.get();
@@ -316,9 +316,8 @@ public class ViewController {
             final Label label = entry.getValue();
 
             final long seconds = model.getPastWorkItems().stream()
-                  .filter((work) -> work.getProject().getId() == p.getId()).mapToLong(work -> {
-                     return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-                  }).sum();
+                  .filter(work -> work.getProject().getId() == p.getId())
+                  .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
@@ -468,7 +467,7 @@ public class ViewController {
       try {
          projectElement = loader.load();
       } catch (final IOException e1) {
-         LOG.error("Could not load '{}'.", loader.getLocation(), e1);
+         LOG.error("Could not load '{}'.", loader.getLocation());
          throw new FXMLLoaderException(e1);
       }
 
