@@ -1,3 +1,5 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+
 package de.doubleslash.keeptime.model.repos;
 
 import org.springframework.data.jpa.repository.JpaRepository;

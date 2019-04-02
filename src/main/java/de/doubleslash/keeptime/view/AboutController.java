@@ -1,3 +1,5 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+
 package de.doubleslash.keeptime.view;
 
 import org.slf4j.Logger;
@@ -14,16 +16,18 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
+import javafx.scene.paint.Color;
 
 public class AboutController {
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
+   private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
 
    private final FileOpenHelper fileOpen = new FileOpenHelper();
    private final BrowserHelper browserOpen = new BrowserHelper();
@@ -40,7 +44,7 @@ public class AboutController {
    @FXML
    private TableView<LicenceTableRow> licenseTableView;
 
-   public static final Logger LOG = LoggerFactory.getLogger(AboutController.class);
+   private static final Logger LOG = LoggerFactory.getLogger(AboutController.class);
 
    @FXML
    public void initialize() {
@@ -52,12 +56,36 @@ public class AboutController {
       TableColumn<LicenceTableRow, String> nameColumn;
       nameColumn = new TableColumn<>("Name");
       nameColumn.setMinWidth(160);
+
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
       // licenseColumn
-      TableColumn<LicenceTableRow, String> licenseColumn;
-      licenseColumn = new TableColumn<>("License");
+      final TableColumn<LicenceTableRow, String> licenseColumn = new TableColumn<>("License");
       licenseColumn.setMinWidth(260);
+      licenseColumn.setCellFactory(param -> new TableCell<LicenceTableRow, String>() {
+         @Override
+         protected void updateItem(final String item, final boolean empty) {
+            super.updateItem(item, empty);
+
+            setText(empty ? null : item);
+            setTextFill(HYPERLINK_COLOR);
+
+            setOnMouseEntered(e -> setUnderline(true));
+
+            setOnMouseExited(e -> setUnderline(false));
+
+            setOnMouseClicked(e -> {
+               if (!empty && e.getButton() == MouseButton.PRIMARY) {
+                  final LicenceTableRow row = (LicenceTableRow) getTableRow().getItem();
+                  final Licenses license = row.getLicense();
+                  LOG.debug("License file name: {}", license);
+
+                  fileOpen.openFile(license.getPath());
+                  // TODO show error if file does not exist
+               }
+            });
+         }
+      });
       licenseColumn.setCellValueFactory(new PropertyValueFactory<>("licenseName"));
 
       final ObservableList<LicenceTableRow> licenses = loadRows();
@@ -66,22 +94,6 @@ public class AboutController {
 
       licenseTableView.getColumns().add(nameColumn);
       licenseTableView.getColumns().add(licenseColumn);
-
-      LOG.debug("tablerow setonaction");
-      licenseTableView.setRowFactory(tv -> {
-         LOG.info("table row clicked");
-         final TableRow<LicenceTableRow> row = new TableRow<>();
-         row.setOnMouseClicked(event -> {
-            if (!row.isEmpty() && event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-               final LicenceTableRow clickedRow = row.getItem();
-               final Licenses license = clickedRow.getLicense();
-               LOG.debug("License file name: {}", license);
-
-               fileOpen.openFile(license.getPath());
-            }
-         });
-         return row;
-      });
 
       LOG.debug("hyperlink setonaction");
       gitHubHyperlink.setOnAction(ae -> {

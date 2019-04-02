@@ -1,4 +1,5 @@
-/* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+/* Copyright 2019 doubleSlash Net Business GmbH
+ * JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
 .text-area {
 	-fx-text-fill: rgba(1,1,1,.5);
     -fx-background-color: rgba(0,0,0,0);

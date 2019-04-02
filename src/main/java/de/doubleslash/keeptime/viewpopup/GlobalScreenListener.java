@@ -1,3 +1,5 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+
 package de.doubleslash.keeptime.viewpopup;
 
 import java.awt.Point;

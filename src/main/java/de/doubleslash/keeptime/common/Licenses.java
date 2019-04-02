@@ -1,3 +1,5 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+
 package de.doubleslash.keeptime.common;
 
 public enum Licenses {
@@ -13,7 +15,7 @@ public enum Licenses {
    private final String path;
    private final String name;
 
-   Licenses(final String licensePath, final String licenseName) {
+   private Licenses(final String licensePath, final String licenseName) {
       path = licensePath;
       name = licenseName;
    }
