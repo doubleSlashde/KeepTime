@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
+import de.doubleslash.keeptime.common.ColorTimeLine;
 import de.doubleslash.keeptime.common.DateFormatter;
+import de.doubleslash.keeptime.common.DateProvider;
+import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -20,6 +23,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
@@ -56,11 +60,20 @@ public class ReportController {
    @FXML
    private ScrollPane scrollPane;
 
+   @FXML
+   private Canvas reportColorTimeLine;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private DatePicker datePicker; // for calender element
 
    private Model model;
+
+   private DateProvider dateProvider;
+
+   private Controller controller;
+
+   private ColorTimeLine colorTimeLine;
 
    @FXML
    private void initialize() {
@@ -151,6 +164,10 @@ public class ReportController {
 
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+
+      controller = new Controller(model, dateProvider);
+      colorTimeLine = new ColorTimeLine(reportColorTimeLine, model, controller);
+      colorTimeLine.update();
    }
 
    private Button createProjectReport() {
