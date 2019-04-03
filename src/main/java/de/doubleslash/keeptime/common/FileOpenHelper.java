@@ -11,9 +11,7 @@ public class FileOpenHelper {
 
    private static final Logger LOG = LoggerFactory.getLogger(FileOpenHelper.class);
 
-   private File fileToOpen;
-
-   public FileOpenHelper() {}
+   private final File fileToOpen;
 
    public FileOpenHelper(final File file) {
       this.fileToOpen = file;
@@ -27,22 +25,14 @@ public class FileOpenHelper {
       executeCommand();
    }
 
-   public void openFile(final File file) {
+   public static void openFile(final File file) {
       executeCommand(file);
    }
 
-   public void openFile(final String fileString) {
+   public static void openFile(final String fileString) {
       final File file = new File(fileString);
 
       executeCommand(file);
-   }
-
-   public void setFile(final File file) {
-      this.fileToOpen = file;
-   }
-
-   public void setFile(final String fileString) {
-      this.fileToOpen = new File(fileString);
    }
 
    private void executeCommand() {
@@ -57,7 +47,7 @@ public class FileOpenHelper {
       }
    }
 
-   private void executeCommand(final File file) {
+   private static void executeCommand(final File file) {
       final Runtime rt = Runtime.getRuntime();
 
       if (OS.isWindows()) {
@@ -77,7 +67,7 @@ public class FileOpenHelper {
       }
    }
 
-   private void executeCommandWindows(final Runtime rt, final File file) {
+   private static void executeCommandWindows(final Runtime rt, final File file) {
       try {
          rt.exec("rundll32 url.dll,FileProtocolHandler " + file);
       } catch (final Exception e) {
@@ -93,7 +83,7 @@ public class FileOpenHelper {
       }
    }
 
-   private void executeCommandLinux(final Runtime rt, final File file) {
+   private static void executeCommandLinux(final Runtime rt, final File file) {
       try {
          rt.exec("xdg-open " + file);
       } catch (final Exception e) {

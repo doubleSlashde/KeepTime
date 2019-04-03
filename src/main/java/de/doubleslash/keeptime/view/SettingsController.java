@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.common.ConfigParser;
+import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -91,13 +92,13 @@ public class SettingsController {
    @FXML
    private void initialize() {
       LOG.debug("start init");
-      LOG.info("OS: {}", System.getProperty(OS_NAME));
+      LOG.info("OS: {}", OS.getOSname());
       LOG.debug("set versionLabel text");
       LOG.debug("load substages");
       loadSubStages();
       LOG.debug("set version label text");
 
-      if (System.getProperty(OS_NAME).contains("Linux")) {
+      if (OS.isLinux()) {
          if (useHotkeyCheckBox != null) {
             LOG.debug("useHotkeyCheckBox is initialized");
             useHotkeyCheckBox.setDisable(true);
@@ -124,7 +125,7 @@ public class SettingsController {
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         if (System.getProperty(OS_NAME).contains("Linux")) {
+         if (OS.isLinux()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
                hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
                      (int) (hoverBackgroundColor.getValue().getGreen() * 255),
