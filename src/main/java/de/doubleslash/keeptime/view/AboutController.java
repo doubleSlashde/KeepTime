@@ -29,9 +29,6 @@ public class AboutController {
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
 
-   private final FileOpenHelper fileOpen = new FileOpenHelper();
-   private final BrowserHelper browserOpen = new BrowserHelper();
-
    @FXML
    private Hyperlink gitHubHyperlink;
 
@@ -80,7 +77,7 @@ public class AboutController {
                   final Licenses license = row.getLicense();
                   LOG.debug("License file name: {}", license);
 
-                  fileOpen.openFile(license.getPath());
+                  FileOpenHelper.openFile(license.getPath());
                   // TODO show error if file does not exist
                }
             });
@@ -98,13 +95,13 @@ public class AboutController {
       LOG.debug("hyperlink setonaction");
       gitHubHyperlink.setOnAction(ae -> {
          LOG.debug("hyperlink clicked");
-         browserOpen.openURL(GITHUB_PAGE);
+         BrowserHelper.openURL(GITHUB_PAGE);
       });
 
       LOG.debug("roportbugbutton setonaction");
       reportBugButton.setOnAction(ae -> {
          LOG.info("Clicked reportBugButton");
-         browserOpen.openURL(GITHUB_ISSUE_PAGE);
+         BrowserHelper.openURL(GITHUB_ISSUE_PAGE);
       });
    }
 

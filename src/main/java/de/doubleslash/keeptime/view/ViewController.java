@@ -136,7 +136,7 @@ public class ViewController {
 
    private Stage mainStage;
    private Controller controller;
-   private static Model model;
+   private Model model;
 
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
@@ -198,7 +198,7 @@ public class ViewController {
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
 
       // Add a light to colorize buttons
-      // TODO is there a nicer way for this?
+      // TODO #12 is there a nicer way for this?
       final Lighting lighting = new Lighting();
       lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
          final Color color = fontColorProperty.get();
