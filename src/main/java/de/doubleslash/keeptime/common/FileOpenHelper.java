@@ -27,16 +27,21 @@ public class FileOpenHelper {
 
    private FileOpenHelper() {}
 
-   public static void openFile(final String fileString) {
+   public static boolean openFile(final String fileString) {
       final File file = new File(fileString);
       final Runtime rt = Runtime.getRuntime();
 
-      if (OS.isWindows()) {
-         executeCommandWindows(rt, file);
-      } else if (OS.isLinux()) {
-         executeCommandLinux(rt, file);
+      if (file.exists() && file.isFile()) {
+         if (OS.isWindows()) {
+            executeCommandWindows(rt, file);
+         } else if (OS.isLinux()) {
+            executeCommandLinux(rt, file);
+         } else {
+            LOG.warn("OS is not supported");
+         }
+         return true;
       } else {
-         LOG.warn("OS is not supported");
+         return false;
       }
    }
 

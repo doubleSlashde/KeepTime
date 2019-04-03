@@ -256,7 +256,7 @@ public class SettingsController {
          aboutStage.setOnHiding(e -> this.thisStage.setAlwaysOnTop(true));
          aboutStage.setOnShowing(e -> {
             this.thisStage.setAlwaysOnTop(false);
-            aboutStage.setAlwaysOnTop(true);
+            aboutStage.setAlwaysOnTop(false);
          });
 
          LOG.debug("done setting up stage");

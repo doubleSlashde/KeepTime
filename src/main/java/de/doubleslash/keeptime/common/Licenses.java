@@ -18,20 +18,29 @@ package de.doubleslash.keeptime.common;
 
 public enum Licenses {
 
-   GPLV3("./licenses/GNU General Public License (GPL), Version 3.0.txt", "GNU General Public License Version 3.0"),
-   EPLV1("./licenses/EPL 1.0.txt", "Eclipse Public License 1.0"),
-   APACHEV2("./licenses/Apache License, Version 2.0.txt", "Apache License Version 2.0"),
+   GPLV3(
+         "./licenses/GNU General Public License (GPL), Version 3.0.txt",
+         "GNU General Public License Version 3.0",
+         "https://www.gnu.org/licenses/gpl-3.0.de.html"),
+   EPLV1("./licenses/EPL 1.0.txt", "Eclipse Public License 1.0", "https://www.eclipse.org/legal/epl-v10.html"),
+   APACHEV2(
+         "./licenses/Apache License, Version 2.0.txt",
+         "Apache License Version 2.0",
+         "https://www.apache.org/licenses/LICENSE-2.0"),
    LGPLV3(
          "./licenses/GNU Lesser General Public License (LGPL), Version 3.0.txt",
-         "GNU Lesser General Public License Version 3.0"),
-   MIT("./licenses/The MIT License.txt", "The MIT License");
+         "GNU Lesser General Public License Version 3.0",
+         "https://www.gnu.org/licenses/lgpl-3.0.de.html"),
+   MIT("./licenses/The MIT License.txt", "The MIT License", "https://opensource.org/licenses/MIT");
 
    private final String path;
    private final String name;
+   private final String url;
 
-   private Licenses(final String licensePath, final String licenseName) {
+   private Licenses(final String licensePath, final String licenseName, final String urlWebsite) {
       path = licensePath;
       name = licenseName;
+      url = urlWebsite;
    }
 
    public String getPath() {
@@ -40,5 +49,9 @@ public enum Licenses {
 
    public String getName() {
       return name;
+   }
+
+   public String getUrl() {
+      return url;
    }
 }

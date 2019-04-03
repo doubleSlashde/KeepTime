@@ -27,6 +27,8 @@ import de.doubleslash.keeptime.view.license.LicenceTableRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -85,14 +87,22 @@ public class AboutController {
 
             setOnMouseExited(e -> setUnderline(false));
 
-            setOnMouseClicked(e -> {
-               if (!empty && e.getButton() == MouseButton.PRIMARY) {
+            setOnMouseClicked(eventOnMouseClicked -> {
+               if (!empty && eventOnMouseClicked.getButton() == MouseButton.PRIMARY) {
                   final LicenceTableRow row = (LicenceTableRow) getTableRow().getItem();
                   final Licenses license = row.getLicense();
                   LOG.debug("License file name: {}", license);
 
-                  FileOpenHelper.openFile(license.getPath());
-                  // TODO show error if file does not exist
+                  if (!FileOpenHelper.openFile(license.getPath())) {
+                     final Alert alert = new Alert(AlertType.ERROR);
+                     alert.setTitle("Ooops");
+                     alert.setHeaderText("Could not find the license file");
+                     alert.setContentText(
+                           String.format("We could not find the license file at \"%s\".%nPlease visit \"%s\".",
+                                 license.getPath(), license.getUrl()));
+
+                     alert.show();
+                  }
                }
             });
          }
