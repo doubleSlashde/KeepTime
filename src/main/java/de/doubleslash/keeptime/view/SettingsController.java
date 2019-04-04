@@ -47,8 +47,6 @@ public class SettingsController {
    AboutController aboutController;
    Stage aboutStage;
 
-   private static final String OS_NAME = "os.name";
-
    @FXML
    private ColorPicker hoverBackgroundColor;
    @FXML
@@ -127,12 +125,8 @@ public class SettingsController {
             LOG.warn("hotkeyLabel is null");
          }
 
-         if (globalKeyloggerLabel != null) {
-            LOG.debug("globalKeyloggerLabel is initialized");
-            globalKeyloggerLabel.setDisable(true);
-         } else {
-            LOG.warn("globalKeyloggerLabel is null");
-         }
+         LOG.debug("globalKeyloggerLabel is initialized");
+         globalKeyloggerLabel.setDisable(true);
       }
 
       LOG.debug("saveButton.setOnAction");
@@ -190,7 +184,7 @@ public class SettingsController {
          thisStage.close();
       });
 
-      LOG.debug("reset*Button.setOnAction");
+      LOG.debug("resetButton.setOnAction");
       resetHoverBackgroundButton
             .setOnAction(ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
       resetHoverFontButton.setOnAction(ae -> hoverFontColor.setValue(Model.ORIGINAL_HOVER_Font_COLOR));
