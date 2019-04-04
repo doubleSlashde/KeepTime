@@ -1,8 +1,6 @@
 package de.doubleslash.keeptime.view;
 
-import java.time.Duration;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.SortedSet;
@@ -34,8 +32,6 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
@@ -95,27 +91,7 @@ public class ReportController {
       this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
       final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
 
-      final List<Rectangle> rects = new ArrayList<>();
-      long maxSeconds = 0;
-      for (final Work w : currentWorkItems) {
-         maxSeconds += Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
-      }
-      double currentX = 0;
-
-      for (final Work w : currentWorkItems) {
-         final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
-         final double width = (double) workedSeconds / maxSeconds * canvas.getWidth();
-         final Color fill = w.getProject().getColor();
-
-         final Rectangle rect = new Rectangle(currentX, 0, width, 0);
-         rect.setFill(fill);
-
-         rects.add(rect);
-
-         currentX += width;
-      }
-
-      colorTimeLine.update(rects);
+      colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
       final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));

@@ -1,11 +1,12 @@
 package de.doubleslash.keeptime.view;
 
+import java.time.Duration;
 import java.util.List;
 
+import de.doubleslash.keeptime.model.Work;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 public class ColorTimeLine {
 
@@ -15,16 +16,22 @@ public class ColorTimeLine {
       this.canvas = canvas;
    }
 
-   public void update(final List<Rectangle> rects) {
+   public void update(final List<Work> workItems, final long seconds) {
       final GraphicsContext gc = canvas.getGraphicsContext2D();
 
       gc.setFill(new Color(.3, .3, .3, .3));
       gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
       gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+      double currentX = 0;
+      for (final Work w : workItems) {
+         final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
+         final double width = (double) workedSeconds / seconds * canvas.getWidth();
+         final Color fill = w.getProject().getColor();
 
-      for (final Rectangle rect : rects) {
-         gc.setFill(rect.getFill());
-         gc.fillRect(rect.getX(), 0, rect.getWidth(), canvas.getHeight());
+         gc.setFill(fill);
+         gc.fillRect(currentX, 0, width, canvas.getHeight());
+
+         currentX += width;
       }
 
    }

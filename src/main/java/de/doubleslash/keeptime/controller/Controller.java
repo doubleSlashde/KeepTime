@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.PreDestroy;
 
@@ -237,29 +236,35 @@ public class Controller {
     * Calculate todays seconds counted as work
     */
    public long calcTodaysWorkSeconds() {
+      final List<Work> workItems = new ArrayList<>();
 
-      return model.getPastWorkItems().stream().filter(work -> {
-         final Project project = work.getProject();
-         // find up to date reference to project
-         final Optional<Project> optionalProject = model.getAllProjects().stream()
-               .filter(p -> p.getId() == project.getId()).findAny();
-         if (optionalProject.isPresent()) {
-            return optionalProject.get().isWork();
+      for (final Work w : model.getPastWorkItems()) {
+         if (w.getProject().isWork()) {
+            workItems.add(w);
          }
-         // TODO should not happen
-         return false;
-      }).mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+      }
+
+      return calcSeconds(workItems);
    }
 
    /**
     * Calculate todays present seconds (work+nonWork)
     */
    public long calcTodaysSeconds() {
-      return model.getPastWorkItems().stream()
-            .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+      return calcSeconds(model.getPastWorkItems());
    }
 
    public ObservableList<Project> getAvailableProjects() {
       return model.getAvailableProjects();
+   }
+
+   public long calcSeconds(final List<Work> workItems) {
+      long seconds = 0;
+
+      for (final Work w : workItems) {
+         seconds += Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
+      }
+
+      return seconds;
    }
 }
