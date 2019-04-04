@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
-import de.doubleslash.keeptime.common.ColorTimeLine;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.DateProvider;
 import de.doubleslash.keeptime.controller.Controller;
@@ -65,7 +64,7 @@ public class ReportController {
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
-   private DatePicker datePicker; // for calender element
+   private DatePicker datePicker; // for calendar element
 
    private Model model;
 
@@ -123,10 +122,7 @@ public class ReportController {
          this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
-         /*
-          * final TextArea textArea = new TextArea(); textArea.setMaxHeight(20); textArea.setFont(Font.font("System",
-          * FontWeight.NORMAL, 15)); textArea.setWrapText(true); this.gridPane.add(textArea, 1, rowIndex);
-          */
+
          final Button bProjectReport = createProjectReport();
          this.gridPane.add(bProjectReport, 1, rowIndex);
 
@@ -157,7 +153,6 @@ public class ReportController {
 
             rowIndex++;
          }
-         // textArea.setText(pr.getNotes(true));
          bProjectReport.setUserData(pr.getNotes(true));
       }
       this.scrollPane.setVvalue(0); // scroll to the top
@@ -165,7 +160,6 @@ public class ReportController {
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
 
-      controller = new Controller(model, dateProvider);
       colorTimeLine = new ColorTimeLine(reportColorTimeLine, model, controller);
       colorTimeLine.update();
    }
@@ -216,5 +210,9 @@ public class ReportController {
 
    public void update() {
       updateReport(this.datePicker.getValue());
+   }
+
+   public void setController(final Controller controller) {
+      this.controller = controller;
    }
 }

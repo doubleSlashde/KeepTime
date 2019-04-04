@@ -1,4 +1,4 @@
-package de.doubleslash.keeptime.common;
+package de.doubleslash.keeptime.view;
 
 import java.time.Duration;
 

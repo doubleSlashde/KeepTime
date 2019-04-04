@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
-import de.doubleslash.keeptime.common.ColorTimeLine;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -121,6 +120,8 @@ public class ViewController {
 
    @FXML
    private Canvas canvas;
+
+   private ColorTimeLine mainColorTimeLine;
 
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
 
@@ -316,11 +317,11 @@ public class ViewController {
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
-         final ColorTimeLine mainColorTimeLine = new ColorTimeLine(canvas, model, controller);
          mainColorTimeLine.update();
          updateTaskbarIcon(currentWorkSeconds);
       });
 
+      mainColorTimeLine = new ColorTimeLine(canvas, model, controller);
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
@@ -424,6 +425,7 @@ public class ViewController {
          final Parent sceneRoot = fxmlLoader.load();
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
+         reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportStage.setScene(new Scene(sceneRoot));
