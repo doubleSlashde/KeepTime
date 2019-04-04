@@ -71,7 +71,7 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
             </BorderPane>
-            <Canvas fx:id="reportColorTimeLine" height="3.0" width="480.0">
+            <Canvas fx:id="canvas" height="3.0" width="480.0">
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>

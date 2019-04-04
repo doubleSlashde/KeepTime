@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.time.Interval;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -74,6 +76,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -317,11 +320,27 @@ public class ViewController {
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
-         mainColorTimeLine.update();
+         final long maxSeconds = controller.calcTodaysSeconds();
+         double currentX = 0;
+         final List<Rectangle> rects = new ArrayList<>();
+         for (final Work w : model.getPastWorkItems()) {
+            final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
+            final double width = (double) workedSeconds / maxSeconds * canvas.getWidth();
+            final Color fill = w.getProject().getColor();
+
+            final Rectangle rect = new Rectangle(currentX, 0, width, 0);
+            rect.setFill(fill);
+
+            rects.add(rect);
+
+            currentX += width;
+         }
+
+         mainColorTimeLine.update(rects);
          updateTaskbarIcon(currentWorkSeconds);
       });
 
-      mainColorTimeLine = new ColorTimeLine(canvas, model, controller);
+      mainColorTimeLine = new ColorTimeLine(canvas);
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
