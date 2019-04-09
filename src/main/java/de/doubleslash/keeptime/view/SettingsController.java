@@ -120,7 +120,6 @@ public class SettingsController {
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
-         displayProjectsRightCheckBox.setDisable(true);
       }
 
       LOG.debug("saveButton.setOnAction");
@@ -154,13 +153,14 @@ public class SettingsController {
 
                alert.showAndWait();
             }
-            if (!displayProjectsRightCheckBox.isSelected()) {
-               displayProjectsRightCheckBox.setSelected(true);
+            if (!displayProjectsRightCheckBox.isSelected() && hideProjectsOnMouseExitCheckBox.isSelected()) {
+               hideProjectsOnMouseExitCheckBox.setSelected(false);
                final Alert warning = new Alert(AlertType.WARNING);
                warning.setTitle("Warning!");
                warning.setHeaderText("No Linux Support");
                warning.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-               warning.setContentText("The project list on the left side has no Linux support. Resetting it.");
+               warning.setContentText(
+                     "The project list on the left side has no Linux support if projects should be hidden. Disabling hiding of project list.");
                warning.showAndWait();
             }
          }

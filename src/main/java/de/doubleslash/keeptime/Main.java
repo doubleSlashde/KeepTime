@@ -182,7 +182,7 @@ public class Main extends Application {
          settings.setHoverFontColor(Model.ORIGINAL_HOVER_Font_COLOR);
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
-         settings.setHideProjectsOnMouseExit(true);
+         settings.setHideProjectsOnMouseExit(false);
          model.getSettingsRepository().save(settings);
       } else {
          settings = settingsList.get(0);
