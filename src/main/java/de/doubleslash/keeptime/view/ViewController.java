@@ -212,7 +212,7 @@ public class ViewController {
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
 
       // Add a light to colorize buttons
-      // TODO #12 is there a nicer way for this?
+      // TODO is there a nicer way for this? (see #12)
       final Lighting lighting = new Lighting();
       lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
          final Color color = fontColorProperty.get();

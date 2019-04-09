@@ -150,7 +150,8 @@ public class AboutController {
          final Alert alert = new Alert(AlertType.ERROR);
          alert.setTitle("Ooops");
          alert.setHeaderText("Could not find the license file");
-         alert.setContentText(String.format("We could not find the license file at \"%s\".%nPlease visit \"%s\".",
+         alert.setContentText(String.format(
+               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
                license.getPath(), license.getUrl()));
 
          alert.show();

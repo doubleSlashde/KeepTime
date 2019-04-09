@@ -98,7 +98,7 @@
               <descriptors>
                 <descriptor>./assembly.xml</descriptor>
               </descriptors>
-              <finalName>keeptime</finalName>
+              <finalName>keeptime-${project.version}</finalName>
             </configuration>
           </execution>
         </executions>

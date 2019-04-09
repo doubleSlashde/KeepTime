@@ -21,7 +21,7 @@ public class OS {
    private static final String OS_PROPERTY = "os.name";
 
    private OS() {
-
+      // prevent instance creation
    }
 
    public static boolean isWindows() {
