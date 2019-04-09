@@ -16,14 +16,6 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.canvas.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
@@ -50,7 +42,7 @@
                         <Font name="Open Sans Regular" size="29.0" />
                      </font>
                   </Label>
-                  <Label fx:id="bigTimeLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="113.0" prefWidth="300.0" text="01:02:23" textAlignment="CENTER">
+                  <Label fx:id="bigTimeLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="113.0" prefWidth="290.0" text="01:02:23" textAlignment="CENTER">
                      <font>
                         <Font name="Open Sans Regular" size="73.0" />
                      </font>
@@ -115,7 +107,7 @@
          <left>
             <VBox fx:id="projectsVBox" BorderPane.alignment="CENTER">
                <children>
-                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="142.0" prefWidth="132.0" stylesheets="@../css/application.css">
+                  <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="142.0" prefWidth="140.0" stylesheets="@../css/application.css">
                      <content>
                         <VBox fx:id="availableProjectVbox" alignment="TOP_CENTER" prefWidth="130.0" />
                      </content>
