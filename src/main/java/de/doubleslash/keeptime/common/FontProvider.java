@@ -16,11 +16,18 @@
 
 package de.doubleslash.keeptime.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import javafx.scene.text.Font;
 
 public class FontProvider {
-   private static final Font defaultFont = Font.font("Open Sans Regular");
-   private static final Font boldFont = Font.font("Open Sans Bold");
+
+   private static final Logger LOG = LoggerFactory.getLogger(FontProvider.class);
+
+   private static Font defaultFont;
+   private static Font boldFont;
 
    private FontProvider() {
       // no instances allowed
@@ -32,5 +39,18 @@ public class FontProvider {
 
    public static Font getBoldFont() {
       return boldFont;
+   }
+
+   public static void loadFonts() {
+      LOG.info("Loading fonts");
+      defaultFont = loadFont(RESOURCE.FONT_REGULAR);
+      boldFont = loadFont(RESOURCE.FONT_BOLD);
+   }
+
+   private static Font loadFont(final RESOURCE fontResource) {
+      LOG.info("Loading font '{}'", fontResource);
+      final Font font = Font.loadFont(Resources.getResource(fontResource).toExternalForm(), 12);
+      LOG.info("Font with name '{}' loaded.", font.getName());
+      return font;
    }
 }

@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +30,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -54,7 +54,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -130,20 +129,8 @@ public class Main extends Application {
       }
    }
 
-   private void loadFonts() {
-      final List<RESOURCE> fontResources = Arrays.asList(RESOURCE.FONT_BOLD, RESOURCE.FONT_SEMI_BOLD,
-            RESOURCE.FONT_REGULAR);
-      LOG.info("Loading fonts '{}'", fontResources);
-
-      for (final RESOURCE fontResource : fontResources) {
-         LOG.info("Loading font '{}'", fontResource);
-         final Font font = Font.loadFont(Resources.getResource(fontResource).toExternalForm(), 12);
-         LOG.info("Font with name '{}' loaded.", font.getName());
-      }
-   }
-
    private void initialiseApplication(final Stage primaryStage) throws Exception {
-      loadFonts();
+      FontProvider.loadFonts();
       readSettings();
 
       final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
