@@ -18,12 +18,12 @@ package de.doubleslash.keeptime.view.license;
 
 import de.doubleslash.keeptime.common.Licenses;
 
-public class LicenceTableRow {
+public class LicenseTableRow {
    private String name;
    private String licenseName;
    private Licenses license;
 
-   public LicenceTableRow(final String name, final Licenses license) {
+   public LicenseTableRow(final String name, final Licenses license) {
       this.license = license;
       this.licenseName = license.getName();
       this.name = name;

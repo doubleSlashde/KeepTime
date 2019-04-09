@@ -16,6 +16,8 @@
 
 package de.doubleslash.keeptime.view;
 
+import java.util.Comparator;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,7 @@ import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.BrowserHelper;
 import de.doubleslash.keeptime.common.FileOpenHelper;
 import de.doubleslash.keeptime.common.Licenses;
-import de.doubleslash.keeptime.view.license.LicenceTableRow;
+import de.doubleslash.keeptime.view.license.LicenseTableRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -58,7 +60,7 @@ public class AboutController {
    private Hyperlink ourLicenseHyperLink;
 
    @FXML
-   private TableView<LicenceTableRow> licenseTableView;
+   private TableView<LicenseTableRow> licenseTableView;
 
    private static final Logger LOG = LoggerFactory.getLogger(AboutController.class);
 
@@ -68,20 +70,20 @@ public class AboutController {
       versionNumberLabel.setText(Main.VERSION);
 
       ourLicenseHyperLink.setFocusTraversable(false);
-      ourLicenseHyperLink.setOnAction(ae -> FileOpenHelper.openFile(Licenses.GPLV3.getPath()));
+      ourLicenseHyperLink.setOnAction(ae -> showLicense(Licenses.GPLV3));
 
       LOG.debug("set up table");
       // name column
-      TableColumn<LicenceTableRow, String> nameColumn;
+      TableColumn<LicenseTableRow, String> nameColumn;
       nameColumn = new TableColumn<>("Name");
       nameColumn.setMinWidth(160);
 
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
       // licenseColumn
-      final TableColumn<LicenceTableRow, String> licenseColumn = new TableColumn<>("License");
+      final TableColumn<LicenseTableRow, String> licenseColumn = new TableColumn<>("License");
       licenseColumn.setMinWidth(260);
-      licenseColumn.setCellFactory(param -> new TableCell<LicenceTableRow, String>() {
+      licenseColumn.setCellFactory(param -> new TableCell<LicenseTableRow, String>() {
          @Override
          protected void updateItem(final String item, final boolean empty) {
             super.updateItem(item, empty);
@@ -95,27 +97,19 @@ public class AboutController {
 
             setOnMouseClicked(eventOnMouseClicked -> {
                if (!empty && eventOnMouseClicked.getButton() == MouseButton.PRIMARY) {
-                  final LicenceTableRow row = (LicenceTableRow) getTableRow().getItem();
+                  final LicenseTableRow row = (LicenseTableRow) getTableRow().getItem();
                   final Licenses license = row.getLicense();
                   LOG.debug("License file name: {}", license);
 
-                  if (!FileOpenHelper.openFile(license.getPath())) {
-                     final Alert alert = new Alert(AlertType.ERROR);
-                     alert.setTitle("Ooops");
-                     alert.setHeaderText("Could not find the license file");
-                     alert.setContentText(
-                           String.format("We could not find the license file at \"%s\".%nPlease visit \"%s\".",
-                                 license.getPath(), license.getUrl()));
-
-                     alert.show();
-                  }
+                  showLicense(license);
                }
             });
          }
+
       });
       licenseColumn.setCellValueFactory(new PropertyValueFactory<>("licenseName"));
 
-      final ObservableList<LicenceTableRow> licenses = loadRows();
+      final ObservableList<LicenseTableRow> licenses = loadLicenseRows();
 
       licenseTableView.setItems(licenses);
 
@@ -135,17 +129,31 @@ public class AboutController {
       });
    }
 
-   public ObservableList<LicenceTableRow> loadRows() {
-      final ObservableList<LicenceTableRow> rows = FXCollections.observableArrayList();
-      rows.add(new LicenceTableRow("jnativehook", Licenses.GPLV3));
-      rows.add(new LicenceTableRow("jnativehook", Licenses.LGPLV3));
-      rows.add(new LicenceTableRow("commons-lang3", Licenses.APACHEV2));
-      rows.add(new LicenceTableRow("flyway-maven-plugin", Licenses.APACHEV2));
-      rows.add(new LicenceTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
-      rows.add(new LicenceTableRow("mockito-core", Licenses.MIT));
-      rows.add(new LicenceTableRow("h2", Licenses.EPLV1));
+   public ObservableList<LicenseTableRow> loadLicenseRows() {
+      final ObservableList<LicenseTableRow> licenseRows = FXCollections.observableArrayList();
+      licenseRows.add(new LicenseTableRow("Open Sans", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("jnativehook", Licenses.GPLV3));
+      licenseRows.add(new LicenseTableRow("jnativehook", Licenses.LGPLV3));
+      licenseRows.add(new LicenseTableRow("commons-lang3", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("flyway-maven-plugin", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
+      licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
 
-      return rows;
+      licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
+
+      return licenseRows;
    }
 
+   private void showLicense(final Licenses license) {
+      if (!FileOpenHelper.openFile(license.getPath())) {
+         final Alert alert = new Alert(AlertType.ERROR);
+         alert.setTitle("Ooops");
+         alert.setHeaderText("Could not find the license file");
+         alert.setContentText(String.format("We could not find the license file at \"%s\".%nPlease visit \"%s\".",
+               license.getPath(), license.getUrl()));
+
+         alert.show();
+      }
+   }
 }
