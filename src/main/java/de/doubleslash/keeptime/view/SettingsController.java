@@ -27,6 +27,7 @@ import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -44,8 +45,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class SettingsController {
-   AboutController aboutController;
-   Stage aboutStage;
 
    @FXML
    private ColorPicker hoverBackgroundColor;
@@ -98,8 +97,14 @@ public class SettingsController {
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
    private Controller controller;
-   private Stage thisStage;
+
    private static final String INPUT_FILE = "config.xml";
+
+   private AboutController aboutController;
+
+   private Stage thisStage;
+
+   private Stage aboutStage;
 
    @FXML
    private void initialize() {
@@ -107,26 +112,15 @@ public class SettingsController {
       LOG.info("OS: {}", OS.getOSname());
       LOG.debug("set versionLabel text");
       LOG.debug("load substages");
-      loadSubStages();
+      loadAboutStage();
       LOG.debug("set version label text");
 
       if (OS.isLinux()) {
-         if (useHotkeyCheckBox != null) {
-            LOG.debug("useHotkeyCheckBox is initialized");
-            useHotkeyCheckBox.setDisable(true);
-         } else {
-            LOG.warn("useHotkeyCheckBox is null");
-         }
-
-         if (hotkeyLabel != null) {
-            LOG.debug("hotkeyLabel is initialized");
-            hotkeyLabel.setDisable(true);
-         } else {
-            LOG.warn("hotkeyLabel is null");
-         }
-
-         LOG.debug("globalKeyloggerLabel is initialized");
+         LOG.info("Disabling unsupported settings for Linux.");
+         useHotkeyCheckBox.setDisable(true);
+         hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
+         displayProjectsRightCheckBox.setDisable(true);
       }
 
       LOG.debug("saveButton.setOnAction");
@@ -141,8 +135,9 @@ public class SettingsController {
                final Alert alert = new Alert(AlertType.WARNING);
                alert.setTitle("Warning!");
                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-               alert.setHeaderText("color settings wrong!");
-               alert.setContentText("The level of opacity on your hover background is to high for Linux.");
+               alert.setHeaderText("Color setting not supported!");
+               alert.setContentText(
+                     "The level of opacity on your hover background is to high for Linux. Resetting it.");
 
                alert.showAndWait();
             }
@@ -153,21 +148,21 @@ public class SettingsController {
                final Alert alert = new Alert(AlertType.WARNING);
                alert.setTitle("Warning!");
                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-               alert.setHeaderText("color settings wrong!");
-               alert.setContentText("The level of opacity on your default background is to high for Linux.");
+               alert.setHeaderText("Color settings not supported!");
+               alert.setContentText(
+                     "The level of opacity on your hover background is to high for Linux. Resetting it.");
 
                alert.showAndWait();
             }
-         }
-
-         if (!displayProjectsRightCheckBox.isSelected()) {
-            final Alert warning = new Alert(AlertType.WARNING);
-            warning.setTitle("No Linux Support");
-            warning.setHeaderText(null);
-            warning.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-            warning.setContentText(
-                  "The project list on the left side has no Linux support and doesn't run quite well on Windows ether. Please change your settings so, that your project list is on the right side.");
-            warning.showAndWait();
+            if (!displayProjectsRightCheckBox.isSelected()) {
+               displayProjectsRightCheckBox.setSelected(true);
+               final Alert warning = new Alert(AlertType.WARNING);
+               warning.setTitle("Warning!");
+               warning.setHeaderText("No Linux Support");
+               warning.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+               warning.setContentText("The project list on the left side has no Linux support. Resetting it.");
+               warning.showAndWait();
+            }
          }
 
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
@@ -232,7 +227,7 @@ public class SettingsController {
       this.thisStage = thisStage;
    }
 
-   private void loadSubStages() {
+   private void loadAboutStage() {
       try {
          // About stage
          LOG.debug("load about.fxml");
@@ -254,9 +249,8 @@ public class SettingsController {
          });
 
          LOG.debug("done setting up stage");
-      } catch (final IOException e1) {
-         // TODO Auto-generated catch block
-         LOG.error(e1.getMessage());
+      } catch (final IOException e) {
+         throw new FXMLLoaderException("Could not load About stage.", e);
       }
 
    }
