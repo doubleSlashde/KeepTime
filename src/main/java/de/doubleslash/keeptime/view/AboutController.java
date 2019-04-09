@@ -55,6 +55,9 @@ public class AboutController {
    private Label versionNumberLabel;
 
    @FXML
+   private Hyperlink ourLicenseHyperLink;
+
+   @FXML
    private TableView<LicenceTableRow> licenseTableView;
 
    private static final Logger LOG = LoggerFactory.getLogger(AboutController.class);
@@ -63,6 +66,9 @@ public class AboutController {
    public void initialize() {
       LOG.debug("set version label");
       versionNumberLabel.setText(Main.VERSION);
+
+      ourLicenseHyperLink.setFocusTraversable(false);
+      ourLicenseHyperLink.setOnAction(ae -> FileOpenHelper.openFile(Licenses.GPLV3.getPath()));
 
       LOG.debug("set up table");
       // name column
@@ -131,8 +137,6 @@ public class AboutController {
 
    public ObservableList<LicenceTableRow> loadRows() {
       final ObservableList<LicenceTableRow> rows = FXCollections.observableArrayList();
-
-      rows.add(new LicenceTableRow("KeepTime", Licenses.GPLV3));
       rows.add(new LicenceTableRow("jnativehook", Licenses.GPLV3));
       rows.add(new LicenceTableRow("jnativehook", Licenses.LGPLV3));
       rows.add(new LicenceTableRow("commons-lang3", Licenses.APACHEV2));

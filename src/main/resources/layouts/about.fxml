@@ -24,7 +24,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="mainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="506.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.AboutController">
+<Pane fx:id="mainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="567.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.AboutController">
    <children>
       <Label fx:id="keepTimeLabel" layoutX="220.0" layoutY="50.0" text="KeepTime">
          <font>
@@ -42,29 +42,39 @@
             <Font name="Open Sans Regular" size="14.0" />
          </font>
       </Label>
-      <Label fx:id="openSourceLabel" layoutX="62.0" layoutY="207.0" text="KeepTime is open source software, check out our github page">
+      <Label fx:id="openSourceLabel" layoutX="62.0" layoutY="207.0" prefHeight="20.0" prefWidth="360.0" text="KeepTime is open source software, licensed under the">
          <font>
             <Font name="Open Sans Regular" size="14.0" />
          </font>
       </Label>
-      <Hyperlink fx:id="gitHubHyperlink" focusTraversable="false" layoutX="57.0" layoutY="226.0" text="https://www.github.com/doubleSlashde/KeepTime">
+      <Hyperlink fx:id="gitHubHyperlink" focusTraversable="false" layoutX="57.0" layoutY="262.0" text="https://www.github.com/doubleSlashde/KeepTime">
          <font>
             <Font name="Open Sans Regular" size="14.0" />
          </font>
       </Hyperlink>
-      <Line fx:id="smallLine" endX="497.0" endY="273.0" startX="62.0" startY="273.0" strokeWidth="2.0" />
-      <Label fx:id="thirdPartyLabel" layoutX="62.0" layoutY="293.0" text="third party software">
+      <Line fx:id="smallLine" endX="497.0" endY="273.0" layoutY="36.0" startX="62.0" startY="273.0" strokeWidth="2.0" />
+      <Label fx:id="thirdPartyLabel" layoutX="62.0" layoutY="329.0" text="third party software">
          <font>
             <Font name="Open Sans Regular" size="14.0" />
          </font>
       </Label>
-      <Button fx:id="reportBugButton" focusTraversable="false" layoutX="378.0" layoutY="288.0" mnemonicParsing="false" prefWidth="110.0" text="report a bug">
+      <Button fx:id="reportBugButton" focusTraversable="false" layoutX="378.0" layoutY="324.0" mnemonicParsing="false" prefWidth="110.0" text="report a bug">
          <font>
             <Font name="Open Sans Regular" size="14.0" />
          </font>
       </Button>
-      <TableView fx:id="licenseTableView" focusTraversable="false" layoutX="62.0" layoutY="342.0" prefHeight="120.0" prefWidth="437.0" />
+      <TableView fx:id="licenseTableView" focusTraversable="false" layoutX="62.0" layoutY="378.0" prefHeight="120.0" prefWidth="437.0" />
       <Label fx:id="versionNumberLabel" layoutX="120.0" layoutY="131.0" text="1.0.0">
+         <font>
+            <Font name="Open Sans Regular" size="14.0" />
+         </font>
+      </Label>
+      <Hyperlink fx:id="ourLicenseHyperLink" layoutX="57.0" layoutY="221.0" text="GPL Version 3.0">
+         <font>
+            <Font name="Open Sans Regular" size="14.0" />
+         </font>
+      </Hyperlink>
+      <Label layoutX="168.0" layoutY="225.0" text=", check out our Github page:">
          <font>
             <Font name="Open Sans Regular" size="14.0" />
          </font>
