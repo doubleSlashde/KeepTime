@@ -1,3 +1,19 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package de.doubleslash.keeptime;
 
 import java.io.IOException;
@@ -14,6 +30,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -75,7 +92,7 @@ public class Main extends Application {
    public void start(final Stage primaryStage) {
       LOG.info("Initialising the UI");
       try {
-         initUI(primaryStage);
+         initialiseApplication(primaryStage);
          LOG.info("UI successfully initialised.");
       } catch (final Exception e) {
          LOG.error("There was an error while initialising the UI", e);
@@ -112,8 +129,8 @@ public class Main extends Application {
       }
    }
 
-   private void initUI(final Stage primaryStage) throws Exception {
-
+   private void initialiseApplication(final Stage primaryStage) throws Exception {
+      FontProvider.loadFonts();
       readSettings();
 
       final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
@@ -165,7 +182,7 @@ public class Main extends Application {
          settings.setHoverFontColor(Model.ORIGINAL_HOVER_Font_COLOR);
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
-         settings.setHideProjectsOnMouseExit(true);
+         settings.setHideProjectsOnMouseExit(false);
          model.getSettingsRepository().save(settings);
       } else {
          settings = settingsList.get(0);
