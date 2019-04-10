@@ -14,14 +14,34 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.repos;
+package de.doubleslash.keeptime.common;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+public class OS {
 
-import de.doubleslash.keeptime.model.Settings;
+   private static final String OS_PROPERTY = "os.name";
 
-@Repository
-public interface SettingsRepository extends JpaRepository<Settings, Long> {
+   private OS() {
+      // prevent instance creation
+   }
+
+   public static boolean isWindows() {
+      if (System.getProperty(OS_PROPERTY).toLowerCase().contains("windows")) {
+         return true;
+      }
+
+      return false;
+   }
+
+   public static boolean isLinux() {
+      if (System.getProperty(OS_PROPERTY).toLowerCase().contains("linux")) {
+         return true;
+      }
+
+      return false;
+   }
+
+   public static String getOSname() {
+      return System.getProperty(OS_PROPERTY);
+   }
 
 }

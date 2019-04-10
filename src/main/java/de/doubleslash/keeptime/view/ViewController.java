@@ -1,3 +1,19 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package de.doubleslash.keeptime.view;
 
 import java.awt.image.BufferedImage;
@@ -17,6 +33,7 @@ import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.DateFormatter;
+import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -166,6 +183,9 @@ public class ViewController {
    private Stage settingsStage;
    private SettingsController settingsController;
 
+   private Stage aboutStage;
+   private AboutController aboutController;
+
    private Map<Project, Node> projectSelectionNodeMap;
 
    @FXML
@@ -193,7 +213,7 @@ public class ViewController {
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
 
       // Add a light to colorize buttons
-      // TODO does this go nicer?
+      // TODO is there a nicer way for this? (see #12)
       final Lighting lighting = new Lighting();
       lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
          final Color color = fontColorProperty.get();
@@ -311,9 +331,8 @@ public class ViewController {
             final Label label = entry.getValue();
 
             final long seconds = model.getPastWorkItems().stream()
-                  .filter((work) -> work.getProject().getId() == p.getId()).mapToLong(work -> {
-                     return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-                  }).sum();
+                  .filter(work -> work.getProject().getId() == p.getId())
+                  .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
@@ -446,7 +465,7 @@ public class ViewController {
          settingsStage.setScene(new Scene(root1));
          settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
-         LOG.error("Error while initialising report or settings stage", e);
+         LOG.error("Error while loading sub stage");
          throw new FXMLLoaderException(e);
       }
    }
@@ -465,7 +484,7 @@ public class ViewController {
       try {
          projectElement = loader.load();
       } catch (final IOException e1) {
-         LOG.error("Could not load '{}'.", loader.getLocation(), e1);
+         LOG.error("Could not load '{}'.", loader.getLocation());
          throw new FXMLLoaderException(e1);
       }
 
@@ -726,19 +745,32 @@ public class ViewController {
       grid.setVgap(10);
       grid.setPadding(new Insets(20, 150, 10, 10));
 
-      grid.add(new Label("Name:"), 0, 0);
+      final Label nameLabel = new Label("Name:");
+      nameLabel.setFont(FontProvider.getDefaultFont());
+      grid.add(nameLabel, 0, 0);
+
       final TextField projectNameTextField = new TextField(projectName);
+      projectNameTextField.setFont(FontProvider.getDefaultFont());
       grid.add(projectNameTextField, 1, 0);
 
-      grid.add(new Label("Color:"), 0, 1);
+      final Label colorLabel = new Label("Color:");
+      colorLabel.setFont(FontProvider.getDefaultFont());
+      grid.add(colorLabel, 0, 1);
+
       final ColorPicker colorPicker = new ColorPicker(projectColor);
       grid.add(colorPicker, 1, 1);
 
-      grid.add(new Label("IsWork:"), 0, 2);
+      final Label isWorkLabel = new Label("IsWork:");
+      isWorkLabel.setFont(FontProvider.getDefaultFont());
+      grid.add(isWorkLabel, 0, 2);
+
       final CheckBox isWorkCheckBox = new CheckBox();
       isWorkCheckBox.setSelected(isWork);
+      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
       grid.add(isWorkCheckBox, 1, 2);
 
+      final Label sortIndex = new Label("SortIndex:");
+      sortIndex.setFont(FontProvider.getDefaultFont());
       grid.add(new Label("SortIndex:"), 0, 3);
 
       return grid;

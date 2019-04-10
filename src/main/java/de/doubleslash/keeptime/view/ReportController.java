@@ -1,3 +1,19 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package de.doubleslash.keeptime.view;
 
 import java.time.LocalDate;
@@ -14,6 +30,7 @@ import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.DateProvider;
+import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -36,8 +53,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.util.Callback;
 
 public class ReportController {
@@ -102,17 +117,15 @@ public class ReportController {
 
       this.gridPane.getChildren().clear();
       this.gridPane.getRowConstraints().clear();
-      this.gridPane.getColumnConstraints().get(0).setPrefWidth(247);
+      this.gridPane.getColumnConstraints().get(0).setPrefWidth(300);
 
       int rowIndex = 0;
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
-      final Font labelFontBold = Font.font("System", FontWeight.BOLD, 15);
-      final Font labelFontNormal = Font.font("System", FontWeight.NORMAL, 15);
 
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
-         projectName.setFont(labelFontBold);
+         projectName.setFont(FontProvider.getBoldFont());
          final Circle circle = new Circle(5, project.getColor());
 
          final HBox nameHBox = new HBox();
@@ -137,11 +150,10 @@ public class ReportController {
          }
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
-         workedTimeLabel.setFont(labelFontBold);
+         workedTimeLabel.setFont(FontProvider.getBoldFont());
          this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
-
          final Button bProjectReport = createProjectReport();
          this.gridPane.add(bProjectReport, 1, rowIndex);
 
@@ -156,18 +168,18 @@ public class ReportController {
             final String currentWorkNote = work.getNotes();
             pr.appendToWorkNotes(currentWorkNote);
             final Label commentLabel = new Label(currentWorkNote);
-            commentLabel.setFont(labelFontNormal);
+            commentLabel.setFont(FontProvider.getDefaultFont());
             commentLabel.setWrapText(true);
             this.gridPane.add(commentLabel, 0, rowIndex);
 
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
-            fromTillLabel.setFont(labelFontNormal);
+            fromTillLabel.setFont(FontProvider.getDefaultFont());
             fromTillLabel.setWrapText(true);
             this.gridPane.add(fromTillLabel, 1, rowIndex);
 
             final Label workedHoursLabel = new Label(workedHours);
-            workedHoursLabel.setFont(labelFontNormal);
+            workedHoursLabel.setFont(FontProvider.getDefaultFont());
             this.gridPane.add(workedHoursLabel, 2, rowIndex);
 
             rowIndex++;
