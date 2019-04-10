@@ -238,9 +238,12 @@ public class Controller {
    public long calcTodaysWorkSeconds() {
       final List<Work> workItems = new ArrayList<>();
 
-      for (final Work w : model.getPastWorkItems()) {
-         if (w.getProject().isWork()) {
-            workItems.add(w);
+      for (final Work work : model.getPastWorkItems()) {
+         final Project project = work.getProject();
+         for (final Project p : model.getAllProjects()) {
+            if (p.getId() == project.getId() && project.isWork()) {
+               workItems.add(work);
+            }
          }
       }
 
