@@ -21,6 +21,8 @@ import de.doubleslash.keeptime.model.Work;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
@@ -32,6 +34,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -99,10 +102,7 @@ public class ReportController {
 
       this.gridPane.getChildren().clear();
       this.gridPane.getRowConstraints().clear();
-      this.gridPane.getColumnConstraints().get(0).setPrefWidth(20);
-      this.gridPane.getColumnConstraints().get(1).setPrefWidth(237);
-      this.gridPane.getColumnConstraints().get(2).setPrefWidth(154);
-      this.gridPane.getColumnConstraints().get(3).setPrefWidth(81);
+      this.gridPane.getColumnConstraints().get(0).setPrefWidth(247);
 
       int rowIndex = 0;
       long currentWorkSeconds = 0;
@@ -115,8 +115,15 @@ public class ReportController {
          projectName.setFont(labelFontBold);
          final Circle circle = new Circle(5, project.getColor());
 
-         this.gridPane.add(circle, 0, rowIndex);
-         this.gridPane.add(projectName, 1, rowIndex);
+         final HBox nameHBox = new HBox();
+         nameHBox.setAlignment(Pos.CENTER_LEFT);
+         nameHBox.setPadding(new Insets(0, 0, 0, 5));
+         nameHBox.setSpacing(5);
+
+         nameHBox.getChildren().add(circle);
+         nameHBox.getChildren().add(projectName);
+
+         this.gridPane.add(nameHBox, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
@@ -131,12 +138,12 @@ public class ReportController {
 
          final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
          workedTimeLabel.setFont(labelFontBold);
-         this.gridPane.add(workedTimeLabel, 3, rowIndex);
+         this.gridPane.add(workedTimeLabel, 2, rowIndex);
 
          // text will be set later
 
          final Button bProjectReport = createProjectReport();
-         this.gridPane.add(bProjectReport, 2, rowIndex);
+         this.gridPane.add(bProjectReport, 1, rowIndex);
 
          rowIndex++;
 
@@ -151,17 +158,17 @@ public class ReportController {
             final Label commentLabel = new Label(currentWorkNote);
             commentLabel.setFont(labelFontNormal);
             commentLabel.setWrapText(true);
-            this.gridPane.add(commentLabel, 1, rowIndex);
+            this.gridPane.add(commentLabel, 0, rowIndex);
 
             final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
                   + DateFormatter.toTimeString(work.getEndTime()));
             fromTillLabel.setFont(labelFontNormal);
             fromTillLabel.setWrapText(true);
-            this.gridPane.add(fromTillLabel, 2, rowIndex);
+            this.gridPane.add(fromTillLabel, 1, rowIndex);
 
             final Label workedHoursLabel = new Label(workedHours);
             workedHoursLabel.setFont(labelFontNormal);
-            this.gridPane.add(workedHoursLabel, 3, rowIndex);
+            this.gridPane.add(workedHoursLabel, 2, rowIndex);
 
             rowIndex++;
          }
