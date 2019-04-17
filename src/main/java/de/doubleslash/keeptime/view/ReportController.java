@@ -44,6 +44,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
@@ -71,6 +72,9 @@ public class ReportController {
    @FXML
    private ScrollPane scrollPane;
 
+   @FXML
+   private AnchorPane reportRoot;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private DatePicker datePicker; // for calender element
@@ -89,6 +93,7 @@ public class ReportController {
    }
 
    private void updateReport(final LocalDate newvalue) {
+      reportRoot.requestFocus();
       this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
       final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
 

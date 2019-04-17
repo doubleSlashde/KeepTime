@@ -84,6 +84,7 @@ import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -440,18 +441,29 @@ public class ViewController {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
          final Parent sceneRoot = fxmlLoader.load();
+         sceneRoot.setFocusTraversable(true);
+         sceneRoot.requestFocus();
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
-         reportStage.setScene(new Scene(sceneRoot));
+
+         final Scene reportScene = new Scene(sceneRoot);
+         reportScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               reportStage.close();
+            }
+         });
+
+         reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
-         reportStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
+         reportStage.setOnHiding(we -> this.mainStage.setAlwaysOnTop(true));
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
-         final Parent root1 = fxmlLoader2.load();
+         final Parent settingsRoot = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
          settingsController.setController(controller);
          settingsStage = new Stage();
@@ -459,7 +471,16 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
-         settingsStage.setScene(new Scene(root1));
+
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
+
+         settingsStage.setScene(settingsScene);
          settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
          LOG.error("Error while loading sub stage");
@@ -534,6 +555,10 @@ public class ViewController {
          dialog.setTitle("Change project with time transfer");
          dialog.setHeaderText("Choose the time to transfer");
          dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+         final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+         okButton.setDefaultButton(true);
+         final Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+         cancelButton.setDefaultButton(false);
 
          final VBox vBox = new VBox();
          final Label description = new Label(
@@ -548,6 +573,9 @@ public class ViewController {
          int gridRow = 0;
          grid.add(new Label("Minutes to transfer"), 0, gridRow);
          final Slider slider = setUpSliderChangeWithTimeMenuItem(activeWorkSecondsProperty);
+         slider.setFocusTraversable(true);
+
+         okButton.setOnKeyPressed(ke -> slider.requestFocus());
 
          grid.add(slider, 1, gridRow);
          final Label minutesToTransferLabel = new Label("999 minute(s)");
@@ -589,6 +617,8 @@ public class ViewController {
          vBox.getChildren().add(grid);
 
          dialog.getDialogPane().setContent(vBox);
+
+         slider.setOnKeyPressed(ke -> slider.requestFocus());
 
          dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {

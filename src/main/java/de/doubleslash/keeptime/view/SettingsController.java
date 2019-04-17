@@ -39,6 +39,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Modality;
@@ -93,6 +94,9 @@ public class SettingsController {
    private Label hotkeyLabel;
    @FXML
    private Label globalKeyloggerLabel;
+
+   @FXML
+   private AnchorPane settingsRoot;
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
@@ -210,6 +214,8 @@ public class SettingsController {
    }
 
    void update() {
+      settingsRoot.requestFocus();
+
       hoverBackgroundColor.setValue(Model.HOVER_BACKGROUND_COLOR.get());
       hoverFontColor.setValue(Model.HOVER_FONT_COLOR.get());
 
