@@ -188,6 +188,8 @@ public class ViewController {
 
    private Map<Project, Node> projectSelectionNodeMap;
 
+   private boolean ctrlIsPressed = false;
+
    @FXML
    private void initialize() {
 
@@ -618,7 +620,30 @@ public class ViewController {
 
          dialog.getDialogPane().setContent(vBox);
 
-         slider.setOnKeyPressed(ke -> slider.requestFocus());
+         slider.setOnKeyPressed(ke -> {
+            if (!slider.isFocused()) {
+               slider.requestFocus();
+            }
+
+            if (ke.getCode() == KeyCode.CONTROL) {
+               ctrlIsPressed = true;
+            }
+
+            if (ke.getCode() == KeyCode.LEFT && ctrlIsPressed) {
+               slider.adjustValue(slider.getValue() - 5);
+            }
+
+            if (ke.getCode() == KeyCode.RIGHT && ctrlIsPressed) {
+               slider.adjustValue(slider.getValue() + 5);
+            }
+
+         });
+
+         slider.setOnKeyReleased(ke -> {
+            if (ke.getCode() == KeyCode.CONTROL) {
+               ctrlIsPressed = false;
+            }
+         });
 
          dialog.setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
