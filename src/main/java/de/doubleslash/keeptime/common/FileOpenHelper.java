@@ -35,7 +35,7 @@ public class FileOpenHelper {
          if (OS.isWindows()) {
             executeCommandWindows(rt, file);
          } else if (OS.isLinux()) {
-            executeCommandLinux(rt, file);
+            executeCommandLinux(rt, fileString);
          } else {
             LOG.warn("OS is not supported");
          }
@@ -56,9 +56,9 @@ public class FileOpenHelper {
       }
    }
 
-   private static void executeCommandLinux(final Runtime rt, final File file) {
+   private static void executeCommandLinux(final Runtime rt, final String fileString) {
       try {
-         final String command = "xdg-open \"" + file + "\"";
+         final String command = "xdg-open \"" + fileString + "\"";
          LOG.debug("executing command: {}", command);
 
          rt.exec(command);
