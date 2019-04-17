@@ -58,10 +58,12 @@ public class FileOpenHelper {
 
    private static void executeCommandLinux(final Runtime rt, final String fileString) {
       try {
-         final String command = "gedit '/home/Dokumente/haha.txt'";
-         LOG.debug("executing command: {}", command);
+         final String command = "'" + fileString + "'";
+         LOG.debug("executing command: gedit {}", command);
 
-         rt.exec(command);
+         rt.exec(new String[] {
+               "gedit", command
+         });
       } catch (final Exception e) {
          LOG.error(e.getMessage());
       }
