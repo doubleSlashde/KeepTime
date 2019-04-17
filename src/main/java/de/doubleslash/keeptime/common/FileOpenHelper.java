@@ -56,9 +56,10 @@ public class FileOpenHelper {
       }
    }
 
-   private static void executeCommandLinux(final Runtime rt, final String fileString) {
+   private static void executeCommandLinux(final Runtime rt, String fileString) {
+      fileString = fileString.replace(" ", "\\ ");
       try {
-         final String command = "xdg-open '" + fileString + "'";
+         final String command = "xdg-open " + fileString;
          LOG.debug("executing command: {}", command);
 
          rt.exec(command);
