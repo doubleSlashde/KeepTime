@@ -62,7 +62,7 @@ public class FileOpenHelper {
          LOG.debug("executing command: gedit {}", command);
 
          rt.exec(new String[] {
-               "gedit", command
+               "xdg-open", command
          });
       } catch (final Exception e) {
          LOG.error(e.getMessage());

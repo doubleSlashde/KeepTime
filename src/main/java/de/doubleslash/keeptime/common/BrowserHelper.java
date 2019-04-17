@@ -50,10 +50,12 @@ public class BrowserHelper {
 
    private static void executeCommandLinux(final Runtime rt, final String url) {
       try {
-         final String command = "xdg-open " + url;
-         LOG.debug("execute command: {}", command);
+         final String command = url;
+         LOG.debug("execute command: xdg-open {}", command);
 
-         rt.exec(command);
+         rt.exec(new String[] {
+               "xdg-open", command
+         });
       } catch (final Exception e) {
          LOG.warn(e.getMessage());
       }
