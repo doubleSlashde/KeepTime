@@ -17,11 +17,15 @@
 package de.doubleslash.keeptime.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -284,4 +288,39 @@ public class ControllerTest {
       assertThat(work.getStartTime(), is(firstProjectPlusOneHour));
    }
 
+   @Test
+   public void shouldCalculateSecondsCorrectlyWhenWorkItemsAreGiven() {
+      final Project workProject1 = new Project("workProject1", Color.GREEN, true, 0);
+      final Project workProject2 = new Project("workProject2", Color.RED, true, 1);
+      final Project nonworkProject1 = new Project("nonworkProject1", Color.RED, false, 2);
+      final Project nonworkProject2 = new Project("nonworkProject2", Color.RED, false, 3);
+
+      final LocalDate localDateNow = LocalDate.now();
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final List<Work> workItems = new ArrayList<>(4);
+      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
+            workProject1, ""));
+      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2),
+            workProject2, ""));
+      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(2), localDateTimeMorning.plusHours(3),
+            nonworkProject1, ""));
+      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4),
+            nonworkProject2, ""));
+
+      model.getAllProjects().addAll(workProject1, workProject2, nonworkProject1, nonworkProject2);
+      model.getPastWorkItems().addAll(workItems);
+
+      final long totalSeconds = testee.calcSeconds(workItems);
+      assertEquals("Seconds were not calculated correctly.", TimeUnit.HOURS.toSeconds(4), totalSeconds);
+
+      final long todaysSeconds = testee.calcTodaysSeconds();
+      assertEquals("Todays seconds were not calulated correctly.", TimeUnit.HOURS.toSeconds(4), todaysSeconds);
+
+      final long todaysWorkSeconds = testee.calcTodaysWorkSeconds();
+      // assertEquals("Todays work seconds were not calculated correctly.",TimeUnit.HOURS.toSeconds(2),
+      // todaysWorkSeconds);
+      // TODO does not work, as id within project cannot be set
+
+   }
 }

@@ -30,13 +30,17 @@ import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.FontProvider;
+import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
@@ -47,6 +51,8 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.shape.Circle;
 import javafx.util.Callback;
 
 public class ReportController {
@@ -69,17 +75,25 @@ public class ReportController {
 
    @FXML
    private GridPane gridPane;
+
    @FXML
    private ScrollPane scrollPane;
 
    @FXML
    private AnchorPane reportRoot;
 
+   @FXML
+   private Canvas colorTimeLineCanvas;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
-   private DatePicker datePicker; // for calender element
+   private DatePicker datePicker; // for calendar element
 
    private Model model;
+
+   private Controller controller;
+
+   private ColorTimeLine colorTimeLine;
 
    @FXML
    private void initialize() {
@@ -90,6 +104,8 @@ public class ReportController {
          LOG.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);
       });
+
+      colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
    }
 
    private void updateReport(final LocalDate newvalue) {
@@ -97,11 +113,14 @@ public class ReportController {
       this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
       final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
 
+      colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
+
       final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
 
       this.gridPane.getChildren().clear();
       this.gridPane.getRowConstraints().clear();
+      this.gridPane.getColumnConstraints().get(0).setPrefWidth(300);
 
       int rowIndex = 0;
       long currentWorkSeconds = 0;
@@ -110,13 +129,23 @@ public class ReportController {
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
          projectName.setFont(FontProvider.getBoldFont());
-         this.gridPane.add(projectName, 0, rowIndex);
+         projectName.setUnderline(project.isWork());
+         final Circle circle = new Circle(5, project.getColor());
+
+         final HBox projectNameHBox = new HBox();
+         projectNameHBox.setAlignment(Pos.CENTER_LEFT);
+         projectNameHBox.setPadding(new Insets(0, 0, 0, 5));
+         projectNameHBox.setSpacing(5);
+
+         projectNameHBox.getChildren().add(circle);
+         projectNameHBox.getChildren().add(projectName);
+
+         this.gridPane.add(projectNameHBox, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
 
-         final long todaysWorkSeconds = onlyCurrentProjectWork.stream()
-               .mapToLong(work -> DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime())).sum();
+         final long todaysWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
 
          currentSeconds += todaysWorkSeconds;
          if (project.isWork()) {
@@ -158,13 +187,13 @@ public class ReportController {
 
             rowIndex++;
          }
-         // textArea.setText(pr.getNotes(true));
          bProjectReport.setUserData(pr.getNotes(true));
       }
       this.scrollPane.setVvalue(0); // scroll to the top
 
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+
    }
 
    private Button createProjectReport() {
@@ -213,5 +242,9 @@ public class ReportController {
 
    public void update() {
       updateReport(this.datePicker.getValue());
+   }
+
+   public void setController(final Controller controller) {
+      this.controller = controller;
    }
 }
