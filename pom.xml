@@ -11,6 +11,19 @@
   <name>KeepTime</name>
   <description>Time tracker</description>
 
+  <licenses>
+    <license>
+      <name>GNU General Public License (GPL) version 3.0</name>
+      <url>http://www.gnu.org/licenses/gpl.txt</url>
+      <distribution>manual</distribution>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>doubleSlash Net-Business GmbH</name>
+    <url>https://www.doubleslash.de/</url>
+  </organization>
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -59,10 +72,6 @@
       <groupId>org.w3c</groupId>
       <artifactId>dom</artifactId>
       <version>2.3.0-jaxb-1.0.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -129,7 +138,7 @@
         <configuration>
           <failBuildOnAnyVulnerability>true</failBuildOnAnyVulnerability>
           <failBuildOnCVSS>8</failBuildOnCVSS>
-          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
+          <!-- <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile> -->
         </configuration>
       </plugin>
     </plugins>
