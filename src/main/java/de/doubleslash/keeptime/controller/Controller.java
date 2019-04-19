@@ -257,8 +257,11 @@ public class Controller {
       for (final Work work : model.getPastWorkItems()) {
          final Project project = work.getProject();
          for (final Project p : model.getAllProjects()) {
-            if (p.getId() == project.getId() && p.isWork()) {
-               workItems.add(work);
+            if (p.getId() == project.getId()) {
+               if (p.isWork()) {
+                  workItems.add(work);
+               }
+               break;
             }
          }
       }
