@@ -173,7 +173,7 @@ public class Main extends Application {
       final Settings settings;
       if (settingsList.isEmpty()) {
          settings = new Settings();
-         settings.setTaskBarColor(Model.TASK_BAR_COLOR.get());
+         settings.setTaskBarColor(model.taskBarColor.get());
 
          settings.setDefaultBackgroundColor(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
          settings.setDefaultFontColor(Model.ORIGINAL_DEFAULT_FONT_COLOR);
@@ -188,14 +188,14 @@ public class Main extends Application {
          settings = settingsList.get(0);
       }
 
-      Model.DEFAULT_BACKGROUND_COLOR.set(settings.getDefaultBackgroundColor());
-      Model.DEFAULT_FONT_COLOR.set(settings.getDefaultFontColor());
-      Model.HOVER_BACKGROUND_COLOR.set(settings.getHoverBackgroundColor());
-      Model.HOVER_FONT_COLOR.set(settings.getHoverFontColor());
-      Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
-      Model.USE_HOTKEY.set(settings.isUseHotkey());
-      Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
-      Model.HIDE_PROJECTS_ON_MOUSE_EXIT.set(settings.isHideProjectsOnMouseExit());
+      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
+      model.defaultFontColor.set(settings.getDefaultFontColor());
+      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
+      model.hoverFontColor.set(settings.getHoverFontColor());
+      model.taskBarColor.set(settings.getTaskBarColor());
+      model.useHotkey.set(settings.isUseHotkey());
+      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
+      model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
@@ -203,8 +203,8 @@ public class Main extends Application {
 
       globalScreenListener = new GlobalScreenListener();
 
-      Model.USE_HOTKEY.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
-      globalScreenListener.register(Model.USE_HOTKEY.get());
+      model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
+      globalScreenListener.register(model.useHotkey.get());
 
       popupViewStage = new Stage();
       popupViewStage.initOwner(primaryStage);

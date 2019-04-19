@@ -55,16 +55,18 @@ public class ViewControllerPopup {
 
    private Controller controller;
 
+   private Model model;
+
    private FilteredList<Project> filteredData;
 
    private void changeProject(final Project item) {
       LOG.info("Change project to '{}'.", item.getName());
 
       // ask for a note for the current project
-      final TextInputDialog dialog = new TextInputDialog(Model.activeWorkItem.get().getNotes());
+      final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
       dialog.setTitle("Note for current project");
       dialog.setHeaderText(
-            "Add a note for '" + Model.activeWorkItem.get().getProject().getName() + "' before changing project?");
+            "Add a note for '" + model.activeWorkItem.get().getProject().getName() + "' before changing project?");
       dialog.setContentText("Note: ");
 
       this.stage.setAlwaysOnTop(false);
@@ -163,7 +165,7 @@ public class ViewControllerPopup {
             } else {
                setOnMouseClicked(ev -> changeProject(project));
 
-               final boolean isActiveProject = project == Model.activeWorkItem.get().getProject();
+               final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
                setText((isActiveProject ? "* " : "") + project.getName());
                setTextFill(project.getColor());
                setUnderline(project.isWork());
@@ -176,6 +178,7 @@ public class ViewControllerPopup {
 
    public void setControllerAndModel(final Controller controller, final Model model) {
       this.controller = controller;
+      this.model = model;
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
       projectListView.setItems(filteredData);

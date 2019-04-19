@@ -58,7 +58,7 @@ public class Controller {
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      final Work currentWork = Model.activeWorkItem.get();
+      final Work currentWork = model.activeWorkItem.get();
 
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       final LocalDate dateNow = now.toLocalDate();
@@ -88,7 +88,7 @@ public class Controller {
          model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
          LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
-      Model.activeWorkItem.set(work);
+      model.activeWorkItem.set(work);
    }
 
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
@@ -121,14 +121,14 @@ public class Controller {
 
       model.getSettingsRepository().save(settings);
 
-      Model.DEFAULT_BACKGROUND_COLOR.set(settings.getDefaultBackgroundColor());
-      Model.DEFAULT_FONT_COLOR.set(settings.getDefaultFontColor());
-      Model.HOVER_BACKGROUND_COLOR.set(settings.getHoverBackgroundColor());
-      Model.HOVER_FONT_COLOR.set(settings.getHoverFontColor());
-      Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
-      Model.USE_HOTKEY.set(settings.isUseHotkey());
-      Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
-      Model.HIDE_PROJECTS_ON_MOUSE_EXIT.set(settings.isHideProjectsOnMouseExit());
+      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
+      model.defaultFontColor.set(settings.getDefaultFontColor());
+      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
+      model.hoverFontColor.set(settings.getHoverFontColor());
+      model.taskBarColor.set(settings.getTaskBarColor());
+      model.useHotkey.set(settings.isUseHotkey());
+      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
+      model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
    }
 
    @PreDestroy
@@ -244,7 +244,7 @@ public class Controller {
    }
 
    public void setComment(final String notes) {
-      final Work work = Model.activeWorkItem.get();
+      final Work work = model.activeWorkItem.get();
       work.setNotes(notes);
    }
 

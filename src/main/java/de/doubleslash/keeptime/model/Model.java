@@ -62,21 +62,20 @@ public class Model {
          Comparator.comparing(Project::getIndex));
    private ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
-   protected static final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
-   public static final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
+   protected final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
+   public final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
-   public static final ObjectProperty<Color> TASK_BAR_COLOR = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
+   public final ObjectProperty<Color> taskBarColor = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
 
-   public static final ObjectProperty<Color> HOVER_BACKGROUND_COLOR = new SimpleObjectProperty<>(
+   public final ObjectProperty<Color> hoverBackgroundColor = new SimpleObjectProperty<>(
          ORIGINAL_HOVER_BACKGROUND_COLOR);
-   public static final ObjectProperty<Color> HOVER_FONT_COLOR = new SimpleObjectProperty<>(ORIGINAL_HOVER_Font_COLOR);
-   public static final ObjectProperty<Color> DEFAULT_BACKGROUND_COLOR = new SimpleObjectProperty<>(
+   public final ObjectProperty<Color> hoverFontColor = new SimpleObjectProperty<>(ORIGINAL_HOVER_Font_COLOR);
+   public final ObjectProperty<Color> defaultBackgroundColor = new SimpleObjectProperty<>(
          ORIGINAL_DEFAULT_BACKGROUND_COLOR);
-   public static final ObjectProperty<Color> DEFAULT_FONT_COLOR = new SimpleObjectProperty<>(
-         ORIGINAL_DEFAULT_FONT_COLOR);
-   public static final ObjectProperty<Boolean> USE_HOTKEY = new SimpleObjectProperty<>(false);
-   public static final ObjectProperty<Boolean> DISPLAY_PROJECTS_RIGHT = new SimpleObjectProperty<>(false);
-   public static final ObjectProperty<Boolean> HIDE_PROJECTS_ON_MOUSE_EXIT = new SimpleObjectProperty<>(true);
+   public final ObjectProperty<Color> defaultFontColor = new SimpleObjectProperty<>(ORIGINAL_DEFAULT_FONT_COLOR);
+   public final ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
+   public final ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
+   public final ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
 
    public void setWorkRepository(final WorkRepository workRepository) {
       this.workRepository = workRepository;
