@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.PreDestroy;
 
@@ -59,7 +58,7 @@ public class Controller {
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      final Work currentWork = Model.activeWorkItem.get();
+      final Work currentWork = model.activeWorkItem.get();
 
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       final LocalDate dateNow = now.toLocalDate();
@@ -89,7 +88,7 @@ public class Controller {
          model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
          LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
-      Model.activeWorkItem.set(work);
+      model.activeWorkItem.set(work);
    }
 
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
@@ -122,14 +121,14 @@ public class Controller {
 
       model.getSettingsRepository().save(settings);
 
-      Model.DEFAULT_BACKGROUND_COLOR.set(settings.getDefaultBackgroundColor());
-      Model.DEFAULT_FONT_COLOR.set(settings.getDefaultFontColor());
-      Model.HOVER_BACKGROUND_COLOR.set(settings.getHoverBackgroundColor());
-      Model.HOVER_FONT_COLOR.set(settings.getHoverFontColor());
-      Model.TASK_BAR_COLOR.set(settings.getTaskBarColor());
-      Model.USE_HOTKEY.set(settings.isUseHotkey());
-      Model.DISPLAY_PROJECTS_RIGHT.set(settings.isDisplayProjectsRight());
-      Model.HIDE_PROJECTS_ON_MOUSE_EXIT.set(settings.isHideProjectsOnMouseExit());
+      model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
+      model.defaultFontColor.set(settings.getDefaultFontColor());
+      model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
+      model.hoverFontColor.set(settings.getHoverFontColor());
+      model.taskBarColor.set(settings.getTaskBarColor());
+      model.useHotkey.set(settings.isUseHotkey());
+      model.displayProjectsRight.set(settings.isDisplayProjectsRight());
+      model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
    }
 
    @PreDestroy
@@ -245,7 +244,7 @@ public class Controller {
    }
 
    public void setComment(final String notes) {
-      final Work work = Model.activeWorkItem.get();
+      final Work work = model.activeWorkItem.get();
       work.setNotes(notes);
    }
 
@@ -253,29 +252,41 @@ public class Controller {
     * Calculate todays seconds counted as work
     */
    public long calcTodaysWorkSeconds() {
+      final List<Work> workItems = new ArrayList<>();
 
-      return model.getPastWorkItems().stream().filter(work -> {
+      for (final Work work : model.getPastWorkItems()) {
          final Project project = work.getProject();
-         // find up to date reference to project
-         final Optional<Project> optionalProject = model.getAllProjects().stream()
-               .filter(p -> p.getId() == project.getId()).findAny();
-         if (optionalProject.isPresent()) {
-            return optionalProject.get().isWork();
+         for (final Project p : model.getAllProjects()) {
+            if (p.getId() == project.getId()) {
+               if (p.isWork()) {
+                  workItems.add(work);
+               }
+               break;
+            }
          }
-         // TODO should not happen
-         return false;
-      }).mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+      }
+
+      return calcSeconds(workItems);
    }
 
    /**
     * Calculate todays present seconds (work+nonWork)
     */
    public long calcTodaysSeconds() {
-      return model.getPastWorkItems().stream()
-            .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+      return calcSeconds(model.getPastWorkItems());
    }
 
    public ObservableList<Project> getAvailableProjects() {
       return model.getAvailableProjects();
+   }
+
+   public long calcSeconds(final List<Work> workItems) {
+      long seconds = 0;
+
+      for (final Work w : workItems) {
+         seconds += Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
+      }
+
+      return seconds;
    }
 }

@@ -97,6 +97,7 @@ public class SettingsController {
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
    private Controller controller;
+   private Model model;
 
    private static final String INPUT_FILE = "config.xml";
 
@@ -203,24 +204,24 @@ public class SettingsController {
       });
    }
 
-   public void setController(final Controller controller) {
+   public void setControllerAndModel(final Controller controller, final Model model) {
       this.controller = controller;
-
+      this.model = model;
       update();
    }
 
    void update() {
-      hoverBackgroundColor.setValue(Model.HOVER_BACKGROUND_COLOR.get());
-      hoverFontColor.setValue(Model.HOVER_FONT_COLOR.get());
+      hoverBackgroundColor.setValue(model.hoverBackgroundColor.get());
+      hoverFontColor.setValue(model.hoverFontColor.get());
 
-      defaultBackgroundColor.setValue(Model.DEFAULT_BACKGROUND_COLOR.get());
-      defaultFontColor.setValue(Model.DEFAULT_FONT_COLOR.get());
+      defaultBackgroundColor.setValue(model.defaultBackgroundColor.get());
+      defaultFontColor.setValue(model.defaultFontColor.get());
 
-      taskBarColor.setValue(Model.TASK_BAR_COLOR.get());
+      taskBarColor.setValue(model.taskBarColor.get());
 
-      useHotkeyCheckBox.setSelected(Model.USE_HOTKEY.get());
-      displayProjectsRightCheckBox.setSelected(Model.DISPLAY_PROJECTS_RIGHT.get());
-      hideProjectsOnMouseExitCheckBox.setSelected(Model.HIDE_PROJECTS_ON_MOUSE_EXIT.get());
+      useHotkeyCheckBox.setSelected(model.useHotkey.get());
+      displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
+      hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
    }
 
    public void setStage(final Stage thisStage) {

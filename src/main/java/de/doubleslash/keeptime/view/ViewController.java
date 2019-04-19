@@ -40,7 +40,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.time.Interval;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -139,6 +138,8 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
+   private ColorTimeLine mainColorTimeLine;
+
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
 
    private class Delta {
@@ -196,7 +197,7 @@ public class ViewController {
 
       // reposition window if projects are hidden (as anchor is top left)
       mouseHoveringProperty.addListener((a, b, c) -> {
-         if (!Model.HIDE_PROJECTS_ON_MOUSE_EXIT.get()) {
+         if (!model.hideProjectsOnMouseExit.get()) {
             setProjectListVisible(true);
             return;
          }
@@ -231,14 +232,14 @@ public class ViewController {
 
       Platform.runLater(() -> {
          loadSubStages();
-         fontColorProperty.set(Model.DEFAULT_FONT_COLOR.get());
+         fontColorProperty.set(model.defaultFontColor.get());
          fontColorProperty.bind(Bindings.createObjectBinding(() -> {
             if (mouseHoveringProperty.get()) {
-               return Model.HOVER_FONT_COLOR.get();
+               return model.hoverFontColor.get();
             } else {
-               return Model.DEFAULT_FONT_COLOR.get();
+               return model.defaultFontColor.get();
             }
-         }, mouseHoveringProperty, Model.DEFAULT_FONT_COLOR, Model.HOVER_FONT_COLOR));
+         }, mouseHoveringProperty, model.defaultFontColor, model.hoverFontColor));
 
          bigTimeLabel.textFillProperty().bind(fontColorProperty);
          allTimeLabel.textFillProperty().bind(fontColorProperty);
@@ -246,7 +247,7 @@ public class ViewController {
          currentProjectLabel.textFillProperty().bind(fontColorProperty);
 
          final Runnable displayProjectRightRunnable = () -> {
-            if (Model.DISPLAY_PROJECTS_RIGHT.get()) {
+            if (model.displayProjectsRight.get()) {
                borderPane.setLeft(null);
                borderPane.setRight(projectsVBox);
             } else {
@@ -255,7 +256,7 @@ public class ViewController {
 
             }
          };
-         Model.DISPLAY_PROJECTS_RIGHT.addListener((a, oldValue, newValue) -> displayProjectRightRunnable.run());
+         model.displayProjectsRight.addListener((a, oldValue, newValue) -> displayProjectRightRunnable.run());
          displayProjectRightRunnable.run();
 
          // Setup textarea font color binding
@@ -276,15 +277,15 @@ public class ViewController {
             }
          }
 
-         Model.activeWorkItem.addListener((a, b, c) -> {
+         model.activeWorkItem.addListener((a, b, c) -> {
             updateProjectView();
             textArea.setText("");
          });
 
          model.getAvailableProjects().addListener(this::setUpAvailableProjectsListener);
 
-         Model.DEFAULT_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
-         Model.HOVER_BACKGROUND_COLOR.addListener((a, b, c) -> updateMainBackgroundColor.run());
+         model.defaultBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
+         model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
          updateMainBackgroundColor.run();
       });
 
@@ -335,10 +336,11 @@ public class ViewController {
             label.setText(DateFormatter.secondsToHHMMSS(seconds));
          }
 
-         updateProjectColorTimeline();
+         mainColorTimeLine.update(model.getPastWorkItems(), controller.calcTodaysSeconds());
          updateTaskbarIcon(currentWorkSeconds);
       });
 
+      mainColorTimeLine = new ColorTimeLine(canvas);
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
@@ -372,10 +374,10 @@ public class ViewController {
    }
 
    private void runUpdateMainBackgroundColor() {
-      Color color = Model.DEFAULT_BACKGROUND_COLOR.get();
+      Color color = model.defaultBackgroundColor.get();
       double opacity = 0;
       if (mouseHoveringProperty.get()) {
-         color = Model.HOVER_BACKGROUND_COLOR.get();
+         color = model.hoverBackgroundColor.get();
          opacity = .3;
       }
       String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
@@ -397,7 +399,7 @@ public class ViewController {
             final List<? extends Project> removedSubList = lis.getRemoved();
             for (final Project project : removedSubList) {
                // change to idle if removed project was active
-               if (project == Model.activeWorkItem.get().getProject()) {
+               if (project == model.activeWorkItem.get().getProject()) {
                   changeProject(model.getIdleProject(), 0);
                }
                final Node remove = projectSelectionNodeMap.remove(project);
@@ -428,7 +430,7 @@ public class ViewController {
       final double afterWidth = mainStage.getWidth();
       projectsVBox.setVisible(showProjectList);
       final double offset = afterWidth - beforeWidth;
-      if (!Model.DISPLAY_PROJECTS_RIGHT.get()) {
+      if (!model.displayProjectsRight.get()) {
          // we only need to move the stage if the node on the left is hidden
          // not sure how we can prevent the jumping
          mainStage.setX(mainStage.getX() - offset);
@@ -442,6 +444,7 @@ public class ViewController {
          final Parent sceneRoot = fxmlLoader.load();
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
+         reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportStage.setScene(new Scene(sceneRoot));
@@ -453,7 +456,7 @@ public class ViewController {
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
          final Parent root1 = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
-         settingsController.setController(controller);
+         settingsController.setControllerAndModel(controller, model);
          settingsStage = new Stage();
          settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
@@ -556,7 +559,7 @@ public class ViewController {
 
          grid.add(new Label("New time distribution"), 0, gridRow);
          gridRow++;
-         grid.add(new Label("Active project duration: " + Model.activeWorkItem.get().getProject().getName()), 0,
+         grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
                gridRow);
          final Label currentProjectTimeLabel = new Label(TIME_ZERO);
          grid.add(currentProjectTimeLabel, 1, gridRow);
@@ -582,7 +585,7 @@ public class ViewController {
             currentProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsActiveWork));
             newProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsNewWork));
             newEndTimeLabel.setText(
-                  DateFormatter.toTimeString(Model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
+                  DateFormatter.toTimeString(model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
          };
          activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
          slider.valueProperty().addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
@@ -786,32 +789,14 @@ public class ViewController {
       }
    }
 
-   private void updateProjectColorTimeline() {
-      final GraphicsContext gc = canvas.getGraphicsContext2D();
-
-      gc.setFill(new Color(.3, .3, .3, .3));
-      gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-      gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-      double currentX = 0;
-      final long maxSeconds = controller.calcTodaysSeconds();
-      for (final Work w : model.getPastWorkItems()) {
-         final long workedSeconds = Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
-         final double fillX = (float) workedSeconds / maxSeconds * canvas.getWidth();
-         gc.setFill(w.getProject().getColor());
-         gc.fillRect(currentX, 0, fillX, canvas.getHeight());
-         currentX += fillX;
-      }
-   }
-
    private void updateTaskbarIcon(final long currentWorkSeconds) {
       final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
 
       gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
-      gcIcon.setFill(Model.activeWorkItem.get().getProject().getColor());
+      gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
       gcIcon.fillRect(1, 27, 31, 5);
 
-      gcIcon.setStroke(Model.TASK_BAR_COLOR.get());
+      gcIcon.setStroke(model.taskBarColor.get());
       gcIcon.setTextAlign(TextAlignment.CENTER);
       gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
             Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5.0);
@@ -834,7 +819,7 @@ public class ViewController {
    }
 
    private void updateProjectView() {
-      final Project project = Model.activeWorkItem.get().getProject();
+      final Project project = model.activeWorkItem.get().getProject();
       currentProjectLabel.setText(project.getName());
       currentProjectLabel.setUnderline(project.isWork());
       final Circle circle = new Circle(4);
