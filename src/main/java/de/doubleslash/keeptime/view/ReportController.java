@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.DateProvider;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
@@ -79,15 +78,13 @@ public class ReportController {
    private ScrollPane scrollPane;
 
    @FXML
-   private Canvas canvas;
+   private Canvas colorTimeLineCanvas;
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private DatePicker datePicker; // for calendar element
 
    private Model model;
-
-   private DateProvider dateProvider;
 
    private Controller controller;
 
@@ -103,7 +100,7 @@ public class ReportController {
          updateReport(newvalue);
       });
 
-      colorTimeLine = new ColorTimeLine(canvas);
+      colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
    }
 
    private void updateReport(final LocalDate newvalue) {
@@ -126,23 +123,23 @@ public class ReportController {
       for (final Project project : workedProjectsSet) {
          final Label projectName = new Label(project.getName());
          projectName.setFont(FontProvider.getBoldFont());
+         projectName.setUnderline(project.isWork());
          final Circle circle = new Circle(5, project.getColor());
 
-         final HBox nameHBox = new HBox();
-         nameHBox.setAlignment(Pos.CENTER_LEFT);
-         nameHBox.setPadding(new Insets(0, 0, 0, 5));
-         nameHBox.setSpacing(5);
+         final HBox projectNameHBox = new HBox();
+         projectNameHBox.setAlignment(Pos.CENTER_LEFT);
+         projectNameHBox.setPadding(new Insets(0, 0, 0, 5));
+         projectNameHBox.setSpacing(5);
 
-         nameHBox.getChildren().add(circle);
-         nameHBox.getChildren().add(projectName);
+         projectNameHBox.getChildren().add(circle);
+         projectNameHBox.getChildren().add(projectName);
 
-         this.gridPane.add(nameHBox, 0, rowIndex);
+         this.gridPane.add(projectNameHBox, 0, rowIndex);
 
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
 
-         final long todaysWorkSeconds = onlyCurrentProjectWork.stream()
-               .mapToLong(work -> DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime())).sum();
+         final long todaysWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
 
          currentSeconds += todaysWorkSeconds;
          if (project.isWork()) {
