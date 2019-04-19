@@ -108,10 +108,11 @@ public class ReportController {
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
    }
 
-   private void updateReport(final LocalDate newvalue) {
+   private void updateReport(final LocalDate dateToShow) {
       reportRoot.requestFocus();
-      this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
-      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
+
+      this.currentDayLabel.setText(DateFormatter.toDayDateString(dateToShow));
+      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(dateToShow);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
