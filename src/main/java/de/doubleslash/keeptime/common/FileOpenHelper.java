@@ -58,12 +58,12 @@ public class FileOpenHelper {
 
    private static void executeCommandLinux(final Runtime rt, final String fileString) {
       try {
-         final String command = fileString;
-         LOG.debug("executing command: gedit {}", command);
+         final String[] command = {
+               "xdg-open", fileString
+         };
+         LOG.debug("executing command: {} {}", command[0], command[1]);
 
-         rt.exec(new String[] {
-               "xdg-open", command
-         });
+         rt.exec(command);
       } catch (final Exception e) {
          LOG.error(e.getMessage());
       }
