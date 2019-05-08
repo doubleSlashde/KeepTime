@@ -16,6 +16,8 @@
 
 package de.doubleslash.keeptime.common;
 
+import java.util.Arrays;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,35 +31,33 @@ public class BrowserHelper {
       final Runtime rt = Runtime.getRuntime();
 
       if (OS.isWindows()) {
-         executeCommandWindows(rt, url);
+         openUrlWindows(rt, url);
       } else if (OS.isLinux()) {
-         executeCommandLinux(rt, url);
+         openUrlLinux(rt, url);
       } else {
          LOG.warn("OS is not supported");
       }
    }
 
-   private static void executeCommandWindows(final Runtime rt, final String url) {
+   private static void openUrlWindows(final Runtime rt, final String url) {
+      final String command = "rundll32 url.dll,FileProtocolHandler " + url;
       try {
-         final String command = "rundll32 url.dll,FileProtocolHandler " + url;
-         LOG.debug("execute command: {}", command);
-
+         LOG.debug("Executing command: {}", command);
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error(e.getMessage());
+         LOG.error("Could not open url '" + url + "' with command '" + command + "'.", e);
       }
    }
 
-   private static void executeCommandLinux(final Runtime rt, final String url) {
+   private static void openUrlLinux(final Runtime rt, final String url) {
+      final String[] command = {
+            "xdg-open", url
+      };
       try {
-         final String command = url;
-         LOG.debug("execute command: xdg-open {}", command);
-
-         rt.exec(new String[] {
-               "xdg-open", command
-         });
+         LOG.debug("Executing command: {}", Arrays.toString(command));
+         rt.exec(command);
       } catch (final Exception e) {
-         LOG.warn(e.getMessage());
+         LOG.error("Could not open url '" + url + "' with command '" + Arrays.toString(command) + "'.", e);
       }
    }
 }
