@@ -215,6 +215,7 @@ public class SettingsController {
    }
 
    void update() {
+      // needed to close stage on esc
       settingsRoot.requestFocus();
 
       hoverBackgroundColor.setValue(model.hoverBackgroundColor.get());

@@ -463,7 +463,7 @@ public class ViewController {
          reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
-         reportStage.setOnHiding(we -> this.mainStage.setAlwaysOnTop(true));
+         reportStage.setOnHiding(windowEvent -> this.mainStage.setAlwaysOnTop(true));
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
@@ -558,8 +558,11 @@ public class ViewController {
          changeWithTimeDialog.setModel(model);
          changeWithTimeDialog.setActiveWorkSecondsProperty(activeWorkSecondsProperty);
          changeWithTimeDialog.setUpDialog(p);
+
+         mainStage.setAlwaysOnTop(false);
          final Optional<Integer> result = changeWithTimeDialog.show();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
+         mainStage.setAlwaysOnTop(true);
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());

@@ -24,6 +24,7 @@ public class ChangeWithTimeDialog {
 
    private static final Logger LOG = LoggerFactory.getLogger(ChangeWithTimeDialog.class);
    private static final String TIME_ZERO = "00:00:00";
+   private static final int BIG_SLIDER_STEP = 5;
 
    private LongProperty activeWorkSecondsProperty;
    private Model model;
@@ -56,8 +57,6 @@ public class ChangeWithTimeDialog {
       grid.add(new Label("Minutes to transfer"), 0, gridRow);
       final Slider slider = setUpSliderChangeWithTimeMenuItem(activeWorkSecondsProperty);
 
-      okButton.setOnKeyPressed(ke -> slider.requestFocus());
-
       grid.add(slider, 1, gridRow);
       final Label minutesToTransferLabel = new Label("999 minute(s)");
       grid.add(minutesToTransferLabel, 2, gridRow);
@@ -78,7 +77,6 @@ public class ChangeWithTimeDialog {
       grid.add(new Label("New project duration: " + p.getName()), 0, gridRow);
       final Label newProjectTimeLabel = new Label(TIME_ZERO);
       grid.add(newProjectTimeLabel, 1, gridRow);
-      gridRow++;
 
       final Runnable updateLabelsRunnable = () -> {
          final long minutesOffset = slider.valueProperty().longValue();
@@ -95,6 +93,13 @@ public class ChangeWithTimeDialog {
       activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
       slider.valueProperty().addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
       vBox.getChildren().add(grid);
+
+      // hack to get focus on slider (doesn't work with dialog.setOnShowing(...) or dialog.setOnShown(...))
+      okButton.setOnKeyPressed(keyEvent -> {
+         if ((keyEvent.getCode() == KeyCode.LEFT || keyEvent.getCode() == KeyCode.RIGHT) && !slider.isFocused()) {
+            slider.requestFocus();
+         }
+      });
 
       dialog.getDialogPane().setContent(vBox);
 
@@ -143,6 +148,7 @@ public class ChangeWithTimeDialog {
       slider.setSnapToTicks(true);
       slider.setFocusTraversable(true);
 
+      // allows you to make bigger steps with arrow keys on slider if ctrl is pressed
       slider.setOnKeyPressed(ke -> {
          if (!slider.isFocused()) {
             slider.requestFocus();
@@ -153,11 +159,11 @@ public class ChangeWithTimeDialog {
          }
 
          if (ke.getCode() == KeyCode.LEFT && ctrlIsPressed) {
-            slider.adjustValue(slider.getValue() - 5);
+            slider.adjustValue(slider.getValue() - BIG_SLIDER_STEP);
          }
 
          if (ke.getCode() == KeyCode.RIGHT && ctrlIsPressed) {
-            slider.adjustValue(slider.getValue() + 5);
+            slider.adjustValue(slider.getValue() + BIG_SLIDER_STEP);
          }
 
       });
