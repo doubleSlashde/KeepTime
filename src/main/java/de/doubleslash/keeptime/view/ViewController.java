@@ -554,13 +554,10 @@ public class ViewController {
 
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
-         final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog();
-         changeWithTimeDialog.setModel(model);
-         changeWithTimeDialog.setActiveWorkSecondsProperty(activeWorkSecondsProperty);
-         changeWithTimeDialog.setUpDialog(p);
-
+         final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model, activeWorkSecondsProperty,
+               p);
          mainStage.setAlwaysOnTop(false);
-         final Optional<Integer> result = changeWithTimeDialog.show();
+         final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
          mainStage.setAlwaysOnTop(true);
       });
