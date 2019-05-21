@@ -17,6 +17,7 @@
 package de.doubleslash.keeptime.common;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,15 +28,15 @@ public class FileOpenHelper {
 
    private FileOpenHelper() {}
 
-   public static boolean openFile(final String fileString) {
-      final File file = new File(fileString);
+   public static boolean openFile(final String filePath) {
+      final File file = new File(filePath);
       final Runtime rt = Runtime.getRuntime();
 
       if (file.exists() && file.isFile()) {
          if (OS.isWindows()) {
-            executeCommandWindows(rt, file);
+            openFileWindows(rt, file);
          } else if (OS.isLinux()) {
-            executeCommandLinux(rt, file);
+            openFileLinux(rt, filePath);
          } else {
             LOG.warn("OS is not supported");
          }
@@ -45,25 +46,25 @@ public class FileOpenHelper {
       }
    }
 
-   private static void executeCommandWindows(final Runtime rt, final File file) {
+   private static void openFileWindows(final Runtime rt, final File file) {
+      final String command = "rundll32 url.dll,FileProtocolHandler " + file;
       try {
-         final String command = "rundll32 url.dll,FileProtocolHandler " + file;
          LOG.debug("executing command: {}", command);
-
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error(e.getMessage());
+         LOG.error("Could not open file '" + file + "' with command '" + command + "'.", e);
       }
    }
 
-   private static void executeCommandLinux(final Runtime rt, final File file) {
+   private static void openFileLinux(final Runtime rt, final String filePath) {
+      final String[] command = {
+            "xdg-open", filePath
+      };
       try {
-         final String command = "xdg-open " + file;
-         LOG.debug("executing command: {}", command);
-
+         LOG.debug("executing command: {}", Arrays.toString(command));
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error(e.getMessage());
+         LOG.error("Could not open file '" + filePath + "' with command '" + Arrays.toString(command) + "'.", e);
       }
    }
 }
