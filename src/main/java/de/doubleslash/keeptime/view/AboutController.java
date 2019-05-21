@@ -39,6 +39,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 public class AboutController {
@@ -153,6 +154,8 @@ public class AboutController {
          alert.setContentText(String.format(
                "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
                license.getPath(), license.getUrl()));
+         
+         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
          alert.show();
       }
