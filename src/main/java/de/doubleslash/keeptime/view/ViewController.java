@@ -72,7 +72,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextArea;
@@ -83,6 +82,7 @@ import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -187,6 +187,8 @@ public class ViewController {
    private AboutController aboutController;
 
    private Map<Project, Node> projectSelectionNodeMap;
+
+   private final boolean ctrlIsPressed = false;
 
    @FXML
    private void initialize() {
@@ -442,19 +444,30 @@ public class ViewController {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
          final Parent sceneRoot = fxmlLoader.load();
+         sceneRoot.setFocusTraversable(true);
+         sceneRoot.requestFocus();
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
          reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
-         reportStage.setScene(new Scene(sceneRoot));
+
+         final Scene reportScene = new Scene(sceneRoot);
+         reportScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               reportStage.close();
+            }
+         });
+
+         reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
-         reportStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
+         reportStage.setOnHiding(windowEvent -> this.mainStage.setAlwaysOnTop(true));
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
-         final Parent root1 = fxmlLoader2.load();
+         final Parent settingsRoot = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
          settingsController.setControllerAndModel(controller, model);
          settingsStage = new Stage();
@@ -462,7 +475,16 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
-         settingsStage.setScene(new Scene(root1));
+
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
+
+         settingsStage.setScene(settingsScene);
          settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
          LOG.error("Error while loading sub stage");
@@ -532,78 +554,12 @@ public class ViewController {
 
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
-         LOG.info("Change with time");
-         final Dialog<Integer> dialog = new Dialog<>();
-         dialog.setTitle("Change project with time transfer");
-         dialog.setHeaderText("Choose the time to transfer");
-         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
-         final VBox vBox = new VBox();
-         final Label description = new Label(
-               "Choose the amount of minutes to transfer from the active project to the new project");
-         description.setWrapText(true);
-         vBox.getChildren().add(description);
-
-         final GridPane grid = new GridPane();
-         grid.setHgap(10);
-         grid.setVgap(10);
-         grid.setPadding(new Insets(20, 150, 10, 10));
-         int gridRow = 0;
-         grid.add(new Label("Minutes to transfer"), 0, gridRow);
-         final Slider slider = setUpSliderChangeWithTimeMenuItem(activeWorkSecondsProperty);
-
-         grid.add(slider, 1, gridRow);
-         final Label minutesToTransferLabel = new Label("999 minute(s)");
-         grid.add(minutesToTransferLabel, 2, gridRow);
-         gridRow++;
-
-         grid.add(new Label("New time distribution"), 0, gridRow);
-         gridRow++;
-         grid.add(new Label("Active project duration: " + model.activeWorkItem.get().getProject().getName()), 0,
-               gridRow);
-         final Label currentProjectTimeLabel = new Label(TIME_ZERO);
-         grid.add(currentProjectTimeLabel, 1, gridRow);
-         gridRow++;
-
-         grid.add(new Label("New end and start time:"), 0, gridRow);
-         final Label newEndTimeLabel = new Label(TIME_ZERO);
-         grid.add(newEndTimeLabel, 1, gridRow);
-         gridRow++;
-
-         grid.add(new Label("New project duration: " + p.getName()), 0, gridRow);
-         final Label newProjectTimeLabel = new Label(TIME_ZERO);
-         grid.add(newProjectTimeLabel, 1, gridRow);
-         gridRow++;
-
-         final Runnable updateLabelsRunnable = () -> {
-            final long minutesOffset = slider.valueProperty().longValue();
-            final long secondsOffset = minutesOffset * 60;
-
-            final long secondsActiveWork = activeWorkSecondsProperty.get() - secondsOffset;
-            final long secondsNewWork = 0 + secondsOffset;
-            minutesToTransferLabel.setText(minutesOffset + " minute(s)");
-            currentProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsActiveWork));
-            newProjectTimeLabel.setText(DateFormatter.secondsToHHMMSS(secondsNewWork));
-            newEndTimeLabel.setText(
-                  DateFormatter.toTimeString(model.activeWorkItem.get().getEndTime().minusSeconds(secondsOffset)));
-         };
-         activeWorkSecondsProperty.addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
-         slider.valueProperty().addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
-         vBox.getChildren().add(grid);
-
-         dialog.getDialogPane().setContent(vBox);
-
-         dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == ButtonType.OK) {
-               return slider.valueProperty().intValue() * 60;
-            }
-            return null;
-         });
+         final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model, activeWorkSecondsProperty,
+               p);
          mainStage.setAlwaysOnTop(false);
-         final Optional<Integer> result = dialog.showAndWait();
-         mainStage.setAlwaysOnTop(true);
-
+         final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
+         mainStage.setAlwaysOnTop(true);
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
@@ -665,30 +621,6 @@ public class ViewController {
       contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
-   }
-
-   private Slider setUpSliderChangeWithTimeMenuItem(final LongProperty activeWorkSecondsProperty) {
-      final Slider slider = new Slider();
-
-      slider.setMin(0);
-      slider.maxProperty().bind(Bindings.createLongBinding(() -> {
-         final long maxValue = activeWorkSecondsProperty.longValue() / 60;
-         if (maxValue > 0) {
-            slider.setDisable(false);
-            return maxValue;
-         }
-         slider.setDisable(true);
-         return 1l;
-      }, activeWorkSecondsProperty));
-      slider.setValue(0);
-      slider.setShowTickLabels(true);
-      slider.setShowTickMarks(true);
-      slider.setMajorTickUnit(60);
-      slider.setMinorTickCount(58);
-      slider.setBlockIncrement(1);
-      slider.setSnapToTicks(true);
-
-      return slider;
    }
 
    private void editProject(final ObservableList<Node> nodes, final Project p) {

@@ -48,6 +48,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -74,8 +75,12 @@ public class ReportController {
 
    @FXML
    private GridPane gridPane;
+
    @FXML
    private ScrollPane scrollPane;
+
+   @FXML
+   private AnchorPane reportRoot;
 
    @FXML
    private Canvas colorTimeLineCanvas;
@@ -103,9 +108,11 @@ public class ReportController {
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
    }
 
-   private void updateReport(final LocalDate newvalue) {
-      this.currentDayLabel.setText(DateFormatter.toDayDateString(newvalue));
-      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(newvalue);
+   private void updateReport(final LocalDate dateToShow) {
+      reportRoot.requestFocus();
+
+      this.currentDayLabel.setText(DateFormatter.toDayDateString(dateToShow));
+      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(dateToShow);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
