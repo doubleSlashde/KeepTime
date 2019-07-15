@@ -63,7 +63,7 @@ public class Main extends Application {
 
    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-   public static final String VERSION = "v1.1.0b";
+   public static final String VERSION = "v1.1.0";
 
    private ConfigurableApplicationContext springContext;
 

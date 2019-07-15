@@ -1,1 +1,1 @@
-start "" "javaw" -Dprism.order=sw -jar keeptime-1.1.0b-SNAPSHOT.jar
+start "" "javaw" -Dprism.order=sw -jar keeptime-1.1.0-SNAPSHOT.jar
