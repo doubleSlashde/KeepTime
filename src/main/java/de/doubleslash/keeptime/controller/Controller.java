@@ -1,3 +1,19 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package de.doubleslash.keeptime.controller;
 
 import java.time.Duration;
@@ -5,7 +21,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.PreDestroy;
 
@@ -45,34 +60,33 @@ public class Controller {
    public void changeProject(final Project newProject, final long minusSeconds) {
       final Work currentWork = model.activeWorkItem.get();
 
-      final LocalDate dateNow = dateProvider.dateNow();
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
+      final LocalDate dateNow = now.toLocalDate();
       if (currentWork != null) {
          currentWork.setEndTime(now);
-
          if (currentWork.getNotes().isEmpty()) {
             currentWork.setNotes("- No notes -");
          }
 
          final String time = DateFormatter
                .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
+
          LOG.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
                currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
          // Save in db
-         model.workRepository.save(currentWork);
+         model.getWorkRepository().save(currentWork);
       }
 
       // Start new work
       final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
-      model.pastWorkItems.add(work);
 
-      // test if the day has changed
+      model.getPastWorkItems().add(work);
       if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
          LOG.info("Removing projects with other creation date than today '{}' from list.", dateNow);
-         final int sizeBefore = model.pastWorkItems.size();
-         model.pastWorkItems.removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
-         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.pastWorkItems.size());
+         final int sizeBefore = model.getPastWorkItems().size();
+         model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
+         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
       model.activeWorkItem.set(work);
    }
@@ -80,20 +94,20 @@ public class Controller {
    public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
          final int index) {
       final Project project = new Project(projectName, projectColor, isWork, index, false);
-      model.allProjects.add(project);
-      model.availableProjects.add(project);
+      model.getAllProjects().add(project);
+      model.getAvailableProjects().add(project);
 
-      final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, project,
-            model.availableProjects.size(), index);
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), project,
+            model.getAvailableProjects().size(), index);
       changedProjects.add(project);
-      model.projectRepository.saveAll(changedProjects);
+      model.getProjectRepository().saveAll(changedProjects);
    }
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
          final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit) {
       // TODO create holder for all the properties (or reuse Settings.class?)
-      final Settings settings = model.settingsRepository.findAll().get(0);
+      final Settings settings = model.getSettingsRepository().findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
 
       settings.setDefaultBackgroundColor(defaultBackgroundColor);
@@ -105,7 +119,7 @@ public class Controller {
       settings.setDisplayProjectsRight(displayProjectsRight);
       settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
 
-      model.settingsRepository.save(settings);
+      model.getSettingsRepository().save(settings);
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
@@ -120,7 +134,7 @@ public class Controller {
    @PreDestroy
    public void shutdown() {
       LOG.info("Controller shutdown");
-      changeProject(model.idleProject, 0);
+      changeProject(model.getIdleProject(), 0);
    }
 
    public void deleteProject(final Project p) {
@@ -129,16 +143,19 @@ public class Controller {
          return;
       }
       LOG.info("Disabeling project '{}'.", p);
+
       final int indexToRemove = p.getIndex();
-      p.setEnabled(false); // we don't delete it because of the referenced work items
+      p.setEnabled(false); // we don't delete it because of the referenced work
+                           // items
       p.setIndex(-1);
 
-      model.availableProjects.remove(p);
+      model.getAvailableProjects().remove(p);
 
-      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(model.availableProjects, indexToRemove);
+      final List<Project> changedProjects = adaptProjectIndexesAfterRemoving(model.getAvailableProjects(),
+            indexToRemove);
 
       changedProjects.add(p);
-      model.projectRepository.saveAll(changedProjects);
+      model.getProjectRepository().saveAll(changedProjects);
    }
 
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
@@ -151,11 +168,11 @@ public class Controller {
       final int oldIndex = p.getIndex();
       p.setIndex(newIndex);
 
-      final List<Project> changedProjects = resortProjectIndexes(model.availableProjects, p, oldIndex, newIndex);
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), p, oldIndex, newIndex);
       changedProjects.add(p);
 
       // save all projects which changed index
-      model.projectRepository.saveAll(changedProjects);
+      model.getProjectRepository().saveAll(changedProjects);
    }
 
    /**
@@ -187,12 +204,8 @@ public class Controller {
       for (int i = 0; i < originalList.size(); i++) {
          final Project project = originalList.get(i);
          final int currentIndex = project.getIndex();
-         if (currentIndex < smallerIndex || currentIndex > biggerIndex) {
-            // index is not affected by change
-            continue;
-         }
-
-         if (project == changedProject) {
+         if ((currentIndex < smallerIndex || currentIndex > biggerIndex) || project == changedProject) {
+            // index is not affected by change or
             // this one is already at the right/wanted index
             continue;
          }
@@ -239,33 +252,41 @@ public class Controller {
     * Calculate todays seconds counted as work
     */
    public long calcTodaysWorkSeconds() {
+      final List<Work> workItems = new ArrayList<>();
 
-      return model.pastWorkItems.stream().filter((work) -> {
+      for (final Work work : model.getPastWorkItems()) {
          final Project project = work.getProject();
-         // find up to date reference to project
-         final Optional<Project> optionalProject = model.allProjects.stream().filter(p -> {
-            return p.getId() == project.getId();
-         }).findAny();
-         if (optionalProject.isPresent()) {
-            return optionalProject.get().isWork();
+         for (final Project p : model.getAllProjects()) {
+            if (p.getId() == project.getId()) {
+               if (p.isWork()) {
+                  workItems.add(work);
+               }
+               break;
+            }
          }
-         // TODO should not happen
-         return false;
-      }).mapToLong((work) -> {
-         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-      }).sum();
+      }
+
+      return calcSeconds(workItems);
    }
 
    /**
     * Calculate todays present seconds (work+nonWork)
     */
    public long calcTodaysSeconds() {
-      return model.pastWorkItems.stream().mapToLong((work) -> {
-         return Duration.between(work.getStartTime(), work.getEndTime()).getSeconds();
-      }).sum();
+      return calcSeconds(model.getPastWorkItems());
    }
 
    public ObservableList<Project> getAvailableProjects() {
-      return this.model.availableProjects;
+      return model.getAvailableProjects();
+   }
+
+   public long calcSeconds(final List<Work> workItems) {
+      long seconds = 0;
+
+      for (final Work w : workItems) {
+         seconds += Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
+      }
+
+      return seconds;
    }
 }

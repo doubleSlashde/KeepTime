@@ -1,3 +1,19 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package de.doubleslash.keeptime;
 
 import java.io.IOException;
@@ -14,6 +30,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -22,8 +39,8 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.ViewController;
-import de.doubleslash.keeptime.viewPopup.GlobalScreenListener;
-import de.doubleslash.keeptime.viewPopup.ViewControllerPopup;
+import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
+import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -46,7 +63,7 @@ public class Main extends Application {
 
    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-   public static final String VERSION = "v1.0.0";
+   public static final String VERSION = "v1.1.0";
 
    private ConfigurableApplicationContext springContext;
 
@@ -75,7 +92,7 @@ public class Main extends Application {
    public void start(final Stage primaryStage) {
       LOG.info("Initialising the UI");
       try {
-         initUI(primaryStage);
+         initialiseApplication(primaryStage);
          LOG.info("UI successfully initialised.");
       } catch (final Exception e) {
          LOG.error("There was an error while initialising the UI", e);
@@ -112,35 +129,35 @@ public class Main extends Application {
       }
    }
 
-   private void initUI(final Stage primaryStage) throws Exception {
-
+   private void initialiseApplication(final Stage primaryStage) throws Exception {
+      FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.workRepository.findByCreationDate(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
-      model.pastWorkItems.addAll(todaysWorkItems);
+      model.getPastWorkItems().addAll(todaysWorkItems);
 
-      final List<Project> projects = model.projectRepository.findAll();
+      final List<Project> projects = model.getProjectRepository().findAll();
 
       LOG.debug("Found '{}' projects", projects.size());
       if (projects.isEmpty()) {
          LOG.info("Adding default project");
-         projects.add(model.DEFAULT_PROJECT);
-         model.projectRepository.save(model.DEFAULT_PROJECT);
+         projects.add(Model.DEFAULT_PROJECT);
+         model.getProjectRepository().save(Model.DEFAULT_PROJECT);
       }
 
-      model.allProjects.addAll(projects);
-      model.availableProjects
-            .addAll(model.allProjects.stream().filter(Project::isEnabled).collect(Collectors.toList()));
+      model.getAllProjects().addAll(projects);
+      model.getAvailableProjects()
+            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();
       if (findAny.isPresent()) {
-         model.idleProject = findAny.get();
-         LOG.debug("Using project '{}' as default project.", model.idleProject);
+         model.setIdleProject(findAny.get());
+         LOG.debug("Using project '{}' as default project.", model.getIdleProject());
       }
 
-      primaryStage.setOnHiding((we) -> {
+      primaryStage.setOnHiding(we -> {
          popupViewStage.close();
          globalScreenListener.shutdown(); // deregister, as this will keep app running
       });
@@ -152,21 +169,21 @@ public class Main extends Application {
    private void readSettings() {
       LOG.debug("Reading configuration");
 
-      final List<Settings> settingsList = model.settingsRepository.findAll();
+      final List<Settings> settingsList = model.getSettingsRepository().findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
          settings = new Settings();
          settings.setTaskBarColor(model.taskBarColor.get());
 
-         settings.setDefaultBackgroundColor(model.defaultBackgroundColor.get());
-         settings.setDefaultFontColor(model.defaultFontColor.get());
+         settings.setDefaultBackgroundColor(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
+         settings.setDefaultFontColor(Model.ORIGINAL_DEFAULT_FONT_COLOR);
 
-         settings.setHoverBackgroundColor(model.hoverBackgroundColor.get());
-         settings.setHoverFontColor(model.hoverFontColor.get());
+         settings.setHoverBackgroundColor(Model.ORIGINAL_HOVER_BACKGROUND_COLOR);
+         settings.setHoverFontColor(Model.ORIGINAL_HOVER_Font_COLOR);
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
-         settings.setHideProjectsOnMouseExit(true);
-         model.settingsRepository.save(settings);
+         settings.setHideProjectsOnMouseExit(false);
+         model.getSettingsRepository().save(settings);
       } else {
          settings = settingsList.get(0);
       }
@@ -185,10 +202,8 @@ public class Main extends Application {
       LOG.debug("Initialising popup UI.");
 
       globalScreenListener = new GlobalScreenListener();
-      // stop and close stage when main stage is shutdown
-      model.useHotkey.addListener((a, b, newValue) -> {
-         globalScreenListener.register(newValue);
-      });
+
+      model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
       globalScreenListener.register(model.useHotkey.get());
 
       popupViewStage = new Stage();
@@ -206,8 +221,8 @@ public class Main extends Application {
       // Give the controller access to the main app.
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
-      viewControllerPopupController.setStage(popupViewStage, popupScene);
-      viewControllerPopupController.setController(controller, model);
+      viewControllerPopupController.setStage(popupViewStage);
+      viewControllerPopupController.setControllerAndModel(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
    }
 
@@ -237,13 +252,12 @@ public class Main extends Application {
             LOG.info("On close request");
          }
       });
-
+      primaryStage.show();
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
       viewController.setController(controller, model);
 
-      primaryStage.show();
    }
 
    @Override

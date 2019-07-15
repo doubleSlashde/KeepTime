@@ -1,7 +1,22 @@
-package de.doubleslash.keeptime.viewPopup;
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+package de.doubleslash.keeptime.viewpopup;
 
 import java.awt.Point;
-import java.io.IOException;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -12,19 +27,15 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 public class ViewControllerPopup {
 
@@ -42,9 +53,8 @@ public class ViewControllerPopup {
 
    private Stage stage;
 
-   private Scene scene;
-
    private Controller controller;
+
    private Model model;
 
    private FilteredList<Project> filteredData;
@@ -71,88 +81,65 @@ public class ViewControllerPopup {
    }
 
    @FXML
-   private void initialize() throws IOException {
+   private void initialize() {
 
       // TODO the cells do not refresh, if a project was changed
-      projectListView.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
-         @Override
-         public ListCell<Project> call(final ListView<Project> list) {
-            return new ListCell<Project>() {
-               @Override
-               protected void updateItem(final Project project, final boolean empty) {
-                  super.updateItem(project, empty);
-
-                  if (project == null || empty) {
-                     setText(null);
-                  } else {
-                     setOnMouseClicked((ev) -> {
-                        changeProject(project);
-                     });
-                     final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
-                     setText((isActiveProject ? "* " : "") + project.getName());
-                     setTextFill(project.getColor());
-                     setUnderline(project.isWork());
-                  }
-               }
-
-            };
-         }
-      });
+      projectListView.setCellFactory(cb -> returnListCellOfProject());
 
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      final Consumer<Double> updateSize = (height) -> {
-         LOG.debug("update size {}.", height);
-         projectListView.setPrefHeight(height);
-         stage.sizeToScene(); // also update scene size
+      final Consumer<Double> updateSize = height -> {
+         if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("%s%f", "update size ", height));
+            projectListView.setPrefHeight(height);
+            stage.sizeToScene(); // also update scene size
+         }
       };
 
       searchTextField.textProperty().addListener((a, b, newValue) -> {
          // TODO do i always have to create a new predicate?
          filteredData.setPredicate(project -> {
             // If filter text is empty, display all persons.
+            boolean returnValue = false;
             if (newValue == null || newValue.isEmpty()) {
-               return true;
+               returnValue = true;
             }
 
             final String lowerCaseFilter = newValue.toLowerCase();
 
             if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               return true; // Filter matches first name.
+               returnValue = true; // Filter matches first name.
             }
 
-            return false; // Does not match.
+            return returnValue; // Does not match.
          });
 
          projectListView.getSelectionModel().selectFirst();
          updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
       });
 
-      searchTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-         @Override
-         public void handle(final KeyEvent event) {
-            final MultipleSelectionModel<Project> selectionModel = projectListView.getSelectionModel();
-            final int selectedIndex = selectionModel.getSelectedIndex();
-            switch (event.getCode()) {
-            case UP:
-               selectionModel.select(selectedIndex - 1);
-               event.consume();
-               break;
-            case DOWN:
-               selectionModel.select(selectedIndex + 1);
-               event.consume();
-               break;
-            case ESCAPE:
-               hide();
-               break;
-            default:
-               break;
+      searchTextField.setOnKeyPressed(eh -> {
+         final MultipleSelectionModel<Project> selectionModel = projectListView.getSelectionModel();
+         final int selectedIndex = selectionModel.getSelectedIndex();
+         switch (eh.getCode()) {
+         case UP:
+            selectionModel.select(selectedIndex - 1);
+            eh.consume();
+            break;
+         case DOWN:
+            selectionModel.select(selectedIndex + 1);
+            eh.consume();
+            break;
+         case ESCAPE:
+            hide();
+            break;
+         default:
+            break;
 
-            }
          }
       });
       // enter pressed in textfield
-      searchTextField.setOnAction((ev) -> {
+      searchTextField.setOnAction(ev -> {
          final Project selectedItem = projectListView.getSelectionModel().getSelectedItem();
          if (selectedItem != null) {
             changeProject(selectedItem);
@@ -164,17 +151,41 @@ public class ViewControllerPopup {
 
    }
 
-   public void setController(final Controller controller, final Model model) {
+   public ListCell<Project> returnListCellOfProject() {
+
+      return new ListCell<Project>() {
+
+         @Override
+         protected void updateItem(final Project project, final boolean empty) {
+            super.updateItem(project, empty);
+
+            if (project == null || empty) {
+               setText(null);
+
+            } else {
+               setOnMouseClicked(ev -> changeProject(project));
+
+               final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
+               setText((isActiveProject ? "* " : "") + project.getName());
+               setTextFill(project.getColor());
+               setUnderline(project.isWork());
+            }
+         }
+
+      };
+
+   }
+
+   public void setControllerAndModel(final Controller controller, final Model model) {
       this.controller = controller;
       this.model = model;
 
-      filteredData = new FilteredList<>(model.sortedAvailableProjects, p -> true);
+      filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
       projectListView.setItems(filteredData);
    }
 
-   public void setStage(final Stage primaryStage, final Scene scene) {
+   public void setStage(final Stage primaryStage) {
       this.stage = primaryStage;
-      this.scene = scene;
 
       // if we loose focus, hide the stage
       stage.focusedProperty().addListener((a, b, newValue) -> {
