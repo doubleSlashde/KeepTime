@@ -120,7 +120,7 @@
         </executions>
       </plugin>
 
-      <!-- see https://jeremylong.github.io/DependencyCheck/summary.html -->
+      <!-- see https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
       <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
       <plugin>
         <groupId>org.owasp</groupId>
@@ -136,7 +136,7 @@
         <executions>
           <execution>
             <goals>
-              <goal>check</goal>
+              <goal>update-only</goal>
             </goals>
           </execution>
         </executions>
