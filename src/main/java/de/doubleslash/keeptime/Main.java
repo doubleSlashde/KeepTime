@@ -221,6 +221,7 @@ public class Main extends Application {
       // Give the controller access to the main app.
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
+      viewControllerPopupController.setMainStage(primaryStage);
       viewControllerPopupController.setStage(popupViewStage);
       viewControllerPopupController.setControllerAndModel(controller, model);
       globalScreenListener.setViewController(viewControllerPopupController);
