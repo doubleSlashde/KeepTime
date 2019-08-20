@@ -62,6 +62,8 @@ public class ViewControllerPopup {
    private void changeProject(final Project item) {
       LOG.info("Change project to '{}'.", item.getName());
 
+      final Stage primaryStage = (Stage) stage.getOwner();
+
       // ask for a note for the current project
       final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
       dialog.setTitle("Note for current project");
@@ -69,9 +71,11 @@ public class ViewControllerPopup {
             "Add a note for '" + model.activeWorkItem.get().getProject().getName() + "' before changing project?");
       dialog.setContentText("Note: ");
 
+      primaryStage.setAlwaysOnTop(false);
       this.stage.setAlwaysOnTop(false);
       final Optional<String> result = dialog.showAndWait();
       this.stage.setAlwaysOnTop(true);
+      primaryStage.setAlwaysOnTop(true);
 
       result.ifPresent(note -> {
          controller.setComment(note);
