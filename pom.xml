@@ -37,7 +37,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <maven-dependency-check.version>5.1.0</maven-dependency-check.version>
+    <maven-dependency-check.version>5.2.1</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -70,6 +70,7 @@
       <artifactId>flyway-core</artifactId>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
     <dependency>
       <groupId>com.1stleg</groupId>
       <artifactId>jnativehook</artifactId>
