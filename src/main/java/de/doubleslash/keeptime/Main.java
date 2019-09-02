@@ -50,6 +50,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -238,6 +242,16 @@ public class Main extends Application {
       primaryStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
+
+      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         LOG.debug("Key was Pressed '{}'", keyEvent.getCode());
+         if (keyComb.match(keyEvent)) {
+            LOG.info("'{}' and '{}' were pressed: iconify window", KeyCode.META, KeyCode.DOWN);
+            primaryStage.setIconified(true);
+            keyEvent.consume();
+         }
+      });
 
       // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
 
