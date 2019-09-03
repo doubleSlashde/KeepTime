@@ -535,6 +535,7 @@ public class ViewController {
          final MouseButton button = a.getButton();
          if (button == MouseButton.PRIMARY) {
             changeProject(p, 0);
+            textArea.requestFocus();
          }
 
       });
@@ -796,5 +797,4 @@ public class ViewController {
          realignProjectList();
       });
    }
-
 }
