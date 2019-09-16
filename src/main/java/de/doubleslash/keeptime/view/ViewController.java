@@ -218,7 +218,6 @@ public class ViewController {
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
-      switchProjectButton.textFillProperty().bind(fontColorProperty);
 
       // Add a light to colorize buttons
       // TODO is there a nicer way for this? (see #12)
