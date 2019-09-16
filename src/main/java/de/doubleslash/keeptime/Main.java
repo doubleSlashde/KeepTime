@@ -243,16 +243,8 @@ public class Main extends Application {
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
-      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.META_DOWN);
-      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
-         LOG.debug("Key was Pressed '{}'", keyEvent.getCode());
-         if (keyComb.match(keyEvent)) {
-            LOG.info("'{}' and '{}' were pressed: iconify window", KeyCode.META, KeyCode.DOWN);
-            primaryStage.setIconified(true);
-            keyEvent.consume();
-         }
-      });
-
+      registerMinifyEventlistener(mainScene, primaryStage);
+      registerMaximizeEventlistener(mainScene, primaryStage);
       // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
 
       primaryStage.setTitle("KeepTime");
@@ -272,6 +264,31 @@ public class Main extends Application {
       viewController.setStage(primaryStage);
       viewController.setController(controller, model);
 
+   }
+
+   private void registerMinifyEventlistener(final Scene mainScene, final Stage primaryStage) {
+      final KeyCode down = KeyCode.DOWN;
+      final KeyCombination keyComb = new KeyCodeCombination(down, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         LOG.info("Key was Pressed '{}'", keyEvent.getCode());
+         if (keyComb.match(keyEvent)) {
+            LOG.info("'{}' and '{}' were pressed: iconify window", KeyCode.META, down);
+            primaryStage.setIconified(true);
+            keyEvent.consume();
+         }
+      });
+   }
+
+   private void registerMaximizeEventlistener(final Scene mainScene, final Stage primaryStage) {
+      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.UP, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         LOG.info("Key was Pressed '{}'", keyEvent.getCode());
+         if (keyComb.match(keyEvent)) {
+            LOG.info("'{}' and '{}' were pressed: Miximizing window...", KeyCode.META, KeyCode.UP);
+            primaryStage.setIconified(false);
+            keyEvent.consume();
+         }
+      });
    }
 
    @Override
