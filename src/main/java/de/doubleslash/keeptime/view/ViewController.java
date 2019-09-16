@@ -41,7 +41,6 @@ import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.view.time.Interval;
-import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -95,7 +94,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 @Component
 public class ViewController {
@@ -133,9 +131,6 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
-
-   @FXML
-   private Button switchProjectButton;
 
    @FXML
    private TextArea textArea;
@@ -348,38 +343,6 @@ public class ViewController {
       });
 
       mainColorTimeLine = new ColorTimeLine(canvas);
-
-      switchProjectButton.setOnAction(actionEvent -> {
-         try {
-            initialisePopupUI(mainStage);
-         } catch (final IOException e) {
-            LOG.error("Could not load popup", e);
-         }
-      });
-   }
-
-   private void initialisePopupUI(final Stage primaryStage) throws IOException {
-      LOG.debug("Initialising popup UI.");
-
-      final Stage popupStage = new Stage();
-      popupStage.initOwner(primaryStage);
-      // Load root layout from fxml file.
-      final FXMLLoader loader = new FXMLLoader();
-      loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_POPUP_LAYOUT));
-      final Parent popupLayout = loader.load();
-      popupStage.initStyle(StageStyle.TRANSPARENT);
-      // Show the scene containing the root layout.
-      final Scene popupScene = new Scene(popupLayout, Color.TRANSPARENT);
-
-      popupStage.setResizable(false);
-      popupStage.setScene(popupScene);
-      // Give the controller access to the main app.
-      popupStage.setAlwaysOnTop(true);
-      final ViewControllerPopup viewControllerPopupController = loader.getController();
-      viewControllerPopupController.setStage(popupStage);
-      viewControllerPopupController.setControllerAndModel(controller, model);
-
-      popupStage.show();
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
