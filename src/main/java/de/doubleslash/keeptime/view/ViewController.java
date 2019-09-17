@@ -71,6 +71,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
@@ -105,7 +106,7 @@ public class ViewController {
    private BorderPane borderPane;
 
    @FXML
-   private VBox availableProjectVbox;
+   private ListView<Node> availableProjectsListView;
 
    @FXML
    private VBox projectsVBox;
@@ -127,6 +128,8 @@ public class ViewController {
 
    @FXML
    private Button addNewProjectButton;
+   @FXML
+   private TextField searchTextField;
    @FXML
    private Button settingsButton;
    @FXML
@@ -405,7 +408,7 @@ public class ViewController {
                   changeProject(model.getIdleProject(), 0);
                }
                final Node remove = projectSelectionNodeMap.remove(project);
-               availableProjectVbox.getChildren().remove(remove);
+               availableProjectsListView.getItems().remove(remove);
             }
          }
       }
@@ -550,7 +553,8 @@ public class ViewController {
          projectNameLabel.setEffect(null);
       });
 
-      availableProjectVbox.getChildren().add(projectElement);
+      // TODO: ListView initialization
+      availableProjectsListView.getItems().add(projectElement);
 
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
@@ -710,7 +714,7 @@ public class ViewController {
 
    private void realignProjectList() {
       LOG.debug("Sorting project view");
-      final ObservableList<Node> children = availableProjectVbox.getChildren();
+      final ObservableList<Node> children = availableProjectsListView.getItems();
       children.clear();
       // TODO changing the model is not ok from here, but the list is not resorted
       final Comparator<? super Project> comparator = model.getSortedAvailableProjects().getComparator();
