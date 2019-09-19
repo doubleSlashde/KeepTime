@@ -2,6 +2,7 @@ package de.doubleslash.keeptime.view;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,7 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -33,6 +35,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Spinner;
@@ -54,15 +57,21 @@ public class ProjectsListViewController {
    private final Stage mainStage;
    private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
 
-   private final ListView<Node> availableProjectsListView;
+   private final ListView<Project> availableProjectsListView;
    private final Map<Project, Node> projectSelectionNodeMap;
 
+   private final FilteredList<Project> filteredData;
+
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
-         final ListView<Node> availableProjectsListView) {
+         final ListView<Project> availableProjectsListView) {
       this.model = model;
       this.controller = controller;
       this.mainStage = mainStage;
       this.availableProjectsListView = availableProjectsListView;
+      availableProjectsListView.setCellFactory(callback -> returnListCellOfProject());
+
+      filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
+      availableProjectsListView.setItems(filteredData);
 
       projectSelectionNodeMap = new HashMap<>(model.getAvailableProjects().size());
 
@@ -119,7 +128,7 @@ public class ProjectsListViewController {
 
    private void realignProjectList() {
       LOG.debug("Sorting project view");
-      final ObservableList<Node> children = availableProjectsListView.getItems();
+      final Collection<Node> children = projectSelectionNodeMap.values();
       children.clear();
       // TODO changing the model is not ok from here, but the list is not resorted
       final Comparator<? super Project> comparator = model.getSortedAvailableProjects().getComparator();
@@ -182,7 +191,7 @@ public class ProjectsListViewController {
          projectNameLabel.setEffect(null);
       });
 
-      availableProjectsListView.getItems().add(projectElement);
+      availableProjectsListView.getItems().add(p);
 
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
@@ -270,8 +279,8 @@ public class ProjectsListViewController {
                if (project == model.activeWorkItem.get().getProject()) {
                   changeProject(model.getIdleProject(), 0);
                }
-               final Node remove = projectSelectionNodeMap.remove(project);
-               availableProjectsListView.getItems().remove(remove);
+               projectSelectionNodeMap.remove(project);
+               availableProjectsListView.getItems().remove(project);
             }
          }
       }
@@ -315,6 +324,22 @@ public class ProjectsListViewController {
                .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
          label.setText(DateFormatter.secondsToHHMMSS(seconds));
       }
+   }
+
+   public ListCell<Project> returnListCellOfProject() {
+      return new ListCell<Project>() {
+
+         @Override
+         protected void updateItem(final Project item, final boolean empty) {
+            setText(null);
+            if (item == null || empty) {
+               setGraphic(null);
+            } else {
+               setGraphic(projectSelectionNodeMap.get(item));
+            }
+         }
+
+      };
    }
 
 }

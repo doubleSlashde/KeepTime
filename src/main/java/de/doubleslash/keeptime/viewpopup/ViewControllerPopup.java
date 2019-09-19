@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.view.ProjectsListViewController;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
@@ -56,6 +57,73 @@ public class ViewControllerPopup {
    private Controller controller;
 
    private Model model;
+
+   private ProjectsListViewController projectsListViewController;
+
+   public void secondInitialize() {
+      // projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView);
+   }
+
+   public ListCell<Project> returnListCellOfProject() {
+
+      return new ListCell<Project>() {
+
+         @Override
+         protected void updateItem(final Project project, final boolean empty) {
+            super.updateItem(project, empty);
+
+            if (project == null || empty) {
+               setText(null);
+
+            } else {
+               setOnMouseClicked(ev -> changeProject(project));
+
+               final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
+               setText((isActiveProject ? "* " : "") + project.getName());
+               setTextFill(project.getColor());
+               setUnderline(project.isWork());
+            }
+         }
+
+      };
+
+   }
+
+   public void setControllerAndModel(final Controller controller, final Model model) {
+      this.controller = controller;
+      this.model = model;
+
+      filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
+      projectListView.setItems(filteredData);
+   }
+
+   public void setStage(final Stage primaryStage) {
+      this.stage = primaryStage;
+
+      // if we loose focus, hide the stage
+      stage.focusedProperty().addListener((a, b, newValue) -> {
+         if (!newValue) {
+            hide();
+         }
+      });
+   }
+
+   public void show(final Point mouseLocation) {
+      if (!stage.isShowing()) {
+         LOG.info("Showing popup");
+         projectListView.getSelectionModel().select(0);
+         projectListView.refresh();
+
+         searchTextField.setText("a"); // trigger to update list size
+         searchTextField.setText("");
+
+         stage.setX(mouseLocation.getX() - 2);
+         stage.setY(mouseLocation.getY() - 2);
+         stage.show();
+         stage.requestFocus();
+         searchTextField.requestFocus();
+      }
+   }
 
    private FilteredList<Project> filteredData;
 
@@ -138,6 +206,7 @@ public class ViewControllerPopup {
 
          }
       });
+
       // enter pressed in textfield
       searchTextField.setOnAction(ev -> {
          final Project selectedItem = projectListView.getSelectionModel().getSelectedItem();
@@ -149,67 +218,6 @@ public class ViewControllerPopup {
       projectListView.getSelectionModel().selectFirst();
       projectListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-   }
-
-   public ListCell<Project> returnListCellOfProject() {
-
-      return new ListCell<Project>() {
-
-         @Override
-         protected void updateItem(final Project project, final boolean empty) {
-            super.updateItem(project, empty);
-
-            if (project == null || empty) {
-               setText(null);
-
-            } else {
-               setOnMouseClicked(ev -> changeProject(project));
-
-               final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
-               setText((isActiveProject ? "* " : "") + project.getName());
-               setTextFill(project.getColor());
-               setUnderline(project.isWork());
-            }
-         }
-
-      };
-
-   }
-
-   public void setControllerAndModel(final Controller controller, final Model model) {
-      this.controller = controller;
-      this.model = model;
-
-      filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
-      projectListView.setItems(filteredData);
-   }
-
-   public void setStage(final Stage primaryStage) {
-      this.stage = primaryStage;
-
-      // if we loose focus, hide the stage
-      stage.focusedProperty().addListener((a, b, newValue) -> {
-         if (!newValue) {
-            hide();
-         }
-      });
-   }
-
-   public void show(final Point mouseLocation) {
-      if (!stage.isShowing()) {
-         LOG.info("Showing popup");
-         projectListView.getSelectionModel().select(0);
-         projectListView.refresh();
-
-         searchTextField.setText("a"); // trigger to update list size
-         searchTextField.setText("");
-
-         stage.setX(mouseLocation.getX() - 2);
-         stage.setY(mouseLocation.getY() - 2);
-         stage.show();
-         stage.requestFocus();
-         searchTextField.requestFocus();
-      }
    }
 
    private void hide() {

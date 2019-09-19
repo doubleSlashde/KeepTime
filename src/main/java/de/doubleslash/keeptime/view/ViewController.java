@@ -111,7 +111,7 @@ public class ViewController {
    private BorderPane borderPane;
 
    @FXML
-   private ListView<Node> availableProjectsListView;
+   private ListView<Project> availableProjectsListView;
 
    @FXML
    private VBox projectsVBox;
@@ -177,9 +177,9 @@ public class ViewController {
       this.mainStage = primaryStage;
    }
 
-   public void setProjectsListViewController(final ProjectsListViewController projectsListViewController) {
-      this.projectsListViewController = projectsListViewController;
-   }
+   // public void setProjectsListViewController(final ProjectsListViewController projectsListViewController) {
+   // this.projectsListViewController = projectsListViewController;
+   // }
 
    private Stage reportStage;
    private ReportController reportController;
@@ -255,7 +255,6 @@ public class ViewController {
             } else {
                borderPane.setRight(null);
                borderPane.setLeft(projectsVBox);
-
             }
          };
          model.displayProjectsRight.addListener((a, oldValue, newValue) -> displayProjectRightRunnable.run());
@@ -287,7 +286,6 @@ public class ViewController {
       // Drag stage
       pane.setOnMousePressed(mouseEvent -> {
 
-         System.out.println("setOnMousePressed");
          // record a delta distance for the drag and drop operation.
          dragDelta.x = mainStage.getX() - mouseEvent.getScreenX();
          dragDelta.y = mainStage.getY() - mouseEvent.getScreenY();

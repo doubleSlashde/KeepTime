@@ -82,5 +82,5 @@
 
 .list-view .scroll-bar:vertical .increment-button:hover,
 .list-view .scroll-bar:vertical .decrement-button:hover {
-	-fx-background-color: trnasparent;
+	-fx-background-color: transparent;
 }
