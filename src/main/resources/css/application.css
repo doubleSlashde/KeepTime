@@ -57,3 +57,30 @@
 .list-view .scroll-bar:horizontal .decrement-button {
     -fx-padding:0;
 }
+
+.list-cell {
+    -fx-background-color: transparent;
+}
+
+.list-cell:selected {
+	-fx-background-color: darkmagenta;
+}
+
+.list-view {
+    -fx-background-color: transparent;
+}
+
+.list-view .scroll-bar:vertical {
+	-fx-background-color: transparent;
+}
+
+.list-view .scroll-bar:vertical .thumb,
+.list-view .scroll-bar:vertical .increment-arrow,
+.list-view .scroll-bar:vertical .decrement-arrow {
+	-fx-opacity: 0.2;
+}
+
+.list-view .scroll-bar:vertical .increment-button:hover,
+.list-view .scroll-bar:vertical .decrement-button:hover {
+	-fx-background-color: trnasparent;
+}

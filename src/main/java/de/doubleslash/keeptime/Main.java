@@ -257,6 +257,7 @@ public class Main extends Application {
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
       viewController.setController(controller, model);
+      viewController.secondInitialize();
 
    }
 
