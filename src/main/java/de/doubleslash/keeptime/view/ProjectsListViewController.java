@@ -2,13 +2,13 @@ package de.doubleslash.keeptime.view;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +38,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextField;
@@ -56,18 +57,18 @@ public class ProjectsListViewController {
    private final Controller controller;
    private final Stage mainStage;
    private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
-
    private final ListView<Project> availableProjectsListView;
    private final Map<Project, Node> projectSelectionNodeMap;
-
    private final FilteredList<Project> filteredData;
+   private final TextField searchTextField;
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
-         final ListView<Project> availableProjectsListView) {
+         final ListView<Project> availableProjectsListView, final TextField searchTextField) {
       this.model = model;
       this.controller = controller;
       this.mainStage = mainStage;
       this.availableProjectsListView = availableProjectsListView;
+      this.searchTextField = searchTextField;
       availableProjectsListView.setCellFactory(callback -> returnListCellOfProject());
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
@@ -81,6 +82,67 @@ public class ProjectsListViewController {
             projectSelectionNodeMap.put(project, node);
          }
       }
+
+      // TODO why is there no nice way for listview height?
+      // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
+      final Consumer<Double> updateSize = height -> {
+         if (LOG.isDebugEnabled()) {
+            LOG.debug(String.format("%s%f", "update size ", height));
+            availableProjectsListView.setPrefHeight(height);
+            mainStage.sizeToScene(); // also update scene size
+         }
+      };
+
+      searchTextField.textProperty().addListener((a, b, newValue) -> {
+         LOG.info("New filter value: " + newValue);
+         // TODO do i always have to create a new predicate?
+         filteredData.setPredicate(project -> {
+            // If filter text is empty, display all persons.
+            boolean returnValue = false;
+            if (newValue == null || newValue.isEmpty()) {
+               returnValue = true;
+            }
+
+            final String lowerCaseFilter = newValue.toLowerCase();
+
+            if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
+               returnValue = true; // Filter matches first name.
+            }
+
+            return returnValue; // Does not match.
+         });
+         LOG.info("Projects to show '{}'.", filteredData.size());
+      });
+
+      searchTextField.setOnKeyPressed(eh -> {
+         final MultipleSelectionModel<Project> selectionModel = availableProjectsListView.getSelectionModel();
+         final int selectedIndex = selectionModel.getSelectedIndex();
+         switch (eh.getCode()) {
+         case UP:
+            LOG.debug("Arrow up pressed.");
+            selectionModel.select(selectedIndex - 1);
+            eh.consume();
+            break;
+         case DOWN:
+            LOG.debug("Arrow down pressed.");
+            selectionModel.select(selectedIndex + 1);
+            eh.consume();
+            break;
+         default:
+            break;
+         }
+         LOG.debug("Selected list item index '{}'.", selectionModel.getSelectedIndex());
+      });
+
+      // enter pressed in textfield
+      searchTextField.setOnAction(ev -> {
+         final Project selectedItem = availableProjectsListView.getSelectionModel().getSelectedItem();
+         if (selectedItem != null) {
+            changeProject(selectedItem, 0);
+         }
+      });
+
+      availableProjectsListView.getSelectionModel().selectFirst();
 
       model.getAvailableProjects().addListener(this::handleAvailableProjectsListChange);
    }
@@ -128,15 +190,10 @@ public class ProjectsListViewController {
 
    private void realignProjectList() {
       LOG.debug("Sorting project view");
-      final Collection<Node> children = projectSelectionNodeMap.values();
-      children.clear();
       // TODO changing the model is not ok from here, but the list is not resorted
       final Comparator<? super Project> comparator = model.getSortedAvailableProjects().getComparator();
       model.getSortedAvailableProjects().setComparator(null); // TODO is there a better way?
       model.getSortedAvailableProjects().setComparator(comparator);
-      for (final Project p : model.getSortedAvailableProjects()) {
-         children.add(projectSelectionNodeMap.get(p));
-      }
    }
 
    private Node addProjectToProjectList(final Project p) {
@@ -190,8 +247,6 @@ public class ProjectsListViewController {
                p.getColor().getBlue() * dimFactor, 1));
          projectNameLabel.setEffect(null);
       });
-
-      availableProjectsListView.getItems().add(p);
 
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
@@ -331,10 +386,14 @@ public class ProjectsListViewController {
 
          @Override
          protected void updateItem(final Project item, final boolean empty) {
-            setText(null);
+            super.updateItem(item, empty);
+
+            setText("");
             if (item == null || empty) {
+               LOG.error("EMPTY");
                setGraphic(null);
             } else {
+               LOG.trace("Item: '{}' -> '{}'", item.getName(), projectSelectionNodeMap.get(item));
                setGraphic(projectSelectionNodeMap.get(item));
             }
          }

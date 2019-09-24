@@ -86,6 +86,9 @@ import javafx.stage.Stage;
 
 @Component
 public class ViewController {
+
+   private static final int PREF_HEIGHT_PROJECT_LIST_VIEW = 142;
+
    private class Delta {
       double x;
       double y;
@@ -177,10 +180,6 @@ public class ViewController {
       this.mainStage = primaryStage;
    }
 
-   // public void setProjectsListViewController(final ProjectsListViewController projectsListViewController) {
-   // this.projectsListViewController = projectsListViewController;
-   // }
-
    private Stage reportStage;
    private ReportController reportController;
 
@@ -191,6 +190,14 @@ public class ViewController {
 
    @FXML
    private void initialize() {
+
+      searchTextField.setOnKeyReleased(keyEvent -> {
+         if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            searchTextField.setText("");
+            availableProjectsListView.setPrefHeight(PREF_HEIGHT_PROJECT_LIST_VIEW);
+         }
+      });
+
       availableProjectsListView.setFixedCellSize(13);
 
       setUpTime();
@@ -571,7 +578,7 @@ public class ViewController {
 
    public void secondInitialize() {
       this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
-            availableProjectsListView);
+            availableProjectsListView, searchTextField);
    }
 
 }
