@@ -56,6 +56,7 @@ public class ViewControllerPopup {
    public void secondInitialize() {
       projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
             searchTextField);
+      projectListView.setFixedCellSize(13);
    }
 
    public void setControllerAndModel(final Controller controller, final Model model) {
@@ -97,7 +98,7 @@ public class ViewControllerPopup {
 
       projectListView.getSelectionModel().selectFirst();
 
-      searchTextField.setOnKeyPressed(keyEvent -> {
+      searchTextField.setOnKeyReleased(keyEvent -> {
          if (keyEvent.getCode() == KeyCode.ESCAPE) {
             hide();
          }
