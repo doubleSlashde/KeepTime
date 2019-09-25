@@ -60,15 +60,16 @@ public class ProjectsListViewController {
    private final ListView<Project> availableProjectsListView;
    private final Map<Project, Node> projectSelectionNodeMap;
    private final FilteredList<Project> filteredData;
-   private final TextField searchTextField;
+
+   private boolean hideable;
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
-         final ListView<Project> availableProjectsListView, final TextField searchTextField) {
+         final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
       this.model = model;
       this.controller = controller;
+      this.hideable = hideable;
       this.mainStage = mainStage;
       this.availableProjectsListView = availableProjectsListView;
-      this.searchTextField = searchTextField;
       availableProjectsListView.setCellFactory(callback -> returnListCellOfProject());
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
@@ -128,9 +129,15 @@ public class ProjectsListViewController {
             selectionModel.select(selectedIndex + 1);
             eh.consume();
             break;
+         case ESCAPE:
+            if (hideable) {
+               searchTextField.getScene().getWindow().hide();
+            }
+            break;
          default:
             break;
          }
+         availableProjectsListView.scrollTo(selectionModel.getSelectedIndex());
          LOG.debug("Selected list item index '{}'.", selectionModel.getSelectedIndex());
       });
 
@@ -145,9 +152,14 @@ public class ProjectsListViewController {
       availableProjectsListView.getSelectionModel().selectFirst();
 
       model.getAvailableProjects().addListener(this::handleAvailableProjectsListChange);
+
+      searchTextField.setPromptText("Search");
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
+      if (hideable) {
+         mainStage.hide();
+      }
       controller.changeProject(newProject, minusSeconds);
    }
 

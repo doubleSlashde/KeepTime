@@ -191,13 +191,6 @@ public class ViewController {
    @FXML
    private void initialize() {
 
-      searchTextField.setOnKeyReleased(keyEvent -> {
-         if (keyEvent.getCode() == KeyCode.ESCAPE) {
-            searchTextField.setText("");
-            availableProjectsListView.setPrefHeight(PREF_HEIGHT_PROJECT_LIST_VIEW);
-         }
-      });
-
       availableProjectsListView.setFixedCellSize(13);
 
       setUpTime();
@@ -578,7 +571,7 @@ public class ViewController {
 
    public void secondInitialize() {
       this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
-            availableProjectsListView, searchTextField);
+            availableProjectsListView, searchTextField, false);
    }
 
 }

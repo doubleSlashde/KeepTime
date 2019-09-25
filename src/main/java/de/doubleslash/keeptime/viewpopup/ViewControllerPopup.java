@@ -31,6 +31,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class ViewControllerPopup {
@@ -55,7 +56,7 @@ public class ViewControllerPopup {
 
    public void secondInitialize() {
       projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
-            searchTextField);
+            searchTextField, true);
       projectListView.setFixedCellSize(13);
    }
 
@@ -105,6 +106,8 @@ public class ViewControllerPopup {
       });
 
       Interval.registerCallBack(() -> projectsListViewController.tick());
+
+      final VBox root = (VBox) searchTextField.getParent();
 
    }
 

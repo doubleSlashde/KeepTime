@@ -1,12 +1,19 @@
-.text-area {
+.text-area, .text-field {
 	-fx-text-fill: rgba(1,1,1,.5);
     -fx-background-color: rgba(0,0,0,0);
 	-fx-border-color: rgba(0,0,0,0);
 }
 
-.text-area:hover {
+.text-area:hover, .text-field:hover {
 	-fx-text-fill: rgba(1,1,1,1);
 	-fx-border-color: rgba(54,143,179,.3);
+}
+
+.text-field {
+    -fx-padding: 0px;
+    -fx-border-insets: 0px;
+    -fx-background-insets: 0px;
+    -fx-prompt-text-fill: black;
 }
 
 .text-area .scroll-pane {
@@ -63,7 +70,7 @@
 }
 
 .list-cell:selected {
-	-fx-background-color: darkmagenta;
+	-fx-background-color: rgba(0,0,0,0.2)
 }
 
 .list-view {
