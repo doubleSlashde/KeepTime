@@ -21,6 +21,8 @@ import java.awt.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -30,8 +32,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class ViewControllerPopup {
@@ -39,7 +41,7 @@ public class ViewControllerPopup {
    private static final Logger LOG = LoggerFactory.getLogger(ViewControllerPopup.class);
 
    @FXML
-   private Pane pane;
+   private VBox root;
 
    @FXML
    private TextField searchTextField;
@@ -58,6 +60,11 @@ public class ViewControllerPopup {
       projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
             searchTextField, true);
       projectListView.setFixedCellSize(13);
+
+      final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
+      model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
+
+      updateMainBackgroundColor.run();
    }
 
    public void setControllerAndModel(final Controller controller, final Model model) {
@@ -107,8 +114,6 @@ public class ViewControllerPopup {
 
       Interval.registerCallBack(() -> projectsListViewController.tick());
 
-      final VBox root = (VBox) searchTextField.getParent();
-
    }
 
    private void hide() {
@@ -118,6 +123,16 @@ public class ViewControllerPopup {
 
          stage.hide();
       }
+   }
+
+   private void runUpdateMainBackgroundColor() {
+      final Color color = model.hoverBackgroundColor.get();
+      final double opacity = .3;
+      String style = StyleUtils.changeStyleAttribute(root.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
+            "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+      root.setStyle(style);
    }
 
 }
