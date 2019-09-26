@@ -88,8 +88,6 @@ import javafx.stage.Stage;
 @Component
 public class ViewController {
 
-   private static final int PREF_HEIGHT_PROJECT_LIST_VIEW = 142;
-
    private class Delta {
       double x;
       double y;
