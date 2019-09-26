@@ -146,6 +146,7 @@ public class ProjectsListViewController {
          final Project selectedItem = availableProjectsListView.getSelectionModel().getSelectedItem();
          if (selectedItem != null) {
             changeProject(selectedItem, 0);
+            searchTextField.setText("");
          }
       });
 
