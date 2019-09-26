@@ -403,7 +403,6 @@ public class ProjectsListViewController {
 
             setText("");
             if (item == null || empty) {
-               LOG.error("EMPTY");
                setGraphic(null);
             } else {
                LOG.trace("Item: '{}' -> '{}'", item.getName(), projectSelectionNodeMap.get(item));
