@@ -289,9 +289,4 @@ public class Controller {
 
       return seconds;
    }
-
-   public long getCurrentWorkSeconds() {
-      return Duration.between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-            .getSeconds();
-   }
 }
