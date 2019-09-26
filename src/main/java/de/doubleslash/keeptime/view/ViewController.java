@@ -31,6 +31,7 @@ import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
@@ -155,18 +156,6 @@ public class ViewController {
    private Controller controller;
    private Model model;
 
-   public static String changeStyleAttribute(final String style, final String attribute, final String newValue) {
-      String newStyle = "";
-      final String newStyleAttribute = "-" + attribute + ": " + newValue + "; ";
-      if (style.contains(attribute)) {
-         newStyle = style.replaceAll("-" + attribute + ": " + "[^;]+;", newStyleAttribute);
-      } else {
-         newStyle = style + newStyleAttribute;
-      }
-
-      return newStyle;
-   }
-
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
       this.model = model;
@@ -262,7 +251,7 @@ public class ViewController {
 
          // Setup textarea font color binding
          final Runnable textAreaColorRunnable = () -> {
-            final String textAreaStyle = changeStyleAttribute(textArea.getStyle(), "fx-text-fill",
+            final String textAreaStyle = StyleUtils.changeStyleAttribute(textArea.getStyle(), "fx-text-fill",
                   "rgba(" + ColorHelper.colorToCssRgba(fontColorProperty.get()) + ")");
             textArea.setStyle(textAreaStyle);
          };
@@ -448,9 +437,9 @@ public class ViewController {
          color = model.hoverBackgroundColor.get();
          opacity = .3;
       }
-      String style = changeStyleAttribute(pane.getStyle(), "fx-background-color",
+      String style = StyleUtils.changeStyleAttribute(pane.getStyle(), "fx-background-color",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
-      style = changeStyleAttribute(style, "fx-border-color",
+      style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
             "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
       pane.setStyle(style);
    }
