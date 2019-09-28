@@ -445,16 +445,16 @@ public class ViewController {
       try {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
-         final Parent sceneRoot = fxmlLoader.load();
-         sceneRoot.setFocusTraversable(true);
-         sceneRoot.requestFocus();
+         final Parent root = fxmlLoader.load();
+         root.setFocusTraversable(true);
+         root.requestFocus();
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
          reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
 
-         final Scene reportScene = new Scene(sceneRoot);
+         final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                LOG.info("pressed ESCAPE");
