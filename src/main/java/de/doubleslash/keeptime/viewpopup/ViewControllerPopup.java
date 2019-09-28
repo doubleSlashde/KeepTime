@@ -48,21 +48,17 @@ public class ViewControllerPopup {
 
    @FXML
    private TextField searchTextField;
+
    @FXML
    private ListView<Project> projectListView;
 
    private Stage stage;
-   private Stage mainStage;
 
    private Controller controller;
 
    private Model model;
 
    private FilteredList<Project> filteredData;
-
-   public void setMainStage(final Stage mainStage) {
-      this.mainStage = mainStage;
-   }
 
    private void changeProject(final Project item) {
       LOG.info("Change project to '{}'.", item.getName());
@@ -74,11 +70,10 @@ public class ViewControllerPopup {
             "Add a note for '" + model.activeWorkItem.get().getProject().getName() + "' before changing project?");
       dialog.setContentText("Note: ");
 
-      mainStage.setAlwaysOnTop(false);
-      this.stage.setAlwaysOnTop(true);
+      final Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+      dialogStage.setAlwaysOnTop(true);
+
       final Optional<String> result = dialog.showAndWait();
-      this.stage.setAlwaysOnTop(false);
-      mainStage.setAlwaysOnTop(true);
 
       result.ifPresent(note -> {
          controller.setComment(note);
