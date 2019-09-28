@@ -48,6 +48,7 @@ public class ViewControllerPopup {
 
    @FXML
    private TextField searchTextField;
+
    @FXML
    private ListView<Project> projectListView;
 
@@ -69,9 +70,10 @@ public class ViewControllerPopup {
             "Add a note for '" + model.activeWorkItem.get().getProject().getName() + "' before changing project?");
       dialog.setContentText("Note: ");
 
-      this.stage.setAlwaysOnTop(false);
+      final Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+      dialogStage.setAlwaysOnTop(true);
+
       final Optional<String> result = dialog.showAndWait();
-      this.stage.setAlwaysOnTop(true);
 
       result.ifPresent(note -> {
          controller.setComment(note);
