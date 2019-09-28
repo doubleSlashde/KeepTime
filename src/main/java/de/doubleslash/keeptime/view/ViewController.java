@@ -235,6 +235,9 @@ public class ViewController {
          todayAllSeconds.textFillProperty().bind(fontColorProperty);
          currentProjectLabel.textFillProperty().bind(fontColorProperty);
 
+         textArea.setText("");
+         textArea.requestFocus();
+
          final Runnable displayProjectRightRunnable = () -> {
             if (model.displayProjectsRight.get()) {
                borderPane.setLeft(null);
@@ -259,6 +262,7 @@ public class ViewController {
          model.activeWorkItem.addListener((a, b, c) -> {
             updateProjectView();
             textArea.setText("");
+            textArea.requestFocus();
          });
 
          model.defaultBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
@@ -330,6 +334,7 @@ public class ViewController {
    private void calendarClicked() {
       LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
+      reportStage.setAlwaysOnTop(true);
       reportController.update();
       reportStage.show();
    }
@@ -474,16 +479,16 @@ public class ViewController {
       try {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
-         final Parent sceneRoot = fxmlLoader.load();
-         sceneRoot.setFocusTraversable(true);
-         sceneRoot.requestFocus();
+         final Parent root = fxmlLoader.load();
+         root.setFocusTraversable(true);
+         root.requestFocus();
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
          reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
 
-         final Scene reportScene = new Scene(sceneRoot);
+         final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                LOG.info("pressed ESCAPE");
@@ -494,7 +499,10 @@ public class ViewController {
          reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
-         reportStage.setOnHiding(windowEvent -> this.mainStage.setAlwaysOnTop(true));
+         reportStage.setOnHiding(windowEvent -> {
+            reportStage.setAlwaysOnTop(false);
+            this.mainStage.setAlwaysOnTop(true);
+         });
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
@@ -560,5 +568,4 @@ public class ViewController {
       this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
             availableProjectsListView, searchTextField, false);
    }
-
 }

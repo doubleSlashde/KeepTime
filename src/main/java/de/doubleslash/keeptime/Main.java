@@ -50,6 +50,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
@@ -241,6 +245,8 @@ public class Main extends Application {
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
+      registerMinimizeEventlistener(mainScene, primaryStage);
+      registerMaximizeEventlistener(mainScene, primaryStage);
       // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
 
       primaryStage.setTitle("KeepTime");
@@ -261,6 +267,28 @@ public class Main extends Application {
       viewController.setController(controller, model);
       viewController.secondInitialize();
 
+   }
+
+   private void registerMinimizeEventlistener(final Scene mainScene, final Stage primaryStage) {
+      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         if (keyComb.match(keyEvent)) {
+            LOG.info("KeyCombination '{}' was pressed: Minimizing window.", keyComb);
+            primaryStage.setIconified(true);
+            keyEvent.consume();
+         }
+      });
+   }
+
+   private void registerMaximizeEventlistener(final Scene mainScene, final Stage primaryStage) {
+      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.UP, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         if (keyComb.match(keyEvent)) {
+            LOG.info("KeyCombination  '{}' was pressed: Maximizing window.", keyComb);
+            primaryStage.setIconified(false);
+            keyEvent.consume();
+         }
+      });
    }
 
    @Override

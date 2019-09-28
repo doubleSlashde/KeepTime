@@ -45,6 +45,7 @@ public class ViewControllerPopup {
 
    @FXML
    private TextField searchTextField;
+
    @FXML
    private ListView<Project> projectListView;
 
