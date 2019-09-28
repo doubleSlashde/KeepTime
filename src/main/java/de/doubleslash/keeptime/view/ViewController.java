@@ -165,6 +165,7 @@ public class ViewController {
       controller.changeProject(newProject, minusSeconds);
       updateProjectView();
       textArea.setText("");
+      textArea.requestFocus();
    }
 
    private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
@@ -371,6 +372,7 @@ public class ViewController {
    private void calendarClicked() {
       LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
+      reportStage.setAlwaysOnTop(true);
       reportController.update();
       reportStage.show();
    }
@@ -463,7 +465,10 @@ public class ViewController {
          reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
-         reportStage.setOnHiding(windowEvent -> this.mainStage.setAlwaysOnTop(true));
+         reportStage.setOnHiding(windowEvent -> {
+            reportStage.setAlwaysOnTop(false);
+            this.mainStage.setAlwaysOnTop(true);
+         });
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
@@ -796,5 +801,4 @@ public class ViewController {
          realignProjectList();
       });
    }
-
 }
