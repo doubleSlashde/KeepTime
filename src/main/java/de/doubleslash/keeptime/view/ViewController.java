@@ -165,6 +165,7 @@ public class ViewController {
       controller.changeProject(newProject, minusSeconds);
       updateProjectView();
       textArea.setText("");
+      textArea.requestFocus();
    }
 
    private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
@@ -539,7 +540,6 @@ public class ViewController {
          final MouseButton button = a.getButton();
          if (button == MouseButton.PRIMARY) {
             changeProject(p, 0);
-            textArea.requestFocus();
          }
 
       });
