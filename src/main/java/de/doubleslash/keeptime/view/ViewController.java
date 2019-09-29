@@ -184,12 +184,7 @@ public class ViewController {
    private Stage settingsStage;
    private SettingsController settingsController;
 
-   private Stage aboutStage;
-   private AboutController aboutController;
-
    private Map<Project, Node> projectSelectionNodeMap;
-
-   private final boolean ctrlIsPressed = false;
 
    @FXML
    private void initialize() {
@@ -465,6 +460,7 @@ public class ViewController {
          reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
+         reportStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
          reportStage.setOnHiding(windowEvent -> {
             reportStage.setAlwaysOnTop(false);
             this.mainStage.setAlwaysOnTop(true);
@@ -480,6 +476,7 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          final Scene settingsScene = new Scene(settingsRoot);
          settingsScene.setOnKeyPressed(ke -> {
@@ -561,6 +558,8 @@ public class ViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model, activeWorkSecondsProperty,
                p);
+         changeWithTimeDialog.initOwner(settingsStage);
+
          mainStage.setAlwaysOnTop(false);
          final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
@@ -576,6 +575,7 @@ public class ViewController {
          alert.setHeaderText("Delete project '" + p.getName() + "'.");
          alert.setContentText(
                "The project will just be hidden from display, as there may be work references to this project.");
+         alert.initOwner(settingsStage);
 
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = alert.showAndWait();
@@ -600,6 +600,7 @@ public class ViewController {
          dialog.getDialogPane().setContent(grid);
 
          dialog.setResultConverter(dialogButton -> dialogButton);
+         dialog.initOwner(settingsStage);
 
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = dialog.showAndWait();

@@ -39,6 +39,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -250,6 +251,7 @@ public class SettingsController {
          aboutStage.setTitle("About KeepTime");
          aboutStage.setResizable(false);
          aboutStage.setScene(new Scene(rootAbout));
+         aboutStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
          aboutStage.setOnHiding(e -> this.thisStage.setAlwaysOnTop(true));
          aboutStage.setOnShowing(e -> {
             this.thisStage.setAlwaysOnTop(false);
