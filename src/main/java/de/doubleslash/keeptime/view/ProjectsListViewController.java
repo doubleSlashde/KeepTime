@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -21,7 +20,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
@@ -148,8 +146,6 @@ public class ProjectsListViewController {
       });
 
       availableProjectsListView.getSelectionModel().selectFirst();
-
-      model.getAvailableProjects().addListener(this::handleAvailableProjectsListChange);
 
       searchTextField.setPromptText("Search");
    }
@@ -326,29 +322,6 @@ public class ProjectsListViewController {
       contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
-   }
-
-   private void handleAvailableProjectsListChange(final Change<? extends Project> lis) {
-      while (lis.next()) {
-         if (lis.wasAdded()) {
-            final List<? extends Project> addedSubList = lis.getAddedSubList();
-            for (final Project project : addedSubList) {
-               final Node node = addProjectToProjectList(project);
-               projectSelectionNodeMap.put(project, node);
-            }
-         } else if (lis.wasRemoved()) {
-            final List<? extends Project> removedSubList = lis.getRemoved();
-            for (final Project project : removedSubList) {
-               // change to idle if removed project was active
-               if (project == model.activeWorkItem.get().getProject()) {
-                  changeProject(model.getIdleProject(), 0);
-               }
-               projectSelectionNodeMap.remove(project);
-               availableProjectsListView.getItems().remove(project);
-            }
-         }
-      }
-      realignProjectList();
    }
 
    private Dialog<ButtonType> setUpDialogButtonType(final String title, final String headerText) {

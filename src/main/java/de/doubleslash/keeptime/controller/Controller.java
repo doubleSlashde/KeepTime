@@ -142,6 +142,11 @@ public class Controller {
          LOG.error("You cannot delete the default project. Tried to delete project '{}'", p);
          return;
       }
+
+      if (p == model.activeWorkItem.get().getProject()) {
+         changeProject(model.getIdleProject());
+      }
+
       LOG.info("Disabeling project '{}'.", p);
 
       final int indexToRemove = p.getIndex();
