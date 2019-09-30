@@ -96,7 +96,7 @@ public class ProjectsListViewController {
          LOG.info("New filter value: " + newValue);
          // TODO do i always have to create a new predicate?
          filteredData.setPredicate(project -> {
-            // If filter text is empty, display all persons.
+            // If filter text is empty, display all data.
             boolean returnValue = false;
             if (newValue == null || newValue.isEmpty()) {
                returnValue = true;
