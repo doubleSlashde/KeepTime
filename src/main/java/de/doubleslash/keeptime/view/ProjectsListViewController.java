@@ -109,7 +109,7 @@ public class ProjectsListViewController {
 
             return false; // Does not match.
          });
-         LOG.info("Projects to show '{}'.", filteredData.size());
+         LOG.debug("Amount of projects to show '{}'.", filteredData.size());
       });
 
       searchTextField.setOnKeyPressed(eh -> {
