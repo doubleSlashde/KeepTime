@@ -97,18 +97,17 @@ public class ProjectsListViewController {
          // TODO do i always have to create a new predicate?
          filteredData.setPredicate(project -> {
             // If filter text is empty, display all data.
-            boolean returnValue = false;
             if (newValue == null || newValue.isEmpty()) {
-               returnValue = true;
+               return true;
             }
 
             final String lowerCaseFilter = newValue.toLowerCase();
 
             if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               returnValue = true; // Filter matches first name.
+               return true; // Filter matches first name.
             }
 
-            return returnValue; // Does not match.
+            return false; // Does not match.
          });
          LOG.info("Projects to show '{}'.", filteredData.size());
       });
