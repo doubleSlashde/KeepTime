@@ -40,6 +40,7 @@ import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
@@ -374,6 +375,10 @@ public class ProjectsListViewController {
             if (item == null || empty) {
                setGraphic(null);
             } else {
+               LOG.debug("Adding tooltip to Project Label.");
+               final Pane pane = (Pane) projectSelectionNodeMap.get(item);
+               final Label projectNameLabel = (Label) pane.getChildren().get(0);
+               projectNameLabel.setTooltip(new Tooltip(item.getName()));
                LOG.trace("Item: '{}' -> '{}'", item.getName(), projectSelectionNodeMap.get(item));
                setGraphic(projectSelectionNodeMap.get(item));
             }
