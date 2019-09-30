@@ -207,7 +207,6 @@ public class ProjectsListViewController {
    }
 
    private Node addProjectToProjectList(final Project p) {
-      // context menu
       final ContextMenu contextMenu = new ContextMenu();
 
       final FXMLLoader loader = new FXMLLoader();
