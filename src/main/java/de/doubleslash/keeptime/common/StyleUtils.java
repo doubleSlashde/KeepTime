@@ -6,6 +6,17 @@ public class StyleUtils {
 
    }
 
+   /**
+    * Returns a new String representing a JavaFX style with a new given value for a given attribute.
+    * 
+    * @param style
+    *           A String representing a JavaFX style.
+    * @param attribute
+    *           A String representing a JavaFX style attribute.
+    * @param newValue
+    *           A String representing the value that should be assigned to the given JavaFX style attribute.
+    * @return A String representing the new JavaFX style.
+    */
    public static String changeStyleAttribute(final String style, final String attribute, final String newValue) {
       String newStyle = "";
       final String newStyleAttribute = "-" + attribute + ": " + newValue + "; ";
