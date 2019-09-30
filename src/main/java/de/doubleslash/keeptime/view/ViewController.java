@@ -102,10 +102,8 @@ public class ViewController {
 
    @FXML
    private Label bigTimeLabel;
-
    @FXML
    private Label allTimeLabel;
-
    @FXML
    private Label todayAllSeconds;
 
@@ -114,7 +112,6 @@ public class ViewController {
 
    @FXML
    private Button minimizeButton;
-
    @FXML
    private Button closeButton;
 
@@ -148,7 +145,6 @@ public class ViewController {
 
    private Stage mainStage;
    private Controller controller;
-
    private Model model;
 
    public void setController(final Controller controller, final Model model) {
@@ -160,12 +156,16 @@ public class ViewController {
       updateProjectView();
    }
 
-   private Stage reportStage;
+   private final Canvas taskbarCanvas = new Canvas(32, 32);
 
+   private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
+   public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
+   public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
+
+   private Stage reportStage;
    private ReportController reportController;
 
    private Stage settingsStage;
-
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
@@ -489,14 +489,6 @@ public class ViewController {
       this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
             availableProjectsListView, searchTextField, false);
    }
-
-   public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
-
-   private final Canvas taskbarCanvas = new Canvas(32, 32);
-
-   private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
-
-   public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
 
    private void setUpTextArea() {
       textArea.setWrapText(true);
