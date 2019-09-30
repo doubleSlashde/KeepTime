@@ -355,11 +355,17 @@ public class ViewController {
       pane.setStyle(style);
    }
 
+   private void setUpTime() {
+      bigTimeLabel.setText(TIME_ZERO);
+      allTimeLabel.setText(TIME_ZERO);
+      todayAllSeconds.setText(TIME_ZERO);
+   }
+
    private void setUpTextArea() {
       textArea.setWrapText(true);
       textArea.setEditable(false);
       textArea.editableProperty().bind(mouseHoveringProperty);
-   
+
       textArea.textProperty().addListener((a, b, c) -> controller.setComment(textArea.getText()));
    }
 
@@ -389,7 +395,7 @@ public class ViewController {
          reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
-   
+
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
@@ -397,7 +403,7 @@ public class ViewController {
                reportStage.close();
             }
          });
-   
+
          reportStage.setScene(reportScene);
          reportStage.setTitle("Report");
          reportStage.setResizable(false);
@@ -405,7 +411,7 @@ public class ViewController {
             reportStage.setAlwaysOnTop(false);
             this.mainStage.setAlwaysOnTop(true);
          });
-   
+
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
          final Parent settingsRoot = fxmlLoader2.load();
@@ -416,7 +422,7 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
-   
+
          final Scene settingsScene = new Scene(settingsRoot);
          settingsScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
@@ -424,7 +430,7 @@ public class ViewController {
                settingsStage.close();
             }
          });
-   
+
          settingsStage.setScene(settingsScene);
          settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
       } catch (final IOException e) {
@@ -435,12 +441,6 @@ public class ViewController {
 
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
-   }
-
-   private void setUpTime() {
-      bigTimeLabel.setText(TIME_ZERO);
-      allTimeLabel.setText(TIME_ZERO);
-      todayAllSeconds.setText(TIME_ZERO);
    }
 
    private Dialog<Project> setUpDialogProject(final String title, final String headerText) {
