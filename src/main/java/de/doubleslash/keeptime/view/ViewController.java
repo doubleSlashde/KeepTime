@@ -87,12 +87,10 @@ import javafx.stage.Stage;
 
 @Component
 public class ViewController {
-
    private static final String TIME_ZERO = "00:00:00";
 
    @FXML
    private Pane pane;
-
    @FXML
    private BorderPane borderPane;
 
@@ -101,6 +99,12 @@ public class ViewController {
 
    @FXML
    private VBox projectsVBox;
+
+   @FXML
+   private Label bigTimeLabel;
+
+   @FXML
+   private Label allTimeLabel;
 
    @FXML
    private Label todayAllSeconds;
@@ -112,6 +116,9 @@ public class ViewController {
    private Button minimizeButton;
 
    @FXML
+   private Button closeButton;
+
+   @FXML
    private Button addNewProjectButton;
 
    @FXML
@@ -119,7 +126,6 @@ public class ViewController {
 
    @FXML
    private Button settingsButton;
-
    @FXML
    private Button calendarButton;
 
@@ -141,8 +147,9 @@ public class ViewController {
    private final Delta dragDelta = new Delta();
 
    private Stage mainStage;
-
    private Controller controller;
+
+   private Model model;
 
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
@@ -490,15 +497,6 @@ public class ViewController {
    private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
 
    public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
-
-   @FXML
-   private Label bigTimeLabel;
-   @FXML
-   private Label allTimeLabel;
-   @FXML
-   private Button closeButton;
-
-   private Model model;
 
    private void setUpTextArea() {
       textArea.setWrapText(true);
