@@ -88,27 +88,11 @@ import javafx.stage.Stage;
 @Component
 public class ViewController {
 
-   private class Delta {
-      double x;
-      double y;
-   }
-
-   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
-
    private static final String TIME_ZERO = "00:00:00";
-
-   private final Delta dragDelta = new Delta();
-
-   private final Canvas taskbarCanvas = new Canvas(32, 32);
-
-   public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
-
-   private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
-
-   public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
 
    @FXML
    private Pane pane;
+
    @FXML
    private BorderPane borderPane;
 
@@ -119,40 +103,46 @@ public class ViewController {
    private VBox projectsVBox;
 
    @FXML
-   private Label bigTimeLabel;
-   @FXML
-   private Label allTimeLabel;
-   @FXML
    private Label todayAllSeconds;
-
-   @FXML
-   private Button minimizeButton;
-   @FXML
-   private Button closeButton;
-
-   @FXML
-   private Button addNewProjectButton;
-   @FXML
-   private TextField searchTextField;
-   @FXML
-   private Button settingsButton;
-   @FXML
-   private Button calendarButton;
-
-   @FXML
-   private Canvas canvas;
 
    @FXML
    private Label currentProjectLabel;
 
    @FXML
+   private Button minimizeButton;
+
+   @FXML
+   private Button addNewProjectButton;
+
+   @FXML
+   private TextField searchTextField;
+
+   @FXML
+   private Button settingsButton;
+
+   @FXML
+   private Button calendarButton;
+
+   @FXML
    private TextArea textArea;
+
+   @FXML
+   private Canvas canvas;
 
    private ColorTimeLine mainColorTimeLine;
 
+   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
+
+   private class Delta {
+      double x;
+      double y;
+   }
+
+   private final Delta dragDelta = new Delta();
+
    private Stage mainStage;
+
    private Controller controller;
-   private Model model;
 
    public void setController(final Controller controller, final Model model) {
       this.controller = controller;
@@ -163,14 +153,12 @@ public class ViewController {
       updateProjectView();
    }
 
-   public void setStage(final Stage primaryStage) {
-      this.mainStage = primaryStage;
-   }
-
    private Stage reportStage;
+
    private ReportController reportController;
 
    private Stage settingsStage;
+
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
@@ -315,13 +303,20 @@ public class ViewController {
       mainColorTimeLine = new ColorTimeLine(canvas);
    }
 
-   private void updateProjectView() {
-      final Project project = model.activeWorkItem.get().getProject();
-      currentProjectLabel.setText(project.getName());
-      currentProjectLabel.setUnderline(project.isWork());
-      final Circle circle = new Circle(4);
-      circle.setFill(project.getColor());
-      currentProjectLabel.setGraphic(circle);
+   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
+      dialog.setResultConverter(dialogButton -> {
+         if (dialogButton == ButtonType.OK) {
+            final ObservableList<Node> nodes = grid.getChildren();
+            final TextField projectNameTextField = (TextField) nodes.get(1);
+            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
+            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
+            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
+            return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
+                  indexSpinner.getValue()); // temporary (misused) transfer object for project
+         }
+         return null;
+      });
+      return dialog;
    }
 
    private void settingsClicked() {
@@ -339,25 +334,28 @@ public class ViewController {
       reportStage.show();
    }
 
-   @FXML
-   public void addNewProject(final ActionEvent ae) {
-      LOG.info("Add new project clicked");
-      // TODO somewhat duplicate dialog of create and edit
-      final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+   private void runUpdateMainBackgroundColor() {
+      Color color = model.defaultBackgroundColor.get();
+      double opacity = 0;
+      if (mouseHoveringProperty.get()) {
+         color = model.hoverBackgroundColor.get();
+         opacity = .3;
+      }
+      String style = StyleUtils.changeStyleAttribute(pane.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
+            "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+      pane.setStyle(style);
+   }
 
-      final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
+   private void setUpTime() {
+      bigTimeLabel.setText(TIME_ZERO);
+      allTimeLabel.setText(TIME_ZERO);
+      todayAllSeconds.setText(TIME_ZERO);
+   }
 
-      // TODO disable OK button if no name is set
-      dialog.getDialogPane().setContent(grid);
-
-      dialogResultConverter(dialog, grid);
-      mainStage.setAlwaysOnTop(false);
-      final Optional<Project> result = dialog.showAndWait();
-      mainStage.setAlwaysOnTop(true);
-
-      result.ifPresent(project -> {
-         controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
-      });
+   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
+      return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
 
    private Dialog<Project> setUpDialogProject(final String title, final String headerText) {
@@ -417,41 +415,90 @@ public class ViewController {
       return grid;
    }
 
-   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
-      dialog.setResultConverter(dialogButton -> {
-         if (dialogButton == ButtonType.OK) {
-            final ObservableList<Node> nodes = grid.getChildren();
-            final TextField projectNameTextField = (TextField) nodes.get(1);
-            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-            return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
-                  indexSpinner.getValue()); // temporary (misused) transfer object for project
-         }
-         return null;
-      });
-      return dialog;
-   }
+   private void updateTaskbarIcon(final long currentWorkSeconds) {
+      final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
 
-   private void runUpdateMainBackgroundColor() {
-      Color color = model.defaultBackgroundColor.get();
-      double opacity = 0;
-      if (mouseHoveringProperty.get()) {
-         color = model.hoverBackgroundColor.get();
-         opacity = .3;
+      gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
+      gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
+      gcIcon.fillRect(1, 27, 31, 5);
+
+      gcIcon.setStroke(model.taskBarColor.get());
+      gcIcon.setTextAlign(TextAlignment.CENTER);
+      gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
+            Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5.0);
+
+      final SnapshotParameters snapshotParameters = new SnapshotParameters();
+      snapshotParameters.setFill(Color.TRANSPARENT);
+      final WritableImage image = taskbarCanvas.snapshot(snapshotParameters, null);
+
+      final StackPane layout = new StackPane();
+      layout.getChildren().addAll(new ImageView(image));
+
+      final BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
+      final Image icon = SwingFXUtils.toFXImage(bi, null);
+
+      final ObservableList<Image> icons = mainStage.getIcons();
+      icons.addAll(icon);
+      if (icons.size() > 1) {
+         icons.remove(0);
       }
-      String style = StyleUtils.changeStyleAttribute(pane.getStyle(), "fx-background-color",
-            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
-      style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
-            "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
-      pane.setStyle(style);
    }
 
-   private void setUpTime() {
-      bigTimeLabel.setText(TIME_ZERO);
-      allTimeLabel.setText(TIME_ZERO);
-      todayAllSeconds.setText(TIME_ZERO);
+   private void updateProjectView() {
+      final Project project = model.activeWorkItem.get().getProject();
+      currentProjectLabel.setText(project.getName());
+      currentProjectLabel.setUnderline(project.isWork());
+      final Circle circle = new Circle(4);
+      circle.setFill(project.getColor());
+      currentProjectLabel.setGraphic(circle);
    }
+
+   public void setStage(final Stage primaryStage) {
+      this.mainStage = primaryStage;
+   }
+
+   @FXML
+   public void addNewProject(final ActionEvent ae) {
+      LOG.info("Add new project clicked");
+      // TODO somewhat duplicate dialog of create and edit
+      final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+
+      final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
+
+      // TODO disable OK button if no name is set
+      dialog.getDialogPane().setContent(grid);
+
+      dialogResultConverter(dialog, grid);
+      mainStage.setAlwaysOnTop(false);
+      final Optional<Project> result = dialog.showAndWait();
+      mainStage.setAlwaysOnTop(true);
+
+      result.ifPresent(project -> {
+         controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
+      });
+   }
+
+   public void secondInitialize() {
+      this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
+            availableProjectsListView, searchTextField, false);
+   }
+
+   public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
+
+   private final Canvas taskbarCanvas = new Canvas(32, 32);
+
+   private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
+
+   public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
+
+   @FXML
+   private Label bigTimeLabel;
+   @FXML
+   private Label allTimeLabel;
+   @FXML
+   private Button closeButton;
+
+   private Model model;
 
    private void setUpTextArea() {
       textArea.setWrapText(true);
@@ -529,43 +576,5 @@ public class ViewController {
          LOG.error("Error while loading sub stage");
          throw new FXMLLoaderException(e);
       }
-   }
-
-   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
-      return new FXMLLoader(Resources.getResource(fxmlLayout));
-   }
-
-   private void updateTaskbarIcon(final long currentWorkSeconds) {
-      final GraphicsContext gcIcon = taskbarCanvas.getGraphicsContext2D();
-
-      gcIcon.clearRect(0, 0, taskbarCanvas.getWidth(), taskbarCanvas.getHeight());
-      gcIcon.setFill(model.activeWorkItem.get().getProject().getColor());
-      gcIcon.fillRect(1, 27, 31, 5);
-
-      gcIcon.setStroke(model.taskBarColor.get());
-      gcIcon.setTextAlign(TextAlignment.CENTER);
-      gcIcon.strokeText(DateFormatter.secondsToHHMMSS(currentWorkSeconds).replaceFirst(":", ":\n"),
-            Math.round(taskbarCanvas.getWidth() / 2), Math.round(taskbarCanvas.getHeight() / 2) - 5.0);
-
-      final SnapshotParameters snapshotParameters = new SnapshotParameters();
-      snapshotParameters.setFill(Color.TRANSPARENT);
-      final WritableImage image = taskbarCanvas.snapshot(snapshotParameters, null);
-
-      final StackPane layout = new StackPane();
-      layout.getChildren().addAll(new ImageView(image));
-
-      final BufferedImage bi = SwingFXUtils.fromFXImage(image, null);
-      final Image icon = SwingFXUtils.toFXImage(bi, null);
-
-      final ObservableList<Image> icons = mainStage.getIcons();
-      icons.addAll(icon);
-      if (icons.size() > 1) {
-         icons.remove(0);
-      }
-   }
-
-   public void secondInitialize() {
-      this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
-            availableProjectsListView, searchTextField, false);
    }
 }
