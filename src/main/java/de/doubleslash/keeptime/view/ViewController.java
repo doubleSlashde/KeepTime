@@ -355,14 +355,92 @@ public class ViewController {
       pane.setStyle(style);
    }
 
-   private void setUpTime() {
-      bigTimeLabel.setText(TIME_ZERO);
-      allTimeLabel.setText(TIME_ZERO);
-      todayAllSeconds.setText(TIME_ZERO);
+   private void setUpTextArea() {
+      textArea.setWrapText(true);
+      textArea.setEditable(false);
+      textArea.editableProperty().bind(mouseHoveringProperty);
+   
+      textArea.textProperty().addListener((a, b, c) -> controller.setComment(textArea.getText()));
+   }
+
+   private void setProjectListVisible(final boolean showProjectList) {
+      projectsVBox.setManaged(showProjectList);
+      final double beforeWidth = mainStage.getWidth();
+      mainStage.sizeToScene();
+      final double afterWidth = mainStage.getWidth();
+      projectsVBox.setVisible(showProjectList);
+      final double offset = afterWidth - beforeWidth;
+      if (!model.displayProjectsRight.get()) {
+         // we only need to move the stage if the node on the left is hidden
+         // not sure how we can prevent the jumping
+         mainStage.setX(mainStage.getX() - offset);
+      }
+   }
+
+   private void loadSubStages() {
+      try {
+         // Report stage
+         final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
+         final Parent root = fxmlLoader.load();
+         root.setFocusTraversable(true);
+         root.requestFocus();
+         reportController = fxmlLoader.getController();
+         reportController.setModel(model);
+         reportController.setController(controller);
+         reportStage = new Stage();
+         reportStage.initModality(Modality.APPLICATION_MODAL);
+   
+         final Scene reportScene = new Scene(root);
+         reportScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               reportStage.close();
+            }
+         });
+   
+         reportStage.setScene(reportScene);
+         reportStage.setTitle("Report");
+         reportStage.setResizable(false);
+         reportStage.setOnHiding(windowEvent -> {
+            reportStage.setAlwaysOnTop(false);
+            this.mainStage.setAlwaysOnTop(true);
+         });
+   
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
+         final Parent settingsRoot = fxmlLoader2.load();
+         settingsController = fxmlLoader2.getController();
+         settingsController.setControllerAndModel(controller, model);
+         settingsStage = new Stage();
+         settingsController.setStage(settingsStage);
+         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.setTitle("Settings");
+         settingsStage.setResizable(false);
+   
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
+   
+         settingsStage.setScene(settingsScene);
+         settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
+      } catch (final IOException e) {
+         LOG.error("Error while loading sub stage");
+         throw new FXMLLoaderException(e);
+      }
    }
 
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
+   }
+
+   private void setUpTime() {
+      bigTimeLabel.setText(TIME_ZERO);
+      allTimeLabel.setText(TIME_ZERO);
+      todayAllSeconds.setText(TIME_ZERO);
    }
 
    private Dialog<Project> setUpDialogProject(final String title, final String headerText) {
@@ -488,83 +566,5 @@ public class ViewController {
    public void secondInitialize() {
       this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
             availableProjectsListView, searchTextField, false);
-   }
-
-   private void setUpTextArea() {
-      textArea.setWrapText(true);
-      textArea.setEditable(false);
-      textArea.editableProperty().bind(mouseHoveringProperty);
-
-      textArea.textProperty().addListener((a, b, c) -> controller.setComment(textArea.getText()));
-   }
-
-   private void setProjectListVisible(final boolean showProjectList) {
-      projectsVBox.setManaged(showProjectList);
-      final double beforeWidth = mainStage.getWidth();
-      mainStage.sizeToScene();
-      final double afterWidth = mainStage.getWidth();
-      projectsVBox.setVisible(showProjectList);
-      final double offset = afterWidth - beforeWidth;
-      if (!model.displayProjectsRight.get()) {
-         // we only need to move the stage if the node on the left is hidden
-         // not sure how we can prevent the jumping
-         mainStage.setX(mainStage.getX() - offset);
-      }
-   }
-
-   private void loadSubStages() {
-      try {
-         // Report stage
-         final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
-         final Parent root = fxmlLoader.load();
-         root.setFocusTraversable(true);
-         root.requestFocus();
-         reportController = fxmlLoader.getController();
-         reportController.setModel(model);
-         reportController.setController(controller);
-         reportStage = new Stage();
-         reportStage.initModality(Modality.APPLICATION_MODAL);
-
-         final Scene reportScene = new Scene(root);
-         reportScene.setOnKeyPressed(ke -> {
-            if (ke.getCode() == KeyCode.ESCAPE) {
-               LOG.info("pressed ESCAPE");
-               reportStage.close();
-            }
-         });
-
-         reportStage.setScene(reportScene);
-         reportStage.setTitle("Report");
-         reportStage.setResizable(false);
-         reportStage.setOnHiding(windowEvent -> {
-            reportStage.setAlwaysOnTop(false);
-            this.mainStage.setAlwaysOnTop(true);
-         });
-
-         // Settings stage
-         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
-         final Parent settingsRoot = fxmlLoader2.load();
-         settingsController = fxmlLoader2.getController();
-         settingsController.setControllerAndModel(controller, model);
-         settingsStage = new Stage();
-         settingsController.setStage(settingsStage);
-         settingsStage.initModality(Modality.APPLICATION_MODAL);
-         settingsStage.setTitle("Settings");
-         settingsStage.setResizable(false);
-
-         final Scene settingsScene = new Scene(settingsRoot);
-         settingsScene.setOnKeyPressed(ke -> {
-            if (ke.getCode() == KeyCode.ESCAPE) {
-               LOG.info("pressed ESCAPE");
-               settingsStage.close();
-            }
-         });
-
-         settingsStage.setScene(settingsScene);
-         settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
-      } catch (final IOException e) {
-         LOG.error("Error while loading sub stage");
-         throw new FXMLLoaderException(e);
-      }
    }
 }
