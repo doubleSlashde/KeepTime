@@ -87,11 +87,9 @@ public class ProjectsListViewController {
       // TODO why is there no nice way for listview height?
       // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
       final Consumer<Double> updateSize = height -> {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("%s%f", "update size ", height));
-            availableProjectsListView.setPrefHeight(height);
-            mainStage.sizeToScene(); // also update scene size
-         }
+         LOG.debug(String.format("%s%f", "update size ", height));
+         availableProjectsListView.setPrefHeight(height);
+         mainStage.sizeToScene(); // also update scene size
       };
 
       searchTextField.textProperty().addListener((a, b, newValue) -> {
