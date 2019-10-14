@@ -143,7 +143,7 @@ public class Controller {
          return;
       }
 
-      if (p == model.activeWorkItem.get().getProject()) {
+      if (isProjectActive(p)) {
          changeProject(model.getIdleProject());
       }
 
@@ -161,6 +161,10 @@ public class Controller {
 
       changedProjects.add(p);
       model.getProjectRepository().saveAll(changedProjects);
+   }
+
+   private boolean isProjectActive(final Project p) {
+      return p == model.activeWorkItem.get().getProject();
    }
 
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,

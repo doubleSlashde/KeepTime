@@ -20,6 +20,7 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
@@ -69,18 +70,23 @@ public class ProjectsListViewController {
       this.hideable = hideable;
       this.mainStage = mainStage;
       this.availableProjectsListView = availableProjectsListView;
-      availableProjectsListView.setCellFactory(callback -> returnListCellOfProject());
+      availableProjectsListView.setCellFactory(listView -> returnListCellOfProject());
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
       availableProjectsListView.setItems(filteredData);
 
       projectSelectionNodeMap = new HashMap<>(model.getAvailableProjects().size());
 
-      for (final Project project : model.getSortedAvailableProjects()) {
-         if (project.isEnabled()) {
-            final Node node = addProjectToProjectList(project);
-            projectSelectionNodeMap.put(project, node);
+      model.getSortedAvailableProjects().addListener((ListChangeListener<? super Project>) listener -> {
+         listener.next();
+         if (listener.wasAdded()) {
+            final Project addedProject = listener.getAddedSubList().get(0);
+            addProjectToProjectSelectionNodeMap(addedProject);
          }
+      });
+
+      for (final Project project : model.getSortedAvailableProjects()) {
+         addProjectToProjectSelectionNodeMap(project);
       }
 
       // TODO why is there no nice way for listview height?
@@ -151,11 +157,24 @@ public class ProjectsListViewController {
       searchTextField.setPromptText("Search");
    }
 
+   private void addProjectToProjectSelectionNodeMap(final Project project) {
+      if (project.isEnabled()) {
+         final Pane projectElement = addProjectToProjectList(project);
+         final Label projectNameLabel = (Label) projectElement.getChildren().get(0);
+         projectNameLabel.setTooltip(new Tooltip(projectNameLabel.getText()));
+         projectSelectionNodeMap.put(project, projectElement);
+      }
+   }
+
    public void changeProject(final Project newProject, final long minusSeconds) {
       if (hideable) {
          mainStage.hide();
       }
       controller.changeProject(newProject, minusSeconds);
+   }
+
+   public Map<Project, Node> getProjectSelectionNodeMap() {
+      return projectSelectionNodeMap;
    }
 
    private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
@@ -203,7 +222,7 @@ public class ProjectsListViewController {
       model.getSortedAvailableProjects().setComparator(comparator);
    }
 
-   private Node addProjectToProjectList(final Project p) {
+   private Pane addProjectToProjectList(final Project p) {
       final ContextMenu contextMenu = new ContextMenu();
 
       final FXMLLoader loader = new FXMLLoader();
@@ -375,10 +394,6 @@ public class ProjectsListViewController {
             if (item == null || empty) {
                setGraphic(null);
             } else {
-               LOG.debug("Adding tooltip to Project Label.");
-               final Pane pane = (Pane) projectSelectionNodeMap.get(item);
-               final Label projectNameLabel = (Label) pane.getChildren().get(0);
-               projectNameLabel.setTooltip(new Tooltip(item.getName()));
                LOG.trace("Item: '{}' -> '{}'", item.getName(), projectSelectionNodeMap.get(item));
                setGraphic(projectSelectionNodeMap.get(item));
             }
