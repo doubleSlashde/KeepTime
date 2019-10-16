@@ -20,7 +20,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
@@ -76,14 +75,6 @@ public class ProjectsListViewController {
       availableProjectsListView.setItems(filteredData);
 
       projectSelectionNodeMap = new HashMap<>(model.getAvailableProjects().size());
-
-      model.getSortedAvailableProjects().addListener((ListChangeListener<? super Project>) listener -> {
-         listener.next();
-         if (listener.wasAdded()) {
-            final Project addedProject = listener.getAddedSubList().get(0);
-            addProjectToProjectSelectionNodeMap(addedProject);
-         }
-      });
 
       for (final Project project : model.getSortedAvailableProjects()) {
          addProjectToProjectSelectionNodeMap(project);
@@ -160,8 +151,6 @@ public class ProjectsListViewController {
    private void addProjectToProjectSelectionNodeMap(final Project project) {
       if (project.isEnabled()) {
          final Pane projectElement = addProjectToProjectList(project);
-         final Label projectNameLabel = (Label) projectElement.getChildren().get(0);
-         projectNameLabel.setTooltip(new Tooltip(projectNameLabel.getText()));
          projectSelectionNodeMap.put(project, projectElement);
       }
    }
@@ -272,6 +261,8 @@ public class ProjectsListViewController {
                p.getColor().getBlue() * dimFactor, 1));
          projectNameLabel.setEffect(null);
       });
+
+      projectNameLabel.setTooltip(new Tooltip(projectNameLabel.getText()));
 
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
@@ -394,6 +385,11 @@ public class ProjectsListViewController {
             if (item == null || empty) {
                setGraphic(null);
             } else {
+               final Pane graphic = (Pane) projectSelectionNodeMap.get(item);
+               if (graphic == null) {
+                  final Project addedProject = item;
+                  addProjectToProjectSelectionNodeMap(addedProject);
+               }
                LOG.trace("Item: '{}' -> '{}'", item.getName(), projectSelectionNodeMap.get(item));
                setGraphic(projectSelectionNodeMap.get(item));
             }
