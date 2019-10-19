@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,14 +79,6 @@ public class ProjectsListViewController {
          addProjectToProjectSelectionNodeMap(project);
       }
 
-      // TODO why is there no nice way for listview height?
-      // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      final Consumer<Double> updateSize = height -> {
-         LOG.debug(String.format("%s%f", "update size ", height));
-         availableProjectsListView.setPrefHeight(height);
-         mainStage.sizeToScene(); // also update scene size
-      };
-
       searchTextField.textProperty().addListener((a, b, newValue) -> {
          LOG.info("New filter value: " + newValue);
          // TODO do i always have to create a new predicate?
@@ -100,10 +91,10 @@ public class ProjectsListViewController {
             final String lowerCaseFilter = newValue.toLowerCase();
 
             if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               return true; // Filter matches first name.
+               return true;
             }
 
-            return false; // Does not match.
+            return false;
          });
          LOG.debug("Amount of projects to show '{}'.", filteredData.size());
       });
@@ -124,8 +115,9 @@ public class ProjectsListViewController {
             break;
          case ESCAPE:
             if (hideable) {
-               searchTextField.getScene().getWindow().hide();
+               mainStage.hide();
             }
+            eh.consume();
             break;
          default:
             break;
@@ -144,8 +136,6 @@ public class ProjectsListViewController {
       });
 
       availableProjectsListView.getSelectionModel().selectFirst();
-
-      searchTextField.setPromptText("Search");
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {
