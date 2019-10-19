@@ -36,6 +36,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextField;
@@ -97,23 +98,25 @@ public class ProjectsListViewController {
             return false;
          });
          LOG.debug("Amount of projects to show '{}'.", filteredData.size());
+         availableProjectsListView.getSelectionModel().selectFirst();
+         availableProjectsListView.scrollTo(0);
       });
 
       searchTextField.setOnKeyPressed(eh -> {
          final MultipleSelectionModel<Project> selectionModel = availableProjectsListView.getSelectionModel();
-         final int selectedIndex = selectionModel.getSelectedIndex();
          switch (eh.getCode()) {
          case UP:
             LOG.debug("Arrow up pressed.");
-            selectionModel.select(selectedIndex - 1);
+            selectionModel.selectPrevious();
             eh.consume();
             break;
          case DOWN:
             LOG.debug("Arrow down pressed.");
-            selectionModel.select(selectedIndex + 1);
+            selectionModel.selectNext();
             eh.consume();
             break;
          case ESCAPE:
+            LOG.debug("Esc pressed.");
             if (hideable) {
                mainStage.hide();
             }
@@ -123,7 +126,6 @@ public class ProjectsListViewController {
             break;
          }
          availableProjectsListView.scrollTo(selectionModel.getSelectedIndex());
-         LOG.debug("Selected list item index '{}'.", selectionModel.getSelectedIndex());
       });
 
       // enter pressed in textfield
@@ -135,6 +137,7 @@ public class ProjectsListViewController {
          }
       });
 
+      availableProjectsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       availableProjectsListView.getSelectionModel().selectFirst();
    }
 
