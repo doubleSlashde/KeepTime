@@ -316,8 +316,9 @@ public class ProjectsListViewController {
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
                   p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
             projectNameLabel.setUnderline(p.isWork());
+            projectNameLabel.getTooltip().setText(p.getName());
 
-            // updateProjectView(); // TODO how to update currentProjectLabel when project was edited?
+            // TODO how to update currentProjectLabel when active project was edited?
             realignProjectList();
          });
       });
