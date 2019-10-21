@@ -10,7 +10,7 @@
 }
 
 .text-field {
-    -fx-padding: 0px 0px 0px 6px;
+    -fx-padding: 0px;
     -fx-border-insets: 0px;
     -fx-background-insets: 0px;
     -fx-prompt-text-fill: black;
