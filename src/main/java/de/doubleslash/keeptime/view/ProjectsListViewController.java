@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +36,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextField;
@@ -80,14 +80,6 @@ public class ProjectsListViewController {
          addProjectToProjectSelectionNodeMap(project);
       }
 
-      // TODO why is there no nice way for listview height?
-      // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      final Consumer<Double> updateSize = height -> {
-         LOG.debug(String.format("%s%f", "update size ", height));
-         availableProjectsListView.setPrefHeight(height);
-         mainStage.sizeToScene(); // also update scene size
-      };
-
       searchTextField.textProperty().addListener((a, b, newValue) -> {
          LOG.info("New filter value: " + newValue);
          // TODO do i always have to create a new predicate?
@@ -100,38 +92,40 @@ public class ProjectsListViewController {
             final String lowerCaseFilter = newValue.toLowerCase();
 
             if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               return true; // Filter matches first name.
+               return true;
             }
 
-            return false; // Does not match.
+            return false;
          });
          LOG.debug("Amount of projects to show '{}'.", filteredData.size());
+         availableProjectsListView.getSelectionModel().selectFirst();
+         availableProjectsListView.scrollTo(0);
       });
 
       searchTextField.setOnKeyPressed(eh -> {
          final MultipleSelectionModel<Project> selectionModel = availableProjectsListView.getSelectionModel();
-         final int selectedIndex = selectionModel.getSelectedIndex();
          switch (eh.getCode()) {
          case UP:
             LOG.debug("Arrow up pressed.");
-            selectionModel.select(selectedIndex - 1);
+            selectionModel.selectPrevious();
             eh.consume();
             break;
          case DOWN:
             LOG.debug("Arrow down pressed.");
-            selectionModel.select(selectedIndex + 1);
+            selectionModel.selectNext();
             eh.consume();
             break;
          case ESCAPE:
+            LOG.debug("Esc pressed.");
             if (hideable) {
-               searchTextField.getScene().getWindow().hide();
+               mainStage.hide();
             }
+            eh.consume();
             break;
          default:
             break;
          }
          availableProjectsListView.scrollTo(selectionModel.getSelectedIndex());
-         LOG.debug("Selected list item index '{}'.", selectionModel.getSelectedIndex());
       });
 
       // enter pressed in textfield
@@ -143,9 +137,8 @@ public class ProjectsListViewController {
          }
       });
 
+      availableProjectsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       availableProjectsListView.getSelectionModel().selectFirst();
-
-      searchTextField.setPromptText("Search");
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {
@@ -321,8 +314,9 @@ public class ProjectsListViewController {
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
                   p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
             projectNameLabel.setUnderline(p.isWork());
+            projectNameLabel.getTooltip().setText(p.getName());
 
-            // updateProjectView(); // TODO how to update currentProjectLabel when project was edited?
+            // TODO how to update currentProjectLabel when active project was edited?
             realignProjectList();
          });
       });

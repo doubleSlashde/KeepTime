@@ -67,6 +67,7 @@
 
 .list-cell {
     -fx-background-color: transparent;
+    -fx-padding: 0px;
 }
 
 .list-cell:selected {
