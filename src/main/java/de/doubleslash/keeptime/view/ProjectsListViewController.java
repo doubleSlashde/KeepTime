@@ -76,10 +76,6 @@ public class ProjectsListViewController {
 
       projectSelectionNodeMap = new HashMap<>(model.getAvailableProjects().size());
 
-      for (final Project project : model.getSortedAvailableProjects()) {
-         addProjectToProjectSelectionNodeMap(project);
-      }
-
       searchTextField.textProperty().addListener((a, b, newValue) -> {
          LOG.info("New filter value: " + newValue);
          // TODO do i always have to create a new predicate?
@@ -377,12 +373,12 @@ public class ProjectsListViewController {
             if (item == null || empty) {
                setGraphic(null);
             } else {
-               Pane graphic = (Pane) projectSelectionNodeMap.get(item);
+               Node graphic = projectSelectionNodeMap.get(item);
                if (graphic == null) {
                   final Project addedProject = item;
                   addProjectToProjectSelectionNodeMap(addedProject);
+                  graphic = projectSelectionNodeMap.get(item);
                }
-               graphic = (Pane) projectSelectionNodeMap.get(item);
                LOG.trace("Item: '{}' -> '{}'", item.getName(), graphic);
                setGraphic(graphic);
             }
