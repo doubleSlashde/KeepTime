@@ -137,57 +137,30 @@ public class ProjectsListViewController {
       availableProjectsListView.getSelectionModel().selectFirst();
    }
 
-   private void addProjectToProjectSelectionNodeMap(final Project project) {
-      final Pane projectElement = addProjectToProjectList(project);
-      projectSelectionNodeMap.put(project, projectElement);
+   /**
+    * Update UI
+    */
+   public void tick() {
+      for (final Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
+         final Project p = entry.getKey();
+         final Label label = entry.getValue();
+
+         final long seconds = model.getPastWorkItems().stream().filter(work -> work.getProject().getId() == p.getId())
+               .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+         label.setText(DateFormatter.secondsToHHMMSS(seconds));
+      }
    }
 
-   public void changeProject(final Project newProject, final long minusSeconds) {
+   private void changeProject(final Project newProject, final long minusSeconds) {
       if (hideable) {
          mainStage.hide();
       }
       controller.changeProject(newProject, minusSeconds);
    }
 
-   public Map<Project, Node> getProjectSelectionNodeMap() {
-      return projectSelectionNodeMap;
-   }
-
-   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
-      final GridPane grid = new GridPane();
-      grid.setHgap(10);
-      grid.setVgap(10);
-      grid.setPadding(new Insets(20, 150, 10, 10));
-
-      final Label nameLabel = new Label("Name:");
-      nameLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(nameLabel, 0, 0);
-
-      final TextField projectNameTextField = new TextField(projectName);
-      projectNameTextField.setFont(FontProvider.getDefaultFont());
-      grid.add(projectNameTextField, 1, 0);
-
-      final Label colorLabel = new Label("Color:");
-      colorLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(colorLabel, 0, 1);
-
-      final ColorPicker colorPicker = new ColorPicker(projectColor);
-      grid.add(colorPicker, 1, 1);
-
-      final Label isWorkLabel = new Label("IsWork:");
-      isWorkLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkLabel, 0, 2);
-
-      final CheckBox isWorkCheckBox = new CheckBox();
-      isWorkCheckBox.setSelected(isWork);
-      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkCheckBox, 1, 2);
-
-      final Label sortIndex = new Label("SortIndex:");
-      sortIndex.setFont(FontProvider.getDefaultFont());
-      grid.add(new Label("SortIndex:"), 0, 3);
-
-      return grid;
+   private void addProjectToProjectSelectionNodeMap(final Project project) {
+      final Node projectElement = createListEntryForProject(project);
+      projectSelectionNodeMap.put(project, projectElement);
    }
 
    private void realignProjectList() {
@@ -198,7 +171,7 @@ public class ProjectsListViewController {
       model.getSortedAvailableProjects().setComparator(comparator);
    }
 
-   private Pane addProjectToProjectList(final Project p) {
+   private Node createListEntryForProject(final Project p) {
       final ContextMenu contextMenu = new ContextMenu();
 
       final FXMLLoader loader = new FXMLLoader();
@@ -342,6 +315,43 @@ public class ProjectsListViewController {
       return grid;
    }
 
+   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
+      final GridPane grid = new GridPane();
+      grid.setHgap(10);
+      grid.setVgap(10);
+      grid.setPadding(new Insets(20, 150, 10, 10));
+
+      final Label nameLabel = new Label("Name:");
+      nameLabel.setFont(FontProvider.getDefaultFont());
+      grid.add(nameLabel, 0, 0);
+
+      final TextField projectNameTextField = new TextField(projectName);
+      projectNameTextField.setFont(FontProvider.getDefaultFont());
+      grid.add(projectNameTextField, 1, 0);
+
+      final Label colorLabel = new Label("Color:");
+      colorLabel.setFont(FontProvider.getDefaultFont());
+      grid.add(colorLabel, 0, 1);
+
+      final ColorPicker colorPicker = new ColorPicker(projectColor);
+      grid.add(colorPicker, 1, 1);
+
+      final Label isWorkLabel = new Label("IsWork:");
+      isWorkLabel.setFont(FontProvider.getDefaultFont());
+      grid.add(isWorkLabel, 0, 2);
+
+      final CheckBox isWorkCheckBox = new CheckBox();
+      isWorkCheckBox.setSelected(isWork);
+      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
+      grid.add(isWorkCheckBox, 1, 2);
+
+      final Label sortIndex = new Label("SortIndex:");
+      sortIndex.setFont(FontProvider.getDefaultFont());
+      grid.add(new Label("SortIndex:"), 0, 3);
+
+      return grid;
+   }
+
    private void editProject(final ObservableList<Node> nodes, final Project p) {
       final TextField projectNameTextField = (TextField) nodes.get(1);
       final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
@@ -351,18 +361,7 @@ public class ProjectsListViewController {
             indexSpinner.getValue());
    }
 
-   public void tick() {
-      for (final Entry<Project, Label> entry : elapsedProjectTimeLabelMap.entrySet()) {
-         final Project p = entry.getKey();
-         final Label label = entry.getValue();
-
-         final long seconds = model.getPastWorkItems().stream().filter(work -> work.getProject().getId() == p.getId())
-               .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
-         label.setText(DateFormatter.secondsToHHMMSS(seconds));
-      }
-   }
-
-   public ListCell<Project> returnListCellOfProject() {
+   private ListCell<Project> returnListCellOfProject() {
       return new ListCell<Project>() {
 
          @Override
