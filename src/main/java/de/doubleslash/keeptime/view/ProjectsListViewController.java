@@ -149,10 +149,8 @@ public class ProjectsListViewController {
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {
-      if (project.isEnabled()) {
-         final Pane projectElement = addProjectToProjectList(project);
-         projectSelectionNodeMap.put(project, projectElement);
-      }
+      final Pane projectElement = addProjectToProjectList(project);
+      projectSelectionNodeMap.put(project, projectElement);
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
@@ -385,13 +383,14 @@ public class ProjectsListViewController {
             if (item == null || empty) {
                setGraphic(null);
             } else {
-               final Pane graphic = (Pane) projectSelectionNodeMap.get(item);
+               Pane graphic = (Pane) projectSelectionNodeMap.get(item);
                if (graphic == null) {
                   final Project addedProject = item;
                   addProjectToProjectSelectionNodeMap(addedProject);
                }
-               LOG.trace("Item: '{}' -> '{}'", item.getName(), projectSelectionNodeMap.get(item));
-               setGraphic(projectSelectionNodeMap.get(item));
+               graphic = (Pane) projectSelectionNodeMap.get(item);
+               LOG.trace("Item: '{}' -> '{}'", item.getName(), graphic);
+               setGraphic(graphic);
             }
          }
 
