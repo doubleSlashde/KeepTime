@@ -142,6 +142,11 @@ public class Controller {
          LOG.error("You cannot delete the default project. Tried to delete project '{}'", p);
          return;
       }
+
+      if (isProjectActive(p)) {
+         changeProject(model.getIdleProject());
+      }
+
       LOG.info("Disabeling project '{}'.", p);
 
       final int indexToRemove = p.getIndex();
@@ -156,6 +161,10 @@ public class Controller {
 
       changedProjects.add(p);
       model.getProjectRepository().saveAll(changedProjects);
+   }
+
+   private boolean isProjectActive(final Project p) {
+      return p == model.activeWorkItem.get().getProject();
    }
 
    public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,

@@ -227,6 +227,8 @@ public class Main extends Application {
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
       viewControllerPopupController.setControllerAndModel(controller, model);
+      viewControllerPopupController.secondInitialize();
+
       globalScreenListener.setViewController(viewControllerPopupController);
    }
 
@@ -263,6 +265,7 @@ public class Main extends Application {
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
       viewController.setController(controller, model);
+      viewController.secondInitialize();
 
    }
 
