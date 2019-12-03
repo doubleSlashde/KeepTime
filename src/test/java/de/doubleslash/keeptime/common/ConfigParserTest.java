@@ -45,16 +45,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 
+// TODO: Refactor these tests. They seem to be sketchy.
+
 public class ConfigParserTest {
    private final Logger Log = LoggerFactory.getLogger(this.getClass());
 
    ClassLoader classLoader = getClass().getClassLoader();
    private final String CONFIG_FILENAME = classLoader.getResource("configTest.xml").getFile();
 
-   private final Project idle = new Project("Idle", Color.AQUAMARINE, true, 0);
-   private final Project heinz = new Project("Heinz", Color.BLUEVIOLET, true, 1);
-   private final Project peter = new Project("Peter", Color.CRIMSON, true, 2);
-   private final Project hinzUndKunz = new Project("Hinz und Kunz", Color.DARKRED, true, 3);
+   private final Project idle = new Project("Idle", "", Color.AQUAMARINE, true, 0);
+   private final Project heinz = new Project("Heinz", "", Color.BLUEVIOLET, true, 1);
+   private final Project peter = new Project("Peter", "", Color.CRIMSON, true, 2);
+   private final Project hinzUndKunz = new Project("Hinz und Kunz", "", Color.DARKRED, true, 3);
    private final ObservableList<Project> projects = FXCollections.observableArrayList();
 
    private final Controller controller = mock(Controller.class);
@@ -76,16 +78,16 @@ public class ConfigParserTest {
             final Object[] args = invocation.getArguments();
             final Object mock = invocation.getMock();
             Log.debug("called with arguments: " + Arrays.toString(args));
-            projects.add(new Project((String) args[0], (Color) args[2], (Boolean) args[1], (Integer) args[3]));
+            projects.add(new Project((String) args[0], "", (Color) args[2], (Boolean) args[1], (Integer) args[3]));
             return "";
 
          }
-      }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
+      }).when(controller).addNewProject(anyString(), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller).addNewProject(eq("Peter Lustig"), anyBoolean(), any(Color.class), anyInt());
-      verify(controller).addNewProject(eq("Peter Pan"), anyBoolean(), any(Color.class), anyInt());
+      verify(controller).addNewProject(eq("Peter Lustig"), anyString(), anyBoolean(), any(Color.class), anyInt());
+      verify(controller).addNewProject(eq("Peter Pan"), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       assertEquals(6, projects.size());
    }
@@ -105,15 +107,15 @@ public class ConfigParserTest {
             final Object[] args = invocation.getArguments();
             final Object mock = invocation.getMock();
             Log.debug("called with arguments: " + Arrays.toString(args));
-            projects.add(new Project((String) args[0], (Color) args[2], (Boolean) args[1], (Integer) args[3]));
+            projects.add(new Project((String) args[0], "", (Color) args[2], (Boolean) args[1], (Integer) args[3]));
             return "";
 
          }
-      }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
+      }).when(controller).addNewProject(anyString(), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller, never()).addNewProject(eq("Idle"), anyBoolean(), any(Color.class), anyInt());
+      verify(controller, never()).addNewProject(eq("Idle"), anyString(), anyBoolean(), any(Color.class), anyInt());
    }
 
    @Test
@@ -125,15 +127,16 @@ public class ConfigParserTest {
             final Object[] args = invocation.getArguments();
             final Object mock = invocation.getMock();
             Log.debug("called with arguments: " + Arrays.toString(args));
-            projects.add(new Project((String) args[0], (Color) args[2], (Boolean) args[1], (Integer) args[3]));
+            projects.add(new Project((String) args[0], "", (Color) args[2], (Boolean) args[1], (Integer) args[3]));
             return "";
 
          }
-      }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
+      }).when(controller).addNewProject(anyString(), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller, atLeastOnce()).addNewProject(eq("Peter Pan"), anyBoolean(), any(Color.class), anyInt());
+      verify(controller, atLeastOnce()).addNewProject(eq("Peter Pan"), anyString(), anyBoolean(), any(Color.class),
+            anyInt());
    }
 
    @Test
@@ -145,15 +148,15 @@ public class ConfigParserTest {
             final Object[] args = invocation.getArguments();
             final Object mock = invocation.getMock();
             Log.debug("called with arguments: " + Arrays.toString(args));
-            projects.add(new Project((String) args[0], (Color) args[2], (Boolean) args[1], (Integer) args[3]));
+            projects.add(new Project((String) args[0], "", (Color) args[2], (Boolean) args[1], (Integer) args[3]));
             return "";
 
          }
-      }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
+      }).when(controller).addNewProject(anyString(), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller).addNewProject(eq("Peter Pan"), anyBoolean(), any(Color.class), eq(5));
+      verify(controller).addNewProject(eq("Peter Pan"), anyString(), anyBoolean(), any(Color.class), eq(5));
    }
 
    @Test
@@ -165,14 +168,13 @@ public class ConfigParserTest {
             final Object[] args = invocation.getArguments();
             final Object mock = invocation.getMock();
             Log.debug("called with arguments: " + Arrays.toString(args));
-            projects.add(new Project((String) args[0], (Color) args[2], (Boolean) args[1], (Integer) args[3]));
+            projects.add(new Project((String) args[0], "", (Color) args[2], (Boolean) args[1], (Integer) args[3]));
             return "";
-
          }
-      }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
+      }).when(controller).addNewProject(anyString(), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
-      verify(controller, atLeastOnce()).addNewProject("Peter Lustig", true, Color.GREEN, 4);
+      verify(controller, atLeastOnce()).addNewProject("Peter Lustig", "", true, Color.GREEN, 4);
    }
 
    @Test
@@ -184,14 +186,14 @@ public class ConfigParserTest {
             final Object[] args = invocation.getArguments();
             final Object mock = invocation.getMock();
             Log.debug("called with arguments: " + Arrays.toString(args));
-            projects.add(new Project((String) args[0], (Color) args[2], (Boolean) args[1], (Integer) args[3]));
+            projects.add(new Project((String) args[0], "", (Color) args[2], (Boolean) args[1], (Integer) args[3]));
             return "";
 
          }
-      }).when(controller).addNewProject(anyString(), anyBoolean(), any(Color.class), anyInt());
+      }).when(controller).addNewProject(anyString(), anyString(), anyBoolean(), any(Color.class), anyInt());
 
       loadConfigFile(CONFIG_FILENAME);
 
-      verify(controller, atLeastOnce()).addNewProject("Peter Pan", false, Color.WHITE, 5);
+      verify(controller, atLeastOnce()).addNewProject("Peter Pan", "", false, Color.WHITE, 5);
    }
 }
