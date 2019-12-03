@@ -195,8 +195,8 @@ public class ControllerTest {
       final LocalDateTime secondProjectDateTime = LocalDateTime.now();
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      final Project firstProject = new Project("1st Project", "A good description", Color.GREEN, true, 0);
-      final Project secondProject = new Project("2nd Project", "An even better description", Color.RED, true, 1);
+      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
       testee.changeProject(secondProject);
@@ -226,8 +226,8 @@ public class ControllerTest {
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      final Project firstProject = new Project("1st Project", "A good description", Color.GREEN, true, 0);
-      final Project secondProject = new Project("2nd Project", "An even better description", Color.RED, true, 1);
+      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
       testee.changeProject(secondProject);
@@ -257,8 +257,8 @@ public class ControllerTest {
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      final Project firstProject = new Project("1st Project", "A good description", Color.GREEN, true, 0);
-      final Project secondProject = new Project("2nd Project", "An even better description", Color.RED, true, 1);
+      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
       testee.changeProject(secondProject, 23 * 60 * 60); // change with -23 hours
@@ -290,10 +290,10 @@ public class ControllerTest {
 
    @Test
    public void shouldCalculateSecondsCorrectlyWhenWorkItemsAreGiven() {
-      final Project workProject1 = new Project("workProject1", "Some description", Color.GREEN, true, 0);
-      final Project workProject2 = new Project("workProject2", "A good description", Color.RED, true, 1);
-      final Project nonworkProject1 = new Project("nonworkProject1", "An even better description", Color.RED, false, 2);
-      final Project nonworkProject2 = new Project("nonworkProject2", "The best description", Color.RED, false, 3);
+      final Project workProject1 = new Project("workProject1", Color.GREEN, true, 0);
+      final Project workProject2 = new Project("workProject2", Color.RED, true, 1);
+      final Project nonworkProject1 = new Project("nonworkProject1", Color.RED, false, 2);
+      final Project nonworkProject2 = new Project("nonworkProject2", Color.RED, false, 3);
 
       final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
@@ -317,7 +317,7 @@ public class ControllerTest {
       final long todaysSeconds = testee.calcTodaysSeconds();
       assertEquals("Todays seconds were not calulated correctly.", TimeUnit.HOURS.toSeconds(4), todaysSeconds);
 
-      // final long todaysWorkSeconds = testee.calcTodaysWorkSeconds();
+      final long todaysWorkSeconds = testee.calcTodaysWorkSeconds();
       // assertEquals("Todays work seconds were not calculated correctly.",TimeUnit.HOURS.toSeconds(2),
       // todaysWorkSeconds);
       // TODO does not work, as id within project cannot be set
