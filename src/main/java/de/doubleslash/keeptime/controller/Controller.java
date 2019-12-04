@@ -91,14 +91,12 @@ public class Controller {
       model.activeWorkItem.set(work);
    }
 
-   public void addNewProject(final String projectName, final String description, final boolean isWork,
-         final Color projectColor, final int index) {
-      final Project project = new Project(projectName, description, projectColor, isWork, index, false);
+   public void addNewProject(final Project project) {
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 
       final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), project,
-            model.getAvailableProjects().size(), index);
+            model.getAvailableProjects().size(), project.getIndex());
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
    }

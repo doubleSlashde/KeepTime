@@ -523,10 +523,7 @@ public class ViewController {
       final Optional<Project> result = dialog.showAndWait();
       mainStage.setAlwaysOnTop(true);
 
-      result.ifPresent(project -> {
-         controller.addNewProject(project.getName(), project.getDescription(), project.isWork(), project.getColor(),
-               project.getIndex());
-      });
+      result.ifPresent(project -> controller.addNewProject(project));
    }
 
    public void secondInitialize() {
