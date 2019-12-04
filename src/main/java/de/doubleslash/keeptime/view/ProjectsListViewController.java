@@ -48,10 +48,6 @@ import javafx.stage.Stage;
 
 public class ProjectsListViewController {
 
-   private static final String TOOLTIP_FORMAT_STRING = "%s%n%s";
-
-   private static final int PROJECT_NAME_LABEL_INDEX = 0;
-
    private static final Logger LOG = LoggerFactory.getLogger(ProjectsListViewController.class);
 
    private final Model model;
@@ -300,8 +296,8 @@ public class ProjectsListViewController {
 
    private void updateTooltip(final Project p) {
       final Pane pane = (Pane) projectSelectionNodeMap.get(p);
-      final Label projectNameLabel = (Label) pane.getChildren().get(PROJECT_NAME_LABEL_INDEX);
-      final String tooltipText = String.format(TOOLTIP_FORMAT_STRING, p.getName(), p.getDescription());
+      final Label projectNameLabel = (Label) pane.getChildren().get(0);
+      final String tooltipText = String.format("%s%n%s", p.getName(), p.getDescription());
       final Tooltip projectTooltip = projectNameLabel.getTooltip();
       if (projectTooltip == null) {
          projectNameLabel.setTooltip(new Tooltip());

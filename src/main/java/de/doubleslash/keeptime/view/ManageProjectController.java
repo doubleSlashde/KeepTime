@@ -16,8 +16,6 @@ import javafx.scene.paint.Color;
 
 public class ManageProjectController {
 
-   private static final int DEFAULT_SPINNER_VALUE = 0;
-
    private static final Logger LOG = LoggerFactory.getLogger(ManageProjectController.class);
 
    private Model model;
@@ -82,7 +80,7 @@ public class ManageProjectController {
       if (model != null) {
          final int availableProjectAmount = model.getAllProjects().size();
          sortIndexSpinner
-               .setValueFactory(new IntegerSpinnerValueFactory(DEFAULT_SPINNER_VALUE, availableProjectAmount, availableProjectAmount));
+               .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
          sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
       }
    }
