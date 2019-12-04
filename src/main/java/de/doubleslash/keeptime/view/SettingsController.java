@@ -16,13 +16,11 @@
 
 package de.doubleslash.keeptime.view;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.doubleslash.keeptime.common.ConfigParser;
 import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -85,9 +83,6 @@ public class SettingsController {
    private Button cancelButton;
 
    @FXML
-   private Button parseConfigButton;
-
-   @FXML
    private Button aboutButton;
 
    @FXML
@@ -102,10 +97,6 @@ public class SettingsController {
 
    private Controller controller;
    private Model model;
-
-   private static final String INPUT_FILE = "config.xml";
-
-   private AboutController aboutController;
 
    private Stage thisStage;
 
@@ -193,14 +184,6 @@ public class SettingsController {
       resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
-      LOG.debug("parseConfigButton.setOnAction");
-      parseConfigButton.setOnAction(actionEvent -> {
-         if (ConfigParser.hasConfigFile(INPUT_FILE)) {
-            final ConfigParser parser = new ConfigParser(controller);
-            parser.parseConfig(new File(INPUT_FILE));
-         }
-      });
-
       LOG.debug("reportBugButton.setOnAction");
       aboutButton.setOnAction(ae -> {
          LOG.info("About clicked");
@@ -242,8 +225,6 @@ public class SettingsController {
          final FXMLLoader fxmlLoader3 = createFXMLLoader(RESOURCE.FXML_ABOUT);
          LOG.debug("load root");
          final Parent rootAbout = fxmlLoader3.load();
-         LOG.debug("get controller class");
-         aboutController = fxmlLoader3.getController();
          LOG.debug("set stage");
          aboutStage = new Stage();
          aboutStage.initModality(Modality.APPLICATION_MODAL);
