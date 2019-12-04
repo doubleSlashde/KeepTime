@@ -79,7 +79,7 @@ public class ConfigParser {
                if (!exists) {
                   LOG.info("Adding project '{}'.", name);
                   final Color colorTemp = Color.valueOf(color);
-                  controller.addNewProject(name, "", Boolean.parseBoolean(isWork), colorTemp, index);
+                  controller.addNewProject(name, Boolean.parseBoolean(isWork), colorTemp, index);
                   index++;
                } else {
                   LOG.debug("Project '{}' already exists", name);
