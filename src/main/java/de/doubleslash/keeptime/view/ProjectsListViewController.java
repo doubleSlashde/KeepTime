@@ -335,8 +335,10 @@ public class ProjectsListViewController {
       final ColorPicker textFillColorPicker = manageProjectController.getTextFillColorPicker();
       final CheckBox isWorkCheckBox = manageProjectController.getIsWorkCheckBox();
       final Spinner<Integer> sortIndexSpinner = manageProjectController.getSortIndexSpinner();
-      controller.editProject(p, nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
-            isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
+
+      final Project newValues = new Project(nameTextField.getText(), descriptionTextArea.getText(),
+            textFillColorPicker.getValue(), isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
+      controller.editProject(p, newValues);
    }
 
    private ListCell<Project> returnListCellOfProject() {

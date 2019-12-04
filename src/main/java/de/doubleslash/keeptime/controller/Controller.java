@@ -165,19 +165,20 @@ public class Controller {
       return p == model.activeWorkItem.get().getProject();
    }
 
-   public void editProject(final Project p, final String newName, final String description, final Color newColor,
-         final boolean isWork, final int newIndex) {
-      LOG.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+   public void editProject(final Project projectToBeUpdated, final Project newValuedProject) {
+      LOG.info("Changing project '{}' to '{}' '{}' '{}'", projectToBeUpdated, newValuedProject.getName(),
+            newValuedProject.getColor(), newValuedProject.isWork());
 
-      p.setName(newName);
-      p.setDescription(description);
-      p.setColor(newColor);
-      p.setWork(isWork);
-      final int oldIndex = p.getIndex();
-      p.setIndex(newIndex);
+      projectToBeUpdated.setName(newValuedProject.getName());
+      projectToBeUpdated.setDescription(newValuedProject.getDescription());
+      projectToBeUpdated.setColor(newValuedProject.getColor());
+      projectToBeUpdated.setWork(newValuedProject.isWork());
+      final int oldIndex = projectToBeUpdated.getIndex();
+      projectToBeUpdated.setIndex(newValuedProject.getIndex());
 
-      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), p, oldIndex, newIndex);
-      changedProjects.add(p);
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), projectToBeUpdated,
+            oldIndex, newValuedProject.getIndex());
+      changedProjects.add(projectToBeUpdated);
 
       // save all projects which changed index
       model.getProjectRepository().saveAll(changedProjects);
