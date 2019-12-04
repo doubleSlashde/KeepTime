@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -22,7 +21,6 @@ import de.doubleslash.keeptime.model.Project;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -38,7 +36,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
@@ -56,11 +54,11 @@ public class ProjectsListViewController {
    private final Controller controller;
    private final Stage mainStage;
    private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
-   private final ListView<Project> availableProjectsListView;
    private final Map<Project, Node> projectSelectionNodeMap;
    private final FilteredList<Project> filteredData;
 
    private boolean hideable;
+   private ManageProjectController manageProjectController;
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
          final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
@@ -68,7 +66,6 @@ public class ProjectsListViewController {
       this.controller = controller;
       this.hideable = hideable;
       this.mainStage = mainStage;
-      this.availableProjectsListView = availableProjectsListView;
       availableProjectsListView.setCellFactory(listView -> returnListCellOfProject());
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
@@ -87,7 +84,8 @@ public class ProjectsListViewController {
 
             final String lowerCaseFilter = newValue.toLowerCase();
 
-            if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
+            if (project.getName().toLowerCase().contains(lowerCaseFilter)
+                  || project.getDescription().toLowerCase().contains(lowerCaseFilter)) {
                return true;
             }
 
@@ -161,6 +159,7 @@ public class ProjectsListViewController {
    private void addProjectToProjectSelectionNodeMap(final Project project) {
       final Node projectElement = createListEntryForProject(project);
       projectSelectionNodeMap.put(project, projectElement);
+      updateTooltip(project);
    }
 
    private void realignProjectList() {
@@ -222,8 +221,6 @@ public class ProjectsListViewController {
          projectNameLabel.setEffect(null);
       });
 
-      projectNameLabel.setTooltip(new Tooltip(projectNameLabel.getText()));
-
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
@@ -277,7 +274,7 @@ public class ProjectsListViewController {
                return;
             }
             final ObservableList<Node> nodes = grid.getChildren();
-            editProject(nodes, p);
+            editProject(p, manageProjectController);
 
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
@@ -287,6 +284,7 @@ public class ProjectsListViewController {
 
             // TODO how to update currentProjectLabel when active project was edited?
             realignProjectList();
+            updateTooltip(p);
          });
       });
 
@@ -294,6 +292,17 @@ public class ProjectsListViewController {
       contextMenu.getItems().addAll(changeWithTimeMenuItem, editMenuItem, deleteMenuItem);
 
       return projectElement;
+   }
+
+   private void updateTooltip(final Project p) {
+      final Pane pane = (Pane) projectSelectionNodeMap.get(p);
+      final Label projectNameLabel = (Label) pane.getChildren().get(0);
+      final String tooltipText = String.format("%s%n%s", p.getName(), p.getDescription());
+      final Tooltip projectTooltip = projectNameLabel.getTooltip();
+      if (projectTooltip == null) {
+         projectNameLabel.setTooltip(new Tooltip());
+      }
+      projectNameLabel.getTooltip().setText(tooltipText);
    }
 
    private Dialog<ButtonType> setUpDialogButtonType(final String title, final String headerText) {
@@ -305,60 +314,29 @@ public class ProjectsListViewController {
    }
 
    private GridPane setUpEditProjectGridPane(final Project p) {
-      final GridPane grid = setUpGridPane(p.getName(), p.getColor(), p.isWork());
-
-      final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.getAvailableProjects().size();
-      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
-      grid.add(indexSpinner, 1, 3);
-
-      return grid;
-   }
-
-   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
-      final GridPane grid = new GridPane();
-      grid.setHgap(10);
-      grid.setVgap(10);
-      grid.setPadding(new Insets(20, 150, 10, 10));
-
-      final Label nameLabel = new Label("Name:");
-      nameLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(nameLabel, 0, 0);
-
-      final TextField projectNameTextField = new TextField(projectName);
-      projectNameTextField.setFont(FontProvider.getDefaultFont());
-      grid.add(projectNameTextField, 1, 0);
-
-      final Label colorLabel = new Label("Color:");
-      colorLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(colorLabel, 0, 1);
-
-      final ColorPicker colorPicker = new ColorPicker(projectColor);
-      grid.add(colorPicker, 1, 1);
-
-      final Label isWorkLabel = new Label("IsWork:");
-      isWorkLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkLabel, 0, 2);
-
-      final CheckBox isWorkCheckBox = new CheckBox();
-      isWorkCheckBox.setSelected(isWork);
-      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkCheckBox, 1, 2);
-
-      final Label sortIndex = new Label("SortIndex:");
-      sortIndex.setFont(FontProvider.getDefaultFont());
-      grid.add(new Label("SortIndex:"), 0, 3);
+      GridPane grid;
+      final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
+      try {
+         grid = loader.load();
+      } catch (final IOException e) {
+         throw new FXMLLoaderException("Error while loading '" + Resources.RESOURCE.FXML_MANAGE_PROJECT + "'.", e);
+      }
+      manageProjectController = loader.getController();
+      manageProjectController.setModel(model);
+      manageProjectController.secondInitialize();
+      manageProjectController.setValues(p.getName(), p.getDescription(), p.getColor(), p.isWork(), p.getIndex());
 
       return grid;
    }
 
-   private void editProject(final ObservableList<Node> nodes, final Project p) {
-      final TextField projectNameTextField = (TextField) nodes.get(1);
-      final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-      final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-      final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-      controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
-            indexSpinner.getValue());
+   private void editProject(final Project p, final ManageProjectController manageProjectController) {
+      final TextField nameTextField = manageProjectController.getNameTextField();
+      final TextArea descriptionTextArea = manageProjectController.getDescriptionTextArea();
+      final ColorPicker textFillColorPicker = manageProjectController.getTextFillColorPicker();
+      final CheckBox isWorkCheckBox = manageProjectController.getIsWorkCheckBox();
+      final Spinner<Integer> sortIndexSpinner = manageProjectController.getSortIndexSpinner();
+      controller.editProject(p, nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
+            isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
    }
 
    private ListCell<Project> returnListCellOfProject() {

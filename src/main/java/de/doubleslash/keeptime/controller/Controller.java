@@ -91,9 +91,9 @@ public class Controller {
       model.activeWorkItem.set(work);
    }
 
-   public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
-         final int index) {
-      final Project project = new Project(projectName, projectColor, isWork, index, false);
+   public void addNewProject(final String projectName, final String description, final boolean isWork,
+         final Color projectColor, final int index) {
+      final Project project = new Project(projectName, description, projectColor, isWork, index, false);
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 
@@ -167,11 +167,12 @@ public class Controller {
       return p == model.activeWorkItem.get().getProject();
    }
 
-   public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
-         final int newIndex) {
+   public void editProject(final Project p, final String newName, final String description, final Color newColor,
+         final boolean isWork, final int newIndex) {
       LOG.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
 
       p.setName(newName);
+      p.setDescription(description);
       p.setColor(newColor);
       p.setWork(isWork);
       final int oldIndex = p.getIndex();

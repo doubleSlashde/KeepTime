@@ -54,7 +54,7 @@ public class Model {
 
    public static final Color ORIGINAL_TASK_BAR_FONT_COLOR = Color.BLACK;
 
-   public static final Project DEFAULT_PROJECT = new Project("Idle", Color.ORANGE, false, 0, true);
+   public static final Project DEFAULT_PROJECT = new Project("Idle", "", Color.ORANGE, false, 0, true);
    private Project idleProject = DEFAULT_PROJECT;
 
    private final ObservableList<Project> availableProjects = FXCollections.observableArrayList();

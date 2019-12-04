@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane fx:id="grid" hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="5.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.171" fx:controller="de.doubleslash.keeptime.view.ManageProjectController">
+  <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" />
+    <ColumnConstraints hgrow="SOMETIMES" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Label text="Name:" />
+      <Label text="Color:" GridPane.rowIndex="2" />
+      <Label text="IsWork:" GridPane.rowIndex="3" />
+      <Label text="SortIndex:" GridPane.rowIndex="4" />
+      <Label text="Description:" GridPane.rowIndex="1" />
+      <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
+      <ColorPicker fx:id="textFillColorPicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <CheckBox fx:id="isWorkCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <Spinner fx:id="sortIndexSpinner" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+      <TextArea fx:id="descriptionTextArea" prefHeight="80.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</GridPane>

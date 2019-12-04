@@ -22,6 +22,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
@@ -38,6 +39,9 @@ public class Project {
 
    private String name;
 
+   @Lob
+   private String description;
+
    @Convert(converter = ColorConverter.class, disableConversion = false)
    private Color color;
 
@@ -53,10 +57,11 @@ public class Project {
       // Needed for jpa
    }
 
-   public Project(final String name, final Color color, final boolean isWork, final int index,
+   public Project(final String name, final String description, final Color color, final boolean isWork, final int index,
          final boolean isDefault) {
       super();
       this.name = name;
+      this.description = description;
       this.color = color;
       this.isWork = isWork;
       this.isDefault = isDefault;
@@ -64,8 +69,9 @@ public class Project {
       this.index = index;
    }
 
-   public Project(final String name, final Color color, final boolean isWork, final int index) {
-      this(name, color, isWork, index, false);
+   public Project(final String name, final String description, final Color color, final boolean isWork,
+         final int index) {
+      this(name, description, color, isWork, index, false);
    }
 
    public String getName() {
@@ -118,6 +124,14 @@ public class Project {
 
    public void setIndex(final int index) {
       this.index = index;
+   }
+
+   public String getDescription() {
+      return description;
+   }
+
+   public void setDescription(final String description) {
+      this.description = description;
    }
 
    @Override
