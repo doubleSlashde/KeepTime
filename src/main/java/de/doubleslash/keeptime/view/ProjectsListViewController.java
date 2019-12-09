@@ -25,8 +25,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -35,8 +33,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
@@ -57,7 +53,7 @@ public class ProjectsListViewController {
    private final Map<Project, Node> projectSelectionNodeMap;
    private final FilteredList<Project> filteredData;
 
-   private boolean hideable;
+   private final boolean hideable;
    private ManageProjectController manageProjectController;
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
@@ -76,21 +72,7 @@ public class ProjectsListViewController {
       searchTextField.textProperty().addListener((a, b, newValue) -> {
          LOG.info("New filter value: " + newValue);
          // TODO do i always have to create a new predicate?
-         filteredData.setPredicate(project -> {
-            // If filter text is empty, display all data.
-            if (newValue == null || newValue.isEmpty()) {
-               return true;
-            }
-
-            final String lowerCaseFilter = newValue.toLowerCase();
-
-            if (project.getName().toLowerCase().contains(lowerCaseFilter)
-                  || project.getDescription().toLowerCase().contains(lowerCaseFilter)) {
-               return true;
-            }
-
-            return false;
-         });
+         filteredData.setPredicate(project -> doesProjectMatchSearchFilter(newValue, project));
          LOG.debug("Amount of projects to show '{}'.", filteredData.size());
          availableProjectsListView.getSelectionModel().selectFirst();
          availableProjectsListView.scrollTo(0);
@@ -133,6 +115,22 @@ public class ProjectsListViewController {
 
       availableProjectsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       availableProjectsListView.getSelectionModel().selectFirst();
+   }
+
+   static boolean doesProjectMatchSearchFilter(final String searchText, final Project project) {
+      // If filter text is empty, display all data.
+      if (searchText == null || searchText.isEmpty()) {
+         return true;
+      }
+
+      final String lowerCaseFilter = searchText.toLowerCase();
+
+      if (project.getName().toLowerCase().contains(lowerCaseFilter)
+            || project.getDescription().toLowerCase().contains(lowerCaseFilter)) {
+         return true;
+      }
+
+      return false;
    }
 
    /**
@@ -324,20 +322,19 @@ public class ProjectsListViewController {
       manageProjectController = loader.getController();
       manageProjectController.setModel(model);
       manageProjectController.secondInitialize();
-      manageProjectController.setValues(p.getName(), p.getDescription(), p.getColor(), p.isWork(), p.getIndex());
+      manageProjectController.setValues(p);
 
       return grid;
    }
 
    private void editProject(final Project p, final ManageProjectController manageProjectController) {
-      final TextField nameTextField = manageProjectController.getNameTextField();
-      final TextArea descriptionTextArea = manageProjectController.getDescriptionTextArea();
-      final ColorPicker textFillColorPicker = manageProjectController.getTextFillColorPicker();
-      final CheckBox isWorkCheckBox = manageProjectController.getIsWorkCheckBox();
-      final Spinner<Integer> sortIndexSpinner = manageProjectController.getSortIndexSpinner();
+      final String projectName = manageProjectController.getProjectName();
+      final String projectDescription = manageProjectController.getProjectDescription();
+      final Color projectColor = manageProjectController.getProjectColor();
+      final boolean isWork = manageProjectController.isWork();
+      final int index = manageProjectController.getIndex();
 
-      final Project newValues = new Project(nameTextField.getText(), descriptionTextArea.getText(),
-            textFillColorPicker.getValue(), isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
+      final Project newValues = new Project(projectName, projectDescription, projectColor, isWork, index);
       controller.editProject(p, newValues);
    }
 
