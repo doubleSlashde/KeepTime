@@ -56,12 +56,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Light;
@@ -310,14 +307,17 @@ public class ViewController {
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog) {
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
-            final TextField nameTextField = manageProjectController.getNameTextField();
-            final TextArea descriptionTextArea = manageProjectController.getDescriptionTextArea();
-            final ColorPicker textFillColorPicker = manageProjectController.getTextFillColorPicker();
-            final CheckBox isWorkCheckBox = manageProjectController.getIsWorkCheckBox();
-            final Spinner<Integer> indexSpinner = manageProjectController.getSortIndexSpinner();
-            return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
-                  isWorkCheckBox.isSelected(), indexSpinner.getValue()); // temporary (misused) transfer object for
-                                                                         // project
+            final String projectName = manageProjectController.getProjectName();
+            final String projectDescription = manageProjectController.getProjectDescription();
+            final Color projectColor = manageProjectController.getProjectColor();
+            final boolean isWork = manageProjectController.isWork();
+            final int index = manageProjectController.getIndex();
+            return new Project(projectName, projectDescription, projectColor, isWork, index); // temporary
+                                                                                              // (misused)
+                                                                                              // transfer
+                                                                                              // object
+                                                                                              // for
+                                                                                              // project
          }
          // TODO: Do you really want to return null?
          return null;
