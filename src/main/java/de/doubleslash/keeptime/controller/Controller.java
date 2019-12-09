@@ -166,8 +166,7 @@ public class Controller {
    }
 
    public void editProject(final Project projectToBeUpdated, final Project newValuedProject) {
-      LOG.info("Changing project '{}' to '{}' '{}' '{}'", projectToBeUpdated, newValuedProject.getName(),
-            newValuedProject.getColor(), newValuedProject.isWork());
+      LOG.info("Changing project '{}' to '{}'.", projectToBeUpdated, newValuedProject);
 
       projectToBeUpdated.setName(newValuedProject.getName());
       projectToBeUpdated.setDescription(newValuedProject.getDescription());
