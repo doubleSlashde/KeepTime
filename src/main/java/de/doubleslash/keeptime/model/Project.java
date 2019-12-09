@@ -136,8 +136,8 @@ public class Project {
 
    @Override
    public String toString() {
-      return "Project [id=" + id + ", name=" + name + ", color=" + color + ", isWork=" + isWork + ", isDefault="
-            + isDefault + ", isEnabled=" + isEnabled + "]";
+      return "Project [id=" + id + ", name=" + name + ", description=" + description + ", color=" + color + ", isWork="
+            + isWork + ", isDefault=" + isDefault + ", isEnabled=" + isEnabled + ", index=" + index + "]";
    }
 
 }
