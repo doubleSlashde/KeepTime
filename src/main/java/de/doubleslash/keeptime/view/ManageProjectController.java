@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Project;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
@@ -38,42 +39,37 @@ public class ManageProjectController {
    @FXML
    private Spinner<Integer> sortIndexSpinner;
 
-   public GridPane getGrid() {
-      return grid;
+   public String getProjectName() {
+      return nameTextField.getText();
    }
 
-   public TextField getNameTextField() {
-      return nameTextField;
+   public String getProjectDescription() {
+      return descriptionTextArea.getText();
    }
 
-   public TextArea getDescriptionTextArea() {
-      return descriptionTextArea;
+   public Color getProjectColor() {
+      return textFillColorPicker.getValue();
    }
 
-   public ColorPicker getTextFillColorPicker() {
-      return textFillColorPicker;
+   public boolean isWork() {
+      return isWorkCheckBox.isSelected();
    }
 
-   public CheckBox getIsWorkCheckBox() {
-      return isWorkCheckBox;
-   }
-
-   public Spinner<Integer> getSortIndexSpinner() {
-      return sortIndexSpinner;
+   public int getIndex() {
+      return sortIndexSpinner.getValue();
    }
 
    public void setModel(final Model model) {
       this.model = model;
    }
 
-   public void setValues(final String name, final String description, final Color textFill, final boolean work,
-         final int sortIndex) {
+   public void setValues(final Project project) {
       LOG.info("Setting values.");
-      nameTextField.setText(name);
-      descriptionTextArea.setText(description);
-      textFillColorPicker.setValue(textFill);
-      isWorkCheckBox.setSelected(work);
-      sortIndexSpinner.getValueFactory().setValue(sortIndex);
+      nameTextField.setText(project.getName());
+      descriptionTextArea.setText(project.getDescription());
+      textFillColorPicker.setValue(project.getColor());
+      isWorkCheckBox.setSelected(project.isWork());
+      sortIndexSpinner.getValueFactory().setValue(project.getIndex());
    }
 
    public void secondInitialize() {
