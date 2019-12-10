@@ -13,7 +13,6 @@ import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 
 public class ManageProjectController {
 
@@ -39,41 +38,8 @@ public class ManageProjectController {
    @FXML
    private Spinner<Integer> sortIndexSpinner;
 
-   public String getProjectName() {
-      return nameTextField.getText();
-   }
-
-   public String getProjectDescription() {
-      return descriptionTextArea.getText();
-   }
-
-   public Color getProjectColor() {
-      return textFillColorPicker.getValue();
-   }
-
-   public boolean isWork() {
-      return isWorkCheckBox.isSelected();
-   }
-
-   public int getIndex() {
-      return sortIndexSpinner.getValue();
-   }
-
    public void setModel(final Model model) {
       this.model = model;
-   }
-
-   public Project getValues() {
-      return new Project(getProjectName(), getProjectDescription(), getProjectColor(), isWork(), getIndex());
-   }
-
-   public void setValues(final Project project) {
-      LOG.info("Setting values.");
-      nameTextField.setText(project.getName());
-      descriptionTextArea.setText(project.getDescription());
-      textFillColorPicker.setValue(project.getColor());
-      isWorkCheckBox.setSelected(project.isWork());
-      sortIndexSpinner.getValueFactory().setValue(project.getIndex());
    }
 
    public void secondInitialize() {
@@ -83,6 +49,20 @@ public class ManageProjectController {
                .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
          sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
       }
+   }
+
+   public void initializeWith(final Project project) {
+      LOG.info("Setting values.");
+      nameTextField.setText(project.getName());
+      descriptionTextArea.setText(project.getDescription());
+      textFillColorPicker.setValue(project.getColor());
+      isWorkCheckBox.setSelected(project.isWork());
+      sortIndexSpinner.getValueFactory().setValue(project.getIndex());
+   }
+
+   public Project getProjectFromUserInput() {
+      return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
+            isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
    }
 
 }

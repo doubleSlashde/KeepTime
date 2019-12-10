@@ -92,6 +92,7 @@ public class Controller {
    }
 
    public void addNewProject(final Project project) {
+      LOG.info("Creating new project '{}'.", project);
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 

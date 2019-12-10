@@ -324,16 +324,11 @@ public class ProjectsListViewController {
       final ManageProjectController manageProjectController = loader.getController();
       manageProjectController.setModel(model);
       manageProjectController.secondInitialize();
-      manageProjectController.setValues(p);
+      manageProjectController.initializeWith(p);
 
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
-            final String projectName = manageProjectController.getProjectName();
-            final String projectDescription = manageProjectController.getProjectDescription();
-            final Color projectColor = manageProjectController.getProjectColor();
-            final boolean isWork = manageProjectController.isWork();
-            final int index = manageProjectController.getIndex();
-            return new Project(projectName, projectDescription, projectColor, isWork, index);
+            return manageProjectController.getProjectFromUserInput();
          }
          // TODO: Do you really want to return null?
          return null;

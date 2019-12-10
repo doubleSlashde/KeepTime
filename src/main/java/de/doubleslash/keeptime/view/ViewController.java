@@ -306,17 +306,7 @@ public class ViewController {
          final ManageProjectController manageProjectController) {
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
-            final String projectName = manageProjectController.getProjectName();
-            final String projectDescription = manageProjectController.getProjectDescription();
-            final Color projectColor = manageProjectController.getProjectColor();
-            final boolean isWork = manageProjectController.isWork();
-            final int index = manageProjectController.getIndex();
-            return new Project(projectName, projectDescription, projectColor, isWork, index); // temporary
-                                                                                              // (misused)
-                                                                                              // transfer
-                                                                                              // object
-                                                                                              // for
-                                                                                              // project
+            return manageProjectController.getProjectFromUserInput();
          }
          // TODO: Do you really want to return null?
          return null;
