@@ -283,12 +283,20 @@ public class ProjectsListViewController {
    private void updateTooltip(final Project p) {
       final Pane pane = (Pane) projectSelectionNodeMap.get(p);
       final Label projectNameLabel = (Label) pane.getChildren().get(0);
-      final String tooltipText = String.format("%s%n%s", p.getName(), p.getDescription());
+      final String tooltipText = createTooltipTextForProject(p);
       final Tooltip projectTooltip = projectNameLabel.getTooltip();
       if (projectTooltip == null) {
          projectNameLabel.setTooltip(new Tooltip());
       }
       projectNameLabel.getTooltip().setText(tooltipText);
+   }
+
+   private String createTooltipTextForProject(final Project p) {
+      if (p.getDescription() == null || p.getDescription().isEmpty()) {
+         return p.getName();
+      } else {
+         return String.format("%s%n%s", p.getName(), p.getDescription());
+      }
    }
 
    private Dialog<Project> setupEditProjectDialog(final String title, final String headerText, final Project project) {
