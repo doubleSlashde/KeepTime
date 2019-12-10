@@ -83,8 +83,6 @@ public class ViewController {
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
    private static final String TIME_ZERO = "00:00:00";
 
-   private ManageProjectController manageProjectController;
-
    @FXML
    private Pane pane;
    @FXML
@@ -304,7 +302,8 @@ public class ViewController {
       mainColorTimeLine = new ColorTimeLine(canvas);
    }
 
-   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog) {
+   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
+         final ManageProjectController manageProjectController) {
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             final String projectName = manageProjectController.getProjectName();
@@ -447,10 +446,13 @@ public class ViewController {
       dialog.setTitle(title);
       dialog.setHeaderText(headerText);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      setUpAddNewProjectGridPane(dialog);
+
+      // TODO disable OK button if no name is set
       return dialog;
    }
 
-   private GridPane setUpAddNewProjectGridPane() {
+   private GridPane setUpAddNewProjectGridPane(final Dialog<Project> dialog) {
       GridPane grid;
       final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
       try {
@@ -458,9 +460,14 @@ public class ViewController {
       } catch (final IOException e) {
          throw new FXMLLoaderException(String.format("Error while loading '%s'.", RESOURCE.FXML_MANAGE_PROJECT), e);
       }
-      manageProjectController = loader.getController();
+
+      dialog.getDialogPane().setContent(grid);
+
+      final ManageProjectController manageProjectController = loader.getController();
       manageProjectController.setModel(model);
       manageProjectController.secondInitialize();
+
+      dialogResultConverter(dialog, manageProjectController);
 
       return grid;
    }
@@ -513,12 +520,6 @@ public class ViewController {
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
-      final GridPane grid = setUpAddNewProjectGridPane();
-
-      // TODO disable OK button if no name is set
-      dialog.getDialogPane().setContent(grid);
-
-      dialogResultConverter(dialog);
       mainStage.setAlwaysOnTop(false);
       final Optional<Project> result = dialog.showAndWait();
       mainStage.setAlwaysOnTop(true);
