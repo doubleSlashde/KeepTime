@@ -1,5 +1,6 @@
 package de.doubleslash.keeptime.view;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -56,6 +57,16 @@ public class ProjectsListViewControllerTest {
       project.setDescription("MylItTLeaNT");
 
       assertTrue(ProjectsListViewController.doesProjectMatchSearchFilter("mYliTTlEAnT", project));
+   }
+
+   @Test
+   public void shouldNotMatchWhenDescriptionAndNameAreNotMatching() {
+      final Project project = new Project();
+
+      project.setName("MyNameIsJohn");
+      project.setDescription("I am a project.");
+
+      assertFalse(ProjectsListViewController.doesProjectMatchSearchFilter("Hellow world", project));
    }
 
 }
