@@ -63,6 +63,10 @@ public class ManageProjectController {
       this.model = model;
    }
 
+   public Project getValues() {
+      return new Project(getProjectName(), getProjectDescription(), getProjectColor(), isWork(), getIndex());
+   }
+
    public void setValues(final Project project) {
       LOG.info("Setting values.");
       nameTextField.setText(project.getName());
