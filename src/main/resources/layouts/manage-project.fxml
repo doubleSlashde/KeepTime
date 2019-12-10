@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
 <GridPane fx:id="grid" hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ManageProjectController">
   <columnConstraints>
@@ -30,13 +31,17 @@
       <Label text="Color:" GridPane.rowIndex="3" />
       <Label text="IsWork:" GridPane.rowIndex="4" />
       <Label text="SortIndex:" GridPane.rowIndex="5" />
-      <Label text="Description:" GridPane.rowIndex="1" />
       <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
       <ColorPicker fx:id="textFillColorPicker" GridPane.columnIndex="1" GridPane.rowIndex="3" />
       <CheckBox fx:id="isWorkCheckBox" mnemonicParsing="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <Spinner fx:id="sortIndexSpinner" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-      <TextArea fx:id="descriptionTextArea" prefHeight="80.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-      <Label text="Description will be matched at search." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <TextArea fx:id="descriptionTextArea" prefHeight="120.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <VBox alignment="CENTER_LEFT" GridPane.rowIndex="1">
+         <children>
+            <Label text="Description:" />
+            <Label disable="true" prefWidth="100.0" text="(will be matched at search)" wrapText="true" />
+         </children>
+      </VBox>
    </children>
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
