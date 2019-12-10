@@ -18,7 +18,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -54,7 +53,6 @@ public class ProjectsListViewController {
    private final FilteredList<Project> filteredData;
 
    private final boolean hideable;
-   private ManageProjectController manageProjectController;
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
          final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
@@ -255,24 +253,14 @@ public class ProjectsListViewController {
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
-         final Dialog<ButtonType> dialog = setUpDialogButtonType("Edit project", "Edit project '" + p.getName() + "'");
-         final GridPane grid = setUpEditProjectGridPane(p);
-
-         // TODO disable OK button if no name is set
-         dialog.getDialogPane().setContent(grid);
-
-         dialog.setResultConverter(dialogButton -> dialogButton);
+         final Dialog<Project> dialog = setupEditProjectDialog("Edit project", "Edit project '" + p.getName() + "'", p);
 
          mainStage.setAlwaysOnTop(false);
-         final Optional<ButtonType> result = dialog.showAndWait();
+         final Optional<Project> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
 
-         result.ifPresent(buttonType -> {
-            if (buttonType != ButtonType.OK) {
-               return;
-            }
-            final ObservableList<Node> nodes = grid.getChildren();
-            editProject(p, manageProjectController);
+         result.ifPresent(editedProject -> {
+            controller.editProject(p, editedProject);
 
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
@@ -303,15 +291,21 @@ public class ProjectsListViewController {
       projectNameLabel.getTooltip().setText(tooltipText);
    }
 
-   private Dialog<ButtonType> setUpDialogButtonType(final String title, final String headerText) {
-      final Dialog<ButtonType> dialog = new Dialog<>();
+   private Dialog<Project> setupEditProjectDialog(final String title, final String headerText, final Project project) {
+      final Dialog<Project> dialog = new Dialog<>();
       dialog.setTitle(title);
       dialog.setHeaderText(headerText);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      final GridPane grid = setUpEditProjectGridPane(project, dialog);
+
+      // TODO disable OK button if no name is set
+      dialog.getDialogPane().setContent(grid);
+
       return dialog;
    }
 
-   private GridPane setUpEditProjectGridPane(final Project p) {
+   private GridPane setUpEditProjectGridPane(final Project p, final Dialog<Project> dialog) {
       GridPane grid;
       final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
       try {
@@ -319,23 +313,25 @@ public class ProjectsListViewController {
       } catch (final IOException e) {
          throw new FXMLLoaderException("Error while loading '" + Resources.RESOURCE.FXML_MANAGE_PROJECT + "'.", e);
       }
-      manageProjectController = loader.getController();
+      final ManageProjectController manageProjectController = loader.getController();
       manageProjectController.setModel(model);
       manageProjectController.secondInitialize();
       manageProjectController.setValues(p);
 
+      dialog.setResultConverter(dialogButton -> {
+         if (dialogButton == ButtonType.OK) {
+            final String projectName = manageProjectController.getProjectName();
+            final String projectDescription = manageProjectController.getProjectDescription();
+            final Color projectColor = manageProjectController.getProjectColor();
+            final boolean isWork = manageProjectController.isWork();
+            final int index = manageProjectController.getIndex();
+            return new Project(projectName, projectDescription, projectColor, isWork, index);
+         }
+         // TODO: Do you really want to return null?
+         return null;
+      });
+
       return grid;
-   }
-
-   private void editProject(final Project p, final ManageProjectController manageProjectController) {
-      final String projectName = manageProjectController.getProjectName();
-      final String projectDescription = manageProjectController.getProjectDescription();
-      final Color projectColor = manageProjectController.getProjectColor();
-      final boolean isWork = manageProjectController.isWork();
-      final int index = manageProjectController.getIndex();
-
-      final Project newValues = new Project(projectName, projectDescription, projectColor, isWork, index);
-      controller.editProject(p, newValues);
    }
 
    private ListCell<Project> returnListCellOfProject() {
