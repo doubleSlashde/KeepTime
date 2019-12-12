@@ -395,6 +395,7 @@ public class ViewController {
          reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
+         reportStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
@@ -420,6 +421,7 @@ public class ViewController {
          settingsStage = new Stage();
          settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
 

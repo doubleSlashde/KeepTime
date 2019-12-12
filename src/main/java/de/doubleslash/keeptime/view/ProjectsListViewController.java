@@ -228,6 +228,7 @@ public class ProjectsListViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
                ViewController.activeWorkSecondsProperty, p);
+         changeWithTimeDialog.initOwner(mainStage);
          mainStage.setAlwaysOnTop(false);
          final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
@@ -243,7 +244,7 @@ public class ProjectsListViewController {
          alert.setHeaderText("Delete project '" + p.getName() + "'.");
          alert.setContentText(
                "The project will just be hidden from display, as there may be work references to this project.");
-
+         alert.initOwner(mainStage);
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = alert.showAndWait();
          mainStage.setAlwaysOnTop(true);
@@ -267,7 +268,7 @@ public class ProjectsListViewController {
          dialog.getDialogPane().setContent(grid);
 
          dialog.setResultConverter(dialogButton -> dialogButton);
-
+         dialog.initOwner(mainStage);
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
