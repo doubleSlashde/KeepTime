@@ -1,3 +1,19 @@
+// Copyright 2019 doubleSlash Net Business GmbH
+//
+// This file is part of KeepTime.
+// KeepTime is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 package de.doubleslash.keeptime.view;
 
 import java.io.IOException;
@@ -12,23 +28,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -37,8 +48,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
@@ -56,11 +65,10 @@ public class ProjectsListViewController {
    private final Controller controller;
    private final Stage mainStage;
    private final Map<Project, Label> elapsedProjectTimeLabelMap = new HashMap<>();
-   private final ListView<Project> availableProjectsListView;
    private final Map<Project, Node> projectSelectionNodeMap;
    private final FilteredList<Project> filteredData;
 
-   private boolean hideable;
+   private final boolean hideable;
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
          final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
@@ -68,7 +76,6 @@ public class ProjectsListViewController {
       this.controller = controller;
       this.hideable = hideable;
       this.mainStage = mainStage;
-      this.availableProjectsListView = availableProjectsListView;
       availableProjectsListView.setCellFactory(listView -> returnListCellOfProject());
 
       filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
@@ -79,20 +86,7 @@ public class ProjectsListViewController {
       searchTextField.textProperty().addListener((a, b, newValue) -> {
          LOG.info("New filter value: " + newValue);
          // TODO do i always have to create a new predicate?
-         filteredData.setPredicate(project -> {
-            // If filter text is empty, display all data.
-            if (newValue == null || newValue.isEmpty()) {
-               return true;
-            }
-
-            final String lowerCaseFilter = newValue.toLowerCase();
-
-            if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               return true;
-            }
-
-            return false;
-         });
+         filteredData.setPredicate(project -> doesProjectMatchSearchFilter(newValue, project));
          LOG.debug("Amount of projects to show '{}'.", filteredData.size());
          availableProjectsListView.getSelectionModel().selectFirst();
          availableProjectsListView.scrollTo(0);
@@ -137,6 +131,22 @@ public class ProjectsListViewController {
       availableProjectsListView.getSelectionModel().selectFirst();
    }
 
+   static boolean doesProjectMatchSearchFilter(final String searchText, final Project project) {
+      // If filter text is empty, display all data.
+      if (searchText == null || searchText.isEmpty()) {
+         return true;
+      }
+
+      final String lowerCaseFilter = searchText.toLowerCase();
+
+      if (project.getName().toLowerCase().contains(lowerCaseFilter)
+            || project.getDescription().toLowerCase().contains(lowerCaseFilter)) {
+         return true;
+      }
+
+      return false;
+   }
+
    /**
     * Update UI
     */
@@ -161,6 +171,7 @@ public class ProjectsListViewController {
    private void addProjectToProjectSelectionNodeMap(final Project project) {
       final Node projectElement = createListEntryForProject(project);
       projectSelectionNodeMap.put(project, projectElement);
+      updateTooltip(project);
    }
 
    private void realignProjectList() {
@@ -222,8 +233,6 @@ public class ProjectsListViewController {
          projectNameLabel.setEffect(null);
       });
 
-      projectNameLabel.setTooltip(new Tooltip(projectNameLabel.getText()));
-
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
@@ -260,24 +269,14 @@ public class ProjectsListViewController {
       editMenuItem.setOnAction(e -> {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
-         final Dialog<ButtonType> dialog = setUpDialogButtonType("Edit project", "Edit project '" + p.getName() + "'");
-         final GridPane grid = setUpEditProjectGridPane(p);
-
-         // TODO disable OK button if no name is set
-         dialog.getDialogPane().setContent(grid);
-
-         dialog.setResultConverter(dialogButton -> dialogButton);
+         final Dialog<Project> dialog = setupEditProjectDialog("Edit project", "Edit project '" + p.getName() + "'", p);
 
          mainStage.setAlwaysOnTop(false);
-         final Optional<ButtonType> result = dialog.showAndWait();
+         final Optional<Project> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
 
-         result.ifPresent(buttonType -> {
-            if (buttonType != ButtonType.OK) {
-               return;
-            }
-            final ObservableList<Node> nodes = grid.getChildren();
-            editProject(nodes, p);
+         result.ifPresent(editedProject -> {
+            controller.editProject(p, editedProject);
 
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
@@ -287,6 +286,7 @@ public class ProjectsListViewController {
 
             // TODO how to update currentProjectLabel when active project was edited?
             realignProjectList();
+            updateTooltip(p);
          });
       });
 
@@ -296,69 +296,61 @@ public class ProjectsListViewController {
       return projectElement;
    }
 
-   private Dialog<ButtonType> setUpDialogButtonType(final String title, final String headerText) {
-      final Dialog<ButtonType> dialog = new Dialog<>();
+   private void updateTooltip(final Project p) {
+      final Pane pane = (Pane) projectSelectionNodeMap.get(p);
+      final Label projectNameLabel = (Label) pane.getChildren().get(0);
+      final String tooltipText = createTooltipTextForProject(p);
+      final Tooltip projectTooltip = projectNameLabel.getTooltip();
+      if (projectTooltip == null) {
+         projectNameLabel.setTooltip(new Tooltip());
+      }
+      projectNameLabel.getTooltip().setText(tooltipText);
+   }
+
+   private String createTooltipTextForProject(final Project p) {
+      if (p.getDescription() == null || p.getDescription().isEmpty()) {
+         return p.getName();
+      } else {
+         return String.format("%s%n%s", p.getName(), p.getDescription());
+      }
+   }
+
+   private Dialog<Project> setupEditProjectDialog(final String title, final String headerText, final Project project) {
+      final Dialog<Project> dialog = new Dialog<>();
       dialog.setTitle(title);
       dialog.setHeaderText(headerText);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      final GridPane grid = setUpEditProjectGridPane(project, dialog);
+
+      // TODO disable OK button if no name is set
+      dialog.getDialogPane().setContent(grid);
+
       return dialog;
    }
 
-   private GridPane setUpEditProjectGridPane(final Project p) {
-      final GridPane grid = setUpGridPane(p.getName(), p.getColor(), p.isWork());
+   private GridPane setUpEditProjectGridPane(final Project p, final Dialog<Project> dialog) {
+      GridPane grid;
+      final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
+      try {
+         grid = loader.load();
+      } catch (final IOException e) {
+         throw new FXMLLoaderException("Error while loading '" + Resources.RESOURCE.FXML_MANAGE_PROJECT + "'.", e);
+      }
+      final ManageProjectController manageProjectController = loader.getController();
+      manageProjectController.setModel(model);
+      manageProjectController.secondInitialize();
+      manageProjectController.initializeWith(p);
 
-      final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.getAvailableProjects().size();
-      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount - 1, p.getIndex()));
-      grid.add(indexSpinner, 1, 3);
-
-      return grid;
-   }
-
-   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
-      final GridPane grid = new GridPane();
-      grid.setHgap(10);
-      grid.setVgap(10);
-      grid.setPadding(new Insets(20, 150, 10, 10));
-
-      final Label nameLabel = new Label("Name:");
-      nameLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(nameLabel, 0, 0);
-
-      final TextField projectNameTextField = new TextField(projectName);
-      projectNameTextField.setFont(FontProvider.getDefaultFont());
-      grid.add(projectNameTextField, 1, 0);
-
-      final Label colorLabel = new Label("Color:");
-      colorLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(colorLabel, 0, 1);
-
-      final ColorPicker colorPicker = new ColorPicker(projectColor);
-      grid.add(colorPicker, 1, 1);
-
-      final Label isWorkLabel = new Label("IsWork:");
-      isWorkLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkLabel, 0, 2);
-
-      final CheckBox isWorkCheckBox = new CheckBox();
-      isWorkCheckBox.setSelected(isWork);
-      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkCheckBox, 1, 2);
-
-      final Label sortIndex = new Label("SortIndex:");
-      sortIndex.setFont(FontProvider.getDefaultFont());
-      grid.add(new Label("SortIndex:"), 0, 3);
+      dialog.setResultConverter(dialogButton -> {
+         if (dialogButton == ButtonType.OK) {
+            return manageProjectController.getProjectFromUserInput();
+         }
+         // TODO: Do you really want to return null?
+         return null;
+      });
 
       return grid;
-   }
-
-   private void editProject(final ObservableList<Node> nodes, final Project p) {
-      final TextField projectNameTextField = (TextField) nodes.get(1);
-      final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-      final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-      final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-      controller.editProject(p, projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
-            indexSpinner.getValue());
    }
 
    private ListCell<Project> returnListCellOfProject() {

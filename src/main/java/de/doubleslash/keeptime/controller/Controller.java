@@ -91,14 +91,13 @@ public class Controller {
       model.activeWorkItem.set(work);
    }
 
-   public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
-         final int index) {
-      final Project project = new Project(projectName, projectColor, isWork, index, false);
+   public void addNewProject(final Project project) {
+      LOG.info("Creating new project '{}'.", project);
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 
       final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), project,
-            model.getAvailableProjects().size(), index);
+            model.getAvailableProjects().size(), project.getIndex());
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
    }
@@ -167,18 +166,19 @@ public class Controller {
       return p == model.activeWorkItem.get().getProject();
    }
 
-   public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
-         final int newIndex) {
-      LOG.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+   public void editProject(final Project projectToBeUpdated, final Project newValuedProject) {
+      LOG.info("Changing project '{}' to '{}'.", projectToBeUpdated, newValuedProject);
 
-      p.setName(newName);
-      p.setColor(newColor);
-      p.setWork(isWork);
-      final int oldIndex = p.getIndex();
-      p.setIndex(newIndex);
+      projectToBeUpdated.setName(newValuedProject.getName());
+      projectToBeUpdated.setDescription(newValuedProject.getDescription());
+      projectToBeUpdated.setColor(newValuedProject.getColor());
+      projectToBeUpdated.setWork(newValuedProject.isWork());
+      final int oldIndex = projectToBeUpdated.getIndex();
+      projectToBeUpdated.setIndex(newValuedProject.getIndex());
 
-      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), p, oldIndex, newIndex);
-      changedProjects.add(p);
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), projectToBeUpdated,
+            oldIndex, newValuedProject.getIndex());
+      changedProjects.add(projectToBeUpdated);
 
       // save all projects which changed index
       model.getProjectRepository().saveAll(changedProjects);

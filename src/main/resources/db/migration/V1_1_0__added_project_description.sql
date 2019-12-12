@@ -1,0 +1,2 @@
+ALTER TABLE project
+ ADD COLUMN description CLOB NOT NULL DEFAULT('')

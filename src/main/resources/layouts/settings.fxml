@@ -24,6 +24,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -235,11 +236,7 @@
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="parseConfigButton" mnemonicParsing="false" text="parse config.xml">
-                     <font>
-                        <Font name="Open Sans Regular" size="12.0" />
-                     </font>
-                  </Button>
+                  <Region HBox.hgrow="ALWAYS" />
                   <Button fx:id="aboutButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="About" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>

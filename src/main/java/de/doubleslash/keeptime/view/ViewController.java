@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.common.StyleUtils;
@@ -50,8 +49,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -59,13 +56,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.effect.Light;
@@ -87,6 +80,7 @@ import javafx.stage.Stage;
 
 @Component
 public class ViewController {
+   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
    private static final String TIME_ZERO = "00:00:00";
 
    @FXML
@@ -133,8 +127,6 @@ public class ViewController {
    private Canvas canvas;
 
    private ColorTimeLine mainColorTimeLine;
-
-   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
 
    private class Delta {
       double x;
@@ -310,17 +302,13 @@ public class ViewController {
       mainColorTimeLine = new ColorTimeLine(canvas);
    }
 
-   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
+   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
+         final ManageProjectController manageProjectController) {
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
-            final ObservableList<Node> nodes = grid.getChildren();
-            final TextField projectNameTextField = (TextField) nodes.get(1);
-            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-            return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
-                  indexSpinner.getValue()); // temporary (misused) transfer object for project
+            return manageProjectController.getProjectFromUserInput();
          }
+         // TODO: Do you really want to return null?
          return null;
       });
       return dialog;
@@ -448,54 +436,28 @@ public class ViewController {
       dialog.setTitle(title);
       dialog.setHeaderText(headerText);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      setUpAddNewProjectGridPane(dialog);
+
+      // TODO disable OK button if no name is set
       return dialog;
    }
 
-   private GridPane setUpAddNewProjectGridPane(final String projectName, final Color projectColor,
-         final boolean isWork) {
-      final GridPane grid = setUpGridPane(projectName, projectColor, isWork);
+   private GridPane setUpAddNewProjectGridPane(final Dialog<Project> dialog) {
+      GridPane grid;
+      final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
+      try {
+         grid = loader.load();
+      } catch (final IOException e) {
+         throw new FXMLLoaderException(String.format("Error while loading '%s'.", RESOURCE.FXML_MANAGE_PROJECT), e);
+      }
 
-      final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.getAvailableProjects().size();
-      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
-      grid.add(indexSpinner, 1, 3);
+      dialog.getDialogPane().setContent(grid);
 
-      return grid;
-   }
+      final ManageProjectController manageProjectController = loader.getController();
+      manageProjectController.setModel(model);
+      manageProjectController.secondInitialize();
 
-   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
-      final GridPane grid = new GridPane();
-      grid.setHgap(10);
-      grid.setVgap(10);
-      grid.setPadding(new Insets(20, 150, 10, 10));
-
-      final Label nameLabel = new Label("Name:");
-      nameLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(nameLabel, 0, 0);
-
-      final TextField projectNameTextField = new TextField(projectName);
-      projectNameTextField.setFont(FontProvider.getDefaultFont());
-      grid.add(projectNameTextField, 1, 0);
-
-      final Label colorLabel = new Label("Color:");
-      colorLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(colorLabel, 0, 1);
-
-      final ColorPicker colorPicker = new ColorPicker(projectColor);
-      grid.add(colorPicker, 1, 1);
-
-      final Label isWorkLabel = new Label("IsWork:");
-      isWorkLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkLabel, 0, 2);
-
-      final CheckBox isWorkCheckBox = new CheckBox();
-      isWorkCheckBox.setSelected(isWork);
-      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkCheckBox, 1, 2);
-
-      final Label sortIndex = new Label("SortIndex:");
-      sortIndex.setFont(FontProvider.getDefaultFont());
-      grid.add(new Label("SortIndex:"), 0, 3);
+      dialogResultConverter(dialog, manageProjectController);
 
       return grid;
    }
@@ -548,19 +510,11 @@ public class ViewController {
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
-      final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
-
-      // TODO disable OK button if no name is set
-      dialog.getDialogPane().setContent(grid);
-
-      dialogResultConverter(dialog, grid);
       mainStage.setAlwaysOnTop(false);
       final Optional<Project> result = dialog.showAndWait();
       mainStage.setAlwaysOnTop(true);
 
-      result.ifPresent(project -> {
-         controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
-      });
+      result.ifPresent(project -> controller.addNewProject(project));
    }
 
    public void secondInitialize() {
