@@ -45,7 +45,8 @@ public class Work {
    @Lob
    private String notes;
 
-   public Work() {}
+   public Work() {
+   }
 
    public Work(final LocalDate creationDate, final LocalDateTime startTime, final LocalDateTime endTime,
          final Project project, final String notes) {
@@ -89,12 +90,22 @@ public class Work {
       return project;
    }
 
+   public void setProject(final Project project) {
+      this.project = project;
+   }
+
    public String getNotes() {
       return notes;
    }
 
    public void setNotes(final String notes) {
       this.notes = notes;
+   }
+
+   @Override
+   public String toString() {
+      return "Work [id=" + id + ", creationDate=" + creationDate + ", startTime=" + startTime + ", endTime=" + endTime
+            + ", projectName=" + project.getName() + ", notes=" + notes + "]";
    }
 
 }

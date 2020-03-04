@@ -64,6 +64,12 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+        <groupId>no.tornado</groupId>
+        <artifactId>tornadofx-controls</artifactId>
+        <version>1.0.3</version>
+    </dependency>
 
     <dependency>
       <groupId>org.flywaydb</groupId>

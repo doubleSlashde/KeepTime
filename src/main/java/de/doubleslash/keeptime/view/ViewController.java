@@ -381,9 +381,10 @@ public class ViewController {
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
          reportController.setController(controller);
+
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
-
+         reportController.setStage(reportStage);
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {

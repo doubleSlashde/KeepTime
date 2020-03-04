@@ -16,6 +16,7 @@
 
 package de.doubleslash.keeptime.controller;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -30,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import de.doubleslash.keeptime.common.DateProvider;
@@ -323,4 +325,68 @@ public class ControllerTest {
       // TODO does not work, as id within project cannot be set
 
    }
+
+   @Test
+   public void shouldUpdateWorkItemPersistentlyWhenWorkItemIsEdited() {
+      Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDate localDateNow = LocalDate.now();
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work originalWork = new Work(localDateNow, localDateTimeMorning.plusHours(0),
+            localDateTimeMorning.plusHours(1), project1, "originalWork");
+      model.getPastWorkItems().add(originalWork);
+
+      final Work newWork = new Work(localDateNow, localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2),
+            project1, "updated");
+
+      testee.editWork(originalWork, newWork);
+
+      final Work testWork = model.getPastWorkItems().get(0);
+      assertThat("edited StartTime is not equal", newWork.getStartTime(), equalTo(testWork.getStartTime()));
+      assertThat("edited EndTime is not equal", newWork.getEndTime(), equalTo(testWork.getEndTime()));
+      assertThat("edited CreationDate is not equal", newWork.getCreationDate(), equalTo(testWork.getCreationDate()));
+      assertThat("edited Notes are not equal", newWork.getNotes(), equalTo(testWork.getNotes()));
+      assertThat("edited Project is not equal", newWork.getProject(), equalTo(testWork.getProject()));
+
+      final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
+      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(argument.capture());
+      assertThat("not saved Persistent", originalWork, is(argument.getValue()));
+
+   }
+
+   @Test
+   public void shouldNotUpdateOthersWhenWorkItemIsEdited() {
+      Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDate localDateNow = LocalDate.now();
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work notToBeUpdatedWork = new Work(localDateNow, localDateTimeMorning.plusHours(0),
+            localDateTimeMorning.plusHours(1), project1, "originalWork");
+      model.getPastWorkItems().add(notToBeUpdatedWork);
+
+      final Work originalWork = new Work(localDateNow, localDateTimeMorning.plusHours(1),
+            localDateTimeMorning.plusHours(2), project1, "originalWork");
+      model.getPastWorkItems().add(originalWork);
+
+      final Work newWork = new Work(localDateNow, localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4),
+            project1, "updated");
+
+      testee.editWork(originalWork, newWork);
+
+      assertThat("changed amout of WorkItems", model.getPastWorkItems().size(), equalTo(2));
+
+      final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
+      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(argument.capture());
+      assertThat("not saved Persistent", argument.getValue(), is(originalWork));
+
+   }
+
 }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import tornadofx.control.DateTimePicker?>
+
+<GridPane fx:id="grid" hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="160.0" prefWidth="263.0" vgap="5.0" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ManageWorkController">
+  <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" />
+    <ColumnConstraints hgrow="SOMETIMES" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+      <RowConstraints vgrow="SOMETIMES" />
+  </rowConstraints>
+   <children>
+      <Label text="Start Time" />
+      <DateTimePicker fx:id="startTimePicker" GridPane.columnIndex="1" />
+      <Label text="End Time" GridPane.rowIndex="1" />
+      <DateTimePicker fx:id="endTimePicker" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Label text="Creation Date" GridPane.rowIndex="2" />
+      <DatePicker fx:id="creationDatePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Label text="Project" GridPane.rowIndex="3" />
+      <ComboBox fx:id="projectComboBox" prefHeight="25.0" prefWidth="174.0" visibleRowCount="4" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      <Label text="notes" GridPane.rowIndex="4" />
+      <TextField fx:id="noteTextBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</GridPane>
