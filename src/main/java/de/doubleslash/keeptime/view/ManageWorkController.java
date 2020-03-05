@@ -63,9 +63,6 @@ public class ManageWorkController {
    private DatePicker endDatePicker;
 
    @FXML
-   private DatePicker creationDatePicker;
-
-   @FXML
    private TextField noteTextBox;
 
    @FXML
@@ -80,9 +77,7 @@ public class ManageWorkController {
       startDatePicker.setValue(work.getStartTime().toLocalDate());
       endDatePicker.setValue(work.getEndTime().toLocalDate());
 
-
       startTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-         LOG.debug("textChanged");
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = (StringProperty) observable;
          try {
@@ -156,7 +151,6 @@ public class ManageWorkController {
       startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
       endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
 
-      creationDatePicker.setValue(work.getCreationDate());
       noteTextBox.setText(work.getNotes());
       projectComboBox.getItems().addAll(model.getAvailableProjects());
 
@@ -202,7 +196,7 @@ public class ManageWorkController {
 
    public Work getWorkFromUserInput() {
 
-      return new Work(creationDatePicker.getValue(),
+      return new Work(startDatePicker.getValue(),
             LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
             LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()),
             projectComboBox.getSelectionModel().getSelectedItem(), noteTextBox.getText());

@@ -36,6 +36,7 @@ public class Work {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
+   // TODO revise CreationDate Logic to use Date of StartTime
    private LocalDate creationDate;
    private LocalDateTime startTime;
    private LocalDateTime endTime;
