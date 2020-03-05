@@ -16,22 +16,30 @@
 
 package de.doubleslash.keeptime.view;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
-import tornadofx.control.DateTimePicker;
+import javafx.util.converter.LocalTimeStringConverter;
 
 public class ManageWorkController {
 
@@ -43,10 +51,16 @@ public class ManageWorkController {
    private GridPane grid;
 
    @FXML
-   private DateTimePicker startTimePicker;
+   private DatePicker startDatePicker;
 
    @FXML
-   private DateTimePicker endTimePicker;
+   private Spinner<LocalTime> startTimeSpinner;
+
+   @FXML
+   private Spinner<LocalTime> endTimeSpinner;
+
+   @FXML
+   private DatePicker endDatePicker;
 
    @FXML
    private DatePicker creationDatePicker;
@@ -63,10 +77,85 @@ public class ManageWorkController {
 
    public void initializeWith(final Work work) {
       LOG.info("Setting values.");
-      startTimePicker.setDateTimeValue(work.getStartTime());
-      startTimePicker.setFormat("yyyy-MM-dd HH:mm:ss");
-      endTimePicker.setDateTimeValue(work.getEndTime());
-      endTimePicker.setFormat("yyyy-MM-dd HH:mm:ss");
+      startDatePicker.setValue(work.getStartTime().toLocalDate());
+      endDatePicker.setValue(work.getEndTime().toLocalDate());
+
+
+      startTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+         LOG.debug("textChanged");
+         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
+         final StringProperty text = (StringProperty) observable;
+         try {
+            stringConverter.fromString(newValue);
+            text.setValue(newValue);
+            startTimeSpinner.increment(0); // TODO find better Solution
+         } catch (final DateTimeParseException e) {
+            text.setValue(oldValue);
+         }
+      });
+
+      startTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
+
+         {
+            setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
+         }
+
+         @Override
+         public void decrement(final int steps) {
+            if (getValue() == null) {
+               setValue(LocalTime.now());
+            } else {
+               final LocalTime time = getValue();
+               setValue(time.minusMinutes(steps));
+            }
+
+         }
+
+         @Override
+         public void increment(final int steps) {
+            if (getValue() == null) {
+               setValue(LocalTime.now());
+            } else {
+               final LocalTime time = getValue();
+               setValue(time.plusMinutes(steps));
+            }
+
+         }
+
+      });
+      endTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
+
+         {
+            setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
+         }
+
+         @Override
+         public void decrement(final int steps) {
+            if (getValue() == null) {
+               setValue(LocalTime.now());
+            } else {
+               final LocalTime time = getValue();
+               setValue(time.minusMinutes(steps));
+            }
+
+         }
+
+         @Override
+         public void increment(final int steps) {
+            if (getValue() == null) {
+               setValue(LocalTime.now());
+            } else {
+               final LocalTime time = getValue();
+               setValue(time.plusMinutes(steps));
+            }
+
+         }
+
+      });
+
+      startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
+      endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
+
       creationDatePicker.setValue(work.getCreationDate());
       noteTextBox.setText(work.getNotes());
       projectComboBox.getItems().addAll(model.getAvailableProjects());
@@ -113,9 +202,10 @@ public class ManageWorkController {
 
    public Work getWorkFromUserInput() {
 
-      return new Work(creationDatePicker.getValue(), startTimePicker.getDateTimeValue(),
-            endTimePicker.getDateTimeValue(), projectComboBox.getSelectionModel().getSelectedItem(),
-            noteTextBox.getText());
+      return new Work(creationDatePicker.getValue(),
+            LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
+            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()),
+            projectComboBox.getSelectionModel().getSelectedItem(), noteTextBox.getText());
    }
 
 }
