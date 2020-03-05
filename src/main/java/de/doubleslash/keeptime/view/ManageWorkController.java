@@ -89,6 +89,18 @@ public class ManageWorkController {
          }
       });
 
+      endTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
+         final StringProperty text = (StringProperty) observable;
+         try {
+            stringConverter.fromString(newValue);
+            text.setValue(newValue);
+            endTimeSpinner.increment(0); // TODO find better Solution
+         } catch (final DateTimeParseException e) {
+            text.setValue(oldValue);
+         }
+      });
+
       startTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
 
          {
