@@ -137,7 +137,8 @@ public class Main extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository()
+            .findByCreationDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 

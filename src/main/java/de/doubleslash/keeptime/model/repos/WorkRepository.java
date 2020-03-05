@@ -28,4 +28,6 @@ import de.doubleslash.keeptime.model.Work;
 public interface WorkRepository extends JpaRepository<Work, Long> {
 
    List<Work> findByCreationDate(LocalDate creationDate);
+
+   List<Work> findByCreationDateOrderByStartTimeAsc(LocalDate creationDate);
 }

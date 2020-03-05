@@ -124,7 +124,8 @@ public class ReportController {
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(dateToShow));
-      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(dateToShow);
+      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(dateToShow);
+      ;
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
