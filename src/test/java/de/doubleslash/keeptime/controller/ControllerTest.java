@@ -52,9 +52,12 @@ public class ControllerTest {
    private Model model;
    private DateProvider mockedDateProvider;
 
+   private WorkRepository mockedWorkRepository;
+
    @Before
    public void beforeTest() {
-      model = new Model(Mockito.mock(ProjectRepository.class), Mockito.mock(WorkRepository.class),
+      mockedWorkRepository = Mockito.mock(WorkRepository.class);
+      model = new Model(Mockito.mock(ProjectRepository.class), mockedWorkRepository,
             Mockito.mock(SettingsRepository.class));
       mockedDateProvider = Mockito.mock(DateProvider.class);
       testee = new Controller(model, mockedDateProvider);
@@ -348,14 +351,14 @@ public class ControllerTest {
       testee.editWork(originalWork, newWork);
 
       final Work testWork = model.getPastWorkItems().get(0);
-      assertThat("edited StartTime is not equal", newWork.getStartTime(), equalTo(testWork.getStartTime()));
-      assertThat("edited EndTime is not equal", newWork.getEndTime(), equalTo(testWork.getEndTime()));
-      assertThat("edited CreationDate is not equal", newWork.getCreationDate(), equalTo(testWork.getCreationDate()));
-      assertThat("edited Notes are not equal", newWork.getNotes(), equalTo(testWork.getNotes()));
-      assertThat("edited Project is not equal", newWork.getProject(), equalTo(testWork.getProject()));
+      assertThat("start time is not updated", newWork.getStartTime(), equalTo(testWork.getStartTime()));
+      assertThat("end time is not updated", newWork.getEndTime(), equalTo(testWork.getEndTime()));
+      assertThat("creation date is not updated", newWork.getCreationDate(), equalTo(testWork.getCreationDate()));
+      assertThat("notes are not updated", newWork.getNotes(), equalTo(testWork.getNotes()));
+      assertThat("project is not updated", newWork.getProject(), equalTo(testWork.getProject()));
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
-      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(argument.capture());
+      Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
       assertThat("not saved Persistent", originalWork, is(argument.getValue()));
 
    }
@@ -388,8 +391,9 @@ public class ControllerTest {
             not(contains(newWork)));
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
-      Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(argument.capture());
-      assertThat("saved other Work persistently than what should be updated", argument.getValue(), is(originalWork));
+      Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
+      assertThat("saved other Work persistently than what should be updated", argument.getValue(),
+            not(is(notToBeUpdatedWork)));
 
    }
 
