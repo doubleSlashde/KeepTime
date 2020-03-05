@@ -35,7 +35,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
@@ -63,7 +63,7 @@ public class ManageWorkController {
    private DatePicker endDatePicker;
 
    @FXML
-   private TextField noteTextBox;
+   private TextArea noteTextArea;
 
    @FXML
    private ComboBox<Project> projectComboBox;
@@ -163,7 +163,7 @@ public class ManageWorkController {
       startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
       endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
 
-      noteTextBox.setText(work.getNotes());
+      noteTextArea.setText(work.getNotes());
       projectComboBox.getItems().addAll(model.getAvailableProjects());
 
       projectComboBox.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
@@ -211,7 +211,7 @@ public class ManageWorkController {
       return new Work(startDatePicker.getValue(),
             LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
             LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()),
-            projectComboBox.getSelectionModel().getSelectedItem(), noteTextBox.getText());
+            projectComboBox.getSelectionModel().getSelectedItem(), noteTextArea.getText());
    }
 
 }

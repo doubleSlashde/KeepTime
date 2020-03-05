@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.gluonhq.charm.glisten.control.AutoCompleteTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
@@ -33,7 +32,6 @@
       <Label text="notes" GridPane.rowIndex="3" />
       <Spinner fx:id="startTimeSpinner" editable="true" GridPane.columnIndex="2" />
       <Spinner fx:id="endTimeSpinner" editable="true" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-      <AutoCompleteTextField />
       <TextArea fx:id="noteTextArea" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
    </children>
    <padding>
