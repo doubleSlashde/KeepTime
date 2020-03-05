@@ -186,10 +186,21 @@ public class Controller {
 
    public void editWork(final Work workToBeEdited, final Work newValuedWork) {
       LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
-      int index = model.getPastWorkItems().size() - 1;
-      if (model.getPastWorkItems().contains(workToBeEdited)) {
-         index = model.getPastWorkItems().indexOf(workToBeEdited);
+      Work toRemove = null;
+      for (final Work w : model.getPastWorkItems()) {
+         if (w.getId() == workToBeEdited.getId()) {
+            toRemove = w;
+            LOG.debug("changing past Work");
+         }
+      }
+
+      int index;
+      if (toRemove != null) {
+         index = model.getPastWorkItems().indexOf(toRemove);
          model.getPastWorkItems().remove(index);
+      } else {
+         // TODO sort in right Place
+         index = model.getPastWorkItems().size() - 1;
       }
 
       workToBeEdited.setCreationDate(newValuedWork.getCreationDate());

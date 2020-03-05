@@ -16,8 +16,10 @@
 
 package de.doubleslash.keeptime.controller;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
@@ -382,10 +384,12 @@ public class ControllerTest {
       testee.editWork(originalWork, newWork);
 
       assertThat("changed amout of WorkItems", model.getPastWorkItems().size(), equalTo(2));
+      assertThat("pastWorkItems contains work wich shouldnt be added", model.getPastWorkItems(),
+            not(contains(newWork)));
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
       Mockito.verify(model.getWorkRepository(), Mockito.times(1)).save(argument.capture());
-      assertThat("not saved Persistent", argument.getValue(), is(originalWork));
+      assertThat("saved other Work persistently than what should be updated", argument.getValue(), is(originalWork));
 
    }
 
