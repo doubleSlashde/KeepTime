@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -37,6 +38,8 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.LocalTimeStringConverter;
@@ -166,6 +169,7 @@ public class ManageWorkController {
       noteTextArea.setText(work.getNotes());
       projectComboBox.getItems().addAll(model.getAvailableProjects());
 
+      // Dropdown Options
       projectComboBox.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
 
          @Override
@@ -178,15 +182,50 @@ public class ManageWorkController {
                   if (item == null || empty) {
                      setGraphic(null);
                   } else {
+                     final Color color = item.getColor();
+                     final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
+                           (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+                     setStyle(" -fx-background-color: " + hexColor);
                      setText(item.getName());
+
                   }
                }
             };
          }
       });
 
-      projectComboBox.setConverter(new StringConverter<Project>() {
+      // selected Item
+      projectComboBox.buttonCellProperty().bind(Bindings.createObjectBinding(() -> {
 
+         // Get the arrow button of the combo-box
+         final StackPane arrowButton = (StackPane) projectComboBox.lookup(".arrow-button");
+
+         return new ListCell<Project>() {
+
+            @Override
+            protected void updateItem(final Project item, final boolean empty) {
+               super.updateItem(item, empty);
+               if (empty || item == null) {
+                  setGraphic(null);
+               } else {
+                  final Color color = item.getColor();
+                  final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
+                        (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+                  setStyle(" -fx-background-color: " + hexColor);
+                  setText(item.getName());
+               }
+
+               // Set the background of the arrow also
+               if (arrowButton != null) {
+                  arrowButton.setBackground(getBackground());
+               }
+            }
+
+         };
+      }, projectComboBox.valueProperty()));
+
+      // selected value showed in combo box
+      projectComboBox.setConverter(new StringConverter<Project>() {
          @Override
          public String toString(final Project project) {
             if (project == null) {
@@ -203,6 +242,10 @@ public class ManageWorkController {
       });
 
       projectComboBox.getSelectionModel().select(work.getProject());
+      final Color color = work.getProject().getColor();
+      final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
+            (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
+      projectComboBox.setStyle(" -fx-background-color: " + hexColor);
 
    }
 
