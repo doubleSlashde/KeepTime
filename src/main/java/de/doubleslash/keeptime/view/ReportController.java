@@ -248,7 +248,7 @@ public class ReportController {
          @Override
          public void updateItem(final LocalDate item, final boolean empty) {
             super.updateItem(item, empty);
-            if (model.getWorkRepository().findByCreationDate(item).isEmpty()) {
+            if (model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(item).isEmpty()) {
                setDisable(true);
                setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
             }
