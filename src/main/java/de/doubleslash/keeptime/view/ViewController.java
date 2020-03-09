@@ -36,6 +36,7 @@ import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.view.time.Interval;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -61,8 +62,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -126,6 +125,18 @@ public class ViewController {
    @FXML
    private Canvas canvas;
 
+   @FXML
+   private FontAwesomeIconView calendarIcon;
+
+   @FXML
+   private FontAwesomeIconView settingsIcon;
+
+   @FXML
+   private FontAwesomeIconView minimizeIcon;
+
+   @FXML
+   private FontAwesomeIconView closeIcon;
+
    private ColorTimeLine mainColorTimeLine;
 
    private class Delta {
@@ -188,19 +199,14 @@ public class ViewController {
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
 
-      // Add a light to colorize buttons
-      // TODO is there a nicer way for this? (see #12)
-      final Lighting lighting = new Lighting();
-      lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
-         final Color color = fontColorProperty.get();
-         return new Light.Distant(45, 45, color);
-      }, fontColorProperty));
-
       settingsButton.setOnAction(ae -> settingsClicked());
-      settingsButton.setEffect(lighting);
 
       calendarButton.setOnAction(ae -> calendarClicked());
-      calendarButton.setEffect(lighting);
+
+      calendarIcon.fillProperty().bind(fontColorProperty);
+      settingsIcon.fillProperty().bind(fontColorProperty);
+      minimizeIcon.fillProperty().bind(fontColorProperty);
+      closeIcon.fillProperty().bind(fontColorProperty);
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
