@@ -16,6 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
@@ -24,15 +25,13 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
+<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
    <children>
       <BorderPane fx:id="borderPane" layoutX="5.0" layoutY="-15.0">
          <center>
@@ -54,20 +53,12 @@
                            <children>
                               <Button fx:id="calendarButton" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@../css/application.css">
                                  <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../icons/icon_calendar.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontAwesomeIconView glyphName="CALENDAR" glyphStyle="fas" size="20" />
                                  </graphic>
                               </Button>
                               <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css">
                                  <graphic>
-                                    <ImageView fitHeight="24.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../icons/icon_gear.png" />
-                                       </image>
-                                    </ImageView>
+                                    <FontAwesomeIconView glyphName="COG" glyphStyle="fas" size="20" />
                                  </graphic>
                               </Button>
                            </children>

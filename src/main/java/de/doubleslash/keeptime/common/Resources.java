@@ -40,10 +40,8 @@ public class Resources {
       FXML_ABOUT("/layouts/about.fxml"),
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
 
-      // icon
-      ICON_MAIN("/icons/icon.png"),
-
       ;
+
       String resourceLocation;
 
       private RESOURCE(final String resourceLocation) {
