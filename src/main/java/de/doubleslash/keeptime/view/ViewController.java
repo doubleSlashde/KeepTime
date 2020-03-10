@@ -295,7 +295,7 @@ public class ViewController {
 
          projectsListViewController.tick();
 
-         mainColorTimeLine.update(model.getPastWorkItems(), controller.calcTodaysSeconds());
+         mainColorTimeLine.update(model.getSortedPastWorkItems(), controller.calcTodaysSeconds());
          updateTaskbarIcon(currentWorkSeconds);
       });
 
