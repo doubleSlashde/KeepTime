@@ -35,6 +35,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import de.doubleslash.keeptime.common.DateProvider;
 import de.doubleslash.keeptime.model.Model;
@@ -334,6 +337,14 @@ public class ControllerTest {
    @Test
    public void shouldUpdateWorkItemPersistentlyWhenWorkItemIsEdited() {
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(new Answer<Work>() {
+
+         @Override
+         public Work answer(final InvocationOnMock invocation) {
+            final Object[] args = invocation.getArguments();
+            return (Work) args[0];
+         }
+      });
 
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
@@ -366,6 +377,13 @@ public class ControllerTest {
    @Test
    public void shouldNotUpdateOthersWhenWorkItemIsEdited() {
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(new Answer<Work>() {
+         @Override
+         public Work answer(final InvocationOnMock invocation) {
+            final Object[] args = invocation.getArguments();
+            return (Work) args[0];
+         }
+      });
 
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
@@ -375,14 +393,17 @@ public class ControllerTest {
 
       final Work notToBeUpdatedWork = new Work(localDateNow, localDateTimeMorning.plusHours(0),
             localDateTimeMorning.plusHours(1), project1, "originalWork");
+      ReflectionTestUtils.setField(notToBeUpdatedWork, "id", 1);
       model.getPastWorkItems().add(notToBeUpdatedWork);
 
       final Work originalWork = new Work(localDateNow, localDateTimeMorning.plusHours(1),
             localDateTimeMorning.plusHours(2), project1, "originalWork");
+      ReflectionTestUtils.setField(originalWork, "id", 2);
       model.getPastWorkItems().add(originalWork);
 
       final Work newWork = new Work(localDateNow, localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4),
             project1, "updated");
+      ReflectionTestUtils.setField(newWork, "id", 3);
 
       testee.editWork(originalWork, newWork);
 
