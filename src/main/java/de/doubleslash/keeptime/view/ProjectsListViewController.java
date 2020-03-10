@@ -34,6 +34,7 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -165,7 +166,25 @@ public class ProjectsListViewController {
       if (hideable) {
          mainStage.hide();
       }
+      if (model.emptyNoteReminder.get()) {
+         final Work currentWork = model.activeWorkItem.get();
+         if (currentWork != null && currentWork.getNotes().isEmpty()) {
+            final Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Empty Notes");
+            alert.setHeaderText(
+                  "You are About to switch Projects but your current work has no Notes associated with it.");
+            alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+            alert.setContentText("Do you want to switch nevertheless?");
+            alert.initOwner(mainStage);
+
+            final Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.NO) {
+               return;
+            }
+         }
+      }
       controller.changeProject(newProject, minusSeconds);
+
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {

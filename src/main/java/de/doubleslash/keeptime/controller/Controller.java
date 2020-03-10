@@ -104,7 +104,8 @@ public class Controller {
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit) {
+         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit,
+         final boolean emptyNoteReminder) {
       // TODO create holder for all the properties (or reuse Settings.class?)
       final Settings settings = model.getSettingsRepository().findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
@@ -117,6 +118,7 @@ public class Controller {
       settings.setUseHotkey(useHotkey);
       settings.setDisplayProjectsRight(displayProjectsRight);
       settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
+      settings.setEmptyNoteReminder(emptyNoteReminder);
 
       model.getSettingsRepository().save(settings);
 
@@ -128,6 +130,7 @@ public class Controller {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.emptyNoteReminder.set(settings.isEmptyNoteReminder());
    }
 
    @PreDestroy

@@ -198,6 +198,7 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.emptyNoteReminder.set(settings.isEmptyNoteReminder());
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
