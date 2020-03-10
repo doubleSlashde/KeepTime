@@ -86,6 +86,7 @@ public class ManageWorkController {
          try {
             stringConverter.fromString(newValue);
             text.setValue(newValue);
+            // needed to log in value from editor to spinner
             startTimeSpinner.increment(0); // TODO find better Solution
          } catch (final DateTimeParseException e) {
             text.setValue(oldValue);
@@ -98,6 +99,7 @@ public class ManageWorkController {
          try {
             stringConverter.fromString(newValue);
             text.setValue(newValue);
+            // needed to log in value from editor to spinner
             endTimeSpinner.increment(0); // TODO find better Solution
          } catch (final DateTimeParseException e) {
             text.setValue(oldValue);
