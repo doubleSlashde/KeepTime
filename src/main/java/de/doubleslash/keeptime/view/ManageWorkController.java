@@ -24,6 +24,8 @@ import java.time.format.FormatStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -185,9 +187,13 @@ public class ManageWorkController {
                      setGraphic(null);
                   } else {
                      final Color color = item.getColor();
-                     final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-                           (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
-                     setStyle(" -fx-background-color: " + hexColor);
+
+                     final double opacity = 0;
+                     String style = StyleUtils.changeStyleAttribute(getStyle(), "fx-background-color",
+                           "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+                     style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
+                           "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+                     setStyle(style);
                      setText(item.getName());
 
                   }
@@ -211,15 +217,20 @@ public class ManageWorkController {
                   setGraphic(null);
                } else {
                   final Color color = item.getColor();
-                  final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-                        (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
-                  setStyle(" -fx-background-color: " + hexColor);
+
+                  final double opacity = 0;
+                  String style = StyleUtils.changeStyleAttribute(getStyle(), "fx-background-color",
+                        "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+                  style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
+                        "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+                  setStyle(style);
+
                   setText(item.getName());
                }
 
                // Set the background of the arrow also
                if (arrowButton != null) {
-                  arrowButton.setBackground(getBackground());
+                  arrowButton.setStyle(getStyle());
                }
             }
 
@@ -245,9 +256,13 @@ public class ManageWorkController {
 
       projectComboBox.getSelectionModel().select(work.getProject());
       final Color color = work.getProject().getColor();
-      final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-            (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
-      projectComboBox.setStyle(" -fx-background-color: " + hexColor);
+
+      final double opacity = 0;
+      String style = StyleUtils.changeStyleAttribute(projectComboBox.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
+            "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+      projectComboBox.setStyle(style);
 
    }
 
