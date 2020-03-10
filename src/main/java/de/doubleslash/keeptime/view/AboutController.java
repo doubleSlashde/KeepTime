@@ -20,6 +20,7 @@ import java.util.Comparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.BrowserHelper;
@@ -42,6 +43,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
+@Component
 public class AboutController {
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
@@ -154,7 +156,7 @@ public class AboutController {
          alert.setContentText(String.format(
                "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
                license.getPath(), license.getUrl()));
-         
+
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
          alert.show();

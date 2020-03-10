@@ -187,6 +187,7 @@ public class ProjectsListViewController {
 
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_PROJECT_LAYOUT));
+      loader.setControllerFactory(model.getSpringContext()::getBean);
       Pane projectElement;
       try {
          projectElement = loader.load();
@@ -332,14 +333,13 @@ public class ProjectsListViewController {
    private GridPane setUpEditProjectGridPane(final Project p, final Dialog<Project> dialog) {
       GridPane grid;
       final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
+      loader.setControllerFactory(model.getSpringContext()::getBean);
       try {
          grid = loader.load();
       } catch (final IOException e) {
          throw new FXMLLoaderException("Error while loading '" + Resources.RESOURCE.FXML_MANAGE_PROJECT + "'.", e);
       }
       final ManageProjectController manageProjectController = loader.getController();
-      manageProjectController.setModel(model);
-      manageProjectController.secondInitialize();
       manageProjectController.initializeWith(p);
 
       dialog.setResultConverter(dialogButton -> {

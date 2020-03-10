@@ -19,6 +19,7 @@ package de.doubleslash.keeptime.model;
 import java.util.Comparator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
@@ -77,6 +78,8 @@ public class Model {
    public final ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
 
+   private ConfigurableApplicationContext springContext;
+
    public void setWorkRepository(final WorkRepository workRepository) {
       this.workRepository = workRepository;
    }
@@ -127,5 +130,13 @@ public class Model {
 
    public ObservableList<Project> getAllProjects() {
       return allProjects;
+   }
+
+   public void setSpringContext(final ConfigurableApplicationContext springContext) {
+      this.springContext = springContext;
+   }
+
+   public ConfigurableApplicationContext getSpringContext() {
+      return this.springContext;
    }
 }

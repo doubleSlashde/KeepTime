@@ -33,7 +33,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
-import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
@@ -74,7 +73,6 @@ public class Main extends Application {
    private Stage popupViewStage;
 
    private Model model;
-   private Controller controller;
 
    private ViewController viewController;
 
@@ -89,7 +87,7 @@ public class Main extends Application {
       springContext = SpringApplication.run(Main.class);
       // TODO test if everywhere is used the same model
       model = springContext.getBean(Model.class);
-      controller = springContext.getBean(Controller.class);
+      model.setSpringContext(springContext);
    }
 
    @Override
@@ -215,6 +213,7 @@ public class Main extends Application {
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_POPUP_LAYOUT));
+      loader.setControllerFactory(springContext::getBean);
       final Parent popupLayout = loader.load();
       popupViewStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
@@ -226,8 +225,6 @@ public class Main extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-      viewControllerPopupController.setControllerAndModel(controller, model);
-      viewControllerPopupController.secondInitialize();
 
       globalScreenListener.setViewController(viewControllerPopupController);
    }
@@ -264,8 +261,6 @@ public class Main extends Application {
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
-      viewController.setController(controller, model);
-      viewController.secondInitialize();
 
    }
 

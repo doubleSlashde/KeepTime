@@ -20,6 +20,8 @@ import java.awt.Point;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
@@ -36,6 +38,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+@Component
 public class ViewControllerPopup {
 
    private static final Logger LOG = LoggerFactory.getLogger(ViewControllerPopup.class);
@@ -51,27 +54,16 @@ public class ViewControllerPopup {
 
    private Stage stage;
 
-   private Controller controller;
+   private final Controller controller;
 
-   private Model model;
+   private final Model model;
 
    private ProjectsListViewController projectsListViewController;
 
-   public void secondInitialize() {
-      projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
-            searchTextField, true);
-      projectListView.setFixedCellSize(13);
-
-      final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
-      model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
-
-      updateMainBackgroundColor.run();
-   }
-
-   public void setControllerAndModel(final Controller controller, final Model model) {
-      this.controller = controller;
+   @Autowired
+   public ViewControllerPopup(final Model model, final Controller contropller) {
       this.model = model;
-
+      this.controller = contropller;
    }
 
    public void setStage(final Stage primaryStage) {
@@ -114,6 +106,15 @@ public class ViewControllerPopup {
       });
 
       Interval.registerCallBack(() -> projectsListViewController.tick());
+
+      projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
+            searchTextField, true);
+      projectListView.setFixedCellSize(13);
+
+      final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
+      model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
+
+      updateMainBackgroundColor.run();
 
    }
 
