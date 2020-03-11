@@ -35,8 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import de.doubleslash.keeptime.common.DateProvider;
@@ -337,14 +335,8 @@ public class ControllerTest {
    @Test
    public void shouldUpdateWorkItemPersistentlyWhenWorkItemIsEdited() {
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
-      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(new Answer<Work>() {
-
-         @Override
-         public Work answer(final InvocationOnMock invocation) {
-            final Object[] args = invocation.getArguments();
-            return (Work) args[0];
-         }
-      });
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class)))
+            .thenAnswer(invocation -> invocation.getArguments()[0]);
 
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
@@ -362,28 +354,23 @@ public class ControllerTest {
       testee.editWork(originalWork, newWork);
 
       final Work testWork = model.getPastWorkItems().get(0);
-      assertThat("start time is not updated", newWork.getStartTime(), equalTo(testWork.getStartTime()));
-      assertThat("end time is not updated", newWork.getEndTime(), equalTo(testWork.getEndTime()));
-      assertThat("creation date is not updated", newWork.getCreationDate(), equalTo(testWork.getCreationDate()));
-      assertThat("notes are not updated", newWork.getNotes(), equalTo(testWork.getNotes()));
-      assertThat("project is not updated", newWork.getProject(), equalTo(testWork.getProject()));
+      assertThat("Start time was not updated", testWork.getStartTime(), equalTo(newWork.getStartTime()));
+      assertThat("End timewas not updated", testWork.getEndTime(), equalTo(newWork.getEndTime()));
+      assertThat("CreationDate was not updated", testWork.getCreationDate(), equalTo(newWork.getCreationDate()));
+      assertThat("Notes were not updated", testWork.getNotes(), equalTo(newWork.getNotes()));
+      assertThat("Project was not updated", testWork.getProject(), equalTo(newWork.getProject()));
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
       Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
-      assertThat("not saved Persistent", originalWork, is(argument.getValue()));
+      assertThat("Edited work was not saved persistently", argument.getValue(), is(originalWork));
 
    }
 
    @Test
    public void shouldNotUpdateOthersWhenWorkItemIsEdited() {
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
-      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(new Answer<Work>() {
-         @Override
-         public Work answer(final InvocationOnMock invocation) {
-            final Object[] args = invocation.getArguments();
-            return (Work) args[0];
-         }
-      });
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class)))
+            .thenAnswer(invocation -> invocation.getArguments()[0]);
 
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
@@ -407,13 +394,13 @@ public class ControllerTest {
 
       testee.editWork(originalWork, newWork);
 
-      assertThat("changed amout of WorkItems", model.getPastWorkItems().size(), equalTo(2));
-      assertThat("pastWorkItems contains work wich shouldnt be added", model.getPastWorkItems(),
+      assertThat("Too many or too less work items in past work items", model.getPastWorkItems().size(), equalTo(2));
+      assertThat("Work with new values in past work items instead of updatd work", model.getPastWorkItems(),
             not(contains(newWork)));
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
       Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
-      assertThat("saved other Work persistently than what should be updated", argument.getValue(),
+      assertThat("Saved other Work persistently than what should be edited", argument.getValue(),
             not(is(notToBeUpdatedWork)));
 
    }
