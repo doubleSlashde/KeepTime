@@ -41,6 +41,7 @@ import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.worktable.ProjectTableRow;
 import de.doubleslash.keeptime.view.worktable.TableRow;
 import de.doubleslash.keeptime.view.worktable.WorkTableRow;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -54,6 +55,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
@@ -64,6 +66,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -115,25 +118,54 @@ public class ReportController {
    }
 
    private void initTableView() {
-      final TreeTableColumn<TableRow, String> noteColumn = new TreeTableColumn<>("Notes");
-      noteColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("notes"));
+
+      final TreeTableColumn<TableRow, TableRow> noteColumn = new TreeTableColumn<>("Notes");
+      noteColumn.setCellFactory(new Callback<TreeTableColumn<TableRow, TableRow>, TreeTableCell<TableRow, TableRow>>() {
+         @Override
+         public TreeTableCell<TableRow, TableRow> call(final TreeTableColumn<TableRow, TableRow> column) {
+            return new TreeTableCell<TableRow, TableRow>() {
+               @Override
+               protected void updateItem(final TableRow item, final boolean empty) {
+                  super.updateItem(item, empty);
+                  if (item == null || empty) {
+                     setGraphic(null);
+                     setText(null);
+                     LOG.debug("null");
+                  } else {
+                     final Text text = new Text(item.getNotes());
+                     text.wrappingWidthProperty().bind(noteColumn.widthProperty().subtract(35));
+                     text.setUnderline(item.isUnderlined());
+                     this.setGraphic(text);
+                  }
+               }
+            };
+         }
+
+      });
+      noteColumn.setCellValueFactory(
+            (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
+                  entry.getValue().getValue()));
       noteColumn.setMinWidth(200);
+      noteColumn.impl_setReorderable(false);
       this.workTableTreeView.getColumns().add(noteColumn);
 
       final TreeTableColumn<TableRow, String> timeRangeColumn = new TreeTableColumn<>("Timeslot");
       timeRangeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeRange"));
       timeRangeColumn.setMinWidth(120);
+      timeRangeColumn.impl_setReorderable(false);
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
       final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
       timeSumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeSum"));
       timeSumColumn.setMinWidth(60);
+      timeSumColumn.impl_setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
 
       final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>();
       buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, Button>("buttonBox"));
       buttonColumn.setMinWidth(100);
       buttonColumn.setSortable(false);
+      buttonColumn.impl_setReorderable(false);
       this.workTableTreeView.getColumns().add(buttonColumn);
 
       workTableTreeView.setShowRoot(false);

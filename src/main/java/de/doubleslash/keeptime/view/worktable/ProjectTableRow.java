@@ -38,4 +38,9 @@ public class ProjectTableRow implements TableRow {
       return buttonBox;
    }
 
+   @Override
+   public boolean isUnderlined() {
+      return project.isWork();
+   }
+
 }

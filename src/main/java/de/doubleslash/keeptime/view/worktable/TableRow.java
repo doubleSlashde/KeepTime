@@ -12,4 +12,6 @@ public interface TableRow {
 
    public HBox getButtonBox();
 
+   public boolean isUnderlined();
+
 }
