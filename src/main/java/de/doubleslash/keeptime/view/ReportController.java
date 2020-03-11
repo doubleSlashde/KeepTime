@@ -122,12 +122,12 @@ public class ReportController {
 
       final TreeTableColumn<TableRow, String> timeRangeColumn = new TreeTableColumn<>("Timeslot");
       timeRangeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeRange"));
-      timeRangeColumn.setMinWidth(100);
+      timeRangeColumn.setMinWidth(120);
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
       final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
       timeSumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeSum"));
-      timeSumColumn.setMinWidth(100);
+      timeSumColumn.setMinWidth(60);
       this.workTableTreeView.getColumns().add(timeSumColumn);
 
       final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>();
