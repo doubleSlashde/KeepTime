@@ -125,7 +125,6 @@ public class ReportController {
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(dateToShow));
       final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(dateToShow);
-      ;
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
@@ -205,7 +204,7 @@ public class ReportController {
 
             editMenuItem.setOnAction(e -> {
                LOG.info("Edit work");
-               final Dialog<Work> dialog = setupEditWorkDialog("Edit work", "Edit work ", work);
+               final Dialog<Work> dialog = setupEditWorkDialog("Edit work", work);
 
                final Optional<Work> result = dialog.showAndWait();
 
@@ -262,12 +261,12 @@ public class ReportController {
 
    }
 
-   private Dialog<Work> setupEditWorkDialog(final String title, final String headerText, final Work work) {
+   private Dialog<Work> setupEditWorkDialog(final String title, final Work work) {
       final Dialog<Work> dialog = new Dialog<>();
 
       dialog.initOwner(stage);
       dialog.setTitle(title);
-      dialog.setHeaderText(headerText);
+      dialog.setHeaderText(title);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
       final GridPane grid = setUpEditWorkGridPane(work, dialog);

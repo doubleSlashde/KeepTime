@@ -34,6 +34,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
@@ -186,10 +187,7 @@ public class ManageWorkController {
                   if (item == null || empty) {
                      setGraphic(null);
                   } else {
-                     final Color color = item.getColor();
-                     final String style = StyleUtils.changeStyleAttribute(getStyle(), "fx-background-color",
-                           "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
-                     setStyle(style);
+                     setColor(this, item.getColor());
                      setText(item.getName());
 
                   }
@@ -260,14 +258,14 @@ public class ManageWorkController {
 
       projectComboBox.getSelectionModel().select(work.getProject());
 
-      setComboBoxColor(work.getProject().getColor());
+      setColor(projectComboBox, work.getProject().getColor());
 
    }
 
-   private void setComboBoxColor(final Color color) {
-      final String style = StyleUtils.changeStyleAttribute(projectComboBox.getStyle(), "fx-background-color",
+   private void setColor(final Node object, final Color color) {
+      final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-background-color",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
-      projectComboBox.setStyle(style);
+      object.setStyle(style);
    }
 
    public Work getWorkFromUserInput() {

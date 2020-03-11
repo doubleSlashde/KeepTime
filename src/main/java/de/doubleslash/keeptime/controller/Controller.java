@@ -187,8 +187,6 @@ public class Controller {
    public void editWork(final Work workToBeEdited, final Work newValuedWork) {
       LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
 
-      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
-
       workToBeEdited.setCreationDate(newValuedWork.getCreationDate());
       workToBeEdited.setStartTime(newValuedWork.getStartTime());
       workToBeEdited.setEndTime(newValuedWork.getEndTime());
@@ -197,6 +195,9 @@ public class Controller {
 
       final Work editedWork = model.getWorkRepository().save(workToBeEdited);
 
+      // remove old
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
+      // add if started today
       final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
       if (dateNow.equals(editedWork.getCreationDate())) {
          model.getPastWorkItems().add(editedWork);
