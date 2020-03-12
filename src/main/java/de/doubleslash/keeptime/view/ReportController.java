@@ -161,7 +161,7 @@ public class ReportController {
       timeSumColumn.impl_setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
 
-      final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>();
+      final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>("Controls");
       buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, Button>("buttonBox"));
       buttonColumn.setMinWidth(100);
       buttonColumn.setSortable(false);
