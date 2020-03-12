@@ -78,7 +78,7 @@ public class ManageWorkController {
 
    public void setModel(final Model model) {
       this.model = model;
-      projectComboBox.setItems(model.getAllProjects());
+      projectComboBox.setItems(model.getSortedAvailableProjects());
    }
 
    @FXML
@@ -148,7 +148,7 @@ public class ManageWorkController {
             } else {
                setColor(this, project.getColor());
                setText(project.getName());
-
+               setUnderline(project.isWork());
             }
          }
       });
