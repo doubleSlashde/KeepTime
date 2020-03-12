@@ -289,7 +289,6 @@ public class ReportController {
          if (dialogButton == ButtonType.OK) {
             return manageWorkController.getWorkFromUserInput();
          }
-         // TODO: Do you really want to return null?
          return null;
       });
 

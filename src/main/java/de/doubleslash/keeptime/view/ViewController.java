@@ -308,7 +308,6 @@ public class ViewController {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
          }
-         // TODO: Do you really want to return null?
          return null;
       });
       return dialog;
