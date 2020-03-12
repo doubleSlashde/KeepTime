@@ -75,7 +75,7 @@ public class ManageWorkController {
    @FXML
    private ComboBox<Project> projectComboBox;
 
-   private boolean userInteraction;
+   private boolean comboChange;
 
    public void setModel(final Model model) {
       this.model = model;
@@ -217,8 +217,14 @@ public class ManageWorkController {
       // needs to set again because editable is ignored from fxml because of custom preselection
       projectComboBox.setEditable(true);
 
-      projectComboBox.getEditor().setOnKeyTyped((e) -> {
-         userInteraction = true;
+      projectComboBox.valueProperty().addListener(new ChangeListener<Project>() {
+
+         @Override
+         public void changed(final ObservableValue<? extends Project> observable, final Project oldValue,
+               final Project newValue) {
+            comboChange = true;
+
+         }
       });
 
       projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
@@ -226,20 +232,21 @@ public class ManageWorkController {
          @Override
          public void changed(final ObservableValue<? extends String> observable, final String oldValue,
                final String newValue) {
+            LOG.debug("text Changed");
 
-            if (userInteraction) {
-               userInteraction = false;
-
-               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-               Platform.runLater(() -> {
-                  LOG.debug("Value:" + newValue);
-                  projectComboBox.hide();
-                  projectComboBox.setItems(model.getAllProjects().filtered(
-                        (project) -> ProjectsListViewController.doesProjectMatchSearchFilter(newValue, project)));
-                  projectComboBox.show();
-               });
-
+            // ignore selectionChanges
+            if (comboChange == true) {
+               comboChange = false;
+               return;
             }
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> {
+               LOG.debug("Value:" + newValue);
+               projectComboBox.hide();
+               projectComboBox.setItems(model.getAllProjects().filtered(
+                     (project) -> ProjectsListViewController.doesProjectMatchSearchFilter(newValue, project)));
+               projectComboBox.show();
+            });
 
          }
       });
