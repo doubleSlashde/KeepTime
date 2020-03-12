@@ -184,17 +184,38 @@ public class Controller {
       model.getProjectRepository().saveAll(changedProjects);
    }
 
+   public void editWork(final Work workToBeEdited, final Work newValuedWork) {
+      LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
+
+      workToBeEdited.setCreationDate(newValuedWork.getCreationDate());
+      workToBeEdited.setStartTime(newValuedWork.getStartTime());
+      workToBeEdited.setEndTime(newValuedWork.getEndTime());
+      workToBeEdited.setNotes(newValuedWork.getNotes());
+      workToBeEdited.setProject(newValuedWork.getProject());
+
+      final Work editedWork = model.getWorkRepository().save(workToBeEdited);
+
+      // remove old
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
+      // add if started today
+      final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
+      if (dateNow.equals(editedWork.getCreationDate())) {
+         model.getPastWorkItems().add(editedWork);
+      }
+
+   }
+
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                          list of all projects to adapt the indexes for
     * @param changedProject
-    *           the project which has changed which already has the new index
+    *                          the project which has changed which already has the new index
     * @param oldIndex
-    *           the old index of the changed project
+    *                          the old index of the changed project
     * @param newIndex
-    *           the new index of the changed project (which the projects also already has)
+    *                          the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -231,9 +252,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                        list of all projects to adapt the indexes for
     * @param removedIndex
-    *           the index which has been removed
+    *                        the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {
@@ -298,4 +319,5 @@ public class Controller {
 
       return seconds;
    }
+
 }

@@ -39,11 +39,13 @@ public class Resources {
       FXML_REPORT("/layouts/report.fxml"),
       FXML_ABOUT("/layouts/about.fxml"),
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
+      FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
 
       // icon
       ICON_MAIN("/icons/icon.png"),
 
       ;
+
       String resourceLocation;
 
       private RESOURCE(final String resourceLocation) {

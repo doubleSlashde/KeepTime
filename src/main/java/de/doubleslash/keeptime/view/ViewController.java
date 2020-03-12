@@ -295,7 +295,7 @@ public class ViewController {
 
          projectsListViewController.tick();
 
-         mainColorTimeLine.update(model.getPastWorkItems(), controller.calcTodaysSeconds());
+         mainColorTimeLine.update(model.getSortedPastWorkItems(), controller.calcTodaysSeconds());
          updateTaskbarIcon(currentWorkSeconds);
       });
 
@@ -308,7 +308,6 @@ public class ViewController {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
          }
-         // TODO: Do you really want to return null?
          return null;
       });
       return dialog;
@@ -381,9 +380,10 @@ public class ViewController {
          reportController = fxmlLoader.getController();
          reportController.setModel(model);
          reportController.setController(controller);
+
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
-
+         reportController.setStage(reportStage);
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
