@@ -229,24 +229,54 @@ public class ManageWorkController {
 
       projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
 
+         Boolean isValidProject = true;
+
          @Override
          public void changed(final ObservableValue<? extends String> observable, final String oldValue,
                final String newValue) {
-            LOG.debug("text Changed");
 
             // ignore selectionChanges
-            if (comboChange == true) {
+            if (comboChange) {
                comboChange = false;
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> {
+                  isValidProject = true;
+                  projectComboBox.getEditor().selectAll();
+               });
+
                return;
+            }
+
+            // is necessary to not autoselect same Project if Project was selected
+            if (isValidProject) {
+               isValidProject = false;
+               projectComboBox.getSelectionModel().clearSelection();
             }
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
-               LOG.debug("Value:" + newValue);
+               LOG.debug("Search:" + newValue);
                projectComboBox.hide();
                projectComboBox.setItems(model.getAllProjects().filtered(
                      (project) -> ProjectsListViewController.doesProjectMatchSearchFilter(newValue, project)));
-               projectComboBox.show();
+               if (projectComboBox.getEditor().focusedProperty().get()) {
+                  projectComboBox.show();
+               }
+
             });
+
+         }
+      });
+
+      projectComboBox.getEditor().focusedProperty().addListener(new ChangeListener<Boolean>() {
+
+         @Override
+         public void changed(final ObservableValue<? extends Boolean> observable, final Boolean oldIsFocused,
+               final Boolean newIsFocused) {
+            if (newIsFocused) {
+               Platform.runLater(() -> projectComboBox.getEditor().selectAll());
+            } else {
+               projectComboBox.hide();
+            }
 
          }
       });
