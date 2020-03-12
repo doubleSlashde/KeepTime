@@ -38,13 +38,11 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.LocalTimeStringConverter;
 
@@ -113,10 +111,6 @@ public class ManageWorkController {
 
       startTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
 
-         {
-            setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-         }
-
          @Override
          public void decrement(final int steps) {
             if (getValue() == null) {
@@ -140,12 +134,11 @@ public class ManageWorkController {
          }
 
       });
+
+      startTimeSpinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
+
       endTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
 
-         {
-            setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-         }
-
          @Override
          public void decrement(final int steps) {
             if (getValue() == null) {
@@ -169,6 +162,7 @@ public class ManageWorkController {
          }
 
       });
+      endTimeSpinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
 
       setUpComboBox();
 
@@ -176,24 +170,18 @@ public class ManageWorkController {
 
    private void setUpComboBox() {
       // color Dropdown Options
-      projectComboBox.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
+      projectComboBox.setCellFactory(listView -> new ListCell<Project>() {
 
          @Override
-         public ListCell<Project> call(final ListView<Project> l) {
-            return new ListCell<Project>() {
+         protected void updateItem(final Project item, final boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+               setGraphic(null);
+            } else {
+               setColor(this, item.getColor());
+               setText(item.getName());
 
-               @Override
-               protected void updateItem(final Project item, final boolean empty) {
-                  super.updateItem(item, empty);
-                  if (item == null || empty) {
-                     setGraphic(null);
-                  } else {
-                     setColor(this, item.getColor());
-                     setText(item.getName());
-
-                  }
-               }
-            };
+            }
          }
       });
 
@@ -218,25 +206,22 @@ public class ManageWorkController {
       // needs to set again because editable is ignored from fxml because of custom preselection
       projectComboBox.setEditable(true);
 
-      projectComboBox.valueProperty().addListener(new ChangeListener<Project>() {
+      projectComboBox.valueProperty().addListener(
+            (final ObservableValue<? extends Project> observable, final Project oldValue, final Project newValue) -> {
+               if (newValue == null) {
+                  return;
+               }
 
-         @Override
-         public void changed(final ObservableValue<? extends Project> observable, final Project oldValue,
-               final Project newValue) {
-            if (newValue == null) {
-               return;
+               selectedProject = newValue;
+               comboChange = true;
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> {
+                  projectComboBox.getEditor().selectAll();
+                  setColor(projectComboBox, newValue.getColor());
+               });
             }
 
-            selectedProject = newValue;
-            comboChange = true;
-            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-            Platform.runLater(() -> {
-               projectComboBox.getEditor().selectAll();
-               setColor(projectComboBox, newValue.getColor());
-            });
-
-         }
-      });
+      );
 
       projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
 
@@ -255,7 +240,7 @@ public class ManageWorkController {
             }
 
             // is necessary to not autoselect same Project if Project was selected
-            if (isValidProject) {
+            if (Boolean.TRUE.equals(isValidProject)) {
                isValidProject = false;
                projectComboBox.getSelectionModel().clearSelection();
             }
@@ -263,7 +248,7 @@ public class ManageWorkController {
             Platform.runLater(() -> {
 
                projectComboBox.hide();
-               projectComboBox.setItems(model.getAllProjects().filtered((project) -> ProjectsListViewController
+               projectComboBox.setItems(model.getAllProjects().filtered(project -> ProjectsListViewController
                      .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
                if (projectComboBox.getEditor().focusedProperty().get()) {
                   projectComboBox.show();
@@ -274,20 +259,16 @@ public class ManageWorkController {
          }
       });
 
-      projectComboBox.getEditor().focusedProperty().addListener(new ChangeListener<Boolean>() {
-
-         @Override
-         public void changed(final ObservableValue<? extends Boolean> observable, final Boolean oldIsFocused,
-               final Boolean newIsFocused) {
-            if (newIsFocused) {
-               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-               Platform.runLater(() -> projectComboBox.getEditor().selectAll());
-            } else {
-               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-               Platform.runLater(() -> projectComboBox.hide());
-            }
-
+      projectComboBox.getEditor().focusedProperty().addListener((final ObservableValue<? extends Boolean> observable,
+            final Boolean oldIsFocused, final Boolean newIsFocused) -> {
+         if (Boolean.TRUE.equals(newIsFocused)) {
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> projectComboBox.getEditor().selectAll());
+         } else {
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> projectComboBox.hide());
          }
+
       });
 
    }

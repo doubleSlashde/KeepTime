@@ -40,7 +40,6 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -97,8 +96,6 @@ public class ReportController {
    private Canvas colorTimeLineCanvas;
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
-
-   private DatePicker datePicker; // for calendar element
 
    private Model model;
 
@@ -300,23 +297,18 @@ public class ReportController {
 
    private Button createProjectReport() {
       final Button bProjectReport = new Button("Copy to clipboard");
-      final EventHandler<ActionEvent> eventListener = new EventHandler<ActionEvent>() {
 
-         @Override
-         public void handle(final ActionEvent event) {
-            final Object source = event.getSource();
-            final Button btn = (Button) source;
-            final Object userData = btn.getUserData();
-            final String notes = (String) userData;
+      bProjectReport.setOnAction((final ActionEvent event) -> {
+         final Object source = event.getSource();
+         final Button btn = (Button) source;
+         final Object userData = btn.getUserData();
+         final String notes = (String) userData;
 
-            final Clipboard clipboard = Clipboard.getSystemClipboard();
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(notes);
-            clipboard.setContent(content);
-         }
-
-      };
-      bProjectReport.setOnAction(eventListener);
+         final Clipboard clipboard = Clipboard.getSystemClipboard();
+         final ClipboardContent content = new ClipboardContent();
+         content.putString(notes);
+         clipboard.setContent(content);
+      });
       return bProjectReport;
    }
 
