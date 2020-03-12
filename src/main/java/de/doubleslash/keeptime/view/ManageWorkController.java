@@ -83,103 +83,71 @@ public class ManageWorkController {
 
    @FXML
    private void initialize() {
-      startTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
-         final StringProperty text = (StringProperty) observable;
-         try {
-            stringConverter.fromString(newValue);
-            text.setValue(newValue);
-            // needed to log in value from editor to spinner
-            startTimeSpinner.increment(0); // TODO find better Solution
-         } catch (final DateTimeParseException e) {
-            text.setValue(oldValue);
-         }
-      });
 
-      endTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
-         final StringProperty text = (StringProperty) observable;
-         try {
-            stringConverter.fromString(newValue);
-            text.setValue(newValue);
-            // needed to log in value from editor to spinner
-            endTimeSpinner.increment(0); // TODO find better Solution
-         } catch (final DateTimeParseException e) {
-            text.setValue(oldValue);
-         }
-      });
+      setUpTimeSpinner(startTimeSpinner);
 
-      startTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
+      setUpTimeSpinner(endTimeSpinner);
 
-         @Override
-         public void decrement(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.minusMinutes(steps));
-            }
-
-         }
-
-         @Override
-         public void increment(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.plusMinutes(steps));
-            }
-
-         }
-
-      });
-
-      startTimeSpinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-
-      endTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
-
-         @Override
-         public void decrement(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.minusMinutes(steps));
-            }
-
-         }
-
-         @Override
-         public void increment(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.plusMinutes(steps));
-            }
-
-         }
-
-      });
-      endTimeSpinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-
-      setUpComboBox();
+      setProjectUpComboBox();
 
    }
 
-   private void setUpComboBox() {
+   private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
+      spinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
+         final StringProperty text = (StringProperty) observable;
+         try {
+            stringConverter.fromString(newValue);
+            text.setValue(newValue);
+            // needed to log in value from editor to spinner
+            spinner.increment(0); // TODO find better Solution
+         } catch (final DateTimeParseException e) {
+            text.setValue(oldValue);
+         }
+      });
+
+      spinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
+
+         @Override
+         public void decrement(final int steps) {
+            if (getValue() == null) {
+               setValue(LocalTime.now());
+            } else {
+               final LocalTime time = getValue();
+               setValue(time.minusMinutes(steps));
+            }
+
+         }
+
+         @Override
+         public void increment(final int steps) {
+            if (getValue() == null) {
+               setValue(LocalTime.now());
+            } else {
+               final LocalTime time = getValue();
+               setValue(time.plusMinutes(steps));
+            }
+
+         }
+
+      });
+
+      spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
+
+   }
+
+   private void setProjectUpComboBox() {
       // color Dropdown Options
       projectComboBox.setCellFactory(listView -> new ListCell<Project>() {
 
          @Override
-         protected void updateItem(final Project item, final boolean empty) {
-            super.updateItem(item, empty);
-            if (item == null || empty) {
+         protected void updateItem(final Project project, final boolean empty) {
+            super.updateItem(project, empty);
+            if (project == null || empty) {
                setGraphic(null);
             } else {
-               setColor(this, item.getColor());
-               setText(item.getName());
+               setColor(this, project.getColor());
+               setText(project.getName());
 
             }
          }
@@ -198,12 +166,12 @@ public class ManageWorkController {
 
          @Override
          public Project fromString(final String string) {
-
+            // ignores String and gets selected Value of ComboBox
             return projectComboBox.getValue();
          }
       });
 
-      // needs to set again because editable is ignored from fxml because of custom preselection
+      // needs to set again because editable is ignored from fxml because of custom preselection of current Project
       projectComboBox.setEditable(true);
 
       projectComboBox.valueProperty().addListener(
@@ -259,6 +227,7 @@ public class ManageWorkController {
          }
       });
 
+      // manages Focusbehaviour
       projectComboBox.getEditor().focusedProperty().addListener((final ObservableValue<? extends Boolean> observable,
             final Boolean oldIsFocused, final Boolean newIsFocused) -> {
          if (Boolean.TRUE.equals(newIsFocused)) {
