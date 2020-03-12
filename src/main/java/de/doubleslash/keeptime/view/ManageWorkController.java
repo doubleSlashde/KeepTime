@@ -76,6 +76,7 @@ public class ManageWorkController {
    private ComboBox<Project> projectComboBox;
 
    private boolean comboChange;
+   private Project selectedProject;
 
    public void setModel(final Model model) {
       this.model = model;
@@ -226,6 +227,7 @@ public class ManageWorkController {
                return;
             }
 
+            selectedProject = newValue;
             comboChange = true;
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
@@ -292,6 +294,7 @@ public class ManageWorkController {
 
    public void initializeWith(final Work work) {
       LOG.info("Setting values.");
+      selectedProject = work.getProject();
       startDatePicker.setValue(work.getStartTime().toLocalDate());
       endDatePicker.setValue(work.getEndTime().toLocalDate());
 
@@ -316,8 +319,8 @@ public class ManageWorkController {
 
       return new Work(startDatePicker.getValue(),
             LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
-            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()),
-            projectComboBox.getSelectionModel().getSelectedItem(), noteTextArea.getText());
+            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
+            noteTextArea.getText());
    }
 
 }
