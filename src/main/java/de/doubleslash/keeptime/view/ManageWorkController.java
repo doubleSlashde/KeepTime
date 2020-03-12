@@ -24,23 +24,25 @@ import java.time.format.FormatStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
-import javafx.beans.binding.Bindings;
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import javafx.util.converter.LocalTimeStringConverter;
 
@@ -71,73 +73,40 @@ public class ManageWorkController {
    @FXML
    private ComboBox<Project> projectComboBox;
 
+   private boolean comboChange;
+   private Project selectedProject;
+
    public void setModel(final Model model) {
       this.model = model;
+      projectComboBox.setItems(model.getSortedAvailableProjects());
    }
 
-   public void initializeWith(final Work work) {
-      LOG.info("Setting values.");
-      startDatePicker.setValue(work.getStartTime().toLocalDate());
-      endDatePicker.setValue(work.getEndTime().toLocalDate());
+   @FXML
+   private void initialize() {
 
-      startTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+      setUpTimeSpinner(startTimeSpinner);
+
+      setUpTimeSpinner(endTimeSpinner);
+
+      setProjectUpComboBox();
+
+   }
+
+   private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
+      spinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = (StringProperty) observable;
          try {
             stringConverter.fromString(newValue);
             text.setValue(newValue);
-            startTimeSpinner.increment(0); // TODO find better Solution
+            // needed to log in value from editor to spinner
+            spinner.increment(0); // TODO find better Solution
          } catch (final DateTimeParseException e) {
             text.setValue(oldValue);
          }
       });
 
-      endTimeSpinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
-         final StringProperty text = (StringProperty) observable;
-         try {
-            stringConverter.fromString(newValue);
-            text.setValue(newValue);
-            endTimeSpinner.increment(0); // TODO find better Solution
-         } catch (final DateTimeParseException e) {
-            text.setValue(oldValue);
-         }
-      });
-
-      startTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
-
-         {
-            setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-         }
-
-         @Override
-         public void decrement(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.minusMinutes(steps));
-            }
-
-         }
-
-         @Override
-         public void increment(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.plusMinutes(steps));
-            }
-
-         }
-
-      });
-      endTimeSpinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
-
-         {
-            setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-         }
+      spinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
 
          @Override
          public void decrement(final int steps) {
@@ -163,68 +132,28 @@ public class ManageWorkController {
 
       });
 
-      startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
-      endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
+      spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
 
-      noteTextArea.setText(work.getNotes());
-      projectComboBox.getItems().addAll(model.getAvailableProjects());
+   }
 
-      // Dropdown Options
-      projectComboBox.setCellFactory(new Callback<ListView<Project>, ListCell<Project>>() {
+   private void setProjectUpComboBox() {
+      // color Dropdown Options
+      projectComboBox.setCellFactory(listView -> new ListCell<Project>() {
 
          @Override
-         public ListCell<Project> call(final ListView<Project> l) {
-            return new ListCell<Project>() {
-
-               @Override
-               protected void updateItem(final Project item, final boolean empty) {
-                  super.updateItem(item, empty);
-                  if (item == null || empty) {
-                     setGraphic(null);
-                  } else {
-                     final Color color = item.getColor();
-                     final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-                           (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
-                     setStyle(" -fx-background-color: " + hexColor);
-                     setText(item.getName());
-
-                  }
-               }
-            };
+         protected void updateItem(final Project project, final boolean empty) {
+            super.updateItem(project, empty);
+            if (project == null || empty) {
+               setGraphic(null);
+            } else {
+               setColor(this, project.getColor());
+               setText(project.getName());
+               setUnderline(project.isWork());
+            }
          }
       });
 
-      // selected Item
-      projectComboBox.buttonCellProperty().bind(Bindings.createObjectBinding(() -> {
-
-         // Get the arrow button of the combo-box
-         final StackPane arrowButton = (StackPane) projectComboBox.lookup(".arrow-button");
-
-         return new ListCell<Project>() {
-
-            @Override
-            protected void updateItem(final Project item, final boolean empty) {
-               super.updateItem(item, empty);
-               if (empty || item == null) {
-                  setGraphic(null);
-               } else {
-                  final Color color = item.getColor();
-                  final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-                        (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
-                  setStyle(" -fx-background-color: " + hexColor);
-                  setText(item.getName());
-               }
-
-               // Set the background of the arrow also
-               if (arrowButton != null) {
-                  arrowButton.setBackground(getBackground());
-               }
-            }
-
-         };
-      }, projectComboBox.valueProperty()));
-
-      // selected value showed in combo box
+      // set text of selected value
       projectComboBox.setConverter(new StringConverter<Project>() {
          @Override
          public String toString(final Project project) {
@@ -237,24 +166,110 @@ public class ManageWorkController {
 
          @Override
          public Project fromString(final String string) {
-            return null;
+            // ignores String and gets selected Value of ComboBox
+            return projectComboBox.getValue();
          }
       });
 
-      projectComboBox.getSelectionModel().select(work.getProject());
-      final Color color = work.getProject().getColor();
-      final String hexColor = String.format("#%02X%02X%02X", (int) (color.getRed() * 255),
-            (int) (color.getGreen() * 255), (int) (color.getBlue() * 255));
-      projectComboBox.setStyle(" -fx-background-color: " + hexColor);
+      // needs to set again because editable is ignored from fxml because of custom preselection of current Project
+      projectComboBox.setEditable(true);
 
+      projectComboBox.valueProperty().addListener(
+            (final ObservableValue<? extends Project> observable, final Project oldValue, final Project newValue) -> {
+               if (newValue == null) {
+                  return;
+               }
+
+               selectedProject = newValue;
+               comboChange = true;
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> {
+                  projectComboBox.getEditor().selectAll();
+                  setColor(projectComboBox, newValue.getColor());
+               });
+            }
+
+      );
+
+      projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
+
+         Boolean isValidProject = true;
+
+         @Override
+         public void changed(final ObservableValue<? extends String> observable, final String oldValue,
+               final String newValue) {
+
+            // ignore selectionChanges
+            if (comboChange) {
+               comboChange = false;
+               isValidProject = true;
+               return;
+            }
+
+            // is necessary to not autoselect same Project if Project was selected
+            if (isValidProject) {
+               isValidProject = false;
+               projectComboBox.getSelectionModel().clearSelection();
+            }
+
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> {
+               projectComboBox.hide();
+               projectComboBox.setItems(model.getAllProjects().filtered(project -> ProjectsListViewController
+                     .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
+               if (projectComboBox.getEditor().focusedProperty().get()) {
+                  projectComboBox.show();
+               }
+
+            });
+
+         }
+      });
+
+      // manages Focusbehaviour
+      projectComboBox.getEditor().focusedProperty().addListener((final ObservableValue<? extends Boolean> observable,
+            final Boolean oldIsFocused, final Boolean newIsFocused) -> {
+         if (newIsFocused) {
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> projectComboBox.getEditor().selectAll());
+         } else {
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> projectComboBox.hide());
+         }
+
+      });
+
+   }
+
+   public void initializeWith(final Work work) {
+      LOG.info("Setting values.");
+      selectedProject = work.getProject();
+      startDatePicker.setValue(work.getStartTime().toLocalDate());
+      endDatePicker.setValue(work.getEndTime().toLocalDate());
+
+      startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
+      endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
+
+      noteTextArea.setText(work.getNotes());
+
+      projectComboBox.getSelectionModel().select(work.getProject());
+
+      setColor(projectComboBox, work.getProject().getColor());
+
+   }
+
+   private void setColor(final Node object, final Color color) {
+      final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      object.setStyle(style);
    }
 
    public Work getWorkFromUserInput() {
 
       return new Work(startDatePicker.getValue(),
             LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
-            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()),
-            projectComboBox.getSelectionModel().getSelectedItem(), noteTextArea.getText());
+            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
+            noteTextArea.getText());
    }
 
 }

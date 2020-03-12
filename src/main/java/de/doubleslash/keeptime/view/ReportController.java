@@ -78,6 +78,8 @@ public class ReportController {
 
    private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #BBBBBB;";
 
+   private static final String EDIT_WORK_DIALOG_TITLE = "Edit work";
+
    @FXML
    private BorderPane topBorderPane;
 
@@ -244,7 +246,7 @@ public class ReportController {
          @Override
          public void updateItem(final LocalDate item, final boolean empty) {
             super.updateItem(item, empty);
-            if (model.getWorkRepository().findByCreationDate(item).isEmpty()) {
+            if (model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(item).isEmpty()) {
                setDisable(true);
                setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
             }
@@ -262,8 +264,8 @@ public class ReportController {
       final Button bProjectReport = new Button("edit");
 
       bProjectReport.setOnAction(e -> {
-         LOG.info("Edit work");
-         final Dialog<Work> dialog = setupEditWorkDialog("Edit work", "Edit work ", work);
+         LOG.info("Edit work clicked.");
+         final Dialog<Work> dialog = setupEditWorkDialog(work);
 
          final Optional<Work> result = dialog.showAndWait();
 
@@ -276,12 +278,11 @@ public class ReportController {
       return bProjectReport;
    }
 
-   private Dialog<Work> setupEditWorkDialog(final String title, final String headerText, final Work work) {
+   private Dialog<Work> setupEditWorkDialog(final Work work) {
       final Dialog<Work> dialog = new Dialog<>();
-
       dialog.initOwner(stage);
-      dialog.setTitle(title);
-      dialog.setHeaderText(headerText);
+      dialog.setTitle(EDIT_WORK_DIALOG_TITLE);
+      dialog.setHeaderText(EDIT_WORK_DIALOG_TITLE);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
       final GridPane grid = setUpEditWorkGridPane(work, dialog);
@@ -306,7 +307,6 @@ public class ReportController {
          if (dialogButton == ButtonType.OK) {
             return manageWorkController.getWorkFromUserInput();
          }
-         // TODO: Do you really want to return null?
          return null;
       });
 
@@ -315,27 +315,24 @@ public class ReportController {
 
    private Button createProjectReportButton(final List<Work> projectWork) {
       final Button bProjectReport = new Button("Copy to clipboard");
-      final EventHandler<ActionEvent> eventListener = new EventHandler<ActionEvent>() {
 
-         @Override
-         public void handle(final ActionEvent event) {
-            LOG.debug("copied to Clipboard");
-            final ProjectReport pr = new ProjectReport(projectWork.size());
-            for (int j = 0; j < projectWork.size(); j++) {
-               final Work work = projectWork.get(j);
-               final String currentWorkNote = work.getNotes();
-               pr.appendToWorkNotes(currentWorkNote);
-
-            }
-            final Clipboard clipboard = Clipboard.getSystemClipboard();
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(pr.getNotes(true));
-            clipboard.setContent(content);
+      final EventHandler<ActionEvent> eventListener = actionEvent -> {
+         LOG.debug("Copy to Clipboard clicked.");
+         final ProjectReport pr = new ProjectReport(projectWork.size());
+         for (int j = 0; j < projectWork.size(); j++) {
+            final Work work = projectWork.get(j);
+            final String currentWorkNote = work.getNotes();
+            pr.appendToWorkNotes(currentWorkNote);
          }
-
+         final Clipboard clipboard = Clipboard.getSystemClipboard();
+         final ClipboardContent content = new ClipboardContent();
+         content.putString(pr.getNotes(true));
+         clipboard.setContent(content);
       };
+
       bProjectReport.setOnAction(eventListener);
       return bProjectReport;
+
    }
 
    public void setModel(final Model model) {

@@ -186,18 +186,6 @@ public class Controller {
 
    public void editWork(final Work workToBeEdited, final Work newValuedWork) {
       LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
-      int index = model.getPastWorkItems().size() - 1;
-      for (int i = 0; i < model.getPastWorkItems().size(); i++) {
-         final Work work = model.getPastWorkItems().get(i);
-         if (work.getId() == workToBeEdited.getId()) {
-            model.getPastWorkItems().remove(work);
-            continue;
-         }
-         if (work.getStartTime().isAfter(newValuedWork.getStartTime())) {
-            index = i;
-            break;
-         }
-      }
 
       workToBeEdited.setCreationDate(newValuedWork.getCreationDate());
       workToBeEdited.setStartTime(newValuedWork.getStartTime());
@@ -205,12 +193,15 @@ public class Controller {
       workToBeEdited.setNotes(newValuedWork.getNotes());
       workToBeEdited.setProject(newValuedWork.getProject());
 
-      final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
-      if (dateNow.equals(workToBeEdited.getCreationDate())) {
-         model.getPastWorkItems().add(index, workToBeEdited);
-      }
+      final Work editedWork = model.getWorkRepository().save(workToBeEdited);
 
-      model.getWorkRepository().save(workToBeEdited);
+      // remove old
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
+      // add if started today
+      final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
+      if (dateNow.equals(editedWork.getCreationDate())) {
+         model.getPastWorkItems().add(editedWork);
+      }
 
    }
 
