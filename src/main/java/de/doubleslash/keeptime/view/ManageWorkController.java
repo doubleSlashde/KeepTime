@@ -242,6 +242,7 @@ public class ManageWorkController {
                Platform.runLater(() -> {
                   isValidProject = true;
                   projectComboBox.getEditor().selectAll();
+                  setColor(projectComboBox, projectComboBox.getValue().getColor());
                });
 
                return;
@@ -273,9 +274,11 @@ public class ManageWorkController {
          public void changed(final ObservableValue<? extends Boolean> observable, final Boolean oldIsFocused,
                final Boolean newIsFocused) {
             if (newIsFocused) {
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
                Platform.runLater(() -> projectComboBox.getEditor().selectAll());
             } else {
-               projectComboBox.hide();
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> projectComboBox.hide());
             }
 
          }
