@@ -222,7 +222,16 @@ public class ManageWorkController {
          @Override
          public void changed(final ObservableValue<? extends Project> observable, final Project oldValue,
                final Project newValue) {
+            if (newValue == null) {
+               return;
+            }
+
             comboChange = true;
+            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+            Platform.runLater(() -> {
+               projectComboBox.getEditor().selectAll();
+               setColor(projectComboBox, newValue.getColor());
+            });
 
          }
       });
@@ -238,12 +247,7 @@ public class ManageWorkController {
             // ignore selectionChanges
             if (comboChange) {
                comboChange = false;
-               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-               Platform.runLater(() -> {
-                  isValidProject = true;
-                  projectComboBox.getEditor().selectAll();
-                  setColor(projectComboBox, projectComboBox.getValue().getColor());
-               });
+               isValidProject = true;
 
                return;
             }
