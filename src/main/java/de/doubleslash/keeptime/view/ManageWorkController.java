@@ -203,18 +203,17 @@ public class ManageWorkController {
             if (comboChange) {
                comboChange = false;
                isValidProject = true;
-
                return;
             }
 
             // is necessary to not autoselect same Project if Project was selected
-            if (Boolean.TRUE.equals(isValidProject)) {
+            if (isValidProject) {
                isValidProject = false;
                projectComboBox.getSelectionModel().clearSelection();
             }
+
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
-
                projectComboBox.hide();
                projectComboBox.setItems(model.getAllProjects().filtered(project -> ProjectsListViewController
                      .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
@@ -230,7 +229,7 @@ public class ManageWorkController {
       // manages Focusbehaviour
       projectComboBox.getEditor().focusedProperty().addListener((final ObservableValue<? extends Boolean> observable,
             final Boolean oldIsFocused, final Boolean newIsFocused) -> {
-         if (Boolean.TRUE.equals(newIsFocused)) {
+         if (newIsFocused) {
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> projectComboBox.getEditor().selectAll());
          } else {

@@ -73,6 +73,8 @@ public class ReportController {
 
    private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #BBBBBB;";
 
+   private static final String EDIT_WORK_DIALOG_TITLE = "Edit work";
+
    @FXML
    private BorderPane topBorderPane;
 
@@ -200,8 +202,8 @@ public class ReportController {
             final MenuItem editMenuItem = new MenuItem("edit");
 
             editMenuItem.setOnAction(e -> {
-               LOG.info("Edit work");
-               final Dialog<Work> dialog = setupEditWorkDialog("Edit work", work);
+               LOG.info(EDIT_WORK_DIALOG_TITLE);
+               final Dialog<Work> dialog = setupEditWorkDialog(work);
 
                final Optional<Work> result = dialog.showAndWait();
 
@@ -258,12 +260,11 @@ public class ReportController {
 
    }
 
-   private Dialog<Work> setupEditWorkDialog(final String title, final Work work) {
+   private Dialog<Work> setupEditWorkDialog(final Work work) {
       final Dialog<Work> dialog = new Dialog<>();
-
       dialog.initOwner(stage);
-      dialog.setTitle(title);
-      dialog.setHeaderText(title);
+      dialog.setTitle(EDIT_WORK_DIALOG_TITLE);
+      dialog.setHeaderText(EDIT_WORK_DIALOG_TITLE);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
       final GridPane grid = setUpEditWorkGridPane(work, dialog);
