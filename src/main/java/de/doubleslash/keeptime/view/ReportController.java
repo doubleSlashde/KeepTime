@@ -186,7 +186,7 @@ public class ReportController {
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
       final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
-            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getIndex))));
 
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
