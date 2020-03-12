@@ -118,7 +118,7 @@ public class Controller {
       settings.setUseHotkey(useHotkey);
       settings.setDisplayProjectsRight(displayProjectsRight);
       settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
-      settings.setEmptyNoteReminder(emptyNoteReminder);
+      settings.setRemindIfNotesAreEmpty(emptyNoteReminder);
 
       model.getSettingsRepository().save(settings);
 
@@ -130,7 +130,7 @@ public class Controller {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
-      model.emptyNoteReminder.set(settings.isEmptyNoteReminder());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }
 
    @PreDestroy

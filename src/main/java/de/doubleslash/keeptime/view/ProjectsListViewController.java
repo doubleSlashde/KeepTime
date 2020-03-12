@@ -50,6 +50,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
 import javafx.scene.input.MouseButton;
@@ -166,19 +167,23 @@ public class ProjectsListViewController {
       if (hideable) {
          mainStage.hide();
       }
-      if (model.emptyNoteReminder.get()) {
+      if (model.remindIfNotesAreEmpty.get()) {
          final Work currentWork = model.activeWorkItem.get();
          if (currentWork != null && currentWork.getNotes().isEmpty()) {
-            final Alert alert = new Alert(AlertType.CONFIRMATION);
-            alert.setTitle("Empty Notes");
-            alert.setHeaderText(
+            final TextInputDialog noteDialog = new TextInputDialog();
+            noteDialog.setTitle("Empty Notes");
+            noteDialog.setHeaderText(
                   "You are About to switch Projects but your current work has no Notes associated with it.");
-            alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-            alert.setContentText("Do you want to switch nevertheless?");
-            alert.initOwner(mainStage);
+            noteDialog.setContentText("You can add Notes now:");
+            noteDialog.initOwner(mainStage);
 
-            final Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.NO) {
+            final Optional<String> result = noteDialog.showAndWait();
+            if (result.isPresent()) {
+               if (!result.get().equals("")) {
+                  currentWork.setNotes(result.get());
+               }
+
+            } else {
                return;
             }
          }

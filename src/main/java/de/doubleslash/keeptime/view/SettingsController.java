@@ -218,7 +218,7 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
-      emptyNoteReminderCheeckBox.setSelected(model.emptyNoteReminder.get());
+      emptyNoteReminderCheeckBox.setSelected(model.remindIfNotesAreEmpty.get());
    }
 
    public void setStage(final Stage thisStage) {

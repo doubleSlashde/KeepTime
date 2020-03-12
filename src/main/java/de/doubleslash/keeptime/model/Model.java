@@ -77,7 +77,7 @@ public class Model {
    public final ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
-   public final ObjectProperty<Boolean> emptyNoteReminder = new SimpleObjectProperty<>(false);
+   public final ObjectProperty<Boolean> remindIfNotesAreEmpty = new SimpleObjectProperty<>(false);
 
    private ConfigurableApplicationContext springContext;
 

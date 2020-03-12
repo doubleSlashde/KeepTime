@@ -59,7 +59,7 @@ public class Settings {
 
    private boolean hideProjectsOnMouseExit;
 
-   private boolean emptyNoteReminder;
+   private boolean remindIfNotesAreEmpty;
 
    public long getId() {
       return id;
@@ -129,12 +129,12 @@ public class Settings {
       this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
    }
 
-   public boolean isEmptyNoteReminder() {
-      return emptyNoteReminder;
+   public boolean isRemindIfNotesAreEmpty() {
+      return remindIfNotesAreEmpty;
    }
 
-   public void setEmptyNoteReminder(final boolean emptyNoteReminder) {
-      this.emptyNoteReminder = emptyNoteReminder;
+   public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
+      this.remindIfNotesAreEmpty = emptyNoteReminder;
    }
 
 }
