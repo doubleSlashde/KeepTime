@@ -140,6 +140,7 @@ public class AboutController {
       licenseRows.add(new LicenseTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
+      licenseRows.add(new LicenseTableRow("fontawesomefx", Licenses.APACHEV2));
 
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
@@ -154,7 +155,7 @@ public class AboutController {
          alert.setContentText(String.format(
                "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
                license.getPath(), license.getUrl()));
-         
+
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
          alert.show();

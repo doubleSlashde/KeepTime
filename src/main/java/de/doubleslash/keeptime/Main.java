@@ -248,7 +248,6 @@ public class Main extends Application {
 
       registerMinimizeEventlistener(mainScene, primaryStage);
       registerMaximizeEventlistener(mainScene, primaryStage);
-      // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
 
       primaryStage.setTitle("KeepTime");
       primaryStage.setScene(mainScene);

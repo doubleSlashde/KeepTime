@@ -41,9 +41,6 @@ public class Resources {
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
       FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
 
-      // icon
-      ICON_MAIN("/icons/icon.png"),
-
       ;
 
       String resourceLocation;
