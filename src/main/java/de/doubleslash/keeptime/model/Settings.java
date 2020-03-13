@@ -59,6 +59,36 @@ public class Settings {
 
    private boolean hideProjectsOnMouseExit;
 
+   private double windowPositionX;
+
+   private double windowPositionY;
+
+   private int screenHash;
+
+   private boolean saveWindowPosition;
+
+   public Settings() {
+   }
+
+   public Settings(final Color hoverBackgroundColor, final Color hoverFontColor, final Color defaultBackgroundColor,
+         final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
+         final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit, final double windowPositionX,
+         final double windowPositionY, final int screenHash, final boolean saveWindowPosition) {
+      this.hoverBackgroundColor = hoverBackgroundColor;
+      this.hoverFontColor = hoverFontColor;
+      this.defaultBackgroundColor = defaultBackgroundColor;
+      this.defaultFontColor = defaultFontColor;
+      this.taskBarColor = taskBarColor;
+      this.useHotkey = useHotkey;
+      this.displayProjectsRight = displayProjectsRight;
+      this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
+      this.windowPositionX = windowPositionX;
+      this.windowPositionY = windowPositionY;
+      this.screenHash = screenHash;
+      this.saveWindowPosition = saveWindowPosition;
+
+   }
+
    public long getId() {
       return id;
    }
@@ -125,6 +155,38 @@ public class Settings {
 
    public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
       this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
+   }
+
+   public double getWindowPositionX() {
+      return windowPositionX;
+   }
+
+   public void setWindowPositionX(final double windowPositionX) {
+      this.windowPositionX = windowPositionX;
+   }
+
+   public double getWindowPositionY() {
+      return windowPositionY;
+   }
+
+   public void setWindowPositionY(final double windowPositionY) {
+      this.windowPositionY = windowPositionY;
+   }
+
+   public int getScreenHash() {
+      return screenHash;
+   }
+
+   public void setScreenHash(final int screenHash) {
+      this.screenHash = screenHash;
+   }
+
+   public boolean isSaveWindowPosition() {
+      return saveWindowPosition;
+   }
+
+   public void setSaveWindowPosition(final boolean saveWindowPosition) {
+      this.saveWindowPosition = saveWindowPosition;
    }
 
 }

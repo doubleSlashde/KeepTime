@@ -30,6 +30,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
+import javafx.stage.Screen;
 
 @Component
 public class Model {
@@ -76,6 +77,11 @@ public class Model {
    public final ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
+
+   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
+   public final ObjectProperty<Double> windowPositionY = new SimpleObjectProperty<>(0.5);
+   public final ObjectProperty<Double> windowPositionX = new SimpleObjectProperty<>(0.5);
+   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
 
    public void setWorkRepository(final WorkRepository workRepository) {
       this.workRepository = workRepository;
@@ -127,5 +133,27 @@ public class Model {
 
    public ObservableList<Project> getAllProjects() {
       return allProjects;
+   }
+
+   public double getAbsolutePositionX() {
+      final Screen toDisplay = getScreenWithHashOrPrimary(screenHash.get());
+      return toDisplay.getVisualBounds().getMinX() + (toDisplay.getVisualBounds().getWidth() * windowPositionX.get());
+
+   }
+
+   public double getAbsolutePositionY() {
+      final Screen toDisplay = getScreenWithHashOrPrimary(screenHash.get());
+      return toDisplay.getVisualBounds().getMinY() + (toDisplay.getVisualBounds().getHeight() * windowPositionY.get());
+
+   }
+
+   private Screen getScreenWithHashOrPrimary(final int hash) {
+
+      for (final Screen s : Screen.getScreens()) {
+         if (s.hashCode() == hash) {
+            return s;
+         }
+      }
+      return Screen.getPrimary();
    }
 }

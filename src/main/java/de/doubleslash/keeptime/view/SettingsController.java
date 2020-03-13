@@ -27,6 +27,7 @@ import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Settings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -75,6 +76,8 @@ public class SettingsController {
    private CheckBox displayProjectsRightCheckBox;
    @FXML
    private CheckBox hideProjectsOnMouseExitCheckBox;
+   @FXML
+   private CheckBox saveWindowPositionCheckBox;
 
    @FXML
    private Button saveButton;
@@ -161,10 +164,11 @@ public class SettingsController {
             }
          }
 
-         controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+         controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected());
+               hideProjectsOnMouseExitCheckBox.isSelected(), model.windowPositionX.get(), model.windowPositionY.get(),
+               model.screenHash.get(), saveWindowPositionCheckBox.isSelected()));
          thisStage.close();
 
       });
@@ -212,6 +216,7 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
+      saveWindowPositionCheckBox.setSelected(model.saveWindowPosition.get());
    }
 
    public void setStage(final Stage thisStage) {

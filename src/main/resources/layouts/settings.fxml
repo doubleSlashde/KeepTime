@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
    <children>
       <VBox spacing="10.0" stylesheets="@../css/menu.css">
          <children>
@@ -212,6 +212,36 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)">
+                                       <font>
+                                          <Font name="Open Sans Regular" size="12.0" />
+                                       </font>
+                                    </CheckBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </Group>
+               </children>
+            </VBox>
+            <VBox styleClass="menuBorder">
+               <children>
+                  <Group>
+                     <children>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label fx:id="hotkeyLabel1" text="Position">
+                                       <font>
+                                          <Font name="Open Sans Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="save Position on Screen">
                                        <font>
                                           <Font name="Open Sans Regular" size="12.0" />
                                        </font>
