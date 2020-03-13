@@ -31,12 +31,12 @@
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
 
-  <repositories>
+ <repositories>
     <!-- Including for fontawesome -->
     <repository>
-      <id>spring-repo</id>
-      <name>Spring Repository</name>
-      <url>https://repo.spring.io/plugins-release/</url>
+      <id>fontawesomefx-repo</id>
+      <name>FontAwesome Repository</name>
+      <url>https://bintray.com/jerady/maven/FontAwesomeFX</url>
     </repository>
   </repositories>
 
