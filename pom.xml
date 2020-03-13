@@ -31,6 +31,15 @@
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
 
+  <repositories>
+    <!-- Including for fontawesome -->
+    <repository>
+      <id>spring-repo</id>
+      <name>Spring Repository</name>
+      <url>https://repo.spring.io/plugins-release/</url>
+    </repository>
+  </repositories>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -93,13 +102,13 @@
       <version>3.1.1</version>
       <type>maven-plugin</type>
     </dependency>
-    
+
     <dependency>
       <groupId>de.jensd</groupId>
       <artifactId>fontawesomefx-commons</artifactId>
       <version>8.15</version>
     </dependency>
-    
+
     <dependency>
       <groupId>de.jensd</groupId>
       <artifactId>fontawesomefx-fontawesome</artifactId>
@@ -144,7 +153,7 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile-->
+          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
         </configuration>
         <executions>
           <execution>
@@ -184,7 +193,7 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile-->
+          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
         </configuration>
       </plugin>
     </plugins>
