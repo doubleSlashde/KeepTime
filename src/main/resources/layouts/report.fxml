@@ -89,12 +89,7 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
             </Canvas>
-            <Label text="Notes:">
-               <font>
-                  <Font name="Open Sans Regular" size="16.0" />
-               </font>
-            </Label>
-            <TreeTableView fx:id="workTableTreeView" prefHeight="255.0" prefWidth="500.0" />
+            <TreeTableView fx:id="workTableTreeView" prefHeight="300.0" prefWidth="500.0" showRoot="false" stylesheets="@../css/dialog.css" />
          </children>
       </VBox>
    </children>

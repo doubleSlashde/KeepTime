@@ -120,7 +120,6 @@ public class ReportController {
    }
 
    private void initTableView() {
-
       final TreeTableColumn<TableRow, TableRow> noteColumn = new TreeTableColumn<>("Notes");
       noteColumn.setCellFactory(new Callback<TreeTableColumn<TableRow, TableRow>, TreeTableCell<TableRow, TableRow>>() {
          @Override
@@ -132,7 +131,6 @@ public class ReportController {
                   if (item == null || empty) {
                      setGraphic(null);
                      setText(null);
-                     LOG.debug("null");
                   } else {
                      final Text text = new Text(item.getNotes());
                      text.wrappingWidthProperty().bind(noteColumn.widthProperty().subtract(35));
@@ -206,9 +204,8 @@ public class ReportController {
 
          final HBox projectButtonBox = new HBox();
          projectButtonBox.getChildren().add(createProjectReportButton(onlyCurrentProjectWork));
-         // TODO center Dot
 
-         final Circle circle = new Circle(9, project.getColor());
+         final Circle circle = new Circle(6, project.getColor());
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox), circle);
@@ -262,7 +259,6 @@ public class ReportController {
 
    private Button createEditWorkButton(final Work work) {
       final Button bProjectReport = new Button("edit");
-
       bProjectReport.setOnAction(e -> {
          LOG.info("Edit work clicked.");
          final Dialog<Work> dialog = setupEditWorkDialog(work);
@@ -315,7 +311,6 @@ public class ReportController {
 
    private Button createProjectReportButton(final List<Work> projectWork) {
       final Button bProjectReport = new Button("Copy to clipboard");
-
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final ProjectReport pr = new ProjectReport(projectWork.size());
