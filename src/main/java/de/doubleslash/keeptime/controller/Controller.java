@@ -187,6 +187,27 @@ public class Controller {
       model.getProjectRepository().saveAll(changedProjects);
    }
 
+   public void editWork(final Work workToBeEdited, final Work newValuedWork) {
+      LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
+
+      workToBeEdited.setCreationDate(newValuedWork.getCreationDate());
+      workToBeEdited.setStartTime(newValuedWork.getStartTime());
+      workToBeEdited.setEndTime(newValuedWork.getEndTime());
+      workToBeEdited.setNotes(newValuedWork.getNotes());
+      workToBeEdited.setProject(newValuedWork.getProject());
+
+      final Work editedWork = model.getWorkRepository().save(workToBeEdited);
+
+      // remove old
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
+      // add if started today
+      final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
+      if (dateNow.equals(editedWork.getCreationDate())) {
+         model.getPastWorkItems().add(editedWork);
+      }
+
+   }
+
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
@@ -301,4 +322,5 @@ public class Controller {
 
       return seconds;
    }
+
 }

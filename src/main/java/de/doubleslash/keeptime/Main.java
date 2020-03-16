@@ -135,7 +135,8 @@ public class Main extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository()
+            .findByCreationDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -245,7 +246,6 @@ public class Main extends Application {
 
       registerMinimizeEventlistener(mainScene, primaryStage);
       registerMaximizeEventlistener(mainScene, primaryStage);
-      // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
 
       primaryStage.setTitle("KeepTime");
       primaryStage.setScene(mainScene);
