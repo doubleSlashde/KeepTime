@@ -142,6 +142,7 @@ public class AboutController {
       licenseRows.add(new LicenseTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
+      licenseRows.add(new LicenseTableRow("fontawesomefx", Licenses.APACHEV2));
 
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 

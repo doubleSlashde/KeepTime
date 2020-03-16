@@ -16,9 +16,11 @@
 
 package de.doubleslash.keeptime.view;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -32,21 +34,28 @@ import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.FontProvider;
+import de.doubleslash.keeptime.common.Resources;
+import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -55,6 +64,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 @Component
@@ -65,6 +75,8 @@ public class ReportController {
    public static final String EMPTY_NOTE = "- No notes -";
 
    private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #BBBBBB;";
+
+   private static final String EDIT_WORK_DIALOG_TITLE = "Edit work";
 
    @FXML
    private BorderPane topBorderPane;
@@ -90,13 +102,15 @@ public class ReportController {
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
-   private DatePicker datePicker; // for calendar element
-
    private final Model model;
 
    private final Controller controller;
 
+   private Stage stage;
+
    private ColorTimeLine colorTimeLine;
+
+   private LocalDate currentReportDate;
 
    @Autowired
    public ReportController(final Model model, final Controller controller) {
@@ -107,12 +121,8 @@ public class ReportController {
    @FXML
    private void initialize() {
       LOG.info("Init reportController");
-
-      this.datePicker = new DatePicker(LocalDate.now());
-      this.datePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
-         LOG.info("Datepicker selected value changed to {}", newvalue);
-         updateReport(newvalue);
-      });
+      currentReportDate = LocalDate.now();
+      final DatePicker datePicker = new DatePicker(this.currentReportDate);
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
 
@@ -123,23 +133,25 @@ public class ReportController {
          @Override
          public void updateItem(final LocalDate item, final boolean empty) {
             super.updateItem(item, empty);
-            if (model.getWorkRepository().findByCreationDate(item).isEmpty()) {
+            if (model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(item).isEmpty()) {
                setDisable(true);
                setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
             }
          }
       };
 
-      this.datePicker.setDayCellFactory(dayCellFactory);
+      datePicker.setDayCellFactory(dayCellFactory);
       final Node popupContent = datePickerSkin.getPopupContent();
       this.topBorderPane.setRight(popupContent);
    }
 
    private void updateReport(final LocalDate dateToShow) {
+      this.currentReportDate = dateToShow;
+
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(dateToShow));
-      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDate(dateToShow);
+      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(dateToShow);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
@@ -213,6 +225,30 @@ public class ReportController {
             workedHoursLabel.setFont(FontProvider.getDefaultFont());
             this.gridPane.add(workedHoursLabel, 2, rowIndex);
 
+            final HBox clickDummy = new HBox();
+            final ContextMenu contextMenu = new ContextMenu();
+            final MenuItem editMenuItem = new MenuItem("edit");
+
+            editMenuItem.setOnAction(e -> {
+               LOG.info(EDIT_WORK_DIALOG_TITLE);
+               final Dialog<Work> dialog = setupEditWorkDialog(work);
+
+               final Optional<Work> result = dialog.showAndWait();
+
+               result.ifPresent(editedWork -> {
+                  controller.editWork(work, editedWork);
+
+                  this.update();
+               });
+            });
+
+            contextMenu.getItems().add(editMenuItem);
+
+            clickDummy.setOnContextMenuRequested(
+                  event -> contextMenu.show(clickDummy, event.getScreenX(), event.getScreenY()));
+
+            this.gridPane.add(clickDummy, 0, rowIndex, 3, 1);
+
             rowIndex++;
          }
          bProjectReport.setUserData(pr.getNotes(true));
@@ -224,30 +260,63 @@ public class ReportController {
 
    }
 
+   private Dialog<Work> setupEditWorkDialog(final Work work) {
+      final Dialog<Work> dialog = new Dialog<>();
+      dialog.initOwner(stage);
+      dialog.setTitle(EDIT_WORK_DIALOG_TITLE);
+      dialog.setHeaderText(EDIT_WORK_DIALOG_TITLE);
+      dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      final GridPane grid = setUpEditWorkGridPane(work, dialog);
+      dialog.getDialogPane().setContent(grid);
+
+      return dialog;
+   }
+
+   private GridPane setUpEditWorkGridPane(final Work work, final Dialog<Work> dialog) {
+      final GridPane grid;
+      final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_WORK));
+      try {
+         grid = loader.load();
+      } catch (final IOException e) {
+         throw new FXMLLoaderException("Error while loading '" + Resources.RESOURCE.FXML_MANAGE_WORK + "'.", e);
+      }
+      final ManageWorkController manageWorkController = loader.getController();
+      manageWorkController.setModel(model);
+      manageWorkController.initializeWith(work);
+
+      dialog.setResultConverter(dialogButton -> {
+         if (dialogButton == ButtonType.OK) {
+            return manageWorkController.getWorkFromUserInput();
+         }
+         return null;
+      });
+
+      return grid;
+   }
+
    private Button createProjectReport() {
       final Button bProjectReport = new Button("Copy to clipboard");
-      final EventHandler<ActionEvent> eventListener = new EventHandler<ActionEvent>() {
 
-         @Override
-         public void handle(final ActionEvent event) {
-            final Object source = event.getSource();
-            final Button btn = (Button) source;
-            final Object userData = btn.getUserData();
-            final String notes = (String) userData;
+      bProjectReport.setOnAction((final ActionEvent event) -> {
+         final Object source = event.getSource();
+         final Button btn = (Button) source;
+         final Object userData = btn.getUserData();
+         final String notes = (String) userData;
 
-            final Clipboard clipboard = Clipboard.getSystemClipboard();
-            final ClipboardContent content = new ClipboardContent();
-            content.putString(notes);
-            clipboard.setContent(content);
-         }
-
-      };
-      bProjectReport.setOnAction(eventListener);
+         final Clipboard clipboard = Clipboard.getSystemClipboard();
+         final ClipboardContent content = new ClipboardContent();
+         content.putString(notes);
+         clipboard.setContent(content);
+      });
       return bProjectReport;
    }
 
    public void update() {
-      updateReport(this.datePicker.getValue());
+      updateReport(this.currentReportDate);
    }
 
+   public void setStage(final Stage stage) {
+      this.stage = stage;
+   }
 }

@@ -64,6 +64,8 @@ public class Model {
    private ObservableList<Project> allProjects = FXCollections.observableArrayList();
 
    protected final ObservableList<Work> pastWorkItems = FXCollections.observableArrayList();
+   private final SortedList<Work> sortedPastWorkItems = new SortedList<>(pastWorkItems,
+         Comparator.comparing(Work::getStartTime));
    public final ObjectProperty<Work> activeWorkItem = new SimpleObjectProperty<>();
 
    public final ObjectProperty<Color> taskBarColor = new SimpleObjectProperty<>(ORIGINAL_TASK_BAR_FONT_COLOR);
@@ -77,6 +79,7 @@ public class Model {
    public final ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
+   public final ObjectProperty<Boolean> emptyNoteReminder = new SimpleObjectProperty<>(false);
 
    private ConfigurableApplicationContext springContext;
 
@@ -139,4 +142,9 @@ public class Model {
    public ConfigurableApplicationContext getSpringContext() {
       return this.springContext;
    }
+
+   public SortedList<Work> getSortedPastWorkItems() {
+      return sortedPastWorkItems;
+   }
+
 }
