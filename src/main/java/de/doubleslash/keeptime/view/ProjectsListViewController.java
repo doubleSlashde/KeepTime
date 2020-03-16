@@ -174,7 +174,8 @@ public class ProjectsListViewController {
             noteDialog.setTitle("Empty Notes");
             noteDialog.setHeaderText(
                   "You are About to switch Projects but your current work has no Notes associated with it.");
-            noteDialog.setContentText("You can add Notes now:");
+            noteDialog.setContentText("You can add Notes now to your work.\n Current Project: "
+                  + model.activeWorkItem.get().getProject().getName());
             noteDialog.initOwner(mainStage);
 
             final Optional<String> result = noteDialog.showAndWait();
