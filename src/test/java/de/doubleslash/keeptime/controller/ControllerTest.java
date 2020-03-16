@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -402,6 +403,46 @@ public class ControllerTest {
       Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
       assertThat("Saved other Work persistently than what should be edited", argument.getValue(),
             not(is(notToBeUpdatedWork)));
+
+   }
+
+   @Test
+   public void shouldDeleteWorkPersistentlyWhenWorkIsDeleted() {
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDate localDateNow = LocalDate.now();
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work work = new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
+            project1, "originalWork");
+      model.getPastWorkItems().add(work);
+
+      testee.deleteWork(work);
+
+      final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
+      Mockito.verify(mockedWorkRepository, Mockito.times(1)).delete(argument.capture());
+      assertThat("Edited work was not deleted persistently", argument.getValue(), is(work));
+
+   }
+
+   @Test
+   public void shouldRemoveWorkFromPastWorkItemsWhenWorkIsDeleted() {
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDate localDateNow = LocalDate.now();
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work work = new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
+            project1, "originalWork");
+      model.getPastWorkItems().add(work);
+
+      testee.deleteWork(work);
+
+      assertTrue("work Items contain work when it should have been deleted", model.getPastWorkItems().isEmpty());
 
    }
 

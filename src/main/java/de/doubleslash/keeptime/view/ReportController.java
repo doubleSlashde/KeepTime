@@ -46,6 +46,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -215,6 +217,28 @@ public class ReportController {
             });
 
             contextMenu.getItems().add(editMenuItem);
+
+            final MenuItem deleteMenuItem = new MenuItem("delete");
+
+            deleteMenuItem.setOnAction(e -> {
+               final Alert alert = new Alert(AlertType.CONFIRMATION);
+               alert.setTitle("Delete Work");
+               alert.setHeaderText("You are abaout too delete the work:\n" + work.toString());
+               alert.setContentText("Are you sure?");
+               alert.initOwner(stage);
+
+               final Optional<ButtonType> result = alert.showAndWait();
+
+               result.ifPresent(buttonType -> {
+                  if (buttonType == ButtonType.OK) {
+                     controller.deleteWork(work);
+                  }
+
+                  this.update();
+               });
+            });
+
+            contextMenu.getItems().add(deleteMenuItem);
 
             clickDummy.setOnContextMenuRequested(
                   event -> contextMenu.show(clickDummy, event.getScreenX(), event.getScreenY()));

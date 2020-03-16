@@ -205,6 +205,14 @@ public class Controller {
 
    }
 
+   public void deleteWork(final Work workToBeDeleted) {
+
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeDeleted.getId()));
+
+      model.getWorkRepository().delete(workToBeDeleted);
+
+   }
+
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
