@@ -27,7 +27,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.view.ProjectsListViewController;
-import de.doubleslash.keeptime.view.time.Interval;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -112,8 +111,6 @@ public class ViewControllerPopup {
             hide();
          }
       });
-
-      Interval.registerCallBack(() -> projectsListViewController.tick());
 
    }
 

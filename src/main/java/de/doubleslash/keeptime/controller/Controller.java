@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.DateProvider;
+import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
@@ -40,6 +41,7 @@ import javafx.scene.paint.Color;
 
 @Service
 public class Controller {
+   private final long QUICK_SAVE_INTERVAL = 60;
 
    private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
@@ -51,6 +53,9 @@ public class Controller {
    public Controller(final Model model, final DateProvider dateProvider) {
       this.model = model;
       this.dateProvider = dateProvider;
+
+      // initiate quicksaving
+      new Interval(QUICK_SAVE_INTERVAL).registerCallBack(() -> saveCurrentWork(0));
    }
 
    public void changeProject(final Project newProject) {
@@ -58,37 +63,49 @@ public class Controller {
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      final Work currentWork = model.activeWorkItem.get();
 
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
       final LocalDate dateNow = now.toLocalDate();
-      if (currentWork != null) {
-         currentWork.setEndTime(now);
-         if (currentWork.getNotes().isEmpty()) {
-            currentWork.setNotes("- No notes -");
-         }
 
-         final String time = DateFormatter
-               .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
-
-         LOG.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
-               currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
-
-         // Save in db
-         model.getWorkRepository().save(currentWork);
-      }
+      saveCurrentWork(minusSeconds);
 
       // Start new work
       final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
 
       model.getPastWorkItems().add(work);
+
+      model.activeWorkItem.set(work);
+   }
+
+   public void saveCurrentWork(final long minusSeconds) {
+      final Work currentWork = model.activeWorkItem.get();
+
+      if (currentWork == null) {
+         return;
+      }
+      final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
+      final LocalDate dateNow = now.toLocalDate();
+
+      currentWork.setEndTime(now);
+      if (currentWork.getNotes().isEmpty()) {
+         currentWork.setNotes("- No notes -");
+      }
+
+      final String time = DateFormatter
+            .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
+
+      LOG.info("Saving Work from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
+            currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
+
+      // Save in db
+      model.getWorkRepository().save(currentWork);
+
       if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
          LOG.info("Removing projects with other creation date than today '{}' from list.", dateNow);
          final int sizeBefore = model.getPastWorkItems().size();
          model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
          LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
-      model.activeWorkItem.set(work);
    }
 
    public void addNewProject(final Project project) {
@@ -133,7 +150,7 @@ public class Controller {
    @PreDestroy
    public void shutdown() {
       LOG.info("Controller shutdown");
-      changeProject(model.getIdleProject(), 0);
+      saveCurrentWork(0);
    }
 
    public void deleteProject(final Project p) {
