@@ -33,10 +33,10 @@
 
  <repositories>
     <!-- Including for fontawesome -->
-    <repository>
+ <repository>
       <id>fontawesomefx-repo</id>
       <name>FontAwesome Repository</name>
-      <url>https://bintray.com/jerady/maven/FontAwesomeFX</url>
+      <url>https://dl.bintray.com/jerady/maven</url>
     </repository>
   </repositories>
 
