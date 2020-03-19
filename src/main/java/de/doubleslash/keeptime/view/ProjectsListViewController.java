@@ -172,19 +172,16 @@ public class ProjectsListViewController {
          if (currentWork != null && currentWork.getNotes().isEmpty()) {
             final TextInputDialog noteDialog = new TextInputDialog();
             noteDialog.setTitle("Empty Notes");
-            noteDialog.setHeaderText(
-                  "You are About to switch Projects but your current work has no Notes associated with it.");
-            noteDialog.setContentText("You can add Notes now to your work.\n Current Project: "
-                  + model.activeWorkItem.get().getProject().getName());
+            noteDialog.setHeaderText("Switch projects without notes?");
+            noteDialog.setContentText(
+                  "What did you do for project '" + model.activeWorkItem.get().getProject().getName() + "' ?");
             noteDialog.initOwner(mainStage);
 
             final Optional<String> result = noteDialog.showAndWait();
             if (result.isPresent()) {
-               if (!result.get().equals("")) {
-                  currentWork.setNotes(result.get());
-               }
-
+               currentWork.setNotes(result.get());
             } else {
+               // cancel pressed
                return;
             }
          }
