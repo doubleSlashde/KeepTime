@@ -32,13 +32,22 @@
   </parent>
 
  <repositories>
-    <!-- Including for fontawesome -->
- <repository>
+   
+    <!-- Including for fontawesome-->
+    <repository>
       <id>fontawesomefx-repo</id>
       <name>FontAwesome Repository</name>
       <url>https://dl.bintray.com/jerady/maven</url>
     </repository>
-  </repositories>
+    
+    <!-- needed to resolve against central first-->
+     <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <layout>default</layout>
+      <url>https://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories> 
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
