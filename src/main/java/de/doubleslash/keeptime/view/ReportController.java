@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
@@ -72,6 +74,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+@Component
 public class ReportController {
 
    public static final String NOTE_DELIMETER = "; ";
@@ -103,9 +106,9 @@ public class ReportController {
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
-   private Model model;
+   private final Model model;
 
-   private Controller controller;
+   private final Controller controller;
 
    private Stage stage;
 
@@ -113,12 +116,20 @@ public class ReportController {
 
    private LocalDate currentReportDate;
 
+   @Autowired
+   public ReportController(final Model model, final Controller controller) {
+      this.model = model;
+      this.controller = controller;
+   }
+
    @FXML
    private void initialize() {
       LOG.info("Init reportController");
       currentReportDate = LocalDate.now();
-      initTableView();
+
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
+      loadCalenderWidget();
+      initTableView();
    }
 
    private void initTableView() {
@@ -176,7 +187,7 @@ public class ReportController {
 
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
-      this.loadCalenderWidget();
+
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
@@ -357,16 +368,8 @@ public class ReportController {
 
    }
 
-   public void setModel(final Model model) {
-      this.model = model;
-   }
-
    public void update() {
       updateReport(this.currentReportDate);
-   }
-
-   public void setController(final Controller controller) {
-      this.controller = controller;
    }
 
    public void setStage(final Stage stage) {

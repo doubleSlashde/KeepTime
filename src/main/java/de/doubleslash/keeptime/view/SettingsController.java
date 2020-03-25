@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
@@ -43,6 +45,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+@Component
 public class SettingsController {
 
    @FXML
@@ -77,6 +80,9 @@ public class SettingsController {
    private CheckBox hideProjectsOnMouseExitCheckBox;
 
    @FXML
+   private CheckBox emptyNoteReminderCheeckBox;
+
+   @FXML
    private Button saveButton;
 
    @FXML
@@ -95,12 +101,18 @@ public class SettingsController {
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
-   private Controller controller;
-   private Model model;
+   private final Controller controller;
+   private final Model model;
 
    private Stage thisStage;
 
    private Stage aboutStage;
+
+   @Autowired
+   public SettingsController(final Model model, final Controller controller) {
+      this.model = model;
+      this.controller = controller;
+   }
 
    @FXML
    private void initialize() {
@@ -164,7 +176,7 @@ public class SettingsController {
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected());
+               hideProjectsOnMouseExitCheckBox.isSelected(), emptyNoteReminderCheeckBox.isSelected());
          thisStage.close();
 
       });
@@ -184,17 +196,11 @@ public class SettingsController {
       resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
-      LOG.debug("reportBugButton.setOnAction");
+      LOG.debug("aboutButton.setOnAction");
       aboutButton.setOnAction(ae -> {
          LOG.info("About clicked");
          aboutStage.show();
       });
-   }
-
-   public void setControllerAndModel(final Controller controller, final Model model) {
-      this.controller = controller;
-      this.model = model;
-      update();
    }
 
    void update() {
@@ -212,6 +218,7 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
+      emptyNoteReminderCheeckBox.setSelected(model.remindIfNotesAreEmpty.get());
    }
 
    public void setStage(final Stage thisStage) {
@@ -223,6 +230,7 @@ public class SettingsController {
          // About stage
          LOG.debug("load about.fxml");
          final FXMLLoader fxmlLoader3 = createFXMLLoader(RESOURCE.FXML_ABOUT);
+         fxmlLoader3.setControllerFactory(model.getSpringContext()::getBean);
          LOG.debug("load root");
          final Parent rootAbout = fxmlLoader3.load();
          LOG.debug("set stage");
