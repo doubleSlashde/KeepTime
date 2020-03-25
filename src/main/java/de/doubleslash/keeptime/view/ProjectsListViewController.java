@@ -34,6 +34,7 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -49,6 +50,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
 import javafx.scene.input.MouseButton;
@@ -165,7 +167,27 @@ public class ProjectsListViewController {
       if (hideable) {
          mainStage.hide();
       }
+      if (model.remindIfNotesAreEmpty.get()) {
+         final Work currentWork = model.activeWorkItem.get();
+         if (currentWork != null && currentWork.getNotes().isEmpty()) {
+            final TextInputDialog noteDialog = new TextInputDialog();
+            noteDialog.setTitle("Empty Notes");
+            noteDialog.setHeaderText("Switch projects without notes?");
+            noteDialog.setContentText(
+                  "What did you do for project '" + model.activeWorkItem.get().getProject().getName() + "' ?");
+            noteDialog.initOwner(mainStage);
+
+            final Optional<String> result = noteDialog.showAndWait();
+            if (result.isPresent()) {
+               currentWork.setNotes(result.get());
+            } else {
+               // cancel pressed
+               return;
+            }
+         }
+      }
       controller.changeProject(newProject, minusSeconds);
+
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {

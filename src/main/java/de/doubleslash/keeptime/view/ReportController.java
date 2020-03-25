@@ -124,11 +124,10 @@ public class ReportController {
    private void initialize() {
       LOG.info("Init reportController");
       currentReportDate = LocalDate.now();
-      colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
 
+      colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
       loadCalenderWidget();
       initTableView();
-
    }
 
    private void initTableView() {

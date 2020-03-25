@@ -80,6 +80,9 @@ public class SettingsController {
    private CheckBox hideProjectsOnMouseExitCheckBox;
 
    @FXML
+   private CheckBox emptyNoteReminderCheeckBox;
+
+   @FXML
    private Button saveButton;
 
    @FXML
@@ -173,7 +176,7 @@ public class SettingsController {
          controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected());
+               hideProjectsOnMouseExitCheckBox.isSelected(), emptyNoteReminderCheeckBox.isSelected());
          thisStage.close();
 
       });
@@ -193,7 +196,7 @@ public class SettingsController {
       resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
-      LOG.debug("reportBugButton.setOnAction");
+      LOG.debug("aboutButton.setOnAction");
       aboutButton.setOnAction(ae -> {
          LOG.info("About clicked");
          aboutStage.show();
@@ -215,6 +218,7 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
+      emptyNoteReminderCheeckBox.setSelected(model.remindIfNotesAreEmpty.get());
    }
 
    public void setStage(final Stage thisStage) {
