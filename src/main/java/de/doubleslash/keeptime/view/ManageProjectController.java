@@ -18,6 +18,8 @@ package de.doubleslash.keeptime.view;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -30,11 +32,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
+@Component
 public class ManageProjectController {
 
    private static final Logger LOG = LoggerFactory.getLogger(ManageProjectController.class);
 
-   private Model model;
+   private final Model model;
 
    @FXML
    private GridPane grid;
@@ -54,17 +57,17 @@ public class ManageProjectController {
    @FXML
    private Spinner<Integer> sortIndexSpinner;
 
-   public void setModel(final Model model) {
+   @Autowired
+   public ManageProjectController(final Model model) {
       this.model = model;
    }
 
-   public void secondInitialize() {
-      if (model != null) {
-         final int availableProjectAmount = model.getAllProjects().size();
-         sortIndexSpinner
-               .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
-         sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
-      }
+   @FXML
+   private void initialize() {
+      final int availableProjectAmount = model.getAllProjects().size();
+      sortIndexSpinner
+            .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
+      sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
    }
 
    public void initializeWith(final Project project) {
