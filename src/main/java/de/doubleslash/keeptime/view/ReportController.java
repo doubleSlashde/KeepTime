@@ -128,7 +128,6 @@ public class ReportController {
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
       loadCalenderWidget();
       initTableView();
-
    }
 
    private void initTableView() {

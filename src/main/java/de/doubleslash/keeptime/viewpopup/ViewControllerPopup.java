@@ -61,9 +61,9 @@ public class ViewControllerPopup {
    private ProjectsListViewController projectsListViewController;
 
    @Autowired
-   public ViewControllerPopup(final Model model, final Controller contropller) {
+   public ViewControllerPopup(final Model model, final Controller controller) {
       this.model = model;
-      this.controller = contropller;
+      this.controller = controller;
    }
 
    public void setStage(final Stage primaryStage) {
@@ -75,6 +75,12 @@ public class ViewControllerPopup {
             hide();
          }
       });
+
+      projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
+            searchTextField, true);
+
+      Interval.registerCallBack(() -> projectsListViewController.tick());
+
    }
 
    public void show(final Point mouseLocation) {
@@ -105,10 +111,6 @@ public class ViewControllerPopup {
          }
       });
 
-      Interval.registerCallBack(() -> projectsListViewController.tick());
-
-      projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
-            searchTextField, true);
       projectListView.setFixedCellSize(13);
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
