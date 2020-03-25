@@ -104,7 +104,7 @@ public class ReportController {
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
-   private Model model;
+   private final Model model;
 
    private final Controller controller;
 
@@ -339,10 +339,6 @@ public class ReportController {
       bProjectReport.setOnAction(eventListener);
       return bProjectReport;
 
-   }
-
-   public void setModel(final Model model) {
-      this.model = model;
    }
 
    public void update() {
