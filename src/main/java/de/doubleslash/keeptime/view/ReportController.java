@@ -272,14 +272,12 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
-
-      // XXX Auto-generated method stub
-      final Button editButton = new Button("delete");
-      editButton.setOnAction(e -> {
+      final Button deleteButton = new Button("delete");
+      deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
          alert.setTitle("Delete Work");
-         alert.setHeaderText("You are about to delete this Work:");
+         alert.setHeaderText("Delete work item");
          alert.setContentText(w.toString());
          alert.initOwner(stage);
 
@@ -292,7 +290,7 @@ public class ReportController {
             }
          });
       });
-      return editButton;
+      return deleteButton;
    }
 
    private Button createEditWorkButton(final Work work) {
