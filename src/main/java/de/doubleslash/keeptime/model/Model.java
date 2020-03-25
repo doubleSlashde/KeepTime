@@ -146,4 +146,5 @@ public class Model {
    public SortedList<Work> getSortedPastWorkItems() {
       return sortedPastWorkItems;
    }
+
 }
