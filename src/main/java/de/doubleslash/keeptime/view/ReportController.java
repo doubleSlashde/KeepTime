@@ -43,6 +43,8 @@ import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.worktable.ProjectTableRow;
 import de.doubleslash.keeptime.view.worktable.TableRow;
 import de.doubleslash.keeptime.view.worktable.WorkTableRow;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -224,7 +226,7 @@ public class ReportController {
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox), circle);
 
          for (final Work w : onlyCurrentProjectWork) {
-            final HBox workButtonBox = new HBox();
+            final HBox workButtonBox = new HBox(5.0);
             workButtonBox.getChildren().add(createEditWorkButton(w));
             workButtonBox.getChildren().add(createDeleteWorkButton(w));
             final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
@@ -272,7 +274,7 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
-      final Button deleteButton = new Button("delete");
+      final Button deleteButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.TRASH));
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -294,7 +296,7 @@ public class ReportController {
    }
 
    private Button createEditWorkButton(final Work work) {
-      final Button editButton = new Button("edit");
+      final Button editButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
       editButton.setOnAction(e -> {
          LOG.info("Edit work clicked.");
          final Dialog<Work> dialog = setupEditWorkDialog(work);
@@ -346,7 +348,7 @@ public class ReportController {
    }
 
    private Button createProjectReportButton(final List<Work> projectWork) {
-      final Button bProjectReport = new Button("Copy to clipboard");
+      final Button bProjectReport = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final ProjectReport pr = new ProjectReport(projectWork.size());
