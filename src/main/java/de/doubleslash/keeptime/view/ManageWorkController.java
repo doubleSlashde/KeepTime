@@ -216,8 +216,9 @@ public class ManageWorkController {
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
                projectComboBox.hide();
-               projectComboBox.setItems(model.getAllProjects().filtered(project -> ProjectsListViewController
-                     .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
+               projectComboBox
+                     .setItems(model.getSortedAvailableProjects().filtered(project -> ProjectsListViewController
+                           .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
                if (projectComboBox.getEditor().focusedProperty().get()) {
                   projectComboBox.show();
                }
