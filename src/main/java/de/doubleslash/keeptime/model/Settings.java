@@ -73,7 +73,8 @@ public class Settings {
    public Settings(final Color hoverBackgroundColor, final Color hoverFontColor, final Color defaultBackgroundColor,
          final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
          final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit, final double windowPositionX,
-         final double windowPositionY, final int screenHash, final boolean saveWindowPosition) {
+         final double windowPositionY, final int screenHash, final boolean saveWindowPosition,
+         final boolean remindIfNotesAreEmpty) {
       this.hoverBackgroundColor = hoverBackgroundColor;
       this.hoverFontColor = hoverFontColor;
       this.defaultBackgroundColor = defaultBackgroundColor;
@@ -86,8 +87,11 @@ public class Settings {
       this.windowPositionY = windowPositionY;
       this.screenHash = screenHash;
       this.saveWindowPosition = saveWindowPosition;
+      this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
 
    }
+
+   private boolean remindIfNotesAreEmpty;
 
    public long getId() {
       return id;
@@ -187,6 +191,14 @@ public class Settings {
 
    public void setSaveWindowPosition(final boolean saveWindowPosition) {
       this.saveWindowPosition = saveWindowPosition;
+   }
+
+   public boolean isRemindIfNotesAreEmpty() {
+      return remindIfNotesAreEmpty;
+   }
+
+   public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
+      this.remindIfNotesAreEmpty = emptyNoteReminder;
    }
 
 }

@@ -27,11 +27,12 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -39,22 +40,31 @@ import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.view.worktable.ProjectTableRow;
+import de.doubleslash.keeptime.view.worktable.TableRow;
+import de.doubleslash.keeptime.view.worktable.WorkTableRow;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableCell;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
@@ -62,9 +72,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+@Component
 public class ReportController {
 
    public static final String NOTE_DELIMETER = "; ";
@@ -86,10 +98,7 @@ public class ReportController {
    private Label currentDayTimeLabel;
 
    @FXML
-   private GridPane gridPane;
-
-   @FXML
-   private ScrollPane scrollPane;
+   private TreeTableView<TableRow> workTableTreeView;
 
    @FXML
    private AnchorPane reportRoot;
@@ -99,9 +108,9 @@ public class ReportController {
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
-   private Model model;
+   private final Model model;
 
-   private Controller controller;
+   private final Controller controller;
 
    private Stage stage;
 
@@ -109,124 +118,128 @@ public class ReportController {
 
    private LocalDate currentReportDate;
 
+   @Autowired
+   public ReportController(final Model model, final Controller controller) {
+      this.model = model;
+      this.controller = controller;
+   }
+
    @FXML
    private void initialize() {
       LOG.info("Init reportController");
       currentReportDate = LocalDate.now();
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
+      loadCalenderWidget();
+      initTableView();
+   }
+
+   private void initTableView() {
+      final TreeTableColumn<TableRow, TableRow> noteColumn = new TreeTableColumn<>("Notes");
+      noteColumn.setCellFactory(new Callback<TreeTableColumn<TableRow, TableRow>, TreeTableCell<TableRow, TableRow>>() {
+         @Override
+         public TreeTableCell<TableRow, TableRow> call(final TreeTableColumn<TableRow, TableRow> column) {
+            return new TreeTableCell<TableRow, TableRow>() {
+               @Override
+               protected void updateItem(final TableRow item, final boolean empty) {
+                  super.updateItem(item, empty);
+                  if (item == null || empty) {
+                     setGraphic(null);
+                     setText(null);
+                  } else {
+                     final Text text = new Text(item.getNotes());
+                     text.wrappingWidthProperty().bind(noteColumn.widthProperty().subtract(35));
+                     text.setUnderline(item.isUnderlined());
+                     this.setGraphic(text);
+                  }
+               }
+            };
+         }
+
+      });
+      noteColumn.setCellValueFactory(
+            (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
+                  entry.getValue().getValue()));
+      noteColumn.setMinWidth(200);
+      noteColumn.impl_setReorderable(false);
+      this.workTableTreeView.getColumns().add(noteColumn);
+
+      final TreeTableColumn<TableRow, String> timeRangeColumn = new TreeTableColumn<>("Timeslot");
+      timeRangeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeRange"));
+      timeRangeColumn.setMinWidth(120);
+      timeRangeColumn.impl_setReorderable(false);
+      this.workTableTreeView.getColumns().add(timeRangeColumn);
+
+      final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
+      timeSumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeSum"));
+      timeSumColumn.setMinWidth(60);
+      timeSumColumn.impl_setReorderable(false);
+      this.workTableTreeView.getColumns().add(timeSumColumn);
+
+      final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>("Controls");
+      buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, Button>("buttonBox"));
+      buttonColumn.setMinWidth(100);
+      buttonColumn.setSortable(false);
+      buttonColumn.impl_setReorderable(false);
+      this.workTableTreeView.getColumns().add(buttonColumn);
+
+      workTableTreeView.setShowRoot(false);
+
    }
 
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
-      this.loadCalenderWidget();
+
       reportRoot.requestFocus();
 
-      this.currentDayLabel.setText(DateFormatter.toDayDateString(dateToShow));
-      final List<Work> currentWorkItems = model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(dateToShow);
+      this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
+      final List<Work> currentWorkItems = model.getWorkRepository()
+            .findByCreationDateOrderByStartTimeAsc(this.currentReportDate);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
       final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
-            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getName))));
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getIndex))));
 
-      this.gridPane.getChildren().clear();
-      this.gridPane.getRowConstraints().clear();
-      this.gridPane.getColumnConstraints().get(0).setPrefWidth(300);
-
-      int rowIndex = 0;
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
 
+      final TreeItem<TableRow> root = new TreeItem<>();
+
       for (final Project project : workedProjectsSet) {
-         final Label projectName = new Label(project.getName());
-         projectName.setFont(FontProvider.getBoldFont());
-         projectName.setUnderline(project.isWork());
-         final Circle circle = new Circle(5, project.getColor());
-
-         final HBox projectNameHBox = new HBox();
-         projectNameHBox.setAlignment(Pos.CENTER_LEFT);
-         projectNameHBox.setPadding(new Insets(0, 0, 0, 5));
-         projectNameHBox.setSpacing(5);
-
-         projectNameHBox.getChildren().add(circle);
-         projectNameHBox.getChildren().add(projectName);
-
-         this.gridPane.add(projectNameHBox, 0, rowIndex);
-
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
                .collect(Collectors.toList());
 
-         final long todaysWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
+         final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
 
-         currentSeconds += todaysWorkSeconds;
+         currentSeconds += projectWorkSeconds;
          if (project.isWork()) {
-            currentWorkSeconds += todaysWorkSeconds;
+            currentWorkSeconds += projectWorkSeconds;
          }
 
-         final Label workedTimeLabel = new Label(DateFormatter.secondsToHHMMSS(todaysWorkSeconds));
-         workedTimeLabel.setFont(FontProvider.getBoldFont());
-         this.gridPane.add(workedTimeLabel, 2, rowIndex);
+         final HBox projectButtonBox = new HBox();
+         projectButtonBox.getChildren().add(createProjectReportButton(onlyCurrentProjectWork));
 
-         // text will be set later
-         final Button bProjectReport = createProjectReport();
-         this.gridPane.add(bProjectReport, 1, rowIndex);
+         final Circle circle = new Circle(6, project.getColor());
 
-         rowIndex++;
+         final TreeItem<TableRow> projectRow = new TreeItem<>(
+               new ProjectTableRow(project, projectWorkSeconds, projectButtonBox), circle);
 
-         final ProjectReport pr = new ProjectReport(onlyCurrentProjectWork.size());
-         for (int j = 0; j < onlyCurrentProjectWork.size(); j++) {
-            final Work work = onlyCurrentProjectWork.get(j);
-            final String workedHours = DateFormatter
-                  .secondsToHHMMSS(DateFormatter.getSecondsBewtween(work.getStartTime(), work.getEndTime()));
-
-            final String currentWorkNote = work.getNotes();
-            pr.appendToWorkNotes(currentWorkNote);
-            final Label commentLabel = new Label(currentWorkNote);
-            commentLabel.setFont(FontProvider.getDefaultFont());
-            commentLabel.setWrapText(true);
-            this.gridPane.add(commentLabel, 0, rowIndex);
-
-            final Label fromTillLabel = new Label(DateFormatter.toTimeString(work.getStartTime()) + " - "
-                  + DateFormatter.toTimeString(work.getEndTime()));
-            fromTillLabel.setFont(FontProvider.getDefaultFont());
-            fromTillLabel.setWrapText(true);
-            this.gridPane.add(fromTillLabel, 1, rowIndex);
-
-            final Label workedHoursLabel = new Label(workedHours);
-            workedHoursLabel.setFont(FontProvider.getDefaultFont());
-            this.gridPane.add(workedHoursLabel, 2, rowIndex);
-
-            final HBox clickDummy = new HBox();
-            final ContextMenu contextMenu = new ContextMenu();
-            final MenuItem editMenuItem = new MenuItem("edit");
-
-            editMenuItem.setOnAction(e -> {
-               LOG.info(EDIT_WORK_DIALOG_TITLE);
-               final Dialog<Work> dialog = setupEditWorkDialog(work);
-
-               final Optional<Work> result = dialog.showAndWait();
-
-               result.ifPresent(editedWork -> {
-                  controller.editWork(work, editedWork);
-
-                  this.update();
-               });
-            });
-
-            contextMenu.getItems().add(editMenuItem);
-
-            clickDummy.setOnContextMenuRequested(
-                  event -> contextMenu.show(clickDummy, event.getScreenX(), event.getScreenY()));
-
-            this.gridPane.add(clickDummy, 0, rowIndex, 3, 1);
-
-            rowIndex++;
+         for (final Work w : onlyCurrentProjectWork) {
+            final HBox workButtonBox = new HBox(5.0);
+            workButtonBox.getChildren().add(createEditWorkButton(w));
+            workButtonBox.getChildren().add(createDeleteWorkButton(w));
+            final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
+            projectRow.getChildren().add(workRow);
          }
-         bProjectReport.setUserData(pr.getNotes(true));
+
+         projectRow.setExpanded(true);
+         root.getChildren().add(projectRow);
+
       }
-      this.scrollPane.setVvalue(0); // scroll to the top
 
+      root.setExpanded(true);
+      workTableTreeView.setRoot(root);
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
 
@@ -258,6 +271,45 @@ public class ReportController {
       final Node popupContent = datePickerSkin.getPopupContent();
       this.topBorderPane.setRight(popupContent);
 
+   }
+
+   private Button createDeleteWorkButton(final Work w) {
+      final Button deleteButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+      deleteButton.setOnAction(e -> {
+         LOG.info("Delete work clicked.");
+         final Alert alert = new Alert(AlertType.CONFIRMATION);
+         alert.setTitle("Delete Work");
+         alert.setHeaderText("Delete work item");
+         alert.setContentText(w.toString());
+         alert.initOwner(stage);
+
+         final Optional<ButtonType> result = alert.showAndWait();
+
+         result.ifPresent(buType -> {
+            if (buType.equals(ButtonType.OK)) {
+               controller.deleteWork(w);
+               this.update();
+            }
+         });
+      });
+      return deleteButton;
+   }
+
+   private Button createEditWorkButton(final Work work) {
+      final Button editButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
+      editButton.setOnAction(e -> {
+         LOG.info("Edit work clicked.");
+         final Dialog<Work> dialog = setupEditWorkDialog(work);
+
+         final Optional<Work> result = dialog.showAndWait();
+
+         result.ifPresent(editedWork -> {
+            controller.editWork(work, editedWork);
+
+            this.update();
+         });
+      });
+      return editButton;
    }
 
    private Dialog<Work> setupEditWorkDialog(final Work work) {
@@ -295,35 +347,29 @@ public class ReportController {
       return grid;
    }
 
-   private Button createProjectReport() {
-      final Button bProjectReport = new Button("Copy to clipboard");
-
-      bProjectReport.setOnAction((final ActionEvent event) -> {
-         final Object source = event.getSource();
-         final Button btn = (Button) source;
-         final Object userData = btn.getUserData();
-         final String notes = (String) userData;
-
+   private Button createProjectReportButton(final List<Work> projectWork) {
+      final Button bProjectReport = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+      final EventHandler<ActionEvent> eventListener = actionEvent -> {
+         LOG.debug("Copy to Clipboard clicked.");
+         final ProjectReport pr = new ProjectReport(projectWork.size());
+         for (int j = 0; j < projectWork.size(); j++) {
+            final Work work = projectWork.get(j);
+            final String currentWorkNote = work.getNotes();
+            pr.appendToWorkNotes(currentWorkNote);
+         }
          final Clipboard clipboard = Clipboard.getSystemClipboard();
          final ClipboardContent content = new ClipboardContent();
-         content.putString(notes);
+         content.putString(pr.getNotes(true));
          clipboard.setContent(content);
-      });
+      };
+
+      bProjectReport.setOnAction(eventListener);
       return bProjectReport;
-   }
 
-   public void setModel(final Model model) {
-      this.model = model;
-
-      this.loadCalenderWidget();
    }
 
    public void update() {
       updateReport(this.currentReportDate);
-   }
-
-   public void setController(final Controller controller) {
-      this.controller = controller;
    }
 
    public void setStage(final Stage stage) {

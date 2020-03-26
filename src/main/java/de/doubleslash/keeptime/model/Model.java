@@ -80,7 +80,8 @@ public class Model {
    public final ObjectProperty<Boolean> useHotkey = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> displayProjectsRight = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Boolean> hideProjectsOnMouseExit = new SimpleObjectProperty<>(true);
-   public final ObjectProperty<Boolean> emptyNoteReminder = new SimpleObjectProperty<>(false);
+
+   public final ObjectProperty<Boolean> remindIfNotesAreEmpty = new SimpleObjectProperty<>(false);
 
    public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
    public final ObjectProperty<Double> windowPositionY = new SimpleObjectProperty<>(0.5);
@@ -174,4 +175,5 @@ public class Model {
    public SortedList<Work> getSortedPastWorkItems() {
       return sortedPastWorkItems;
    }
+
 }

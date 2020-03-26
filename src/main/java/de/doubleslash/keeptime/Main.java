@@ -77,6 +77,7 @@ public class Main extends Application {
    private Stage popupViewStage;
 
    private Model model;
+
    private Controller controller;
 
    private ViewController viewController;
@@ -93,6 +94,7 @@ public class Main extends Application {
       // TODO test if everywhere is used the same model
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      model.setSpringContext(springContext);
    }
 
    @Override
@@ -208,6 +210,8 @@ public class Main extends Application {
       model.windowPositionY.set(settings.getWindowPositionY());
       model.screenHash.set(settings.getScreenHash());
       model.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
+
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
@@ -223,6 +227,7 @@ public class Main extends Application {
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_POPUP_LAYOUT));
+      loader.setControllerFactory(springContext::getBean);
       final Parent popupLayout = loader.load();
       popupViewStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
@@ -234,8 +239,6 @@ public class Main extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-      viewControllerPopupController.setControllerAndModel(controller, model);
-      viewControllerPopupController.secondInitialize();
 
       globalScreenListener.setViewController(viewControllerPopupController);
    }
@@ -263,7 +266,7 @@ public class Main extends Application {
                   model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
                   model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
                   model.windowPositionX.get(), model.windowPositionY.get(), model.screenHash.get(),
-                  model.saveWindowPosition.get());
+                  model.saveWindowPosition.get(), model.remindIfNotesAreEmpty.get());
 
             if (observable.equals(primaryStage.xProperty())) {
                Screen screen = Screen.getPrimary();
@@ -334,8 +337,6 @@ public class Main extends Application {
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
-      viewController.setController(controller, model);
-      viewController.secondInitialize();
 
    }
 

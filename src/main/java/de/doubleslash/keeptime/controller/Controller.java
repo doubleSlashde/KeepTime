@@ -116,6 +116,7 @@ public class Controller {
       settings.setWindowPositionX(newValuedSettings.getWindowPositionX());
       settings.setWindowPositionY(newValuedSettings.getWindowPositionY());
       settings.setScreenHash(newValuedSettings.getScreenHash());
+      settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
 
       settings = model.getSettingsRepository().save(settings);
 
@@ -131,6 +132,7 @@ public class Controller {
       model.windowPositionX.set(settings.getWindowPositionX());
       model.windowPositionY.set(settings.getWindowPositionY());
       model.screenHash.set(settings.getScreenHash());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }
 
    @PreDestroy
@@ -206,6 +208,13 @@ public class Controller {
          model.getPastWorkItems().add(editedWork);
       }
 
+   }
+
+   public void deleteWork(final Work workToBeDeleted) {
+      LOG.info("Deleting work '{}'.", workToBeDeleted);
+
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeDeleted.getId()));
+      model.getWorkRepository().delete(workToBeDeleted);
    }
 
    /**
