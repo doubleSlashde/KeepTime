@@ -241,10 +241,11 @@ public class ManageWorkController {
       });
 
       // on
-      projectComboBox.setOnKeyReleased((ke) -> {
+      projectComboBox.setOnKeyReleased(ke -> {
          if (ke.getCode() == KeyCode.ENTER && projectComboBox.getSelectionModel().isEmpty()) {
             if (!projectComboBox.getItems().isEmpty()) {
                projectComboBox.getSelectionModel().selectFirst();
+               comboChange = true;
             }
          }
 
