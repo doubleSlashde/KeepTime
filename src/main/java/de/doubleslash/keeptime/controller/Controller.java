@@ -121,7 +121,8 @@ public class Controller {
 
    public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
          final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit) {
+         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit,
+         final boolean emptyNoteReminder) {
       // TODO create holder for all the properties (or reuse Settings.class?)
       final Settings settings = model.getSettingsRepository().findAll().get(0);
       settings.setTaskBarColor(taskBarColor);
@@ -134,6 +135,7 @@ public class Controller {
       settings.setUseHotkey(useHotkey);
       settings.setDisplayProjectsRight(displayProjectsRight);
       settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
+      settings.setRemindIfNotesAreEmpty(emptyNoteReminder);
 
       model.getSettingsRepository().save(settings);
 
@@ -145,6 +147,7 @@ public class Controller {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }
 
    @PreDestroy
@@ -222,17 +225,24 @@ public class Controller {
 
    }
 
+   public void deleteWork(final Work workToBeDeleted) {
+      LOG.info("Deleting work '{}'.", workToBeDeleted);
+
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeDeleted.getId()));
+      model.getWorkRepository().delete(workToBeDeleted);
+   }
+
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *                          list of all projects to adapt the indexes for
+    *           list of all projects to adapt the indexes for
     * @param changedProject
-    *                          the project which has changed which already has the new index
+    *           the project which has changed which already has the new index
     * @param oldIndex
-    *                          the old index of the changed project
+    *           the old index of the changed project
     * @param newIndex
-    *                          the new index of the changed project (which the projects also already has)
+    *           the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -269,9 +279,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *                        list of all projects to adapt the indexes for
+    *           list of all projects to adapt the indexes for
     * @param removedIndex
-    *                        the index which has been removed
+    *           the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {

@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
@@ -147,17 +148,10 @@ public class ViewController {
    private final Delta dragDelta = new Delta();
 
    private Stage mainStage;
-   private Controller controller;
-   private Model model;
 
-   public void setController(final Controller controller, final Model model) {
-      this.controller = controller;
-      this.model = model;
+   private final Controller controller;
 
-      controller.changeProject(model.getIdleProject(), 0);
-
-      updateProjectView();
-   }
+   private final Model model;
 
    private final Canvas taskbarCanvas = new Canvas(32, 32);
 
@@ -172,6 +166,12 @@ public class ViewController {
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
+
+   @Autowired
+   public ViewController(final Model model, final Controller controller) {
+      this.model = model;
+      this.controller = controller;
+   }
 
    @FXML
    private void initialize() {
@@ -308,6 +308,11 @@ public class ViewController {
       });
 
       mainColorTimeLine = new ColorTimeLine(canvas);
+
+      controller.changeProject(model.getIdleProject(), 0);
+
+      updateProjectView();
+
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
@@ -382,13 +387,11 @@ public class ViewController {
       try {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
+         fxmlLoader.setControllerFactory(model.getSpringContext()::getBean);
          final Parent root = fxmlLoader.load();
          root.setFocusTraversable(true);
          root.requestFocus();
          reportController = fxmlLoader.getController();
-         reportController.setModel(model);
-         reportController.setController(controller);
-
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportController.setStage(reportStage);
@@ -410,9 +413,9 @@ public class ViewController {
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
          final Parent settingsRoot = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
-         settingsController.setControllerAndModel(controller, model);
          settingsStage = new Stage();
          settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
@@ -453,6 +456,7 @@ public class ViewController {
    private GridPane setUpAddNewProjectGridPane(final Dialog<Project> dialog) {
       GridPane grid;
       final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
+      loader.setControllerFactory(model.getSpringContext()::getBean);
       try {
          grid = loader.load();
       } catch (final IOException e) {
@@ -462,8 +466,6 @@ public class ViewController {
       dialog.getDialogPane().setContent(grid);
 
       final ManageProjectController manageProjectController = loader.getController();
-      manageProjectController.setModel(model);
-      manageProjectController.secondInitialize();
 
       dialogResultConverter(dialog, manageProjectController);
 
@@ -510,6 +512,8 @@ public class ViewController {
 
    public void setStage(final Stage primaryStage) {
       this.mainStage = primaryStage;
+      this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
+            availableProjectsListView, searchTextField, false);
    }
 
    @FXML
@@ -525,8 +529,4 @@ public class ViewController {
       result.ifPresent(project -> controller.addNewProject(project));
    }
 
-   public void secondInitialize() {
-      this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
-            availableProjectsListView, searchTextField, false);
-   }
 }
