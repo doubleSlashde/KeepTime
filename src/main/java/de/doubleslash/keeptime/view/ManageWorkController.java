@@ -41,6 +41,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
@@ -236,6 +237,17 @@ public class ManageWorkController {
          } else {
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> projectComboBox.hide());
+         }
+
+      });
+
+      // on
+      projectComboBox.setOnKeyReleased(ke -> {
+         if (ke.getCode() == KeyCode.ENTER && projectComboBox.getSelectionModel().isEmpty()) {
+            if (!projectComboBox.getItems().isEmpty()) {
+               projectComboBox.getSelectionModel().selectFirst();
+               comboChange = true;
+            }
          }
 
       });
