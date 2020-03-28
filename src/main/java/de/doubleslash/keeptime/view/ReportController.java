@@ -193,7 +193,7 @@ public class ReportController {
 
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
-
+      rootItem.getChildren().clear();
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
