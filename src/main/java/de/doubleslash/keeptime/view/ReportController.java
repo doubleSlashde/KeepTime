@@ -118,6 +118,8 @@ public class ReportController {
 
    private LocalDate currentReportDate;
 
+   private final TreeItem<TableRow> rootItem = new TreeItem<>();
+
    @Autowired
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
@@ -185,11 +187,13 @@ public class ReportController {
 
       workTableTreeView.setShowRoot(false);
 
+      workTableTreeView.setRoot(rootItem);
+      rootItem.setExpanded(true);
    }
 
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
-
+      rootItem.getChildren().clear();
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
@@ -203,8 +207,6 @@ public class ReportController {
 
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
-
-      final TreeItem<TableRow> root = new TreeItem<>();
 
       for (final Project project : workedProjectsSet) {
          final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
@@ -234,12 +236,10 @@ public class ReportController {
          }
 
          projectRow.setExpanded(true);
-         root.getChildren().add(projectRow);
+         rootItem.getChildren().add(projectRow);
 
       }
 
-      root.setExpanded(true);
-      workTableTreeView.setRoot(root);
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
 
