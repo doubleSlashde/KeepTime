@@ -258,6 +258,17 @@ public class ManageWorkController {
          projectComboBox.setOnShown(null);
       });
 
+      // on
+      projectComboBox.setOnKeyReleased(ke -> {
+         if (ke.getCode() == KeyCode.ENTER && projectComboBox.getSelectionModel().isEmpty()) {
+            if (!projectComboBox.getItems().isEmpty()) {
+               projectComboBox.getSelectionModel().selectFirst();
+               comboChange = true;
+            }
+         }
+
+      });
+
    }
 
    public void initializeWith(final Work work) {
