@@ -146,8 +146,11 @@ public class ManageWorkController {
             if (project == null || empty) {
                setGraphic(null);
             } else {
-               setColor(this, project.getColor());
+               setColor(this, model.defaultBackgroundColor.get());
+
+               setTextFill(project.getColor());
                setText(project.getName());
+
                setUnderline(project.isWork());
             }
          }
@@ -185,7 +188,8 @@ public class ManageWorkController {
                // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
                Platform.runLater(() -> {
                   projectComboBox.getEditor().selectAll();
-                  setColor(projectComboBox, newValue.getColor());
+                  setTextColor(projectComboBox.getEditor(), newValue.getColor());
+
                });
             }
 
@@ -210,6 +214,10 @@ public class ManageWorkController {
             if (isValidProject) {
                isValidProject = false;
                projectComboBox.getSelectionModel().clearSelection();
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> {
+                  setTextColor(projectComboBox.getEditor(), model.defaultFontColor.get());
+               });
             }
 
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
@@ -255,12 +263,21 @@ public class ManageWorkController {
 
       projectComboBox.getSelectionModel().select(work.getProject());
 
-      setColor(projectComboBox, work.getProject().getColor());
+      setColor(projectComboBox, model.defaultBackgroundColor.get());
+      setColor(projectComboBox.getEditor(), model.defaultBackgroundColor.get());
+
+      setTextColor(projectComboBox.getEditor(), model.defaultFontColor.get());
 
    }
 
    private void setColor(final Node object, final Color color) {
       final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      object.setStyle(style);
+   }
+
+   private void setTextColor(final Node object, final Color color) {
+      final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-text-fill",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
       object.setStyle(style);
    }
