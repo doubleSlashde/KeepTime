@@ -24,6 +24,8 @@ import java.time.format.FormatStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.model.Model;
@@ -38,9 +40,12 @@ import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
@@ -238,6 +243,19 @@ public class ManageWorkController {
             Platform.runLater(() -> projectComboBox.hide());
          }
 
+      });
+
+      // strg+a Behaviour bug hack
+      // https://stackoverflow.com/questions/51943654/javafx-combobox-make-control-a-select-all-in-text-box-while-dropdown-is-visi
+      projectComboBox.setOnShown(e -> {
+         final ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) projectComboBox.getSkin();
+         final ListView<?> list = (ListView<?>) skin.getPopupContent();
+         list.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (keyEvent.isControlDown() && keyEvent.getCode() == KeyCode.A) {
+               projectComboBox.getEditor().selectAll();
+            }
+         });
+         projectComboBox.setOnShown(null);
       });
 
    }
