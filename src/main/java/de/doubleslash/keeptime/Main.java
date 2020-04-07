@@ -33,6 +33,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.ScreenPosManager;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -42,8 +43,6 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -60,7 +59,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
@@ -206,10 +204,10 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
-      model.windowPositionX.set(settings.getWindowPositionX());
-      model.windowPositionY.set(settings.getWindowPositionY());
-      model.screenHash.set(settings.getScreenHash());
-      model.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.screenSettings.windowPositionX.set(settings.getWindowPositionX());
+      model.screenSettings.windowPositionY.set(settings.getWindowPositionY());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
 
    }
@@ -246,67 +244,7 @@ public class Main extends Application {
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
 
-      if (Boolean.TRUE.equals(model.saveWindowPosition.get())) {
-         LOG.info("Setting position of lightsStage to X: '{}' Y: '{}'.", model.getAbsolutePositionX(),
-               model.getAbsolutePositionY());
-         primaryStage.setX(model.getAbsolutePositionX());
-         primaryStage.setY(model.getAbsolutePositionY());
-      }
-
-      final ChangeListener<Number> posChange = new ChangeListener<Number>() {
-
-         @Override
-         public void changed(final ObservableValue<? extends Number> observable, final Number oldValue,
-               final Number newValue) {
-            if (!model.saveWindowPosition.get()) {
-               return;
-            }
-
-            final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
-                  model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
-                  model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
-                  model.windowPositionX.get(), model.windowPositionY.get(), model.screenHash.get(),
-                  model.saveWindowPosition.get(), model.remindIfNotesAreEmpty.get());
-
-            if (observable.equals(primaryStage.xProperty())) {
-               Screen screen = Screen.getPrimary();
-               for (final Screen s : Screen.getScreens()) {
-                  if (s.getVisualBounds().getMinX() <= newValue.doubleValue()
-                        && newValue.doubleValue() <= s.getVisualBounds().getMaxX()
-                        && s.getVisualBounds().getMinY() <= model.windowPositionY.get()
-                        && model.windowPositionY.get() <= s.getVisualBounds().getMaxY()) {
-                     screen = s;
-                     break;
-                  }
-               }
-               newSettings.setScreenHash(screen.hashCode());
-               final double xInScreen = newValue.doubleValue() - screen.getVisualBounds().getMinX();
-               newSettings.setWindowPositionX(xInScreen / screen.getVisualBounds().getWidth());
-
-            } else {
-
-               Screen screen = Screen.getPrimary();
-               for (final Screen s : Screen.getScreens()) {
-                  if (s.getVisualBounds().getMinY() <= newValue.doubleValue()
-                        && newValue.doubleValue() <= s.getVisualBounds().getMaxY()
-                        && s.getVisualBounds().getMinX() <= model.windowPositionX.get()
-                        && model.windowPositionX.get() <= s.getVisualBounds().getMaxX()) {
-                     screen = s;
-                     break;
-                  }
-               }
-               newSettings.setScreenHash(screen.hashCode());
-               final double yInScreen = newValue.doubleValue() - screen.getVisualBounds().getMinY();
-               newSettings.setWindowPositionY(yInScreen / screen.getVisualBounds().getHeight());
-            }
-
-            controller.updateSettings(newSettings);
-            LOG.debug("updated Position to x: {} y: {}", model.windowPositionX.get(), model.windowPositionY.get());
-         }
-
-      };
-      primaryStage.xProperty().addListener(posChange);
-      primaryStage.yProperty().addListener(posChange);
+      new ScreenPosManager(primaryStage, model, controller);
 
       Pane mainPane;
 

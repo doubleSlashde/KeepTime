@@ -179,9 +179,9 @@ public class SettingsController {
          controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected(), model.windowPositionX.get(), model.windowPositionY.get(),
-               model.screenHash.get(), saveWindowPositionCheckBox.isSelected(),
-               emptyNoteReminderCheckBox.isSelected()));
+               hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.windowPositionX.get(),
+               model.screenSettings.windowPositionY.get(), model.screenSettings.screenHash.get(),
+               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected()));
          thisStage.close();
 
       });
@@ -223,7 +223,7 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
-      saveWindowPositionCheckBox.setSelected(model.saveWindowPosition.get());
+      saveWindowPositionCheckBox.setSelected(model.screenSettings.saveWindowPosition.get());
       emptyNoteReminderCheckBox.setSelected(model.remindIfNotesAreEmpty.get());
    }
 

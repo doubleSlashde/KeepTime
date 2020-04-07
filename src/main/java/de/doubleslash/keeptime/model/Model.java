@@ -31,7 +31,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 
 @Component
 public class Model {
@@ -83,10 +82,7 @@ public class Model {
 
    public final ObjectProperty<Boolean> remindIfNotesAreEmpty = new SimpleObjectProperty<>(false);
 
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> windowPositionY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> windowPositionX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+   public final ScreenSettings screenSettings = new ScreenSettings();
 
    private ConfigurableApplicationContext springContext;
 
@@ -140,28 +136,6 @@ public class Model {
 
    public ObservableList<Project> getAllProjects() {
       return allProjects;
-   }
-
-   public double getAbsolutePositionX() {
-      final Screen toDisplay = getScreenWithHashOrPrimary(screenHash.get());
-      return toDisplay.getVisualBounds().getMinX() + (toDisplay.getVisualBounds().getWidth() * windowPositionX.get());
-
-   }
-
-   public double getAbsolutePositionY() {
-      final Screen toDisplay = getScreenWithHashOrPrimary(screenHash.get());
-      return toDisplay.getVisualBounds().getMinY() + (toDisplay.getVisualBounds().getHeight() * windowPositionY.get());
-
-   }
-
-   private Screen getScreenWithHashOrPrimary(final int hash) {
-
-      for (final Screen s : Screen.getScreens()) {
-         if (s.hashCode() == hash) {
-            return s;
-         }
-      }
-      return Screen.getPrimary();
    }
 
    public void setSpringContext(final ConfigurableApplicationContext springContext) {

@@ -128,10 +128,10 @@ public class Controller {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
-      model.saveWindowPosition.set(settings.isSaveWindowPosition());
-      model.windowPositionX.set(settings.getWindowPositionX());
-      model.windowPositionY.set(settings.getWindowPositionY());
-      model.screenHash.set(settings.getScreenHash());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.screenSettings.windowPositionX.set(settings.getWindowPositionX());
+      model.screenSettings.windowPositionY.set(settings.getWindowPositionY());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }
 

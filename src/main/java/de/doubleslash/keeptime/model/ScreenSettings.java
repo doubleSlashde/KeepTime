@@ -1,0 +1,11 @@
+package de.doubleslash.keeptime.model;
+
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+
+public class ScreenSettings {
+   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
+   public final ObjectProperty<Double> windowPositionY = new SimpleObjectProperty<>(0.5);
+   public final ObjectProperty<Double> windowPositionX = new SimpleObjectProperty<>(0.5);
+   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+}
