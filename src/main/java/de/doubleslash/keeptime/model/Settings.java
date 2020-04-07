@@ -67,6 +67,8 @@ public class Settings {
 
    private boolean saveWindowPosition;
 
+   private boolean remindIfNotesAreEmpty;
+
    public Settings() {
    }
 
@@ -90,8 +92,6 @@ public class Settings {
       this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
 
    }
-
-   private boolean remindIfNotesAreEmpty;
 
    public long getId() {
       return id;
