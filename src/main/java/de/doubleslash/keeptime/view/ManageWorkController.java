@@ -103,16 +103,15 @@ public class ManageWorkController {
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
-      spinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+      spinner.focusedProperty().addListener((e) -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
-         final StringProperty text = (StringProperty) observable;
+         final StringProperty text = spinner.getEditor().textProperty();
          try {
-            stringConverter.fromString(newValue);
-            text.setValue(newValue);
+            stringConverter.fromString(text.get());
             // needed to log in value from editor to spinner
             spinner.increment(0); // TODO find better Solution
-         } catch (final DateTimeParseException e) {
-            text.setValue(oldValue);
+         } catch (final DateTimeParseException ex) {
+            text.setValue(spinner.getValue().toString());
          }
       });
 
