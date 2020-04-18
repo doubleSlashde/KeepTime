@@ -33,6 +33,7 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -76,9 +77,12 @@ public class ManageWorkController {
    private boolean comboChange;
    private Project selectedProject;
 
+   private FilteredList<Project> filteredList;
+
    public void setModel(final Model model) {
       this.model = model;
-      projectComboBox.setItems(model.getSortedAvailableProjects());
+      filteredList = new FilteredList<>(model.getSortedAvailableProjects());
+      projectComboBox.setItems(filteredList);
    }
 
    @FXML
@@ -187,9 +191,7 @@ public class ManageWorkController {
                comboChange = true;
                // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
                Platform.runLater(() -> {
-                  projectComboBox.getEditor().selectAll();
                   setTextColor(projectComboBox.getEditor(), newValue.getColor());
-
                });
             }
 
@@ -197,7 +199,7 @@ public class ManageWorkController {
 
       projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
 
-         Boolean isValidProject = true;
+         boolean isValidProject = true;
 
          @Override
          public void changed(final ObservableValue<? extends String> observable, final String oldValue,
@@ -223,9 +225,11 @@ public class ManageWorkController {
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
                projectComboBox.hide();
-               projectComboBox
-                     .setItems(model.getSortedAvailableProjects().filtered(project -> ProjectsListViewController
-                           .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
+
+               final String searchText = projectComboBox.getEditor().getText();
+               filteredList.setPredicate(
+                     project -> ProjectsListViewController.doesProjectMatchSearchFilter(searchText, project));
+
                if (projectComboBox.getEditor().focusedProperty().get()) {
                   projectComboBox.show();
                }
