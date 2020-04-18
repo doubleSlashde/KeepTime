@@ -24,6 +24,8 @@ import java.time.format.FormatStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.model.Model;
@@ -33,15 +35,19 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
@@ -77,9 +83,12 @@ public class ManageWorkController {
    private boolean comboChange;
    private Project selectedProject;
 
+   private FilteredList<Project> filteredList;
+
    public void setModel(final Model model) {
       this.model = model;
-      projectComboBox.setItems(model.getSortedAvailableProjects());
+      filteredList = new FilteredList<>(model.getSortedAvailableProjects());
+      projectComboBox.setItems(filteredList);
    }
 
    @FXML
@@ -91,19 +100,19 @@ public class ManageWorkController {
 
       setProjectUpComboBox();
 
+      Platform.runLater(() -> projectComboBox.requestFocus());
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
-      spinner.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+      spinner.focusedProperty().addListener((e) -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
-         final StringProperty text = (StringProperty) observable;
+         final StringProperty text = spinner.getEditor().textProperty();
          try {
-            stringConverter.fromString(newValue);
-            text.setValue(newValue);
+            stringConverter.fromString(text.get());
             // needed to log in value from editor to spinner
             spinner.increment(0); // TODO find better Solution
-         } catch (final DateTimeParseException e) {
-            text.setValue(oldValue);
+         } catch (final DateTimeParseException ex) {
+            text.setValue(spinner.getValue().toString());
          }
       });
 
@@ -147,8 +156,11 @@ public class ManageWorkController {
             if (project == null || empty) {
                setGraphic(null);
             } else {
-               setColor(this, project.getColor());
+               setColor(this, model.hoverBackgroundColor.get());
+
+               setTextFill(project.getColor());
                setText(project.getName());
+
                setUnderline(project.isWork());
             }
          }
@@ -185,16 +197,17 @@ public class ManageWorkController {
                comboChange = true;
                // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
                Platform.runLater(() -> {
-                  projectComboBox.getEditor().selectAll();
-                  setColor(projectComboBox, newValue.getColor());
+                  setTextColor(projectComboBox.getEditor(), newValue.getColor());
                });
             }
 
       );
 
+      enableStrgA_combo();
+
       projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
 
-         Boolean isValidProject = true;
+         boolean isValidProject = true;
 
          @Override
          public void changed(final ObservableValue<? extends String> observable, final String oldValue,
@@ -211,14 +224,20 @@ public class ManageWorkController {
             if (isValidProject) {
                isValidProject = false;
                projectComboBox.getSelectionModel().clearSelection();
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> {
+                  setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
+               });
             }
 
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
                projectComboBox.hide();
-               projectComboBox
-                     .setItems(model.getSortedAvailableProjects().filtered(project -> ProjectsListViewController
-                           .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
+
+               final String searchText = projectComboBox.getEditor().getText();
+               filteredList.setPredicate(
+                     project -> ProjectsListViewController.doesProjectMatchSearchFilter(searchText, project));
+
                if (projectComboBox.getEditor().focusedProperty().get()) {
                   projectComboBox.show();
                }
@@ -267,8 +286,33 @@ public class ManageWorkController {
 
       projectComboBox.getSelectionModel().select(work.getProject());
 
-      setColor(projectComboBox, work.getProject().getColor());
+      setColor(projectComboBox, model.hoverBackgroundColor.get());
+      setColor(projectComboBox.getEditor(), model.hoverBackgroundColor.get());
 
+      setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
+   }
+
+   public Work getWorkFromUserInput() {
+      return new Work(startDatePicker.getValue(),
+            LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
+            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
+            noteTextArea.getText());
+   }
+
+   private void enableStrgA_combo() {
+      // strg+a Behaviour bug hack
+      // https://stackoverflow.com/questions/51943654/javafx-combobox-make-control-a-select-all-in-text-box-while-dropdown-is-visi
+      projectComboBox.setOnShown(e -> {
+         final ComboBoxListViewSkin<?> skin = (ComboBoxListViewSkin<?>) projectComboBox.getSkin();
+         final ListView<?> list = (ListView<?>) skin.getPopupContent();
+         final KeyCodeCombination ctrlA = new KeyCodeCombination(KeyCode.A, KeyCodeCombination.CONTROL_DOWN);
+         list.addEventFilter(KeyEvent.KEY_PRESSED, keyEvent -> {
+            if (ctrlA.match(keyEvent)) {
+               projectComboBox.getEditor().selectAll();
+            }
+         });
+         projectComboBox.setOnShown(null);
+      });
    }
 
    private void setColor(final Node object, final Color color) {
@@ -277,12 +321,10 @@ public class ManageWorkController {
       object.setStyle(style);
    }
 
-   public Work getWorkFromUserInput() {
-
-      return new Work(startDatePicker.getValue(),
-            LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
-            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
-            noteTextArea.getText());
+   private void setTextColor(final Node object, final Color color) {
+      final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-text-fill",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      object.setStyle(style);
    }
 
 }
