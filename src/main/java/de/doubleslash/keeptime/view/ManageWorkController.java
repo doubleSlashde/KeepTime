@@ -33,6 +33,7 @@ import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
@@ -77,9 +78,12 @@ public class ManageWorkController {
    private boolean comboChange;
    private Project selectedProject;
 
+   private FilteredList<Project> filteredList;
+
    public void setModel(final Model model) {
       this.model = model;
-      projectComboBox.setItems(model.getSortedAvailableProjects());
+      filteredList = new FilteredList<>(model.getSortedAvailableProjects());
+      projectComboBox.setItems(filteredList);
    }
 
    @FXML
@@ -147,8 +151,11 @@ public class ManageWorkController {
             if (project == null || empty) {
                setGraphic(null);
             } else {
-               setColor(this, project.getColor());
+               setColor(this, model.hoverBackgroundColor.get());
+
+               setTextFill(project.getColor());
                setText(project.getName());
+
                setUnderline(project.isWork());
             }
          }
@@ -185,8 +192,7 @@ public class ManageWorkController {
                comboChange = true;
                // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
                Platform.runLater(() -> {
-                  projectComboBox.getEditor().selectAll();
-                  setColor(projectComboBox, newValue.getColor());
+                  setTextColor(projectComboBox.getEditor(), newValue.getColor());
                });
             }
 
@@ -194,7 +200,7 @@ public class ManageWorkController {
 
       projectComboBox.getEditor().textProperty().addListener(new ChangeListener<String>() {
 
-         Boolean isValidProject = true;
+         boolean isValidProject = true;
 
          @Override
          public void changed(final ObservableValue<? extends String> observable, final String oldValue,
@@ -211,14 +217,20 @@ public class ManageWorkController {
             if (isValidProject) {
                isValidProject = false;
                projectComboBox.getSelectionModel().clearSelection();
+               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+               Platform.runLater(() -> {
+                  setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
+               });
             }
 
             // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
             Platform.runLater(() -> {
                projectComboBox.hide();
-               projectComboBox
-                     .setItems(model.getSortedAvailableProjects().filtered(project -> ProjectsListViewController
-                           .doesProjectMatchSearchFilter(projectComboBox.getEditor().getText(), project)));
+
+               final String searchText = projectComboBox.getEditor().getText();
+               filteredList.setPredicate(
+                     project -> ProjectsListViewController.doesProjectMatchSearchFilter(searchText, project));
+
                if (projectComboBox.getEditor().focusedProperty().get()) {
                   projectComboBox.show();
                }
@@ -267,12 +279,21 @@ public class ManageWorkController {
 
       projectComboBox.getSelectionModel().select(work.getProject());
 
-      setColor(projectComboBox, work.getProject().getColor());
+      setColor(projectComboBox, model.hoverBackgroundColor.get());
+      setColor(projectComboBox.getEditor(), model.hoverBackgroundColor.get());
+
+      setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
 
    }
 
    private void setColor(final Node object, final Color color) {
       final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      object.setStyle(style);
+   }
+
+   private void setTextColor(final Node object, final Color color) {
+      final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-text-fill",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
       object.setStyle(style);
    }
