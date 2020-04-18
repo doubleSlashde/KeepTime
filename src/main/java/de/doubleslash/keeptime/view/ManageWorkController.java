@@ -146,7 +146,7 @@ public class ManageWorkController {
             if (project == null || empty) {
                setGraphic(null);
             } else {
-               setColor(this, model.defaultBackgroundColor.get());
+               setColor(this, model.hoverBackgroundColor.get());
 
                setTextFill(project.getColor());
                setText(project.getName());
@@ -216,7 +216,7 @@ public class ManageWorkController {
                projectComboBox.getSelectionModel().clearSelection();
                // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
                Platform.runLater(() -> {
-                  setTextColor(projectComboBox.getEditor(), model.defaultFontColor.get());
+                  setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
                });
             }
 
@@ -263,10 +263,10 @@ public class ManageWorkController {
 
       projectComboBox.getSelectionModel().select(work.getProject());
 
-      setColor(projectComboBox, model.defaultBackgroundColor.get());
-      setColor(projectComboBox.getEditor(), model.defaultBackgroundColor.get());
+      setColor(projectComboBox, model.hoverBackgroundColor.get());
+      setColor(projectComboBox.getEditor(), model.hoverBackgroundColor.get());
 
-      setTextColor(projectComboBox.getEditor(), model.defaultFontColor.get());
+      setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
 
    }
 
