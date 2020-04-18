@@ -100,6 +100,7 @@ public class ManageWorkController {
 
       setProjectUpComboBox();
 
+      Platform.runLater(() -> projectComboBox.requestFocus());
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
