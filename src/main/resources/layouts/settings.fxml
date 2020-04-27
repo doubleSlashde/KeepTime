@@ -232,7 +232,7 @@
                            <children>
                               <HBox spacing="10.0">
                                  <children>
-                                    <Label fx:id="hotkeyLabel1" text="Position">
+                                    <Label text="Position">
                                        <font>
                                           <Font name="Open Sans Bold" size="12.0" />
                                        </font>
@@ -241,7 +241,7 @@
                               </HBox>
                               <HBox spacing="10.0">
                                  <children>
-                                    <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="save Position on Screen">
+                                    <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="Save Position on Screen">
                                        <font>
                                           <Font name="Open Sans Regular" size="12.0" />
                                        </font>
@@ -262,7 +262,7 @@
                            <children>
                               <HBox spacing="10.0">
                                  <children>
-                                    <Label fx:id="hotkeyLabel1" text="Note Reminder">
+                                    <Label text="Note Reminder">
                                        <font>
                                           <Font name="Open Sans Bold" size="12.0" />
                                        </font>
