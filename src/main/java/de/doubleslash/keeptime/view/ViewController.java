@@ -304,7 +304,6 @@ public class ViewController {
          mainColorTimeLine.update(model.getSortedPastWorkItems(), controller.calcTodaysSeconds());
          updateTaskbarIcon(currentWorkSeconds);
 
-         projectsListViewController.tick();
       });
 
       mainColorTimeLine = new ColorTimeLine(canvas);
