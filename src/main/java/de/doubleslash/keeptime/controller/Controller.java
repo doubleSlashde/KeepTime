@@ -55,7 +55,7 @@ public class Controller {
       this.dateProvider = dateProvider;
 
       // initiate quicksaving
-      new Interval(QUICK_SAVE_INTERVAL).registerCallBack(() -> saveCurrentWork(0));
+      new Interval(QUICK_SAVE_INTERVAL).registerCallBack(() -> saveCurrentWork(dateProvider.dateTimeNow()));
    }
 
    public void changeProject(final Project newProject) {
@@ -65,26 +65,23 @@ public class Controller {
    public void changeProject(final Project newProject, final long minusSeconds) {
 
       final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
-      final LocalDate dateNow = now.toLocalDate();
 
-      saveCurrentWork(minusSeconds);
+      saveCurrentWork(now);
 
       // Start new work
-      final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
+      final Work work = new Work(now.toLocalDate(), now, now.plusSeconds(minusSeconds), newProject, "");
 
       model.getPastWorkItems().add(work);
 
       model.activeWorkItem.set(work);
    }
 
-   public void saveCurrentWork(final long minusSeconds) {
+   public void saveCurrentWork(final LocalDateTime now) {
       final Work currentWork = model.activeWorkItem.get();
 
       if (currentWork == null) {
          return;
       }
-      final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
-      final LocalDate dateNow = now.toLocalDate();
 
       currentWork.setEndTime(now);
       if (currentWork.getNotes().isEmpty()) {
@@ -100,10 +97,10 @@ public class Controller {
       // Save in db
       model.getWorkRepository().save(currentWork);
 
-      if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
-         LOG.info("Removing projects with other creation date than today '{}' from list.", dateNow);
+      if (currentWork != null && !now.toLocalDate().isEqual(currentWork.getCreationDate())) {
+         LOG.info("Removing projects with other creation date than today '{}' from list.", now.toLocalDate());
          final int sizeBefore = model.getPastWorkItems().size();
-         model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
+         model.getPastWorkItems().removeIf(w -> !now.toLocalDate().isEqual(w.getCreationDate()));
          LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
    }
@@ -153,7 +150,7 @@ public class Controller {
    @PreDestroy
    public void shutdown() {
       LOG.info("Controller shutdown");
-      saveCurrentWork(0);
+      saveCurrentWork(dateProvider.dateTimeNow());
    }
 
    public void deleteProject(final Project p) {
