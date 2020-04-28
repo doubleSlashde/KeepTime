@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -231,6 +230,7 @@ public class ControllerTest {
 
    @Test
    public void changeProjectOtherDayTest() {
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(i -> i.getArguments()[0]);
       final LocalDateTime firstProjectDateTime = LocalDateTime.now();
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
@@ -253,7 +253,7 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("'1st project' should be in the past work items", model.getPastWorkItems().size(), is(1));
+      assertThat("'2nd project' should be in the past work items", model.getPastWorkItems().size(), is(1));
       assertThat("The project should be  '2ndProject'", model.getPastWorkItems().get(0).getProject(),
             is(secondProject));
       assertThat("'2ndProject' should be the active work project", model.activeWorkItem.get().getProject(),
@@ -293,7 +293,7 @@ public class ControllerTest {
             is(secondProject));
       final Work work = model.activeWorkItem.get();
       assertThat("'2ndProject' should be the active work project", work.getProject(), is(secondProject));
-      assertThat(work.getCreationDate(), is(firstProjectDateTime.toLocalDate()));
+      assertThat(work.getStartTime().toLocalDate(), is(firstProjectDateTime.toLocalDate()));
       assertThat(work.getStartTime(), is(firstProjectPlusOneHour));
    }
 
@@ -304,18 +304,15 @@ public class ControllerTest {
       final Project nonworkProject1 = new Project("nonworkProject1", "An even better description", Color.RED, false, 2);
       final Project nonworkProject2 = new Project("nonworkProject2", "The best description", Color.RED, false, 3);
 
-      final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
 
       final List<Work> workItems = new ArrayList<>(4);
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
-            workProject1, ""));
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2),
-            workProject2, ""));
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(2), localDateTimeMorning.plusHours(3),
-            nonworkProject1, ""));
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4),
-            nonworkProject2, ""));
+      workItems.add(new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), workProject1, ""));
+      workItems.add(new Work(localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2), workProject2, ""));
+      workItems
+            .add(new Work(localDateTimeMorning.plusHours(2), localDateTimeMorning.plusHours(3), nonworkProject1, ""));
+      workItems
+            .add(new Work(localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4), nonworkProject2, ""));
 
       model.getAllProjects().addAll(workProject1, workProject2, nonworkProject1, nonworkProject2);
       model.getPastWorkItems().addAll(workItems);
@@ -342,22 +339,20 @@ public class ControllerTest {
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
 
-      final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
 
-      final Work originalWork = new Work(localDateNow, localDateTimeMorning.plusHours(0),
-            localDateTimeMorning.plusHours(1), project1, "originalWork");
+      final Work originalWork = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), project1,
+            "originalWork");
       model.getPastWorkItems().add(originalWork);
 
-      final Work newWork = new Work(localDateNow, localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2),
-            project1, "updated");
+      final Work newWork = new Work(localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2), project1,
+            "updated");
 
       testee.editWork(originalWork, newWork);
 
       final Work testWork = model.getPastWorkItems().get(0);
       assertThat("Start time was not updated", testWork.getStartTime(), equalTo(newWork.getStartTime()));
       assertThat("End timewas not updated", testWork.getEndTime(), equalTo(newWork.getEndTime()));
-      assertThat("CreationDate was not updated", testWork.getCreationDate(), equalTo(newWork.getCreationDate()));
       assertThat("Notes were not updated", testWork.getNotes(), equalTo(newWork.getNotes()));
       assertThat("Project was not updated", testWork.getProject(), equalTo(newWork.getProject()));
 
@@ -376,21 +371,20 @@ public class ControllerTest {
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
 
-      final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
 
-      final Work notToBeUpdatedWork = new Work(localDateNow, localDateTimeMorning.plusHours(0),
-            localDateTimeMorning.plusHours(1), project1, "originalWork");
+      final Work notToBeUpdatedWork = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
+            project1, "originalWork");
       ReflectionTestUtils.setField(notToBeUpdatedWork, "id", 1);
       model.getPastWorkItems().add(notToBeUpdatedWork);
 
-      final Work originalWork = new Work(localDateNow, localDateTimeMorning.plusHours(1),
-            localDateTimeMorning.plusHours(2), project1, "originalWork");
+      final Work originalWork = new Work(localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2), project1,
+            "originalWork");
       ReflectionTestUtils.setField(originalWork, "id", 2);
       model.getPastWorkItems().add(originalWork);
 
-      final Work newWork = new Work(localDateNow, localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4),
-            project1, "updated");
+      final Work newWork = new Work(localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4), project1,
+            "updated");
       ReflectionTestUtils.setField(newWork, "id", 3);
 
       testee.editWork(originalWork, newWork);
@@ -412,11 +406,10 @@ public class ControllerTest {
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
 
-      final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
 
-      final Work work = new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
-            project1, "originalWork");
+      final Work work = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), project1,
+            "originalWork");
       model.getPastWorkItems().add(work);
 
       testee.deleteWork(work);
@@ -433,11 +426,10 @@ public class ControllerTest {
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
 
-      final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
 
-      final Work work = new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
-            project1, "originalWork");
+      final Work work = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), project1,
+            "originalWork");
       model.getPastWorkItems().add(work);
 
       testee.deleteWork(work);

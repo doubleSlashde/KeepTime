@@ -267,8 +267,7 @@ public class ManageWorkController {
 
    public Work getWorkFromUserInput() {
 
-      return new Work(startDatePicker.getValue(),
-            LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
+      return new Work(LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
             LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
             noteTextArea.getText());
    }

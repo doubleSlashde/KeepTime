@@ -64,26 +64,35 @@ public class Controller {
 
    public void changeProject(final Project newProject, final long minusSeconds) {
 
-      final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
+      final LocalDateTime workEnd = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
+      final LocalDate today = dateProvider.dateTimeNow().toLocalDate();
 
-      saveCurrentWork(now);
+      final Work oldWork = saveCurrentWork(workEnd);
+
+      if (oldWork != null && !today.isEqual(oldWork.getStartTime().toLocalDate())) {
+         LOG.info("Removing projects with other creation date than today '{}' from list.", today);
+         final int sizeBefore = model.getPastWorkItems().size();
+         model.getPastWorkItems().removeIf(w -> !today.isEqual(w.getStartTime().toLocalDate()));
+         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
+      }
 
       // Start new work
-      final Work work = new Work(now.toLocalDate(), now, now.plusSeconds(minusSeconds), newProject, "");
+      final Work newWork = new Work(workEnd, workEnd.plusSeconds(minusSeconds), newProject, "");
 
-      model.getPastWorkItems().add(work);
+      model.getPastWorkItems().add(newWork);
 
-      model.activeWorkItem.set(work);
+      model.activeWorkItem.set(newWork);
+
    }
 
-   public void saveCurrentWork(final LocalDateTime now) {
+   public Work saveCurrentWork(final LocalDateTime workEnd) {
       final Work currentWork = model.activeWorkItem.get();
 
       if (currentWork == null) {
-         return;
+         return null;
       }
 
-      currentWork.setEndTime(now);
+      currentWork.setEndTime(workEnd);
       if (currentWork.getNotes().isEmpty()) {
          currentWork.setNotes("- No notes -");
       }
@@ -95,14 +104,8 @@ public class Controller {
             currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
       // Save in db
-      model.getWorkRepository().save(currentWork);
+      return model.getWorkRepository().save(currentWork);
 
-      if (currentWork != null && !now.toLocalDate().isEqual(currentWork.getCreationDate())) {
-         LOG.info("Removing projects with other creation date than today '{}' from list.", now.toLocalDate());
-         final int sizeBefore = model.getPastWorkItems().size();
-         model.getPastWorkItems().removeIf(w -> !now.toLocalDate().isEqual(w.getCreationDate()));
-         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
-      }
    }
 
    public void addNewProject(final Project project) {
@@ -204,7 +207,6 @@ public class Controller {
    public void editWork(final Work workToBeEdited, final Work newValuedWork) {
       LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
 
-      workToBeEdited.setCreationDate(newValuedWork.getCreationDate());
       workToBeEdited.setStartTime(newValuedWork.getStartTime());
       workToBeEdited.setEndTime(newValuedWork.getEndTime());
       workToBeEdited.setNotes(newValuedWork.getNotes());
@@ -216,7 +218,7 @@ public class Controller {
       model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
       // add if started today
       final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
-      if (dateNow.equals(editedWork.getCreationDate())) {
+      if (dateNow.equals(editedWork.getStartTime().toLocalDate())) {
          model.getPastWorkItems().add(editedWork);
       }
 
@@ -233,13 +235,13 @@ public class Controller {
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                          list of all projects to adapt the indexes for
     * @param changedProject
-    *           the project which has changed which already has the new index
+    *                          the project which has changed which already has the new index
     * @param oldIndex
-    *           the old index of the changed project
+    *                          the old index of the changed project
     * @param newIndex
-    *           the new index of the changed project (which the projects also already has)
+    *                          the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -276,9 +278,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *           list of all projects to adapt the indexes for
+    *                        list of all projects to adapt the indexes for
     * @param removedIndex
-    *           the index which has been removed
+    *                        the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {

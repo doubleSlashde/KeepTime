@@ -136,7 +136,7 @@ public class Main extends Application {
       readSettings();
 
       final List<Work> todaysWorkItems = model.getWorkRepository()
-            .findByCreationDateOrderByStartTimeAsc(LocalDate.now());
+            .findByStartDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
