@@ -113,8 +113,8 @@ public class Controller {
       settings.setDisplayProjectsRight(newValuedSettings.isDisplayProjectsRight());
       settings.setHideProjectsOnMouseExit(newValuedSettings.isHideProjectsOnMouseExit());
       settings.setSaveWindowPosition(newValuedSettings.isSaveWindowPosition());
-      settings.setWindowPositionX(newValuedSettings.getWindowPositionX());
-      settings.setWindowPositionY(newValuedSettings.getWindowPositionY());
+      settings.setWindowXProportion(newValuedSettings.getWindowXProportion());
+      settings.setWindowYProportion(newValuedSettings.getWindowYProportion());
       settings.setScreenHash(newValuedSettings.getScreenHash());
       settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
 
@@ -129,8 +129,8 @@ public class Controller {
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
-      model.screenSettings.windowPositionX.set(settings.getWindowPositionX());
-      model.screenSettings.windowPositionY.set(settings.getWindowPositionY());
+      model.screenSettings.xProportion.set(settings.getWindowXProportion());
+      model.screenSettings.yProportion.set(settings.getWindowYProportion());
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }

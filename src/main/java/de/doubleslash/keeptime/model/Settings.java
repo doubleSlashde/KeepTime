@@ -59,11 +59,11 @@ public class Settings {
 
    private boolean hideProjectsOnMouseExit;
 
-   private double windowPositionX;
+   private double windowXProportion;
 
-   private double windowPositionY;
+   private double windowYProportion;
 
-   private int screenHash;
+   private int windowScreenhash;
 
    private boolean saveWindowPosition;
 
@@ -85,9 +85,9 @@ public class Settings {
       this.useHotkey = useHotkey;
       this.displayProjectsRight = displayProjectsRight;
       this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
-      this.windowPositionX = windowPositionX;
-      this.windowPositionY = windowPositionY;
-      this.screenHash = screenHash;
+      this.windowXProportion = windowPositionX;
+      this.windowYProportion = windowPositionY;
+      this.windowScreenhash = screenHash;
       this.saveWindowPosition = saveWindowPosition;
       this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
 
@@ -161,28 +161,28 @@ public class Settings {
       this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
    }
 
-   public double getWindowPositionX() {
-      return windowPositionX;
+   public double getWindowXProportion() {
+      return windowXProportion;
    }
 
-   public void setWindowPositionX(final double windowPositionX) {
-      this.windowPositionX = windowPositionX;
+   public void setWindowXProportion(final double windowPositionX) {
+      this.windowXProportion = windowPositionX;
    }
 
-   public double getWindowPositionY() {
-      return windowPositionY;
+   public double getWindowYProportion() {
+      return windowYProportion;
    }
 
-   public void setWindowPositionY(final double windowPositionY) {
-      this.windowPositionY = windowPositionY;
+   public void setWindowYProportion(final double windowPositionY) {
+      this.windowYProportion = windowPositionY;
    }
 
    public int getScreenHash() {
-      return screenHash;
+      return windowScreenhash;
    }
 
    public void setScreenHash(final int screenHash) {
-      this.screenHash = screenHash;
+      this.windowScreenhash = screenHash;
    }
 
    public boolean isSaveWindowPosition() {

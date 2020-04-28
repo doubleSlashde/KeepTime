@@ -179,8 +179,8 @@ public class SettingsController {
          controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.windowPositionX.get(),
-               model.screenSettings.windowPositionY.get(), model.screenSettings.screenHash.get(),
+               hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.xProportion.get(),
+               model.screenSettings.yProportion.get(), model.screenSettings.screenHash.get(),
                saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected()));
          thisStage.close();
 

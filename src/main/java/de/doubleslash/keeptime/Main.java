@@ -33,7 +33,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
-import de.doubleslash.keeptime.common.ScreenPosManager;
+import de.doubleslash.keeptime.common.ScreenPosHelper;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -43,6 +43,8 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -204,8 +206,8 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
-      model.screenSettings.windowPositionX.set(settings.getWindowPositionX());
-      model.screenSettings.windowPositionY.set(settings.getWindowPositionY());
+      model.screenSettings.xProportion.set(settings.getWindowXProportion());
+      model.screenSettings.yProportion.set(settings.getWindowYProportion());
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
@@ -244,7 +246,48 @@ public class Main extends Application {
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
 
-      new ScreenPosManager(primaryStage, model, controller);
+      final ScreenPosHelper poshelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
+            model.screenSettings.xProportion.get(), model.screenSettings.yProportion.get());
+      // set stage to saved Position
+      if (model.screenSettings.saveWindowPosition.get()) {
+
+         primaryStage.setX(poshelper.getAbsolutX());
+         primaryStage.setY(poshelper.getAbsolutY());
+      }
+
+      // add listeners to record Windowpositionchange
+
+      final ChangeListener<Number> posChange = new ChangeListener<Number>() {
+
+         @Override
+         public void changed(final ObservableValue<? extends Number> observable, final Number oldValue,
+               final Number newValue) {
+
+            // dont save if option disabled
+            if (!model.screenSettings.saveWindowPosition.get()) {
+               return;
+            }
+
+            if (observable.equals(primaryStage.xProperty())) {
+               poshelper.setAbsolutX(newValue.doubleValue());
+            } else {
+               poshelper.setAbsolutY(newValue.doubleValue());
+            }
+
+            final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
+                  model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
+                  model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
+                  poshelper.getxProportion(), poshelper.getyProportion(), poshelper.getScreenhash(),
+                  model.screenSettings.saveWindowPosition.get(), model.remindIfNotesAreEmpty.get());
+
+            controller.updateSettings(newSettings);
+
+         }
+
+      };
+
+      primaryStage.xProperty().addListener(posChange);
+      primaryStage.yProperty().addListener(posChange);
 
       Pane mainPane;
 
