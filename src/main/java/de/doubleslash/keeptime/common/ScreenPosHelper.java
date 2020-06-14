@@ -1,94 +1,109 @@
 package de.doubleslash.keeptime.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
+/**
+ * Helper to handle screen coordinates. Converts between absolute coordinates to screen+proportional coordinates. E.g.
+ * you have two screens, each with 1000px width. Absolute position gives you 1500px and this class will get you hash for
+ * screen #2 and proportional value 0.5. <br>
+ * Reference #38
+ */
 public class ScreenPosHelper {
 
-   private int screenhash;
-   private double absolutX;
-   private double absolutY;
-   private double xProportion;
-   private double yProportion;
+   private static final Logger LOG = LoggerFactory.getLogger(ScreenPosHelper.class);
 
-   public ScreenPosHelper(final double absolutX, final double absolutY) {
-      this.absolutX = absolutX;
-      this.absolutY = absolutY;
-      calcRelativScreenpos();
+   private int screenHash;
+
+   private double absoluteX;
+   private double absoluteY;
+
+   private double proportionalX;
+   private double proportionalY;
+
+   public ScreenPosHelper(final int screenhash, final double proportionalX, final double proportionalY) {
+      this.screenHash = screenhash;
+      this.proportionalX = proportionalX;
+      this.proportionalY = proportionalY;
+      calcAbsolutePosition();
    }
 
-   public ScreenPosHelper(final int screenhash, final double xProportion, final double yProportion) {
-      this.screenhash = screenhash;
-      this.xProportion = xProportion;
-      this.yProportion = yProportion;
-      calcAbsolutScreenpos();
+   public double getAbsoluteX() {
+      return absoluteX;
    }
 
-   public double getAbsolutX() {
-      return absolutX;
+   public void setAbsoluteX(final double absolutX) {
+      this.absoluteX = absolutX;
+      calcProportionalPosition();
    }
 
-   public void setAbsolutX(final double absolutX) {
-      this.absolutX = absolutX;
-      calcRelativScreenpos();
+   public double getAbsoluteY() {
+      return absoluteY;
    }
 
-   public double getAbsolutY() {
-      return absolutY;
+   public void setAbsoluteY(final double absolutY) {
+      this.absoluteY = absolutY;
+      calcProportionalPosition();
    }
 
-   public void setAbsolutY(final double absolutY) {
-      this.absolutY = absolutY;
-      calcRelativScreenpos();
+   public int getScreenHash() {
+      return screenHash;
    }
 
-   public int getScreenhash() {
-      return screenhash;
+   public double getProportionalX() {
+      return proportionalX;
    }
 
-   public void setScreenhash(final int screenhash) {
-      this.screenhash = screenhash;
-      calcRelativScreenpos();
+   public double getProportionalY() {
+      return proportionalY;
    }
 
-   public double getxProportion() {
-      return xProportion;
+   public void resetPositionIfInvalid() {
+      if (!isPositionValid()) {
+         final Screen screen = getScreenWithHashOrPrimary(this.screenHash);
+         final Rectangle2D screenBounds = screen.getBounds();
+         LOG.warn(
+               "Position is not in the range of the screen. Screen (hash '{}') range '{}'. Calculated positions '{}'/'{}'. Setting to '0'/'0'.",
+               screen.hashCode(), screenBounds, absoluteX, absoluteY);
+         proportionalX = 0;
+         proportionalY = 0;
+         absoluteX = 0;
+         absoluteY = 0;
+      }
    }
 
-   public void setxProportion(final double xProportion) {
-      this.xProportion = xProportion;
-      calcAbsolutScreenpos();
-   }
-
-   public double getyProportion() {
-      return yProportion;
-   }
-
-   public void setyProportion(final double yProportion) {
-      this.yProportion = yProportion;
-      calcAbsolutScreenpos();
-   }
-
-   private void calcRelativScreenpos() {
+   private void calcProportionalPosition() {
       Screen screen = Screen.getPrimary();
       for (final Screen s : Screen.getScreens()) {
-         if (s.getBounds().getMinX() <= this.absolutX && this.absolutX <= s.getBounds().getMaxX()
-               && s.getBounds().getMinY() <= this.absolutY && this.absolutY <= s.getBounds().getMaxY()) {
+         if (s.getBounds().contains(this.absoluteX, this.absoluteY)) {
             screen = s;
             break;
          }
       }
-      this.screenhash = screen.hashCode();
-      final double xInScreen = absolutX - screen.getBounds().getMinX();
-      this.xProportion = xInScreen / screen.getBounds().getWidth();
-      final double yInScreen = absolutY - screen.getBounds().getMinY();
-      this.yProportion = yInScreen / screen.getBounds().getHeight();
+      this.screenHash = screen.hashCode();
+      final Rectangle2D bounds = screen.getBounds();
+      final double xInScreen = absoluteX - bounds.getMinX();
+      this.proportionalX = xInScreen / bounds.getWidth();
+      final double yInScreen = absoluteY - bounds.getMinY();
+      this.proportionalY = yInScreen / bounds.getHeight();
 
    }
 
-   private void calcAbsolutScreenpos() {
-      final Screen screen = getScreenWithHashOrPrimary(this.screenhash);
-      this.absolutX = screen.getBounds().getMinX() + (screen.getBounds().getWidth() * this.xProportion);
-      this.absolutY = screen.getBounds().getMinY() + (screen.getBounds().getHeight() * this.yProportion);
+   private void calcAbsolutePosition() {
+      final Screen screen = getScreenWithHashOrPrimary(this.screenHash);
+      final Rectangle2D screenBounds = screen.getBounds();
+
+      this.absoluteX = screenBounds.getMinX() + (screenBounds.getWidth() * this.proportionalX);
+      this.absoluteY = screenBounds.getMinY() + (screenBounds.getHeight() * this.proportionalY);
+   }
+
+   private boolean isPositionValid() {
+      final Screen screen = getScreenWithHashOrPrimary(this.screenHash);
+      final Rectangle2D screenBounds = screen.getBounds();
+      return screenBounds.contains(this.absoluteX, this.absoluteY);
    }
 
    private Screen getScreenWithHashOrPrimary(final int screenHash) {
@@ -97,6 +112,7 @@ public class ScreenPosHelper {
             return s;
          }
       }
+      LOG.warn("Could not find wanted screen with hash '{}'. Using primary.", screenHash);
       return Screen.getPrimary();
    }
 

@@ -248,11 +248,12 @@ public class Main extends Application {
 
       final ScreenPosHelper poshelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
             model.screenSettings.xProportion.get(), model.screenSettings.yProportion.get());
+      poshelper.resetPositionIfInvalid();
+
       // set stage to saved Position
       if (model.screenSettings.saveWindowPosition.get()) {
-
-         primaryStage.setX(poshelper.getAbsolutX());
-         primaryStage.setY(poshelper.getAbsolutY());
+         primaryStage.setX(poshelper.getAbsoluteX());
+         primaryStage.setY(poshelper.getAbsoluteY());
       }
 
       // add listeners to record Windowpositionchange
@@ -269,15 +270,15 @@ public class Main extends Application {
             }
 
             if (observable.equals(primaryStage.xProperty())) {
-               poshelper.setAbsolutX(newValue.doubleValue());
+               poshelper.setAbsoluteX(newValue.doubleValue());
             } else {
-               poshelper.setAbsolutY(newValue.doubleValue());
+               poshelper.setAbsoluteY(newValue.doubleValue());
             }
 
             final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
                   model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
                   model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
-                  poshelper.getxProportion(), poshelper.getyProportion(), poshelper.getScreenhash(),
+                  poshelper.getProportionalX(), poshelper.getProportionalY(), poshelper.getScreenHash(),
                   model.screenSettings.saveWindowPosition.get(), model.remindIfNotesAreEmpty.get());
 
             controller.updateSettings(newSettings);
