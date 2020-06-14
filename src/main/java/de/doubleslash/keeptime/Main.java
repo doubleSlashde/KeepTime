@@ -283,6 +283,9 @@ public class Main extends Application {
          stage.setY(positionHelper.getAbsoluteY());
       }
 
+      // TODO when activating autoSave while app is running, the current position is only updated by accident -
+      // as when clicking x the stage moves by 1px on x and the listener is triggered. not working when rightclick->exit
+
       // add listeners to record Windowpositionchange
       final ChangeListener<Number> positionChangeListener = (final ObservableValue<? extends Number> observable,
             final Number oldValue, final Number newValue) -> {
@@ -291,11 +294,11 @@ public class Main extends Application {
             return;
          }
 
-         if (observable.equals(stage.xProperty())) {
-            positionHelper.setAbsoluteX(newValue.doubleValue());
-         } else {
-            positionHelper.setAbsoluteY(newValue.doubleValue());
-         }
+         LOG.debug("Stage position changed '{}'/'{}'.", stage.xProperty().doubleValue(),
+               stage.yProperty().doubleValue());
+
+         positionHelper.setAbsoluteX(stage.xProperty().doubleValue());
+         positionHelper.setAbsoluteY(stage.yProperty().doubleValue());
 
          model.screenSettings.screenHash.set(positionHelper.getScreenHash());
          model.screenSettings.proportionalX.set(positionHelper.getProportionalX());
