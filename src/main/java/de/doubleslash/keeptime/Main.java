@@ -45,7 +45,6 @@ import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -63,7 +62,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 @SpringBootApplication
 public class Main extends Application {
@@ -206,8 +204,8 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
-      model.screenSettings.xProportion.set(settings.getWindowXProportion());
-      model.screenSettings.yProportion.set(settings.getWindowYProportion());
+      model.screenSettings.proportionalX.set(settings.getWindowXProportion());
+      model.screenSettings.proportionalY.set(settings.getWindowYProportion());
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
@@ -246,57 +244,13 @@ public class Main extends Application {
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
 
-      final ScreenPosHelper poshelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
-            model.screenSettings.xProportion.get(), model.screenSettings.yProportion.get());
-      poshelper.resetPositionIfInvalid();
-
-      // set stage to saved Position
-      if (model.screenSettings.saveWindowPosition.get()) {
-         primaryStage.setX(poshelper.getAbsoluteX());
-         primaryStage.setY(poshelper.getAbsoluteY());
-      }
-
-      // add listeners to record Windowpositionchange
-
-      final ChangeListener<Number> posChange = new ChangeListener<Number>() {
-
-         @Override
-         public void changed(final ObservableValue<? extends Number> observable, final Number oldValue,
-               final Number newValue) {
-
-            // dont save if option disabled
-            if (!model.screenSettings.saveWindowPosition.get()) {
-               return;
-            }
-
-            if (observable.equals(primaryStage.xProperty())) {
-               poshelper.setAbsoluteX(newValue.doubleValue());
-            } else {
-               poshelper.setAbsoluteY(newValue.doubleValue());
-            }
-
-            final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
-                  model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
-                  model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
-                  poshelper.getProportionalX(), poshelper.getProportionalY(), poshelper.getScreenHash(),
-                  model.screenSettings.saveWindowPosition.get(), model.remindIfNotesAreEmpty.get());
-
-            controller.updateSettings(newSettings);
-
-         }
-
-      };
-
-      primaryStage.xProperty().addListener(posChange);
-      primaryStage.yProperty().addListener(posChange);
-
-      Pane mainPane;
+      setupStagePositioning(primaryStage);
 
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
       loader.setControllerFactory(springContext::getBean);
-      mainPane = loader.load();
+      final Pane mainPane = loader.load();
       primaryStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
@@ -309,17 +263,47 @@ public class Main extends Application {
       primaryStage.setAlwaysOnTop(true);
       primaryStage.setResizable(false);
 
-      primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-         @Override
-         public void handle(final WindowEvent event) {
-            LOG.info("On close request");
-         }
-      });
+      primaryStage.setOnCloseRequest(windowEvent -> LOG.info("On close request"));
+
       primaryStage.show();
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
 
+   }
+
+   private void setupStagePositioning(final Stage stage) {
+      final ScreenPosHelper positionHelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
+            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get());
+      positionHelper.resetPositionIfInvalid();
+
+      // set stage to saved Position
+      if (model.screenSettings.saveWindowPosition.get()) {
+         stage.setX(positionHelper.getAbsoluteX());
+         stage.setY(positionHelper.getAbsoluteY());
+      }
+
+      // add listeners to record Windowpositionchange
+      final ChangeListener<Number> positionChangeListener = (final ObservableValue<? extends Number> observable,
+            final Number oldValue, final Number newValue) -> {
+         // don't save if option disabled
+         if (!model.screenSettings.saveWindowPosition.get()) {
+            return;
+         }
+
+         if (observable.equals(stage.xProperty())) {
+            positionHelper.setAbsoluteX(newValue.doubleValue());
+         } else {
+            positionHelper.setAbsoluteY(newValue.doubleValue());
+         }
+
+         model.screenSettings.screenHash.set(positionHelper.getScreenHash());
+         model.screenSettings.proportionalX.set(positionHelper.getProportionalX());
+         model.screenSettings.proportionalY.set(positionHelper.getProportionalY());
+      };
+
+      stage.xProperty().addListener(positionChangeListener);
+      stage.yProperty().addListener(positionChangeListener);
    }
 
    private void registerMinimizeEventlistener(final Scene mainScene, final Stage primaryStage) {
