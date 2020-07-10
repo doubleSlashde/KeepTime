@@ -31,6 +31,12 @@ public class ScreenPosHelper {
       calcAbsolutePosition();
    }
 
+   public ScreenPosHelper(final double absoluteX, final double absoluteY) {
+      this.absoluteX = absoluteX;
+      this.absoluteY = absoluteY;
+      calcProportionalPosition();
+   }
+
    public double getAbsoluteX() {
       return absoluteX;
    }

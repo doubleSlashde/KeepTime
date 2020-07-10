@@ -31,6 +31,7 @@ import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.ScreenPosHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
@@ -46,6 +47,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
@@ -512,6 +515,7 @@ public class ViewController {
       this.mainStage = primaryStage;
       this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
             availableProjectsListView, searchTextField, false);
+      setupStagePositioning();
    }
 
    @FXML
@@ -525,6 +529,47 @@ public class ViewController {
       mainStage.setAlwaysOnTop(true);
 
       result.ifPresent(project -> controller.addNewProject(project));
+   }
+
+   private void setupStagePositioning() {
+      final ScreenPosHelper positionHelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
+            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get());
+      positionHelper.resetPositionIfInvalid();
+
+      // set stage to saved Position
+      if (model.screenSettings.saveWindowPosition.get()) {
+         mainStage.setX(positionHelper.getAbsoluteX());
+         mainStage.setY(positionHelper.getAbsoluteY());
+      }
+
+      // TODO when activating autoSave while app is running, the current position is only updated by accident -
+      // as when clicking x the stage moves by 1px on x and the listener is triggered. not working when rightclick->exit
+
+      // add listeners to record Windowpositionchange
+      final ChangeListener<Number> positionChangeListener = (final ObservableValue<? extends Number> observable,
+            final Number oldValue, final Number newValue) -> {
+         savePosition();
+      };
+
+      mainStage.xProperty().addListener(positionChangeListener);
+      mainStage.yProperty().addListener(positionChangeListener);
+   }
+
+   public void savePosition() {
+      // don't save if option disabled
+      if (!model.screenSettings.saveWindowPosition.get()) {
+         return;
+      }
+
+      LOG.debug("Stage position changed '{}'/'{}'.", mainStage.xProperty().doubleValue(),
+            mainStage.yProperty().doubleValue());
+
+      final ScreenPosHelper positionHelper = new ScreenPosHelper(mainStage.xProperty().doubleValue(),
+            mainStage.yProperty().doubleValue());
+      model.screenSettings.screenHash.set(positionHelper.getScreenHash());
+      model.screenSettings.proportionalX.set(positionHelper.getProportionalX());
+      model.screenSettings.proportionalY.set(positionHelper.getProportionalY());
+
    }
 
 }

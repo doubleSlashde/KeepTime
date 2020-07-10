@@ -112,6 +112,9 @@ public class SettingsController {
    private Stage aboutStage;
 
    @Autowired
+   ViewController mainscreen;
+
+   @Autowired
    public SettingsController(final Model model, final Controller controller) {
       this.model = model;
       this.controller = controller;
@@ -176,6 +179,11 @@ public class SettingsController {
             }
          }
 
+         if (saveWindowPositionCheckBox.isSelected()) {
+            // UPDATE POSITION
+            mainscreen.savePosition();
+         }
+
          controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
@@ -187,7 +195,9 @@ public class SettingsController {
       });
 
       LOG.debug("cancelButton.setOnAction");
-      cancelButton.setOnAction(ae -> {
+      cancelButton.setOnAction(ae ->
+
+      {
          LOG.info("Cancel clicked");
          thisStage.close();
       });

@@ -33,7 +33,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
-import de.doubleslash.keeptime.common.ScreenPosHelper;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -43,8 +42,6 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -244,8 +241,6 @@ public class Main extends Application {
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
 
-      setupStagePositioning(primaryStage);
-
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
@@ -270,43 +265,6 @@ public class Main extends Application {
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
 
-   }
-
-   private void setupStagePositioning(final Stage stage) {
-      final ScreenPosHelper positionHelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
-            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get());
-      positionHelper.resetPositionIfInvalid();
-
-      // set stage to saved Position
-      if (model.screenSettings.saveWindowPosition.get()) {
-         stage.setX(positionHelper.getAbsoluteX());
-         stage.setY(positionHelper.getAbsoluteY());
-      }
-
-      // TODO when activating autoSave while app is running, the current position is only updated by accident -
-      // as when clicking x the stage moves by 1px on x and the listener is triggered. not working when rightclick->exit
-
-      // add listeners to record Windowpositionchange
-      final ChangeListener<Number> positionChangeListener = (final ObservableValue<? extends Number> observable,
-            final Number oldValue, final Number newValue) -> {
-         // don't save if option disabled
-         if (!model.screenSettings.saveWindowPosition.get()) {
-            return;
-         }
-
-         LOG.debug("Stage position changed '{}'/'{}'.", stage.xProperty().doubleValue(),
-               stage.yProperty().doubleValue());
-
-         positionHelper.setAbsoluteX(stage.xProperty().doubleValue());
-         positionHelper.setAbsoluteY(stage.yProperty().doubleValue());
-
-         model.screenSettings.screenHash.set(positionHelper.getScreenHash());
-         model.screenSettings.proportionalX.set(positionHelper.getProportionalX());
-         model.screenSettings.proportionalY.set(positionHelper.getProportionalY());
-      };
-
-      stage.xProperty().addListener(positionChangeListener);
-      stage.yProperty().addListener(positionChangeListener);
    }
 
    private void registerMinimizeEventlistener(final Scene mainScene, final Stage primaryStage) {
