@@ -132,7 +132,6 @@ public class ReportController {
       currentReportDate = LocalDate.now();
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
-      loadCalenderWidget();
       initTableView();
    }
 
@@ -242,6 +241,8 @@ public class ReportController {
 
       this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
       this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+
+      loadCalenderWidget();
 
    }
 

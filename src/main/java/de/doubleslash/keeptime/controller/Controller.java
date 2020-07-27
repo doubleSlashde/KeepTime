@@ -37,7 +37,6 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
 import javafx.collections.ObservableList;
-import javafx.scene.paint.Color;
 
 @Service
 public class Controller {
@@ -119,25 +118,24 @@ public class Controller {
       model.getProjectRepository().saveAll(changedProjects);
    }
 
-   public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
-         final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit,
-         final boolean emptyNoteReminder) {
-      // TODO create holder for all the properties (or reuse Settings.class?)
-      final Settings settings = model.getSettingsRepository().findAll().get(0);
-      settings.setTaskBarColor(taskBarColor);
+   public void updateSettings(final Settings newValuedSettings) {
+      Settings settings = model.getSettingsRepository().findAll().get(0);
 
-      settings.setDefaultBackgroundColor(defaultBackgroundColor);
-      settings.setDefaultFontColor(defaultFontColor);
+      settings.setTaskBarColor(newValuedSettings.getTaskBarColor());
+      settings.setDefaultBackgroundColor(newValuedSettings.getDefaultBackgroundColor());
+      settings.setDefaultFontColor(newValuedSettings.getDefaultFontColor());
+      settings.setHoverBackgroundColor(newValuedSettings.getHoverBackgroundColor());
+      settings.setHoverFontColor(newValuedSettings.getHoverFontColor());
+      settings.setUseHotkey(newValuedSettings.isUseHotkey());
+      settings.setDisplayProjectsRight(newValuedSettings.isDisplayProjectsRight());
+      settings.setHideProjectsOnMouseExit(newValuedSettings.isHideProjectsOnMouseExit());
+      settings.setSaveWindowPosition(newValuedSettings.isSaveWindowPosition());
+      settings.setWindowXProportion(newValuedSettings.getWindowXProportion());
+      settings.setWindowYProportion(newValuedSettings.getWindowYProportion());
+      settings.setScreenHash(newValuedSettings.getScreenHash());
+      settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
 
-      settings.setHoverBackgroundColor(hoverBackgroundColor);
-      settings.setHoverFontColor(hoverFontColor);
-      settings.setUseHotkey(useHotkey);
-      settings.setDisplayProjectsRight(displayProjectsRight);
-      settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
-      settings.setRemindIfNotesAreEmpty(emptyNoteReminder);
-
-      model.getSettingsRepository().save(settings);
+      settings = model.getSettingsRepository().save(settings);
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
@@ -147,13 +145,28 @@ public class Controller {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.screenSettings.proportionalX.set(settings.getWindowXProportion());
+      model.screenSettings.proportionalY.set(settings.getWindowYProportion());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }
 
    @PreDestroy
    public void shutdown() {
       LOG.info("Controller shutdown");
-      saveCurrentWork(dateProvider.dateTimeNow());
+
+      LOG.info("Changing project to persist current work on shutdown.");
+      changeProject(model.getIdleProject(), 0);
+
+      LOG.info("Updating settings to persist local changes on shutdown.");
+      final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
+            model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
+            model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
+            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
+            model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
+            model.remindIfNotesAreEmpty.get());
+      updateSettings(newSettings);
    }
 
    public void deleteProject(final Project p) {
@@ -235,13 +248,13 @@ public class Controller {
     * Changes the indexes of the originalList parameter to have a consistent order.
     * 
     * @param originalList
-    *                          list of all projects to adapt the indexes for
+    *           list of all projects to adapt the indexes for
     * @param changedProject
-    *                          the project which has changed which already has the new index
+    *           the project which has changed which already has the new index
     * @param oldIndex
-    *                          the old index of the changed project
+    *           the old index of the changed project
     * @param newIndex
-    *                          the new index of the changed project (which the projects also already has)
+    *           the new index of the changed project (which the projects also already has)
     * @return all projects whose index has been adapted
     */
    List<Project> resortProjectIndexes(final List<Project> originalList, final Project changedProject,
@@ -278,9 +291,9 @@ public class Controller {
     * Decreases all indexes by one, after the removed index
     * 
     * @param originalList
-    *                        list of all projects to adapt the indexes for
+    *           list of all projects to adapt the indexes for
     * @param removedIndex
-    *                        the index which has been removed
+    *           the index which has been removed
     * @return all projects whose index has been adapted
     */
    List<Project> adaptProjectIndexesAfterRemoving(final List<Project> originalList, final int removedIndex) {

@@ -232,7 +232,7 @@
                            <children>
                               <HBox spacing="10.0">
                                  <children>
-                                    <Label fx:id="hotkeyLabel1" text="Note Reminder">
+                                    <Label text="Position">
                                        <font>
                                           <Font name="Open Sans Bold" size="12.0" />
                                        </font>
@@ -241,7 +241,37 @@
                               </HBox>
                               <HBox spacing="10.0">
                                  <children>
-                                    <CheckBox fx:id="emptyNoteReminderCheeckBox" mnemonicParsing="false" text="Ask for notes when switching project (if empty)" wrapText="true" HBox.hgrow="NEVER">
+                                    <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="Save Position on Screen">
+                                       <font>
+                                          <Font name="Open Sans Regular" size="12.0" />
+                                       </font>
+                                    </CheckBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </Group>
+               </children>
+            </VBox>
+            <VBox styleClass="menuBorder">
+               <children>
+                  <Group>
+                     <children>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label text="Note Reminder">
+                                       <font>
+                                          <Font name="Open Sans Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <CheckBox fx:id="emptyNoteReminderCheckBox" mnemonicParsing="false" text="Ask for notes when switching project (if empty)" wrapText="true" HBox.hgrow="NEVER">
                                        <font>
                                           <Font name="Open Sans Regular" size="12.0" />
                                        </font>

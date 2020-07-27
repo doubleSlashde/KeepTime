@@ -33,6 +33,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
@@ -41,7 +42,6 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -59,7 +59,6 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 @SpringBootApplication
 public class Main extends Application {
@@ -74,6 +73,8 @@ public class Main extends Application {
 
    private Model model;
 
+   private Controller controller;
+
    private ViewController viewController;
 
    private GlobalScreenListener globalScreenListener;
@@ -87,6 +88,7 @@ public class Main extends Application {
       springContext = SpringApplication.run(Main.class);
       // TODO test if everywhere is used the same model
       model = springContext.getBean(Model.class);
+      controller = springContext.getBean(Controller.class);
       model.setSpringContext(springContext);
    }
 
@@ -199,7 +201,12 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.screenSettings.proportionalX.set(settings.getWindowXProportion());
+      model.screenSettings.proportionalY.set(settings.getWindowYProportion());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
+
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
@@ -233,13 +240,12 @@ public class Main extends Application {
 
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
-      Pane mainPane;
 
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
       loader.setControllerFactory(springContext::getBean);
-      mainPane = loader.load();
+      final Pane mainPane = loader.load();
       primaryStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
@@ -252,12 +258,8 @@ public class Main extends Application {
       primaryStage.setAlwaysOnTop(true);
       primaryStage.setResizable(false);
 
-      primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-         @Override
-         public void handle(final WindowEvent event) {
-            LOG.info("On close request");
-         }
-      });
+      primaryStage.setOnCloseRequest(windowEvent -> LOG.info("On close request"));
+
       primaryStage.show();
       viewController = loader.getController();
       // Give the controller access to the main app.
