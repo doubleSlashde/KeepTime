@@ -29,6 +29,7 @@ import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Settings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -78,9 +79,11 @@ public class SettingsController {
    private CheckBox displayProjectsRightCheckBox;
    @FXML
    private CheckBox hideProjectsOnMouseExitCheckBox;
+   @FXML
+   private CheckBox saveWindowPositionCheckBox;
 
    @FXML
-   private CheckBox emptyNoteReminderCheeckBox;
+   private CheckBox emptyNoteReminderCheckBox;
 
    @FXML
    private Button saveButton;
@@ -107,6 +110,9 @@ public class SettingsController {
    private Stage thisStage;
 
    private Stage aboutStage;
+
+   @Autowired
+   ViewController mainscreen;
 
    @Autowired
    public SettingsController(final Model model, final Controller controller) {
@@ -173,16 +179,25 @@ public class SettingsController {
             }
          }
 
-         controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+         if (saveWindowPositionCheckBox.isSelected()) {
+            // UPDATE POSITION
+            mainscreen.savePosition();
+         }
+
+         controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected(), emptyNoteReminderCheeckBox.isSelected());
+               hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
+               model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
+               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected()));
          thisStage.close();
 
       });
 
       LOG.debug("cancelButton.setOnAction");
-      cancelButton.setOnAction(ae -> {
+      cancelButton.setOnAction(ae ->
+
+      {
          LOG.info("Cancel clicked");
          thisStage.close();
       });
@@ -218,7 +233,8 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
-      emptyNoteReminderCheeckBox.setSelected(model.remindIfNotesAreEmpty.get());
+      saveWindowPositionCheckBox.setSelected(model.screenSettings.saveWindowPosition.get());
+      emptyNoteReminderCheckBox.setSelected(model.remindIfNotesAreEmpty.get());
    }
 
    public void setStage(final Stage thisStage) {
