@@ -292,13 +292,6 @@ public class ManageWorkController {
       setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
    }
 
-   public Work getWorkFromUserInput() {
-      return new Work(startDatePicker.getValue(),
-            LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
-            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
-            noteTextArea.getText());
-   }
-
    private void enableStrgA_combo() {
       // strg+a Behaviour bug hack
       // https://stackoverflow.com/questions/51943654/javafx-combobox-make-control-a-select-all-in-text-box-while-dropdown-is-visi
@@ -319,6 +312,12 @@ public class ManageWorkController {
       final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-background-color",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
       object.setStyle(style);
+   }
+
+   public Work getWorkFromUserInput() {
+      return new Work(LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
+            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
+            noteTextArea.getText());
    }
 
    private void setTextColor(final Node object, final Color color) {

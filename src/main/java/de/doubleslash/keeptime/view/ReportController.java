@@ -197,7 +197,7 @@ public class ReportController {
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
       final List<Work> currentWorkItems = model.getWorkRepository()
-            .findByCreationDateOrderByStartTimeAsc(this.currentReportDate);
+            .findByStartDateOrderByStartTimeAsc(this.currentReportDate);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
@@ -260,7 +260,7 @@ public class ReportController {
          @Override
          public void updateItem(final LocalDate item, final boolean empty) {
             super.updateItem(item, empty);
-            if (model.getWorkRepository().findByCreationDateOrderByStartTimeAsc(item).isEmpty()) {
+            if (model.getWorkRepository().findByStartDateOrderByStartTimeAsc(item).isEmpty()) {
                setDisable(true);
                setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
             }

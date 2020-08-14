@@ -25,11 +25,11 @@ import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
+import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.view.ProjectsListViewController;
-import de.doubleslash.keeptime.view.time.Interval;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -79,7 +79,7 @@ public class ViewControllerPopup {
       projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
             searchTextField, true);
 
-      Interval.registerCallBack(() -> projectsListViewController.tick());
+      new Interval(1).registerCallBack(() -> projectsListViewController.tick());
 
    }
 

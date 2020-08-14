@@ -33,11 +33,11 @@ import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.common.ScreenPosHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
+import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.view.time.Interval;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -287,7 +287,7 @@ public class ViewController {
             () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
 
       // update ui each second
-      Interval.registerCallBack(() -> {
+      new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
@@ -306,6 +306,7 @@ public class ViewController {
 
          mainColorTimeLine.update(model.getSortedPastWorkItems(), controller.calcTodaysSeconds());
          updateTaskbarIcon(currentWorkSeconds);
+
       });
 
       mainColorTimeLine = new ColorTimeLine(canvas);

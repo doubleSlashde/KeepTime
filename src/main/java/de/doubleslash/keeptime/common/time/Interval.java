@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.view.time;
+package de.doubleslash.keeptime.common.time;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,16 +28,17 @@ import javafx.util.Duration;
 
 public class Interval {
 
-   private static final List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
+   private final List<CallBackListener> callBackListeners = new CopyOnWriteArrayList<>();
 
-   private static Timeline timelineSession;
-   private static LocalDateTime last = LocalDateTime.now();
+   private Timeline timelineSession;
+   private LocalDateTime last = LocalDateTime.now();
+   private final long seconds;
 
-   private Interval() {
-      throw new IllegalStateException("Utility class");
+   public Interval(final long seconds) {
+      this.seconds = seconds;
    }
 
-   public static void registerCallBack(final CallBackListener cbl) {
+   public void registerCallBack(final CallBackListener cbl) {
       if (timelineSession == null) {
          createTimeLine();
       }
@@ -47,14 +48,14 @@ public class Interval {
    /**
     * only create timeLine if needed
     */
-   private static void createTimeLine() {
-      timelineSession = new Timeline(new KeyFrame(Duration.seconds(1), ae -> debounceAndExecuteCallbacks()));
+   private void createTimeLine() {
+      timelineSession = new Timeline(new KeyFrame(Duration.seconds(seconds), ae -> debounceAndExecuteCallbacks()));
       timelineSession.setCycleCount(Animation.INDEFINITE);
       timelineSession.play();
 
    }
 
-   private static void debounceAndExecuteCallbacks() {
+   private void debounceAndExecuteCallbacks() {
       final LocalDateTime now = LocalDateTime.now();
       final long secondsBewtween = DateFormatter.getSecondsBewtween(last, now);
       final int nanoBetween = java.time.Duration.between(last, now).abs().getNano();
@@ -66,7 +67,7 @@ public class Interval {
       }
    }
 
-   public static void removeCallBack(final CallBackListener cbl) {
+   public void removeCallBack(final CallBackListener cbl) {
       if (timelineSession == null) {
          return;
       }
