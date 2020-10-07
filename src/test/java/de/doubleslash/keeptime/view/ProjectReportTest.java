@@ -40,7 +40,7 @@ public class ProjectReportTest {
    @Test
    public void testAppendToWorkNotes() {
       this.uut.appendToWorkNotes("note 1 ");
-      this.uut.appendToWorkNotes(ReportController.EMPTY_NOTE);
+      this.uut.appendToWorkNotes("");
       this.uut.appendToWorkNotes("note 2 ");
       final String expected = "note 1; note 2";
       assertEquals(expected, this.uut.getNotes(false));
@@ -49,7 +49,7 @@ public class ProjectReportTest {
    @Test
    public void testAppendToWorkNotesAddNumberOfNotes() {
       this.uut.appendToWorkNotes("note 1 ");
-      this.uut.appendToWorkNotes(ReportController.EMPTY_NOTE);
+      this.uut.appendToWorkNotes("");
       this.uut.appendToWorkNotes("note 2 ");
       final String expected = "3 Notes: note 1; note 2";
       assertEquals(expected, this.uut.getNotes(true));
@@ -70,8 +70,8 @@ public class ProjectReportTest {
       this.uut = new ProjectReport(4);
       this.uut.appendToWorkNotes("note 1");
       this.uut.appendToWorkNotes("note 2");
-      this.uut.appendToWorkNotes(ReportController.EMPTY_NOTE);
-      this.uut.appendToWorkNotes(ReportController.EMPTY_NOTE);
+      this.uut.appendToWorkNotes("");
+      this.uut.appendToWorkNotes("");
       final String expected = "4 Notes: note 1; note 2";
       assertEquals(expected, this.uut.getNotes(true));
    }

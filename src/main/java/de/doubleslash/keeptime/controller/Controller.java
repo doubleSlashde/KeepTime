@@ -92,9 +92,6 @@ public class Controller {
       }
 
       currentWork.setEndTime(workEnd);
-      if (currentWork.getNotes().isEmpty()) {
-         currentWork.setNotes("- No notes -");
-      }
 
       final String time = DateFormatter
             .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
