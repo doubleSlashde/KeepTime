@@ -12,6 +12,9 @@
 	-fx-padding:0px;
 	-fx-margin:0px
 }
+.tree-table-row-cell:selected {
+    -fx-background-color: #00a5e1;
+}
 .tree-table-row-cell .arrow {
 	-fx-padding:4px;
 }

@@ -72,7 +72,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -84,6 +83,8 @@ public class ReportController {
    public static final String EMPTY_NOTE = "- No notes -";
 
    private static final String FX_BACKGROUND_COLOR_NOT_WORKED = "-fx-background-color: #BBBBBB;";
+
+   private static final String FX_BACKGROUND_COLOR_WORKED = "-fx-background-color: #00a5e1;";
 
    private static final String EDIT_WORK_DIALOG_TITLE = "Edit work";
 
@@ -148,10 +149,9 @@ public class ReportController {
                      setGraphic(null);
                      setText(null);
                   } else {
-                     final Text text = new Text(item.getNotes());
-                     text.wrappingWidthProperty().bind(noteColumn.widthProperty().subtract(35));
-                     text.setUnderline(item.isUnderlined());
-                     this.setGraphic(text);
+                     final Label label = new Label(item.getNotes());
+                     label.setUnderline(item.isUnderlined());
+                     this.setGraphic(label);
                   }
                }
             };
@@ -263,6 +263,9 @@ public class ReportController {
             if (model.getWorkRepository().findByStartDateOrderByStartTimeAsc(item).isEmpty()) {
                setDisable(true);
                setStyle(FX_BACKGROUND_COLOR_NOT_WORKED);
+            } else {
+               setDisable(false);
+               setStyle(FX_BACKGROUND_COLOR_WORKED);
             }
          }
 
