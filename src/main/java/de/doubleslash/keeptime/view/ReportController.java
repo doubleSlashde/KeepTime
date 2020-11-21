@@ -60,6 +60,7 @@ import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -152,6 +153,7 @@ public class ReportController {
                      final String notes = item.getNotes();
                      final Label label = new Label(notes.isEmpty() ? EMPTY_NOTE : notes);
                      label.setUnderline(item.isUnderlined());
+                     label.setTooltip(new Tooltip(notes));
                      this.setGraphic(label);
                   }
                }
@@ -220,7 +222,7 @@ public class ReportController {
          }
 
          final HBox projectButtonBox = new HBox();
-         projectButtonBox.getChildren().add(createProjectReportButton(onlyCurrentProjectWork));
+         projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
 
          final Circle circle = new Circle(6, project.getColor());
 
@@ -229,6 +231,7 @@ public class ReportController {
 
          for (final Work w : onlyCurrentProjectWork) {
             final HBox workButtonBox = new HBox(5.0);
+            workButtonBox.getChildren().add(createCopyWorkButton(w));
             workButtonBox.getChildren().add(createEditWorkButton(w));
             workButtonBox.getChildren().add(createDeleteWorkButton(w));
             final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
@@ -352,8 +355,8 @@ public class ReportController {
       return grid;
    }
 
-   private Button createProjectReportButton(final List<Work> projectWork) {
-      final Button bProjectReport = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+   private Button createCopyProjectButton(final List<Work> projectWork) {
+      final Button copyButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final ProjectReport pr = new ProjectReport(projectWork.size());
@@ -368,9 +371,22 @@ public class ReportController {
          clipboard.setContent(content);
       };
 
-      bProjectReport.setOnAction(eventListener);
-      return bProjectReport;
+      copyButton.setOnAction(eventListener);
+      return copyButton;
+   }
 
+   private Node createCopyWorkButton(final Work w) {
+      final Button copyButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+      final EventHandler<ActionEvent> eventListener = actionEvent -> {
+         LOG.debug("Copy to Clipboard clicked.");
+         final Clipboard clipboard = Clipboard.getSystemClipboard();
+         final ClipboardContent content = new ClipboardContent();
+         content.putString(w.getNotes());
+         clipboard.setContent(content);
+      };
+
+      copyButton.setOnAction(eventListener);
+      return copyButton;
    }
 
    public void update() {
