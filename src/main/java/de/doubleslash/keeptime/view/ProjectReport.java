@@ -16,7 +16,6 @@
 
 package de.doubleslash.keeptime.view;
 
-import static de.doubleslash.keeptime.view.ReportController.EMPTY_NOTE;
 import static de.doubleslash.keeptime.view.ReportController.NOTE_DELIMETER;
 
 import java.lang.invoke.MethodHandles;
@@ -42,7 +41,7 @@ public class ProjectReport {
 
    public void appendToWorkNotes(final String currentWorkNote) {
       this.numberOfNotes++;
-      if (!currentWorkNote.equals(EMPTY_NOTE)) {
+      if (!currentWorkNote.isEmpty()) {
          if (this.numberOfNotes > 1) {
             this.sb.append(NOTE_DELIMETER);
          }

@@ -149,7 +149,8 @@ public class ReportController {
                      setGraphic(null);
                      setText(null);
                   } else {
-                     final Label label = new Label(item.getNotes());
+                     final String notes = item.getNotes();
+                     final Label label = new Label(notes.isEmpty() ? EMPTY_NOTE : notes);
                      label.setUnderline(item.isUnderlined());
                      this.setGraphic(label);
                   }
