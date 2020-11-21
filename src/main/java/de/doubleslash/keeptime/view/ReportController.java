@@ -148,7 +148,8 @@ public class ReportController {
                      setGraphic(null);
                      setText(null);
                   } else {
-                     final Text text = new Text(item.getNotes());
+                     final String notes = item.getNotes();
+                     final Text text = new Text(notes.isEmpty() ? EMPTY_NOTE : notes);
                      text.wrappingWidthProperty().bind(noteColumn.widthProperty().subtract(35));
                      text.setUnderline(item.isUnderlined());
                      this.setGraphic(text);
