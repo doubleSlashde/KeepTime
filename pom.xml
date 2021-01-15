@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.1.5.RELEASE</version>
+    <version>2.3.7.RELEASE</version>
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
 
@@ -73,9 +73,6 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>runtime</scope>
-      <!-- overwriting managed version as newer version is not supported by flyway: H2 1.4.199 is newer than this version 
-        of Flyway and support has not been tested. -->
-      <version>1.4.200</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
