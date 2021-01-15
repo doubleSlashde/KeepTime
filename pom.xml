@@ -55,7 +55,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <maven-dependency-check.version>5.2.1</maven-dependency-check.version>
+    <maven-dependency-check.version>6.0.5</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -75,7 +75,7 @@
       <scope>runtime</scope>
       <!-- overwriting managed version as newer version is not supported by flyway: H2 1.4.199 is newer than this version 
         of Flyway and support has not been tested. -->
-      <version>1.4.197</version>
+      <version>1.4.200</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -108,7 +108,7 @@
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-assembly-plugin</artifactId>
-      <version>3.1.1</version>
+      <version>3.3.0</version>
       <type>maven-plugin</type>
     </dependency>
 
@@ -182,7 +182,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.9.1</version>
       </plugin>
 
       <plugin>
