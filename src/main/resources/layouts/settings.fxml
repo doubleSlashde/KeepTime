@@ -296,6 +296,7 @@
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
                   </Button>
+                  <Button fx:id="exportButton" mnemonicParsing="false" text="Export" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Button fx:id="aboutButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="About" HBox.hgrow="ALWAYS" />
                </children>

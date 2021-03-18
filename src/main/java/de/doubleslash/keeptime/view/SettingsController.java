@@ -16,8 +16,15 @@
 
 package de.doubleslash.keeptime.view;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.SQLException;
+import java.util.Properties;
 
+import org.h2.tools.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +50,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -92,6 +101,9 @@ public class SettingsController {
    private Button cancelButton;
 
    @FXML
+   private Button exportButton;
+
+   @FXML
    private Button aboutButton;
 
    @FXML
@@ -135,6 +147,8 @@ public class SettingsController {
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
       }
+
+      initExportButton();
 
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
@@ -215,6 +229,35 @@ public class SettingsController {
       aboutButton.setOnAction(ae -> {
          LOG.info("About clicked");
          aboutStage.show();
+      });
+   }
+
+   private void initExportButton() {
+      LOG.debug("Initialize exportButton.");
+      exportButton.setOnAction(actionEvent -> {
+         LOG.info("Button pressed: exportButton");
+
+         final Properties properties = new Properties();
+         try (InputStream resourceStream = SettingsController.class.getResourceAsStream("/application.properties")) {
+            properties.load(resourceStream);
+
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(Paths.get(".").toFile());
+            final String h2Version = properties.getProperty("h2.version");
+            fileChooser.setInitialFileName(String.format("KeepTime_database-export_H2-version-%s.sql", h2Version));
+            fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL scrip files.", "*.sql"));
+
+            final File fileToSave = fileChooser.showSaveDialog(thisStage);
+            Files.deleteIfExists(Paths.get(fileToSave.getAbsolutePath()));
+
+            final String url = properties.getProperty("spring.datasource.url");
+            final String username = properties.getProperty("spring.datasource.username");
+            final String password = properties.getProperty("spring.datasource.password");
+
+            Script.process(url, username, password, fileToSave.getAbsolutePath(), "", "");
+         } catch (final SQLException | IOException e) {
+            LOG.error("Could not export db to script file.", e);
+         }
       });
    }
 

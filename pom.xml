@@ -55,6 +55,8 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
+	<h2.version>1.4.197</h2.version>
+
     <maven-dependency-check.version>6.0.5</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
@@ -72,7 +74,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.197</version>
+      <version>${h2.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -171,6 +173,13 @@
       </plugin>
 
     </plugins>
+    
+    <!-- resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources -->
   </build>
 
   <reporting>
