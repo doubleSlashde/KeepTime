@@ -350,7 +350,7 @@ public class Controller {
       long seconds = 0;
 
       for (final Work w : workItems) {
-         seconds += Duration.between(w.getStartTime(), w.getEndTime()).getSeconds();
+         seconds += DateFormatter.getSecondsBewtween(w.getStartTime(), w.getEndTime());
       }
 
       return seconds;
