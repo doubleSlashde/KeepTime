@@ -5,7 +5,7 @@
 
   <groupId>de.doubleslash</groupId>
   <artifactId>keeptime</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>KeepTime</name>
@@ -173,13 +173,6 @@
       </plugin>
 
     </plugins>
-    
-    <!-- resources>
-      <resource>
-        <filtering>true</filtering>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources -->
   </build>
 
   <reporting>

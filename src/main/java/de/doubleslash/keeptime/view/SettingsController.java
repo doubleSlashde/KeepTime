@@ -18,11 +18,8 @@ package de.doubleslash.keeptime.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.Properties;
 
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -30,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.ApplicationProperties;
 import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -118,6 +116,7 @@ public class SettingsController {
 
    private final Controller controller;
    private final Model model;
+   private final ApplicationProperties applicationProperties;
 
    private Stage thisStage;
 
@@ -127,9 +126,11 @@ public class SettingsController {
    ViewController mainscreen;
 
    @Autowired
-   public SettingsController(final Model model, final Controller controller) {
+   public SettingsController(final Model model, final Controller controller,
+         ApplicationProperties applicationProperties) {
       this.model = model;
       this.controller = controller;
+      this.applicationProperties = applicationProperties;
    }
 
    @FXML
@@ -217,11 +218,11 @@ public class SettingsController {
       });
 
       LOG.debug("resetButton.setOnAction");
-      resetHoverBackgroundButton
-            .setOnAction(ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
+      resetHoverBackgroundButton.setOnAction(
+            ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
       resetHoverFontButton.setOnAction(ae -> hoverFontColor.setValue(Model.ORIGINAL_HOVER_Font_COLOR));
-      resetDefaultBackgroundButton
-            .setOnAction(ae -> defaultBackgroundColor.setValue(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR));
+      resetDefaultBackgroundButton.setOnAction(
+            ae -> defaultBackgroundColor.setValue(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR));
       resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
@@ -237,26 +238,42 @@ public class SettingsController {
       exportButton.setOnAction(actionEvent -> {
          LOG.info("Button pressed: exportButton");
 
-         final Properties properties = new Properties();
-         try (InputStream resourceStream = SettingsController.class.getResourceAsStream("/application.properties")) {
-            properties.load(resourceStream);
+         try {
+            final String h2Version = applicationProperties.getH2Version();
 
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(Paths.get(".").toFile());
-            final String h2Version = properties.getProperty("h2.version");
             fileChooser.setInitialFileName(String.format("KeepTime_database-export_H2-version-%s.sql", h2Version));
-            fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL scrip files.", "*.sql"));
-
+            fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
             final File fileToSave = fileChooser.showSaveDialog(thisStage);
-            Files.deleteIfExists(Paths.get(fileToSave.getAbsolutePath()));
+            if (fileToSave == null) {
+               LOG.info("User canceled export.");
+               return;
+            }
 
-            final String url = properties.getProperty("spring.datasource.url");
-            final String username = properties.getProperty("spring.datasource.username");
-            final String password = properties.getProperty("spring.datasource.password");
+            final String url = applicationProperties.getSpringDataSourceUrl();
+            final String username = applicationProperties.getSpringDataSourceUserName();
+            final String password = applicationProperties.getSpringDataSourcePassword();
 
+            LOG.info("Exporting database to '{}'.", fileToSave);
             Script.process(url, username, password, fileToSave.getAbsolutePath(), "", "");
-         } catch (final SQLException | IOException e) {
+            LOG.info("Export done.");
+
+            Alert informationDialog = new Alert(AlertType.INFORMATION);
+            informationDialog.setTitle("Export done");
+            informationDialog.setHeaderText("The current data was exported.");
+            informationDialog.setContentText("The data was exported to '" + fileToSave + "'.");
+
+            informationDialog.showAndWait();
+         } catch (final SQLException e) {
             LOG.error("Could not export db to script file.", e);
+
+            Alert errorDialog = new Alert(AlertType.ERROR);
+            errorDialog.setTitle("Export failed");
+            errorDialog.setHeaderText("The current data could not be exported.");
+            errorDialog.setContentText("Please inform a developer and provide your log file.");
+
+            errorDialog.showAndWait();
          }
       });
    }
