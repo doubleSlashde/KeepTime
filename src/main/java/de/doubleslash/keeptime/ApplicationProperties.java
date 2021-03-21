@@ -15,6 +15,11 @@ public class ApplicationProperties {
    private String springDataSourceUserName;
    private String springDataSourcePassword;
 
+   private String gitCommitId;
+   private String gitCommitTime;
+   private String gitBranch;
+   private String gitDirty;
+
    public String getBuildVersion() {
       return buildVersion;
    }
@@ -67,5 +72,41 @@ public class ApplicationProperties {
    @Value("${spring.datasource.password}")
    private void setSpringDataSourcePassword(String springDataSourcePassword) {
       this.springDataSourcePassword = springDataSourcePassword;
+   }
+
+   public String getGitCommitId() {
+      return gitCommitId;
+   }
+
+   @Value("${git.commit.id}")
+   private void setGitCommitId(String gitCommitId) {
+      this.gitCommitId = gitCommitId;
+   }
+
+   public String getGitCommitTime() {
+      return gitCommitTime;
+   }
+
+   @Value("${git.commit.time}")
+   private void setGitCommitTime(String gitCommitTime) {
+      this.gitCommitTime = gitCommitTime;
+   }
+
+   public String getGitBranch() {
+      return gitBranch;
+   }
+
+   @Value("${git.branch}")
+   private void setGitBranch(String gitBranch) {
+      this.gitBranch = gitBranch;
+   }
+
+   public String getGitDirty() {
+      return gitDirty;
+   }
+
+   @Value("${git.dirty}")
+   private void setGitDirty(String gitDirty) {
+      this.gitDirty = gitDirty;
    }
 }

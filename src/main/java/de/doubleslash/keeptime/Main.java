@@ -87,6 +87,10 @@ public class Main extends Application {
       ApplicationProperties applicationProperties = springContext.getBean(ApplicationProperties.class);
       LOG.info("KeepTime Version: '{}'.", applicationProperties.getBuildVersion());
       LOG.info("KeepTime Build Timestamp: '{}'.", applicationProperties.getBuildTimestamp());
+      LOG.info("KeepTime Git Infos: id '{}', branch '{}', time '{}', dirty '{}'.",
+            applicationProperties.getGitCommitId(), applicationProperties.getGitBranch(),
+            applicationProperties.getGitCommitTime(), applicationProperties.getGitDirty());
+
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
       model.setSpringContext(springContext);
@@ -137,8 +141,7 @@ public class Main extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository()
-            .findByStartDateOrderByStartTimeAsc(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByStartDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -153,7 +156,7 @@ public class Main extends Application {
 
       model.getAllProjects().addAll(projects);
       model.getAvailableProjects()
-            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
+           .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();
