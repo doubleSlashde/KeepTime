@@ -256,7 +256,7 @@ public class SettingsController {
             final String password = applicationProperties.getSpringDataSourcePassword();
 
             LOG.info("Exporting database to '{}'.", fileToSave);
-            Script.process(url, username, password, fileToSave.getAbsolutePath(), "", "");
+            Script.process(url, username, password, fileToSave.getAbsolutePath(), "DROP", "");
             LOG.info("Export done.");
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);

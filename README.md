@@ -26,6 +26,7 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + Use Hotkey (`Strg`+`Win`): Change the project by using the Hotkey feature. A popup will appear at the mouse cursor.
 + Save Position on Screen: Remembers the last position of the Main UI on application start.
 + Ask for notes when switching project (if empty): Pops up a dialog to add notes if no notes are given and you try to switch projects
++ Export: export database for backup and later import (import currently not yet implemented)
 
 ### Reports:
 ![Report Screen](readme/images/reportDescription.png?raw=true "Report")
