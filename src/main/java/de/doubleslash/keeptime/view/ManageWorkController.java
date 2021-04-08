@@ -40,6 +40,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
@@ -80,8 +81,12 @@ public class ManageWorkController {
    @FXML
    private ComboBox<Project> projectComboBox;
 
+   @FXML
+   private Label errorLabel;
+
    private boolean comboChange;
    private Project selectedProject;
+   private boolean valid;
 
    private FilteredList<Project> filteredList;
 
@@ -98,9 +103,40 @@ public class ManageWorkController {
 
       setUpTimeSpinner(endTimeSpinner);
 
+      setUpTimeRestriction();
+
       setProjectUpComboBox();
 
       Platform.runLater(() -> projectComboBox.requestFocus());
+   }
+
+   private void setUpTimeRestriction() {
+      final ChangeListener<Object> timeListener = (final ObservableValue<? extends Object> observable,
+            final Object oldValue, final Object newValue) -> {
+         if (startTimeSpinner.getValue() == null || endTimeSpinner.getValue() == null
+               || startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
+            return;
+         }
+         if (startDatePicker.getValue().isAfter(endDatePicker.getValue())
+               || (startDatePicker.getValue().isEqual(endDatePicker.getValue())
+                     && startTimeSpinner.getValue().isAfter(endTimeSpinner.getValue()))) {
+            errorLabel.setText("startDate has to be before endDate");
+            valid = false;
+         } else {
+            errorLabel.setText("");
+            valid = true;
+         }
+
+      };
+      startTimeSpinner.valueProperty().addListener(timeListener);
+      endTimeSpinner.valueProperty().addListener(timeListener);
+      endDatePicker.valueProperty().addListener(timeListener);
+      startDatePicker.valueProperty().addListener(timeListener);
+
+   }
+
+   public boolean isValid() {
+      return valid;
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
@@ -281,6 +317,9 @@ public class ManageWorkController {
 
       startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
       endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
+      valid = !startDatePicker.getValue().isAfter(endDatePicker.getValue())
+            || (startDatePicker.getValue().isEqual(endDatePicker.getValue())
+                  && startTimeSpinner.getValue().isAfter(endTimeSpinner.getValue()));
 
       noteTextArea.setText(work.getNotes());
 
@@ -290,6 +329,7 @@ public class ManageWorkController {
       setColor(projectComboBox.getEditor(), model.hoverBackgroundColor.get());
 
       setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
+
    }
 
    private void enableStrgA_combo() {
