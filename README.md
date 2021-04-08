@@ -45,6 +45,11 @@ It is recommended to run the application at computer start so you do not forget 
 
 You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
 
+###migrate from old version.
+
+because the folder of the db-files changed in preparation for a db upgrade, it is necessary to move them from hand or the old data will be lost.
+Please move the keeptip-h2-db.mv.db from the db/ folder into the db/1.4.197/ folder.
+
 ## Requirements
 
 * Windows 7, 10
