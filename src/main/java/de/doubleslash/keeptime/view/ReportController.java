@@ -344,11 +344,12 @@ public class ReportController {
       final ManageWorkController manageWorkController = loader.getController();
       manageWorkController.setModel(model);
       manageWorkController.initializeWith(work);
-      dialog.getDialogPane().lookupButton(ButtonType.OK).addEventFilter(ActionEvent.ACTION, event -> {
-         if (!manageWorkController.isValid()) {
-            event.consume();
-         }
-      });
+
+      dialog.getDialogPane()
+            .lookupButton(ButtonType.OK)
+            .disableProperty()
+            .bind(manageWorkController.validProperty().not());
+
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return manageWorkController.getWorkFromUserInput();

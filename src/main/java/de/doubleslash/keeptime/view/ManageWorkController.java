@@ -32,6 +32,11 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.BooleanExpression;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -86,7 +91,7 @@ public class ManageWorkController {
 
    private boolean comboChange;
    private Project selectedProject;
-   private boolean valid;
+   private BooleanProperty isValidProperty = new SimpleBooleanProperty();
 
    private FilteredList<Project> filteredList;
 
@@ -111,32 +116,33 @@ public class ManageWorkController {
    }
 
    private void setUpTimeRestriction() {
-      final ChangeListener<Object> timeListener = (final ObservableValue<? extends Object> observable,
-            final Object oldValue, final Object newValue) -> {
+
+      BooleanBinding isValidBinding = Bindings.createBooleanBinding(() -> {
          if (startTimeSpinner.getValue() == null || endTimeSpinner.getValue() == null
                || startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
-            return;
+            return false;
          }
+
          if (startDatePicker.getValue().isAfter(endDatePicker.getValue())
                || (startDatePicker.getValue().isEqual(endDatePicker.getValue())
                      && startTimeSpinner.getValue().isAfter(endTimeSpinner.getValue()))) {
-            errorLabel.setText("startDate has to be before endDate");
-            valid = false;
+            return false;
          } else {
-            errorLabel.setText("");
-            valid = true;
+            return true;
+         }
+      }, startTimeSpinner.valueProperty(), endTimeSpinner.valueProperty(), endDatePicker.valueProperty(),
+            startDatePicker.valueProperty());
+
+      this.isValidProperty.bind(isValidBinding);
+
+      errorLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+         if (isValidProperty.getValue()) {
+            return "";
+         } else {
+            return "startDate has to be before endDate";
          }
 
-      };
-      startTimeSpinner.valueProperty().addListener(timeListener);
-      endTimeSpinner.valueProperty().addListener(timeListener);
-      endDatePicker.valueProperty().addListener(timeListener);
-      startDatePicker.valueProperty().addListener(timeListener);
-
-   }
-
-   public boolean isValid() {
-      return valid;
+      }, isValidProperty));
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
@@ -317,9 +323,6 @@ public class ManageWorkController {
 
       startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
       endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
-      valid = !startDatePicker.getValue().isAfter(endDatePicker.getValue())
-            || (startDatePicker.getValue().isEqual(endDatePicker.getValue())
-                  && startTimeSpinner.getValue().isAfter(endTimeSpinner.getValue()));
 
       noteTextArea.setText(work.getNotes());
 
@@ -329,7 +332,6 @@ public class ManageWorkController {
       setColor(projectComboBox.getEditor(), model.hoverBackgroundColor.get());
 
       setTextColor(projectComboBox.getEditor(), model.hoverFontColor.get());
-
    }
 
    private void enableStrgA_combo() {
@@ -364,6 +366,10 @@ public class ManageWorkController {
       final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-text-fill",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
       object.setStyle(style);
+   }
+
+   public BooleanProperty validProperty() {
+      return this.isValidProperty;
    }
 
 }
