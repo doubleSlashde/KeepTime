@@ -122,9 +122,10 @@ public class ManageWorkController {
             return false;
          }
 
-         if (startDatePicker.getValue().isAfter(endDatePicker.getValue())
-               || (startDatePicker.getValue().isEqual(endDatePicker.getValue())
-                     && startTimeSpinner.getValue().isAfter(endTimeSpinner.getValue()))) {
+         LocalDateTime start = LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue());
+         LocalDateTime end = LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue());
+
+         if (start.isAfter(end)) {
             return false;
          } else {
             return true;
