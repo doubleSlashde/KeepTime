@@ -34,7 +34,6 @@ import de.doubleslash.keeptime.model.Work;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
@@ -136,7 +135,7 @@ public class ManageWorkController {
       this.isValidProperty.bind(isValidBinding);
 
       errorLabel.textProperty().bind(Bindings.createStringBinding(() -> {
-         if (isValidProperty.getValue()) {
+         if (Boolean.TRUE.equals(isValidProperty.get())) {
             return "";
          } else {
             return "startDate has to be before endDate";
