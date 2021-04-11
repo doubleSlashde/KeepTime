@@ -32,6 +32,10 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -40,6 +44,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
@@ -80,8 +85,12 @@ public class ManageWorkController {
    @FXML
    private ComboBox<Project> projectComboBox;
 
+   @FXML
+   private Label errorLabel;
+
    private boolean comboChange;
    private Project selectedProject;
+   private BooleanProperty isValidProperty = new SimpleBooleanProperty();
 
    private FilteredList<Project> filteredList;
 
@@ -98,9 +107,42 @@ public class ManageWorkController {
 
       setUpTimeSpinner(endTimeSpinner);
 
+      setUpTimeRestriction();
+
       setProjectUpComboBox();
 
       Platform.runLater(() -> projectComboBox.requestFocus());
+   }
+
+   private void setUpTimeRestriction() {
+
+      BooleanBinding isValidBinding = Bindings.createBooleanBinding(() -> {
+         if (startTimeSpinner.getValue() == null || endTimeSpinner.getValue() == null
+               || startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
+            return false;
+         }
+
+         LocalDateTime start = LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue());
+         LocalDateTime end = LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue());
+
+         if (start.isAfter(end)) {
+            return false;
+         } else {
+            return true;
+         }
+      }, startTimeSpinner.valueProperty(), endTimeSpinner.valueProperty(), endDatePicker.valueProperty(),
+            startDatePicker.valueProperty());
+
+      this.isValidProperty.bind(isValidBinding);
+
+      errorLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+         if (Boolean.TRUE.equals(isValidProperty.get())) {
+            return "";
+         } else {
+            return "startDate has to be before endDate";
+         }
+
+      }, isValidProperty));
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
@@ -324,6 +366,10 @@ public class ManageWorkController {
       final String style = StyleUtils.changeStyleAttribute(object.getStyle(), "fx-text-fill",
             "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
       object.setStyle(style);
+   }
+
+   public BooleanProperty validProperty() {
+      return this.isValidProperty;
    }
 
 }
