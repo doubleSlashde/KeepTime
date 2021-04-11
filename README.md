@@ -45,10 +45,13 @@ It is recommended to run the application at computer start so you do not forget 
 
 You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
 
-###migrate from old version.
+### Migrate from old version
 
-because the folder of the db-files changed in preparation for a db upgrade, it is necessary to move them from hand or the old data will be lost.
-Please move the keeptip-h2-db.mv.db from the db/ folder into the db/1.4.197/ folder.
+1. Download new version and replace the .jar file.
+2. Start new version of KeepTime. Notice that your old data is not available.
+3. Stop KeepTime
+4. Copy the files (not directories) of directory `db` (next to the .jar file) into `db/1.4.197/` (path now includes the database version).
+5. Start KeepTime again. Notice that your data is available again.
 
 ## Requirements
 
