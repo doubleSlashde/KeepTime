@@ -65,8 +65,6 @@ public class Main extends Application {
 
    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-   public static final String VERSION = "v1.1.0";
-
    private ConfigurableApplicationContext springContext;
 
    private Stage popupViewStage;
@@ -81,12 +79,18 @@ public class Main extends Application {
 
    @Override
    public void init() throws Exception {
-      LOG.info("Starting KeepTime {}", VERSION);
+      LOG.info("Starting KeepTime.");
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
       springContext = SpringApplication.run(Main.class);
-      // TODO test if everywhere is used the same model
+      ApplicationProperties applicationProperties = springContext.getBean(ApplicationProperties.class);
+      LOG.info("KeepTime Version: '{}'.", applicationProperties.getBuildVersion());
+      LOG.info("KeepTime Build Timestamp: '{}'.", applicationProperties.getBuildTimestamp());
+      LOG.info("KeepTime Git Infos: id '{}', branch '{}', time '{}', dirty '{}'.",
+            applicationProperties.getGitCommitId(), applicationProperties.getGitBranch(),
+            applicationProperties.getGitCommitTime(), applicationProperties.getGitDirty());
+
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
       model.setSpringContext(springContext);
@@ -137,8 +141,7 @@ public class Main extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository()
-            .findByStartDateOrderByStartTimeAsc(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByStartDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -153,7 +156,7 @@ public class Main extends Application {
 
       model.getAllProjects().addAll(projects);
       model.getAvailableProjects()
-            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
+           .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();

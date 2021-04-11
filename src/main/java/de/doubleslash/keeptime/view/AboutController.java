@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.ApplicationProperties;
 import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.BrowserHelper;
 import de.doubleslash.keeptime.common.FileOpenHelper;
@@ -67,10 +68,16 @@ public class AboutController {
 
    private static final Logger LOG = LoggerFactory.getLogger(AboutController.class);
 
+   private final ApplicationProperties applicationProperties;
+
+   public AboutController (ApplicationProperties applicationProperties) {
+	   this.applicationProperties = applicationProperties;
+   }
+   
    @FXML
    public void initialize() {
       LOG.debug("set version label");
-      versionNumberLabel.setText(Main.VERSION);
+      versionNumberLabel.setText(applicationProperties.getBuildVersion());
 
       ourLicenseHyperLink.setFocusTraversable(false);
       ourLicenseHyperLink.setOnAction(ae -> showLicense(Licenses.GPLV3));

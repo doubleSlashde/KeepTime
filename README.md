@@ -26,6 +26,7 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + Use Hotkey (`Strg`+`Win`): Change the project by using the Hotkey feature. A popup will appear at the mouse cursor.
 + Save Position on Screen: Remembers the last position of the Main UI on application start.
 + Ask for notes when switching project (if empty): Pops up a dialog to add notes if no notes are given and you try to switch projects
++ Export: export database for backup and later import (import currently not yet implemented)
 
 ### Reports:
 ![Report Screen](readme/images/reportDescription.png?raw=true "Report")
@@ -43,6 +44,14 @@ It is recommended to run the application at computer start so you do not forget 
 * Create a shortcut to the *.bat* in the autostart folder
 
 You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
+
+### Migrate from old version
+
+1. Download new version and replace the .jar file.
+2. Start new version of KeepTime. Notice that your old data is not available.
+3. Stop KeepTime
+4. Copy the files (not directories) of directory `db` (next to the .jar file) into `db/1.4.197/` (path now includes the database version).
+5. Start KeepTime again. Notice that your data is available again.
 
 ## Requirements
 

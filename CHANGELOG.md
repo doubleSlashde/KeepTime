@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- export functionality of database
 - search functionality
 - functionality to edit past work items
 - possibility to save position on screen
