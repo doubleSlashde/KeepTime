@@ -17,171 +17,53 @@
 package de.doubleslash.keeptime.viewpopup;
 
 import java.awt.Point;
-import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.StyleUtils;
+import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import javafx.collections.transformation.FilteredList;
+import de.doubleslash.keeptime.view.ProjectsListViewController;
 import javafx.fxml.FXML;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+@Component
 public class ViewControllerPopup {
-
-   private static final int LIST_CELL_HEIGHT = 23 + 2;
 
    private static final Logger LOG = LoggerFactory.getLogger(ViewControllerPopup.class);
 
    @FXML
-   private Pane pane;
+   private VBox root;
 
    @FXML
    private TextField searchTextField;
+
    @FXML
    private ListView<Project> projectListView;
 
    private Stage stage;
 
-   private Controller controller;
+   private final Controller controller;
 
-   private Model model;
+   private final Model model;
 
-   private FilteredList<Project> filteredData;
+   private ProjectsListViewController projectsListViewController;
 
-   private void changeProject(final Project item) {
-      LOG.info("Change project to '{}'.", item.getName());
-
-      // ask for a note for the current project
-      final TextInputDialog dialog = new TextInputDialog(model.activeWorkItem.get().getNotes());
-      dialog.setTitle("Note for current project");
-      dialog.setHeaderText(
-            "Add a note for '" + model.activeWorkItem.get().getProject().getName() + "' before changing project?");
-      dialog.setContentText("Note: ");
-
-      this.stage.setAlwaysOnTop(false);
-      final Optional<String> result = dialog.showAndWait();
-      this.stage.setAlwaysOnTop(true);
-
-      result.ifPresent(note -> {
-         controller.setComment(note);
-         hide();
-         controller.changeProject(item);
-      });
-   }
-
-   @FXML
-   private void initialize() {
-
-      // TODO the cells do not refresh, if a project was changed
-      projectListView.setCellFactory(cb -> returnListCellOfProject());
-
-      // TODO why is there no nice way for listview height?
-      // https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
-      final Consumer<Double> updateSize = height -> {
-         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("%s%f", "update size ", height));
-            projectListView.setPrefHeight(height);
-            stage.sizeToScene(); // also update scene size
-         }
-      };
-
-      searchTextField.textProperty().addListener((a, b, newValue) -> {
-         // TODO do i always have to create a new predicate?
-         filteredData.setPredicate(project -> {
-            // If filter text is empty, display all persons.
-            boolean returnValue = false;
-            if (newValue == null || newValue.isEmpty()) {
-               returnValue = true;
-            }
-
-            final String lowerCaseFilter = newValue.toLowerCase();
-
-            if (project.getName().toLowerCase().contains(lowerCaseFilter)) {
-               returnValue = true; // Filter matches first name.
-            }
-
-            return returnValue; // Does not match.
-         });
-
-         projectListView.getSelectionModel().selectFirst();
-         updateSize.accept((double) (filteredData.size() * LIST_CELL_HEIGHT));
-      });
-
-      searchTextField.setOnKeyPressed(eh -> {
-         final MultipleSelectionModel<Project> selectionModel = projectListView.getSelectionModel();
-         final int selectedIndex = selectionModel.getSelectedIndex();
-         switch (eh.getCode()) {
-         case UP:
-            selectionModel.select(selectedIndex - 1);
-            eh.consume();
-            break;
-         case DOWN:
-            selectionModel.select(selectedIndex + 1);
-            eh.consume();
-            break;
-         case ESCAPE:
-            hide();
-            break;
-         default:
-            break;
-
-         }
-      });
-      // enter pressed in textfield
-      searchTextField.setOnAction(ev -> {
-         final Project selectedItem = projectListView.getSelectionModel().getSelectedItem();
-         if (selectedItem != null) {
-            changeProject(selectedItem);
-         }
-      });
-
-      projectListView.getSelectionModel().selectFirst();
-      projectListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
-   }
-
-   public ListCell<Project> returnListCellOfProject() {
-
-      return new ListCell<Project>() {
-
-         @Override
-         protected void updateItem(final Project project, final boolean empty) {
-            super.updateItem(project, empty);
-
-            if (project == null || empty) {
-               setText(null);
-
-            } else {
-               setOnMouseClicked(ev -> changeProject(project));
-
-               final boolean isActiveProject = project == model.activeWorkItem.get().getProject();
-               setText((isActiveProject ? "* " : "") + project.getName());
-               setTextFill(project.getColor());
-               setUnderline(project.isWork());
-            }
-         }
-
-      };
-
-   }
-
-   public void setControllerAndModel(final Controller controller, final Model model) {
-      this.controller = controller;
+   @Autowired
+   public ViewControllerPopup(final Model model, final Controller controller) {
       this.model = model;
-
-      filteredData = new FilteredList<>(model.getSortedAvailableProjects(), p -> true);
-      projectListView.setItems(filteredData);
+      this.controller = controller;
    }
 
    public void setStage(final Stage primaryStage) {
@@ -193,6 +75,12 @@ public class ViewControllerPopup {
             hide();
          }
       });
+
+      projectsListViewController = new ProjectsListViewController(model, controller, stage, projectListView,
+            searchTextField, true);
+
+      new Interval(1).registerCallBack(() -> projectsListViewController.tick());
+
    }
 
    public void show(final Point mouseLocation) {
@@ -212,6 +100,26 @@ public class ViewControllerPopup {
       }
    }
 
+   @FXML
+   private void initialize() {
+
+      projectListView.getSelectionModel().selectFirst();
+
+      searchTextField.setOnKeyReleased(keyEvent -> {
+         if (keyEvent.getCode() == KeyCode.ESCAPE) {
+            hide();
+         }
+      });
+
+      projectListView.setFixedCellSize(13);
+
+      final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
+      model.hoverBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
+
+      updateMainBackgroundColor.run();
+
+   }
+
    private void hide() {
       if (stage.isShowing()) {
 
@@ -219,6 +127,16 @@ public class ViewControllerPopup {
 
          stage.hide();
       }
+   }
+
+   private void runUpdateMainBackgroundColor() {
+      final Color color = model.hoverBackgroundColor.get();
+      final double opacity = .3;
+      String style = StyleUtils.changeStyleAttribute(root.getStyle(), "fx-background-color",
+            "rgba(" + ColorHelper.colorToCssRgba(color) + ")");
+      style = StyleUtils.changeStyleAttribute(style, "fx-border-color",
+            "rgba(" + ColorHelper.colorToCssRgb(color) + ", " + opacity + ")");
+      root.setStyle(style);
    }
 
 }

@@ -42,7 +42,6 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -50,26 +49,28 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 @SpringBootApplication
 public class Main extends Application {
 
    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-   public static final String VERSION = "v1.1.0";
-
    private ConfigurableApplicationContext springContext;
 
    private Stage popupViewStage;
 
    private Model model;
+
    private Controller controller;
 
    private ViewController viewController;
@@ -78,14 +79,21 @@ public class Main extends Application {
 
    @Override
    public void init() throws Exception {
-      LOG.info("Starting KeepTime {}", VERSION);
+      LOG.info("Starting KeepTime.");
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
       springContext = SpringApplication.run(Main.class);
-      // TODO test if everywhere is used the same model
+      ApplicationProperties applicationProperties = springContext.getBean(ApplicationProperties.class);
+      LOG.info("KeepTime Version: '{}'.", applicationProperties.getBuildVersion());
+      LOG.info("KeepTime Build Timestamp: '{}'.", applicationProperties.getBuildTimestamp());
+      LOG.info("KeepTime Git Infos: id '{}', branch '{}', time '{}', dirty '{}'.",
+            applicationProperties.getGitCommitId(), applicationProperties.getGitBranch(),
+            applicationProperties.getGitCommitTime(), applicationProperties.getGitDirty());
+
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      model.setSpringContext(springContext);
    }
 
    @Override
@@ -133,7 +141,7 @@ public class Main extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByStartDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -148,7 +156,7 @@ public class Main extends Application {
 
       model.getAllProjects().addAll(projects);
       model.getAvailableProjects()
-            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
+           .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();
@@ -196,6 +204,12 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.screenSettings.proportionalX.set(settings.getWindowXProportion());
+      model.screenSettings.proportionalY.set(settings.getWindowYProportion());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
+
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
@@ -211,6 +225,7 @@ public class Main extends Application {
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_POPUP_LAYOUT));
+      loader.setControllerFactory(springContext::getBean);
       final Parent popupLayout = loader.load();
       popupViewStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
@@ -222,42 +237,59 @@ public class Main extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-      viewControllerPopupController.setControllerAndModel(controller, model);
+
       globalScreenListener.setViewController(viewControllerPopupController);
    }
 
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
-      Pane mainPane;
 
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
       loader.setControllerFactory(springContext::getBean);
-      mainPane = loader.load();
+      final Pane mainPane = loader.load();
       primaryStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
-      // Image(Resources.getResource(RESOURCE.ICON_MAIN).toString())); // TODO use an app icon
+      registerMinimizeEventlistener(mainScene, primaryStage);
+      registerMaximizeEventlistener(mainScene, primaryStage);
 
       primaryStage.setTitle("KeepTime");
       primaryStage.setScene(mainScene);
       primaryStage.setAlwaysOnTop(true);
       primaryStage.setResizable(false);
 
-      primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-         @Override
-         public void handle(final WindowEvent event) {
-            LOG.info("On close request");
-         }
-      });
+      primaryStage.setOnCloseRequest(windowEvent -> LOG.info("On close request"));
+
       primaryStage.show();
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
-      viewController.setController(controller, model);
 
+   }
+
+   private void registerMinimizeEventlistener(final Scene mainScene, final Stage primaryStage) {
+      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         if (keyComb.match(keyEvent)) {
+            LOG.info("KeyCombination '{}' was pressed: Minimizing window.", keyComb);
+            primaryStage.setIconified(true);
+            keyEvent.consume();
+         }
+      });
+   }
+
+   private void registerMaximizeEventlistener(final Scene mainScene, final Stage primaryStage) {
+      final KeyCombination keyComb = new KeyCodeCombination(KeyCode.UP, KeyCombination.META_DOWN);
+      mainScene.addEventFilter(KeyEvent.KEY_RELEASED, keyEvent -> {
+         if (keyComb.match(keyEvent)) {
+            LOG.info("KeyCombination  '{}' was pressed: Maximizing window.", keyComb);
+            primaryStage.setIconified(false);
+            keyEvent.consume();
+         }
+      });
    }
 
    @Override

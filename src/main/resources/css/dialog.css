@@ -1,0 +1,20 @@
+.tree-table-row-cell{
+    -fx-background-color: #dddddd;
+    -fx-cell-size:20;
+    -fx-border:0px
+}
+.tree-table-row-cell:odd {
+    -fx-background-color: #eeeeee;
+}
+
+.tree-table-row-cell * {
+	-fx-alignment:center;
+	-fx-padding:0px;
+	-fx-margin:0px
+}
+.tree-table-row-cell:selected {
+    -fx-background-color: #00a5e1;
+}
+.tree-table-row-cell .arrow {
+	-fx-padding:4px;
+}

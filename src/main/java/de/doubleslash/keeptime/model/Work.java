@@ -16,7 +16,6 @@
 
 package de.doubleslash.keeptime.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.Column;
@@ -36,7 +35,6 @@ public class Work {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
-   private LocalDate creationDate;
    private LocalDateTime startTime;
    private LocalDateTime endTime;
 
@@ -45,12 +43,11 @@ public class Work {
    @Lob
    private String notes;
 
-   public Work() {}
+   public Work() {
+   }
 
-   public Work(final LocalDate creationDate, final LocalDateTime startTime, final LocalDateTime endTime,
-         final Project project, final String notes) {
+   public Work(final LocalDateTime startTime, final LocalDateTime endTime, final Project project, final String notes) {
       super();
-      this.creationDate = creationDate;
       this.startTime = startTime;
       this.endTime = endTime;
       this.project = project;
@@ -59,14 +56,6 @@ public class Work {
 
    public long getId() {
       return id;
-   }
-
-   public LocalDate getCreationDate() {
-      return creationDate;
-   }
-
-   public void setCreationDate(final LocalDate creationDate) {
-      this.creationDate = creationDate;
    }
 
    public LocalDateTime getStartTime() {
@@ -89,12 +78,22 @@ public class Work {
       return project;
    }
 
+   public void setProject(final Project project) {
+      this.project = project;
+   }
+
    public String getNotes() {
       return notes;
    }
 
    public void setNotes(final String notes) {
       this.notes = notes;
+   }
+
+   @Override
+   public String toString() {
+      return "Work [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", projectName="
+            + project.getName() + ", notes=" + notes + "]";
    }
 
 }

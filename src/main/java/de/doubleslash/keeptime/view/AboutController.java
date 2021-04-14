@@ -20,7 +20,9 @@ import java.util.Comparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.ApplicationProperties;
 import de.doubleslash.keeptime.Main;
 import de.doubleslash.keeptime.common.BrowserHelper;
 import de.doubleslash.keeptime.common.FileOpenHelper;
@@ -42,6 +44,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
+@Component
 public class AboutController {
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
@@ -65,10 +68,16 @@ public class AboutController {
 
    private static final Logger LOG = LoggerFactory.getLogger(AboutController.class);
 
+   private final ApplicationProperties applicationProperties;
+
+   public AboutController (ApplicationProperties applicationProperties) {
+	   this.applicationProperties = applicationProperties;
+   }
+   
    @FXML
    public void initialize() {
       LOG.debug("set version label");
-      versionNumberLabel.setText(Main.VERSION);
+      versionNumberLabel.setText(applicationProperties.getBuildVersion());
 
       ourLicenseHyperLink.setFocusTraversable(false);
       ourLicenseHyperLink.setOnAction(ae -> showLicense(Licenses.GPLV3));
@@ -140,6 +149,7 @@ public class AboutController {
       licenseRows.add(new LicenseTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
+      licenseRows.add(new LicenseTableRow("fontawesomefx", Licenses.APACHEV2));
 
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
@@ -154,7 +164,7 @@ public class AboutController {
          alert.setContentText(String.format(
                "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
                license.getPath(), license.getUrl()));
-         
+
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
          alert.show();

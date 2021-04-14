@@ -24,6 +24,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -201,7 +202,7 @@
                                           <Font name="Open Sans Bold" size="12.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefHeight="17.0" prefWidth="106.0" text="(global keylogger!)">
+                                    <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefHeight="17.0" prefWidth="120.0" text="(global keylistener!)">
                                        <font>
                                           <Font name="Open Sans Regular" size="12.0" />
                                        </font>
@@ -223,6 +224,66 @@
                   </Group>
                </children>
             </VBox>
+            <VBox styleClass="menuBorder">
+               <children>
+                  <Group>
+                     <children>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label text="Position">
+                                       <font>
+                                          <Font name="Open Sans Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="Save Position on Screen">
+                                       <font>
+                                          <Font name="Open Sans Regular" size="12.0" />
+                                       </font>
+                                    </CheckBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </Group>
+               </children>
+            </VBox>
+            <VBox styleClass="menuBorder">
+               <children>
+                  <Group>
+                     <children>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label text="Note Reminder">
+                                       <font>
+                                          <Font name="Open Sans Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <CheckBox fx:id="emptyNoteReminderCheckBox" mnemonicParsing="false" text="Ask for notes when switching project (if empty)" wrapText="true" HBox.hgrow="NEVER">
+                                       <font>
+                                          <Font name="Open Sans Regular" size="12.0" />
+                                       </font>
+                                    </CheckBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </Group>
+               </children>
+            </VBox>
             <HBox spacing="10.0">
                <children>
                   <Button fx:id="saveButton" mnemonicParsing="false" text="Save">
@@ -230,17 +291,22 @@
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="cancelButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Cancel">
+                  <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel">
                      <font>
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="parseConfigButton" mnemonicParsing="false" text="parse config.xml">
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="exportButton" mnemonicParsing="false" text="Export">
                      <font>
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
                   </Button>
-                  <Button fx:id="aboutButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="70.0" text="About" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="aboutButton" mnemonicParsing="false" text="About">
+                     <font>
+                        <Font name="Open Sans Regular" size="12.0" />
+                     </font>
+                  </Button>
                </children>
             </HBox>
          </children>

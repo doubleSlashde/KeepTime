@@ -31,15 +31,16 @@ import org.springframework.stereotype.Service;
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.DateProvider;
+import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
 import javafx.collections.ObservableList;
-import javafx.scene.paint.Color;
 
 @Service
 public class Controller {
+   private final long QUICK_SAVE_INTERVAL = 60;
 
    private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
@@ -51,6 +52,9 @@ public class Controller {
    public Controller(final Model model, final DateProvider dateProvider) {
       this.model = model;
       this.dateProvider = dateProvider;
+
+      // initiate quicksaving
+      new Interval(QUICK_SAVE_INTERVAL).registerCallBack(() -> saveCurrentWork(dateProvider.dateTimeNow()));
    }
 
    public void changeProject(final Project newProject) {
@@ -58,68 +62,77 @@ public class Controller {
    }
 
    public void changeProject(final Project newProject, final long minusSeconds) {
-      final Work currentWork = model.activeWorkItem.get();
 
-      final LocalDateTime now = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
-      final LocalDate dateNow = now.toLocalDate();
-      if (currentWork != null) {
-         currentWork.setEndTime(now);
-         if (currentWork.getNotes().isEmpty()) {
-            currentWork.setNotes("- No notes -");
-         }
+      final LocalDateTime workEnd = dateProvider.dateTimeNow().minusSeconds(minusSeconds);
+      final LocalDate today = dateProvider.dateTimeNow().toLocalDate();
 
-         final String time = DateFormatter
-               .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
+      final Work oldWork = saveCurrentWork(workEnd);
 
-         LOG.info("You worked from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
-               currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
-
-         // Save in db
-         model.getWorkRepository().save(currentWork);
+      if (oldWork != null && !today.isEqual(oldWork.getStartTime().toLocalDate())) {
+         LOG.info("Removing projects with other creation date than today '{}' from list.", today);
+         final int sizeBefore = model.getPastWorkItems().size();
+         model.getPastWorkItems().removeIf(w -> !today.isEqual(w.getStartTime().toLocalDate()));
+         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
       }
 
       // Start new work
-      final Work work = new Work(dateNow, now, now.plusSeconds(minusSeconds), newProject, "");
+      final Work newWork = new Work(workEnd, workEnd.plusSeconds(minusSeconds), newProject, "");
 
-      model.getPastWorkItems().add(work);
-      if (currentWork != null && !dateNow.isEqual(currentWork.getCreationDate())) {
-         LOG.info("Removing projects with other creation date than today '{}' from list.", dateNow);
-         final int sizeBefore = model.getPastWorkItems().size();
-         model.getPastWorkItems().removeIf(w -> !dateNow.isEqual(w.getCreationDate()));
-         LOG.debug("Removed '{}' work items from past work items.", sizeBefore - model.getPastWorkItems().size());
-      }
-      model.activeWorkItem.set(work);
+      model.getPastWorkItems().add(newWork);
+
+      model.activeWorkItem.set(newWork);
+
    }
 
-   public void addNewProject(final String projectName, final boolean isWork, final Color projectColor,
-         final int index) {
-      final Project project = new Project(projectName, projectColor, isWork, index, false);
+   public Work saveCurrentWork(final LocalDateTime workEnd) {
+      final Work currentWork = model.activeWorkItem.get();
+
+      if (currentWork == null) {
+         return null;
+      }
+
+      currentWork.setEndTime(workEnd);
+
+      final String time = DateFormatter
+            .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
+
+      LOG.info("Saving Work from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
+            currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
+
+      // Save in db
+      return model.getWorkRepository().save(currentWork);
+
+   }
+
+   public void addNewProject(final Project project) {
+      LOG.info("Creating new project '{}'.", project);
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 
       final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), project,
-            model.getAvailableProjects().size(), index);
+            model.getAvailableProjects().size(), project.getIndex());
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
    }
 
-   public void updateSettings(final Color hoverBackgroundColor, final Color hoverFontColor,
-         final Color defaultBackgroundColor, final Color defaultFontColor, final Color taskBarColor,
-         final boolean useHotkey, final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit) {
-      // TODO create holder for all the properties (or reuse Settings.class?)
-      final Settings settings = model.getSettingsRepository().findAll().get(0);
-      settings.setTaskBarColor(taskBarColor);
+   public void updateSettings(final Settings newValuedSettings) {
+      Settings settings = model.getSettingsRepository().findAll().get(0);
 
-      settings.setDefaultBackgroundColor(defaultBackgroundColor);
-      settings.setDefaultFontColor(defaultFontColor);
+      settings.setTaskBarColor(newValuedSettings.getTaskBarColor());
+      settings.setDefaultBackgroundColor(newValuedSettings.getDefaultBackgroundColor());
+      settings.setDefaultFontColor(newValuedSettings.getDefaultFontColor());
+      settings.setHoverBackgroundColor(newValuedSettings.getHoverBackgroundColor());
+      settings.setHoverFontColor(newValuedSettings.getHoverFontColor());
+      settings.setUseHotkey(newValuedSettings.isUseHotkey());
+      settings.setDisplayProjectsRight(newValuedSettings.isDisplayProjectsRight());
+      settings.setHideProjectsOnMouseExit(newValuedSettings.isHideProjectsOnMouseExit());
+      settings.setSaveWindowPosition(newValuedSettings.isSaveWindowPosition());
+      settings.setWindowXProportion(newValuedSettings.getWindowXProportion());
+      settings.setWindowYProportion(newValuedSettings.getWindowYProportion());
+      settings.setScreenHash(newValuedSettings.getScreenHash());
+      settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
 
-      settings.setHoverBackgroundColor(hoverBackgroundColor);
-      settings.setHoverFontColor(hoverFontColor);
-      settings.setUseHotkey(useHotkey);
-      settings.setDisplayProjectsRight(displayProjectsRight);
-      settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
-
-      model.getSettingsRepository().save(settings);
+      settings = model.getSettingsRepository().save(settings);
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
@@ -129,12 +142,28 @@ public class Controller {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.screenSettings.proportionalX.set(settings.getWindowXProportion());
+      model.screenSettings.proportionalY.set(settings.getWindowYProportion());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
    }
 
    @PreDestroy
    public void shutdown() {
       LOG.info("Controller shutdown");
+
+      LOG.info("Changing project to persist current work on shutdown.");
       changeProject(model.getIdleProject(), 0);
+
+      LOG.info("Updating settings to persist local changes on shutdown.");
+      final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
+            model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
+            model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
+            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
+            model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
+            model.remindIfNotesAreEmpty.get());
+      updateSettings(newSettings);
    }
 
    public void deleteProject(final Project p) {
@@ -142,6 +171,11 @@ public class Controller {
          LOG.error("You cannot delete the default project. Tried to delete project '{}'", p);
          return;
       }
+
+      if (isProjectActive(p)) {
+         changeProject(model.getIdleProject());
+      }
+
       LOG.info("Disabeling project '{}'.", p);
 
       final int indexToRemove = p.getIndex();
@@ -158,21 +192,53 @@ public class Controller {
       model.getProjectRepository().saveAll(changedProjects);
    }
 
-   public void editProject(final Project p, final String newName, final Color newColor, final boolean isWork,
-         final int newIndex) {
-      LOG.info("Changing project '{}' to '{}' '{}' '{}'", p, newName, newColor, isWork);
+   private boolean isProjectActive(final Project p) {
+      return p == model.activeWorkItem.get().getProject();
+   }
 
-      p.setName(newName);
-      p.setColor(newColor);
-      p.setWork(isWork);
-      final int oldIndex = p.getIndex();
-      p.setIndex(newIndex);
+   public void editProject(final Project projectToBeUpdated, final Project newValuedProject) {
+      LOG.info("Changing project '{}' to '{}'.", projectToBeUpdated, newValuedProject);
 
-      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), p, oldIndex, newIndex);
-      changedProjects.add(p);
+      projectToBeUpdated.setName(newValuedProject.getName());
+      projectToBeUpdated.setDescription(newValuedProject.getDescription());
+      projectToBeUpdated.setColor(newValuedProject.getColor());
+      projectToBeUpdated.setWork(newValuedProject.isWork());
+      final int oldIndex = projectToBeUpdated.getIndex();
+      projectToBeUpdated.setIndex(newValuedProject.getIndex());
+
+      final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), projectToBeUpdated,
+            oldIndex, newValuedProject.getIndex());
+      changedProjects.add(projectToBeUpdated);
 
       // save all projects which changed index
       model.getProjectRepository().saveAll(changedProjects);
+   }
+
+   public void editWork(final Work workToBeEdited, final Work newValuedWork) {
+      LOG.info("Changing work '{}' to '{}'.", workToBeEdited, newValuedWork);
+
+      workToBeEdited.setStartTime(newValuedWork.getStartTime());
+      workToBeEdited.setEndTime(newValuedWork.getEndTime());
+      workToBeEdited.setNotes(newValuedWork.getNotes());
+      workToBeEdited.setProject(newValuedWork.getProject());
+
+      final Work editedWork = model.getWorkRepository().save(workToBeEdited);
+
+      // remove old
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeEdited.getId()));
+      // add if started today
+      final LocalDate dateNow = dateProvider.dateTimeNow().toLocalDate();
+      if (dateNow.equals(editedWork.getStartTime().toLocalDate())) {
+         model.getPastWorkItems().add(editedWork);
+      }
+
+   }
+
+   public void deleteWork(final Work workToBeDeleted) {
+      LOG.info("Deleting work '{}'.", workToBeDeleted);
+
+      model.getPastWorkItems().removeIf(w -> (w.getId() == workToBeDeleted.getId()));
+      model.getWorkRepository().delete(workToBeDeleted);
    }
 
    /**
@@ -289,4 +355,5 @@ public class Controller {
 
       return seconds;
    }
+
 }

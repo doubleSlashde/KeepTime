@@ -18,17 +18,23 @@ package de.doubleslash.keeptime.view;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 
+import org.h2.tools.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import de.doubleslash.keeptime.common.ConfigParser;
+import de.doubleslash.keeptime.ApplicationProperties;
 import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Settings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -42,9 +48,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+@Component
 public class SettingsController {
 
    @FXML
@@ -77,6 +86,11 @@ public class SettingsController {
    private CheckBox displayProjectsRightCheckBox;
    @FXML
    private CheckBox hideProjectsOnMouseExitCheckBox;
+   @FXML
+   private CheckBox saveWindowPositionCheckBox;
+
+   @FXML
+   private CheckBox emptyNoteReminderCheckBox;
 
    @FXML
    private Button saveButton;
@@ -85,7 +99,7 @@ public class SettingsController {
    private Button cancelButton;
 
    @FXML
-   private Button parseConfigButton;
+   private Button exportButton;
 
    @FXML
    private Button aboutButton;
@@ -100,16 +114,24 @@ public class SettingsController {
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
-   private Controller controller;
-   private Model model;
-
-   private static final String INPUT_FILE = "config.xml";
-
-   private AboutController aboutController;
+   private final Controller controller;
+   private final Model model;
+   private final ApplicationProperties applicationProperties;
 
    private Stage thisStage;
 
    private Stage aboutStage;
+
+   @Autowired
+   ViewController mainscreen;
+
+   @Autowired
+   public SettingsController(final Model model, final Controller controller,
+         ApplicationProperties applicationProperties) {
+      this.model = model;
+      this.controller = controller;
+      this.applicationProperties = applicationProperties;
+   }
 
    @FXML
    private void initialize() {
@@ -126,6 +148,8 @@ public class SettingsController {
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
       }
+
+      initExportButton();
 
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
@@ -170,48 +194,88 @@ public class SettingsController {
             }
          }
 
-         controller.updateSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+         if (saveWindowPositionCheckBox.isSelected()) {
+            // UPDATE POSITION
+            mainscreen.savePosition();
+         }
+
+         controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
-               hideProjectsOnMouseExitCheckBox.isSelected());
+               hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
+               model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
+               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected()));
          thisStage.close();
 
       });
 
       LOG.debug("cancelButton.setOnAction");
-      cancelButton.setOnAction(ae -> {
+      cancelButton.setOnAction(ae ->
+
+      {
          LOG.info("Cancel clicked");
          thisStage.close();
       });
 
       LOG.debug("resetButton.setOnAction");
-      resetHoverBackgroundButton
-            .setOnAction(ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
+      resetHoverBackgroundButton.setOnAction(
+            ae -> hoverBackgroundColor.setValue(Model.ORIGINAL_HOVER_BACKGROUND_COLOR));
       resetHoverFontButton.setOnAction(ae -> hoverFontColor.setValue(Model.ORIGINAL_HOVER_Font_COLOR));
-      resetDefaultBackgroundButton
-            .setOnAction(ae -> defaultBackgroundColor.setValue(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR));
+      resetDefaultBackgroundButton.setOnAction(
+            ae -> defaultBackgroundColor.setValue(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR));
       resetDefaultFontButton.setOnAction(ae -> defaultFontColor.setValue(Model.ORIGINAL_DEFAULT_FONT_COLOR));
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
-      LOG.debug("parseConfigButton.setOnAction");
-      parseConfigButton.setOnAction(actionEvent -> {
-         if (ConfigParser.hasConfigFile(INPUT_FILE)) {
-            final ConfigParser parser = new ConfigParser(controller);
-            parser.parseConfig(new File(INPUT_FILE));
-         }
-      });
-
-      LOG.debug("reportBugButton.setOnAction");
+      LOG.debug("aboutButton.setOnAction");
       aboutButton.setOnAction(ae -> {
          LOG.info("About clicked");
          aboutStage.show();
       });
    }
 
-   public void setControllerAndModel(final Controller controller, final Model model) {
-      this.controller = controller;
-      this.model = model;
-      update();
+   private void initExportButton() {
+      LOG.debug("Initialize exportButton.");
+      exportButton.setOnAction(actionEvent -> {
+         LOG.info("Button pressed: exportButton");
+
+         try {
+            final String h2Version = applicationProperties.getH2Version();
+
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(Paths.get(".").toFile());
+            fileChooser.setInitialFileName(String.format("KeepTime_database-export_H2-version-%s.sql", h2Version));
+            fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
+            final File fileToSave = fileChooser.showSaveDialog(thisStage);
+            if (fileToSave == null) {
+               LOG.info("User canceled export.");
+               return;
+            }
+
+            final String url = applicationProperties.getSpringDataSourceUrl();
+            final String username = applicationProperties.getSpringDataSourceUserName();
+            final String password = applicationProperties.getSpringDataSourcePassword();
+
+            LOG.info("Exporting database to '{}'.", fileToSave);
+            Script.process(url, username, password, fileToSave.getAbsolutePath(), "DROP", "");
+            LOG.info("Export done.");
+
+            Alert informationDialog = new Alert(AlertType.INFORMATION);
+            informationDialog.setTitle("Export done");
+            informationDialog.setHeaderText("The current data was exported.");
+            informationDialog.setContentText("The data was exported to '" + fileToSave + "'.");
+
+            informationDialog.showAndWait();
+         } catch (final SQLException e) {
+            LOG.error("Could not export db to script file.", e);
+
+            Alert errorDialog = new Alert(AlertType.ERROR);
+            errorDialog.setTitle("Export failed");
+            errorDialog.setHeaderText("The current data could not be exported.");
+            errorDialog.setContentText("Please inform a developer and provide your log file.");
+
+            errorDialog.showAndWait();
+         }
+      });
    }
 
    void update() {
@@ -229,6 +293,8 @@ public class SettingsController {
       useHotkeyCheckBox.setSelected(model.useHotkey.get());
       displayProjectsRightCheckBox.setSelected(model.displayProjectsRight.get());
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
+      saveWindowPositionCheckBox.setSelected(model.screenSettings.saveWindowPosition.get());
+      emptyNoteReminderCheckBox.setSelected(model.remindIfNotesAreEmpty.get());
    }
 
    public void setStage(final Stage thisStage) {
@@ -240,10 +306,9 @@ public class SettingsController {
          // About stage
          LOG.debug("load about.fxml");
          final FXMLLoader fxmlLoader3 = createFXMLLoader(RESOURCE.FXML_ABOUT);
+         fxmlLoader3.setControllerFactory(model.getSpringContext()::getBean);
          LOG.debug("load root");
          final Parent rootAbout = fxmlLoader3.load();
-         LOG.debug("get controller class");
-         aboutController = fxmlLoader3.getController();
          LOG.debug("set stage");
          aboutStage = new Stage();
          aboutStage.initModality(Modality.APPLICATION_MODAL);
