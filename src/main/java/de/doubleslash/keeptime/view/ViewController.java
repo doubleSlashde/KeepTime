@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,13 +64,6 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -217,10 +211,29 @@ public class ViewController {
 
       calendarButton.setOnAction(ae -> calendarClicked());
 
-      calendarIcon.fillProperty().bind(fontColorProperty);
-      settingsIcon.fillProperty().bind(fontColorProperty);
-      minimizeIcon.fillProperty().bind(fontColorProperty);
-      closeIcon.fillProperty().bind(fontColorProperty);
+      calendarButton.textFillProperty().bind(fontColorProperty);
+      calendarButton.setMaxSize(30, 30);
+      calendarButton.setMinSize(30, 30);
+      calendarButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      calendarButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_CALENDAR_DAYS_ICON)));
+
+      closeButton.textFillProperty().bind(fontColorProperty);
+      closeButton.setMaxSize(30, 30);
+      closeButton.setMinSize(30, 30);
+      closeButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      closeButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_CLOSE_ICON)));
+
+      settingsButton.textFillProperty().bind(fontColorProperty);
+      settingsButton.setMaxSize(30, 30);
+      settingsButton.setMinSize(30, 30);
+      settingsButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      settingsButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_SETTINGS_ICON)));
+
+      minimizeButton.textFillProperty().bind(fontColorProperty);
+      minimizeButton.setMaxSize(30, 30);
+      minimizeButton.setMinSize(30, 30);
+      minimizeButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      minimizeButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_MINUS_ICON)));
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
