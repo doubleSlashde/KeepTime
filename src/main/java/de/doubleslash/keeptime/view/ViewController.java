@@ -18,10 +18,14 @@ package de.doubleslash.keeptime.view;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +84,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 @Component
 public class ViewController {
@@ -315,6 +326,30 @@ public class ViewController {
 
       updateProjectView();
 
+   }
+
+   public String getSvgPathWithXMl(RESOURCE resource) throws ParserConfigurationException, IOException, SAXException {
+      String svgPath;
+      Document document;
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+
+      try (InputStream inputStream = Resources.getResource(resource).openStream()) {
+         document = db.parse(inputStream);
+         NodeList nodeList = document.getElementsByTagName("path");
+         svgPath = nodeList.item(0).getAttributes().getNamedItem("d").getNodeValue();
+      }
+      return svgPath;
+   }
+
+   private Node getNode(String s) {
+      SVGPath IconSvg = new SVGPath();
+      IconSvg.setContent(s);
+      Bounds bounds = IconSvg.getBoundsInParent();
+      double scale = Math.min(20 / bounds.getWidth(), 20 / bounds.getHeight());
+      IconSvg.setScaleX(scale);
+      IconSvg.setScaleY(scale);
+      return IconSvg;
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
