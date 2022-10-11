@@ -25,6 +25,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import de.doubleslash.keeptime.common.SvgNodeProvider;
+import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,19 +52,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -73,7 +63,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-
 @Component
 public class ReportController {
 
@@ -280,7 +269,13 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
-      final Button deleteButton = new Button("");
+      final Button deleteButton;
+
+         deleteButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_TRASH_ICON));
+         deleteButton.setMaxSize(20, 18);
+         deleteButton.setMinSize(20, 18);
+         deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -302,7 +297,10 @@ public class ReportController {
    }
 
    private Button createEditWorkButton(final Work work) {
-      final Button editButton = new Button("");
+      final Button editButton = new Button("",SvgNodeProvider.getSvgNode(RESOURCE.SVG_PENCIL_ICON));
+      editButton.setMaxSize(20, 18);
+      editButton.setMinSize(20, 18);
+      editButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
       editButton.setOnAction(e -> {
          LOG.info("Edit work clicked.");
          final Dialog<Work> dialog = setupEditWorkDialog(work);
@@ -359,7 +357,10 @@ public class ReportController {
    }
 
    private Button createCopyProjectButton(final List<Work> projectWork) {
-      final Button copyButton = new Button("");
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_FLOPPY_DISK_ICON));
+      copyButton.setMaxSize(20, 18);
+      copyButton.setMinSize(20, 18);
+      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final ProjectReport pr = new ProjectReport(projectWork.size());
@@ -379,7 +380,11 @@ public class ReportController {
    }
 
    private Node createCopyWorkButton(final Work w) {
-      final Button copyButton = new Button("");
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_FLOPPY_DISK_ICON));
+      copyButton.setMaxSize(20, 18);
+      copyButton.setMinSize(20, 18);
+      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final Clipboard clipboard = Clipboard.getSystemClipboard();
