@@ -49,6 +49,14 @@ public class Resources {
 
       SVG_MINUS_ICON("/svgs/minus.svg"),
 
+      SVG_TRASH_ICON("/svgs/trash-can.svg"),
+
+      SVG_PENCIL_ICON("/svgs/pencil.svg"),
+
+      SVG_FLOPPY_DISK_ICON("/svgs/floppy-disk.svg"),
+
+      SVG_BUG_ICON("/svgs/bug.svg")
+
 
       ;
 
