@@ -16,7 +16,6 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
@@ -63,9 +62,6 @@
          <font>
             <Font name="Open Sans Regular" size="14.0" />
          </font>
-         <graphic>
-            <FontAwesomeIconView glyphName="BUG" />
-         </graphic>
       </Button>
       <TableView fx:id="licenseTableView" focusTraversable="false" layoutX="39.0" layoutY="302.0" prefHeight="188.0" prefWidth="437.0" />
       <Label fx:id="versionNumberLabel" layoutX="97.0" layoutY="92.0" text="1.0.0">
