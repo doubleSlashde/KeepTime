@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import de.doubleslash.keeptime.common.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -32,12 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.doubleslash.keeptime.common.ColorHelper;
-import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
-import de.doubleslash.keeptime.common.ScreenPosHelper;
-import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
@@ -84,6 +80,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 
 @Component
 public class ViewController {
@@ -132,18 +129,6 @@ public class ViewController {
 
    @FXML
    private Canvas canvas;
-
-   @FXML
-   private Button calendarIcon;
-
-   @FXML
-   private Button settingsIcon;
-
-   @FXML
-   private Button minimizeIcon;
-
-   @FXML
-   private Button closeIcon;
 
    private ColorTimeLine mainColorTimeLine;
 
@@ -214,25 +199,25 @@ public class ViewController {
       calendarButton.setMaxSize(30, 30);
       calendarButton.setMinSize(30, 30);
       calendarButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-      calendarButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_CALENDAR_DAYS_ICON)));
+      calendarButton.setGraphic(SvgNodeProvider.getSvgNode(RESOURCE.SVG_CALENDAR_DAYS_ICON));
 
       closeButton.textFillProperty().bind(fontColorProperty);
       closeButton.setMaxSize(30, 30);
       closeButton.setMinSize(30, 30);
       closeButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-      closeButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_CLOSE_ICON)));
+      closeButton.setGraphic(SvgNodeProvider.getSvgNode(RESOURCE.SVG_CLOSE_ICON));
 
       settingsButton.textFillProperty().bind(fontColorProperty);
       settingsButton.setMaxSize(30, 30);
       settingsButton.setMinSize(30, 30);
       settingsButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-      settingsButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_SETTINGS_ICON)));
+      settingsButton.setGraphic(SvgNodeProvider.getSvgNode(RESOURCE.SVG_SETTINGS_ICON));
 
       minimizeButton.textFillProperty().bind(fontColorProperty);
       minimizeButton.setMaxSize(30, 30);
       minimizeButton.setMinSize(30, 30);
       minimizeButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-      minimizeButton.setGraphic(getNode(getSvgPathWithXMl(RESOURCE.SVG_MINUS_ICON)));
+      minimizeButton.setGraphic(SvgNodeProvider.getSvgNode(RESOURCE.SVG_MINUS_ICON));
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
@@ -340,29 +325,7 @@ public class ViewController {
 
    }
 
-   public String getSvgPathWithXMl(RESOURCE resource) throws ParserConfigurationException, IOException, SAXException {
-      String svgPath;
-      Document document;
-      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      DocumentBuilder db = dbf.newDocumentBuilder();
 
-      try (InputStream inputStream = Resources.getResource(resource).openStream()) {
-         document = db.parse(inputStream);
-         NodeList nodeList = document.getElementsByTagName("path");
-         svgPath = nodeList.item(0).getAttributes().getNamedItem("d").getNodeValue();
-      }
-      return svgPath;
-   }
-
-   private Node getNode(String s) {
-      SVGPath IconSvg = new SVGPath();
-      IconSvg.setContent(s);
-      Bounds bounds = IconSvg.getBoundsInParent();
-      double scale = Math.min(20 / bounds.getWidth(), 20 / bounds.getHeight());
-      IconSvg.setScaleX(scale);
-      IconSvg.setScaleY(scale);
-      return IconSvg;
-   }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {
@@ -382,7 +345,7 @@ public class ViewController {
       settingsStage.show();
    }
 
-   private void calendarClicked() {
+   private void calendarClicked(){
       LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
       reportStage.setAlwaysOnTop(true);
