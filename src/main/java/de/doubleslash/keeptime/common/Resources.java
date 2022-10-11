@@ -41,6 +41,15 @@ public class Resources {
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
       FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
 
+      SVG_CALENDAR_DAYS_ICON("/svgs/calendar-days.svg"),
+
+      SVG_CLOSE_ICON("/svgs/x.svg"),
+
+      SVG_SETTINGS_ICON("/svgs/gear.svg"),
+
+      SVG_MINUS_ICON("/svgs/minus.svg"),
+
+
       ;
 
       String resourceLocation;
