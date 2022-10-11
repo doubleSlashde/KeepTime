@@ -43,7 +43,6 @@ import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -135,16 +134,16 @@ public class ViewController {
    private Canvas canvas;
 
    @FXML
-   private FontAwesomeIconView calendarIcon;
+   private Button calendarIcon;
 
    @FXML
-   private FontAwesomeIconView settingsIcon;
+   private Button settingsIcon;
 
    @FXML
-   private FontAwesomeIconView minimizeIcon;
+   private Button minimizeIcon;
 
    @FXML
-   private FontAwesomeIconView closeIcon;
+   private Button closeIcon;
 
    private ColorTimeLine mainColorTimeLine;
 
@@ -182,7 +181,7 @@ public class ViewController {
    }
 
    @FXML
-   private void initialize() {
+   private void initialize() throws ParserConfigurationException, IOException, SAXException {
 
       availableProjectsListView.setFixedCellSize(13);
 

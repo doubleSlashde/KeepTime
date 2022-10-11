@@ -43,8 +43,6 @@ import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.worktable.ProjectTableRow;
 import de.doubleslash.keeptime.view.worktable.TableRow;
 import de.doubleslash.keeptime.view.worktable.WorkTableRow;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -282,7 +280,7 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
-      final Button deleteButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+      final Button deleteButton = new Button("");
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -304,7 +302,7 @@ public class ReportController {
    }
 
    private Button createEditWorkButton(final Work work) {
-      final Button editButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
+      final Button editButton = new Button("");
       editButton.setOnAction(e -> {
          LOG.info("Edit work clicked.");
          final Dialog<Work> dialog = setupEditWorkDialog(work);
@@ -361,7 +359,7 @@ public class ReportController {
    }
 
    private Button createCopyProjectButton(final List<Work> projectWork) {
-      final Button copyButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+      final Button copyButton = new Button("");
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final ProjectReport pr = new ProjectReport(projectWork.size());
@@ -381,7 +379,7 @@ public class ReportController {
    }
 
    private Node createCopyWorkButton(final Work w) {
-      final Button copyButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+      final Button copyButton = new Button("");
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final Clipboard clipboard = Clipboard.getSystemClipboard();

@@ -43,7 +43,7 @@ public class Resources {
 
       SVG_CALENDAR_DAYS_ICON("/svgs/calendar-days.svg"),
 
-      SVG_CLOSE_ICON("/svgs/x.svg"),
+      SVG_CLOSE_ICON("/svgs/xmark.svg"),
 
       SVG_SETTINGS_ICON("/svgs/gear.svg"),
 
