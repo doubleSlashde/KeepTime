@@ -169,25 +169,36 @@ public class ProjectsListViewController {
       }
       if (model.remindIfNotesAreEmpty.get()) {
          final Work currentWork = model.activeWorkItem.get();
+         if (currentWork != null && currentWork.getNotes().isEmpty() ) {
+            if (showNoNoteSelectet(currentWork)) return;
+         }
+      }
+      if (model.remindIfNotesAreEmptyIsWork.get()) {
+         final Work currentWork = model.activeWorkItem.get();
          if (currentWork != null && currentWork.getNotes().isEmpty() &&currentWork.getProject().isWork()) {
-            final TextInputDialog noteDialog = new TextInputDialog();
-            noteDialog.setTitle("Empty Notes");
-            noteDialog.setHeaderText("Switch projects without notes?");
-            noteDialog.setContentText(
-                  "What did you do for project '" + model.activeWorkItem.get().getProject().getName() + "' ?");
-            noteDialog.initOwner(mainStage);
-
-            final Optional<String> result = noteDialog.showAndWait();
-            if (result.isPresent()) {
-               currentWork.setNotes(result.get());
-            } else {
-               // cancel pressed
-               return;
-            }
+            if (showNoNoteSelectet(currentWork)) return;
          }
       }
       controller.changeProject(newProject, minusSeconds);
 
+   }
+
+   private boolean showNoNoteSelectet(Work currentWork) {
+      final TextInputDialog noteDialog = new TextInputDialog();
+      noteDialog.setTitle("Empty Notes");
+      noteDialog.setHeaderText("Switch projects without notes?");
+      noteDialog.setContentText(
+            "What did you do for project '" + model.activeWorkItem.get().getProject().getName() + "' ?");
+      noteDialog.initOwner(mainStage);
+
+      final Optional<String> result = noteDialog.showAndWait();
+      if (result.isPresent()) {
+         currentWork.setNotes(result.get());
+      } else {
+         // cancel pressed
+         return true;
+      }
+      return false;
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {

@@ -82,6 +82,10 @@ public class Model {
 
    public final ObjectProperty<Boolean> remindIfNotesAreEmpty = new SimpleObjectProperty<>(false);
 
+   public final ObjectProperty<Boolean> remindIfNotesAreEmptyIsWork = new SimpleObjectProperty<>(false);
+
+
+
    public final ScreenSettings screenSettings = new ScreenSettings();
 
    private ConfigurableApplicationContext springContext;
