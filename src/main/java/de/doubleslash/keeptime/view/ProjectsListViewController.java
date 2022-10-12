@@ -169,7 +169,7 @@ public class ProjectsListViewController {
       }
       if (model.remindIfNotesAreEmpty.get()) {
          final Work currentWork = model.activeWorkItem.get();
-         if (currentWork != null && currentWork.getNotes().isEmpty()) {
+         if (currentWork != null && currentWork.getNotes().isEmpty() &&currentWork.getProject().isWork()) {
             final TextInputDialog noteDialog = new TextInputDialog();
             noteDialog.setTitle("Empty Notes");
             noteDialog.setHeaderText("Switch projects without notes?");
