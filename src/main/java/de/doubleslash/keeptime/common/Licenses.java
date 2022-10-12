@@ -35,8 +35,8 @@ public enum Licenses {
            "The MIT License",
            "https://opensource.org/licenses/MIT"),
 
-   FONTAWESOME("./licenses/Fontawesome.txt",
-           "Fontawesome License",
+   FONTAWESOME("./licenses/Fontawesome Icons — CC BY 4.0 License.txt",
+           "Fontawesome Icons — CC BY 4.0 License ",
            " https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt");
 
 
