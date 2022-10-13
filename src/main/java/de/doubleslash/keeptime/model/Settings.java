@@ -71,11 +71,7 @@ public class Settings {
 
    private boolean emptyNoteReminderIsWork;
 
-
-
    private boolean confirmClose;
-
-
 
    public Settings() {
    }

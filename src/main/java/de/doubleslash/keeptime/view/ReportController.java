@@ -274,7 +274,6 @@ public class ReportController {
       deleteButton.setMaxSize(20, 18);
       deleteButton.setMinSize(20, 18);
       deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -383,7 +382,6 @@ public class ReportController {
       copyButton.setMaxSize(20, 18);
       copyButton.setMinSize(20, 18);
       copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final Clipboard clipboard = Clipboard.getSystemClipboard();
