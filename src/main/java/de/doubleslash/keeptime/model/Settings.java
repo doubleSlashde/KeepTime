@@ -73,6 +73,10 @@ public class Settings {
 
 
 
+   private boolean confirmClose;
+
+
+
    public Settings() {
    }
 
@@ -80,7 +84,7 @@ public class Settings {
          final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
          final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit, final double windowPositionX,
          final double windowPositionY, final int screenHash, final boolean saveWindowPosition,
-         final boolean remindIfNotesAreEmpty, final boolean emptyNoteReminderIsWork) {
+         final boolean remindIfNotesAreEmpty, final boolean emptyNoteReminderIsWork, final boolean confirmClose) {
       this.hoverBackgroundColor = hoverBackgroundColor;
       this.hoverFontColor = hoverFontColor;
       this.defaultBackgroundColor = defaultBackgroundColor;
@@ -95,6 +99,7 @@ public class Settings {
       this.saveWindowPosition = saveWindowPosition;
       this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
       this.emptyNoteReminderIsWork = emptyNoteReminderIsWork;
+      this.confirmClose=confirmClose;
 
    }
 
@@ -213,5 +218,11 @@ public class Settings {
    public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
       this.remindIfNotesAreEmpty = emptyNoteReminder;
    }
+   public boolean isConfirmClose() {
+      return confirmClose;
+   }
 
+   public void setConfirmClose(boolean confirmClose) {
+      this.confirmClose = confirmClose;
+   }
 }

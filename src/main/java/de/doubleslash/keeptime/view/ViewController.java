@@ -28,6 +28,7 @@ import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.shape.SVGPath;
+import org.apache.commons.codec.language.bm.Languages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,7 +187,7 @@ public class ViewController {
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setOnAction(ae -> mainStage.close());
+      closeButton.setOnAction(ae -> openConfirmationWindow());
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
@@ -325,7 +326,22 @@ public class ViewController {
 
    }
 
+private void openConfirmationWindow(){
+      if(model.confirmClose.get()){
+      Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"", ButtonType.YES, ButtonType.CANCEL);
+      alert.setTitle("");
+      alert.setHeaderText("Are you sure you want to close KeepTime ?");
 
+      alert.initOwner(mainStage);
+      alert.showAndWait();
+
+      if (alert.getResult() == ButtonType.YES) {
+         mainStage.close();
+      }
+   }else {
+         mainStage.close();
+      }
+}
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {

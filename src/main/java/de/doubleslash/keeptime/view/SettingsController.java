@@ -96,6 +96,9 @@ public class SettingsController {
    private CheckBox emptyNoteReminderCheckBoxIsWork;
 
    @FXML
+   private CheckBox confirmCloseCheckBox;
+
+   @FXML
    private Button saveButton;
 
    @FXML
@@ -207,7 +210,7 @@ public class SettingsController {
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
-               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(), emptyNoteReminderCheckBoxIsWork.isSelected()));
+               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(), emptyNoteReminderCheckBoxIsWork.isSelected(),confirmCloseCheckBox.isSelected()));
          thisStage.close();
 
       });
@@ -299,6 +302,7 @@ public class SettingsController {
       saveWindowPositionCheckBox.setSelected(model.screenSettings.saveWindowPosition.get());
       emptyNoteReminderCheckBox.setSelected(model.remindIfNotesAreEmpty.get());
       emptyNoteReminderCheckBoxIsWork.setSelected(model.remindIfNotesAreEmptyIsWork.get());
+      confirmCloseCheckBox.setSelected(model.confirmClose.get());
    }
 
    public void setStage(final Stage thisStage) {
