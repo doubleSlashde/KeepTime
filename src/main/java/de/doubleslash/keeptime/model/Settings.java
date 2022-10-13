@@ -70,9 +70,6 @@ public class Settings {
    private boolean remindIfNotesAreEmpty;
 
    private boolean emptyNoteReminderIsWork;
-
-
-
    public Settings() {
    }
 

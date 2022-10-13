@@ -133,7 +133,6 @@ public class Controller {
       settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
       settings.setEmptyNoteReminderIsWork(newValuedSettings.isEmptyNoteReminderIsWork());
 
-
       settings = model.getSettingsRepository().save(settings);
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
@@ -150,7 +149,6 @@ public class Controller {
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
       model.remindIfNotesAreEmptyIsWork.set(settings.isEmptyNoteReminderIsWork());
-
    }
 
    @PreDestroy

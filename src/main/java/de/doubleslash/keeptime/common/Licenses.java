@@ -39,7 +39,6 @@ public enum Licenses {
            "Fontawesome Icons — CC BY 4.0 License ",
            "http://creativecommons.org/licenses/by/4.0/");
 
-
    private final String path;
    private final String name;
    private final String url;

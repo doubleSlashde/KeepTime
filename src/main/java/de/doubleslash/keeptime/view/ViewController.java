@@ -18,16 +18,12 @@ package de.doubleslash.keeptime.view;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import de.doubleslash.keeptime.common.*;
-import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,13 +69,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 
 @Component
@@ -166,7 +155,7 @@ public class ViewController {
    }
 
    @FXML
-   private void initialize(){
+   private void initialize() {
 
       availableProjectsListView.setFixedCellSize(13);
 
@@ -325,8 +314,6 @@ public class ViewController {
 
    }
 
-
-
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {
       dialog.setResultConverter(dialogButton -> {
@@ -345,7 +332,7 @@ public class ViewController {
       settingsStage.show();
    }
 
-   private void calendarClicked(){
+   private void calendarClicked() {
       LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
       reportStage.setAlwaysOnTop(true);

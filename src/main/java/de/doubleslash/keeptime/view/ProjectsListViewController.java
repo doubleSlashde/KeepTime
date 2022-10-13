@@ -170,20 +170,20 @@ public class ProjectsListViewController {
       if (model.remindIfNotesAreEmpty.get()) {
          final Work currentWork = model.activeWorkItem.get();
          if (currentWork != null && currentWork.getNotes().isEmpty() ) {
-            if (showNoNoteSelectet(currentWork)) return;
+            if (showNoNoteSelected(currentWork)) return;
          }
       }
       if (model.remindIfNotesAreEmptyIsWork.get()) {
          final Work currentWork = model.activeWorkItem.get();
          if (currentWork != null && currentWork.getNotes().isEmpty() &&currentWork.getProject().isWork()) {
-            if (showNoNoteSelectet(currentWork)) return;
+            if (showNoNoteSelected(currentWork)) return;
          }
       }
       controller.changeProject(newProject, minusSeconds);
 
    }
 
-   private boolean showNoNoteSelectet(Work currentWork) {
+   private boolean showNoNoteSelected(Work currentWork) {
       final TextInputDialog noteDialog = new TextInputDialog();
       noteDialog.setTitle("Empty Notes");
       noteDialog.setHeaderText("Switch projects without notes?");
