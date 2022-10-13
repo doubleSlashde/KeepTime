@@ -166,7 +166,7 @@ public class Controller {
             model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
             model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
             model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
-            model.remindIfNotesAreEmpty.get(),model.remindIfNotesAreEmptyIsWork.get());
+            model.remindIfNotesAreEmpty.get(),model.remindIfNotesAreEmptyIsWork.get(), model.confirmClose.get());
       updateSettings(newSettings);
    }
 
