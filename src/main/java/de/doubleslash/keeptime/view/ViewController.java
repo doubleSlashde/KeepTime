@@ -167,7 +167,7 @@ public class ViewController {
    }
 
    @FXML
-   private void initialize() throws ParserConfigurationException, IOException, SAXException {
+   private void initialize(){
 
       availableProjectsListView.setFixedCellSize(13);
 
