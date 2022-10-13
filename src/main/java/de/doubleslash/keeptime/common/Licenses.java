@@ -37,7 +37,7 @@ public enum Licenses {
 
    FONTAWESOME("./licenses/Fontawesome Icons — CC BY 4.0 License.txt",
            "Fontawesome Icons — CC BY 4.0 License ",
-           " https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt");
+           "http://creativecommons.org/licenses/by/4.0/");
 
 
    private final String path;
