@@ -270,11 +270,10 @@ public class ReportController {
 
    private Button createDeleteWorkButton(final Work w) {
       final Button deleteButton;
-
-         deleteButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_TRASH_ICON));
-         deleteButton.setMaxSize(20, 18);
-         deleteButton.setMinSize(20, 18);
-         deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      deleteButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_TRASH_ICON));
+      deleteButton.setMaxSize(20, 18);
+      deleteButton.setMinSize(20, 18);
+      deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
