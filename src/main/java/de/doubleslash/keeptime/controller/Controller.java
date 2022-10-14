@@ -132,6 +132,7 @@ public class Controller {
       settings.setScreenHash(newValuedSettings.getScreenHash());
       settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
       settings.setEmptyNoteReminderIsWork(newValuedSettings.isEmptyNoteReminderIsWork());
+      settings.setConfirmClose(newValuedSettings.isConfirmClose());
 
       settings = model.getSettingsRepository().save(settings);
 
@@ -149,6 +150,7 @@ public class Controller {
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
       model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isEmptyNoteReminderIsWork());
+      model.confirmClose.set(settings.isConfirmClose());
    }
 
    @PreDestroy
@@ -164,7 +166,7 @@ public class Controller {
             model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
             model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
             model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
-            model.remindIfNotesAreEmpty.get(),model.remindIfNotesAreEmptyOnlyForWorkEntry.get());
+            model.remindIfNotesAreEmpty.get(),model.remindIfNotesAreEmptyOnlyForWorkEntry.get(),model.confirmClose.get());
       updateSettings(newSettings);
    }
 

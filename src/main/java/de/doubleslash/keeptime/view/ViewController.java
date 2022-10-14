@@ -330,7 +330,7 @@ private void openConfirmationWindow(){
       if(model.confirmClose.get()){
       Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"", ButtonType.YES, ButtonType.CANCEL);
       alert.setTitle("");
-      alert.setHeaderText("Are you sure you want to close KeepTime ?");
+      alert.setHeaderText("Are you sure you want to close KeepTime?");
 
       alert.initOwner(mainStage);
       alert.showAndWait();
