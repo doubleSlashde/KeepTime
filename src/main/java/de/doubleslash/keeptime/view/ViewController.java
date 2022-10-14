@@ -112,19 +112,6 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
-
-   @FXML
-   private SVGPath calendarIcon;
-
-   @FXML
-   private SVGPath settingsIcon;
-
-   @FXML
-   private SVGPath minimizeIcon;
-
-   @FXML
-   private SVGPath closeIcon;
-
    @FXML
    private TextArea textArea;
 
