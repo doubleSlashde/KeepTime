@@ -270,11 +270,10 @@ public class ReportController {
 
    private Button createDeleteWorkButton(final Work w) {
       final Button deleteButton;
-      deleteButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_TRASH_ICON));
+      deleteButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_TRASH_ICON,0.03,0.03));
       deleteButton.setMaxSize(20, 18);
       deleteButton.setMinSize(20, 18);
       deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -296,7 +295,7 @@ public class ReportController {
    }
 
    private Button createEditWorkButton(final Work work) {
-      final Button editButton = new Button("",SvgNodeProvider.getSvgNode(RESOURCE.SVG_PENCIL_ICON));
+      final Button editButton = new Button("",SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_PENCIL_ICON, 0.03 ,0.03));
       editButton.setMaxSize(20, 18);
       editButton.setMinSize(20, 18);
       editButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -356,7 +355,7 @@ public class ReportController {
    }
 
    private Button createCopyProjectButton(final List<Work> projectWork) {
-      final Button copyButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_FLOPPY_DISK_ICON));
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_FLOPPY_DISK_ICON, 0.03 ,0.03));
       copyButton.setMaxSize(20, 18);
       copyButton.setMinSize(20, 18);
       copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -379,7 +378,7 @@ public class ReportController {
    }
 
    private Node createCopyWorkButton(final Work w) {
-      final Button copyButton = new Button("", SvgNodeProvider.getSvgNode(RESOURCE.SVG_FLOPPY_DISK_ICON));
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_FLOPPY_DISK_ICON, 0.03 ,0.03));
       copyButton.setMaxSize(20, 18);
       copyButton.setMinSize(20, 18);
       copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
