@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import de.doubleslash.keeptime.common.*;
 import javafx.scene.control.*;
-import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,19 +112,6 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
-
-   @FXML
-   private SVGPath calendarIcon;
-
-   @FXML
-   private SVGPath settingsIcon;
-
-   @FXML
-   private SVGPath minimizeIcon;
-
-   @FXML
-   private SVGPath closeIcon;
-
    @FXML
    private TextArea textArea;
 
