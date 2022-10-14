@@ -170,7 +170,7 @@ public class ProjectsListViewController {
       final Work currentWork = model.activeWorkItem.get();
       if (model.remindIfNotesAreEmpty.get() && currentWork.getNotes().isEmpty()) {
 
-         if (currentWork != null && (!model.remindIfNotesAreEmptyIsWork.get() || currentWork.getProject().isWork())) {
+         if (currentWork != null && (!model.remindIfNotesAreEmptyOnlyForWorkEntry.get() || currentWork.getProject().isWork())) {
             if (showDialogNoNoteSelected(currentWork)) return;
          }
       }
