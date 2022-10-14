@@ -82,7 +82,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-
 @Component
 public class ViewController {
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
@@ -167,7 +166,7 @@ public class ViewController {
    }
 
    @FXML
-   private void initialize(){
+   private void initialize() {
 
       availableProjectsListView.setFixedCellSize(13);
 
@@ -292,17 +291,18 @@ public class ViewController {
          mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
       });
 
-      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
+      bigTimeLabel.textProperty()
+                  .bind(Bindings.createStringBinding(
+                        () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
+                        activeWorkSecondsProperty));
 
       // update ui each second
       new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
-         final long currentWorkSeconds = Duration
-               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-               .getSeconds();
+         final long currentWorkSeconds = Duration.between(model.activeWorkItem.get().getStartTime(),
+               model.activeWorkItem.get().getEndTime()).getSeconds();
          activeWorkSecondsProperty.set(currentWorkSeconds);
          final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
          final long todaySeconds = controller.calcTodaysSeconds();
@@ -326,22 +326,22 @@ public class ViewController {
 
    }
 
-private void openConfirmationWindow(){
-      if(model.confirmClose.get()){
-      Alert alert = new Alert(Alert.AlertType.CONFIRMATION,"", ButtonType.YES, ButtonType.CANCEL);
-      alert.setTitle("");
-      alert.setHeaderText("Are you sure you want to close KeepTime?");
+   private void openConfirmationWindow() {
+      if (model.confirmClose.get()) {
+         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.CANCEL);
+         alert.setTitle("");
+         alert.setHeaderText("Are you sure you want to close KeepTime?");
 
-      alert.initOwner(mainStage);
-      alert.showAndWait();
+         alert.initOwner(mainStage);
+         alert.showAndWait();
 
-      if (alert.getResult() == ButtonType.YES) {
+         if (alert.getResult() == ButtonType.YES) {
+            mainStage.close();
+         }
+      } else {
          mainStage.close();
       }
-   }else {
-         mainStage.close();
-      }
-}
+   }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {
@@ -361,7 +361,7 @@ private void openConfirmationWindow(){
       settingsStage.show();
    }
 
-   private void calendarClicked(){
+   private void calendarClicked() {
       LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
       reportStage.setAlwaysOnTop(true);

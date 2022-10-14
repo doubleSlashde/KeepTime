@@ -210,7 +210,8 @@ public class SettingsController {
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
-               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(), emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(),confirmCloseCheckBox.isSelected()));
+               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
+               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected()));
          thisStage.close();
 
       });
