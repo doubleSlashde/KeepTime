@@ -53,10 +53,9 @@ public class Resources {
 
       SVG_PENCIL_ICON("/svgs/pencil.svg"),
 
-      SVG_FLOPPY_DISK_ICON("/svgs/floppy-disk.svg"),
+      SVG_CLIPBOARD("/svgs/clipboard.svg"),
 
-      SVG_BUG_ICON("/svgs/bug.svg")
-
+      SVG_BUG_ICON("/svgs/bug.svg"),
 
       ;
 

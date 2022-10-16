@@ -31,14 +31,9 @@ public enum Licenses {
          "./licenses/GNU Lesser General Public License (LGPL), Version 3.0.txt",
          "GNU Lesser General Public License Version 3.0",
          "https://www.gnu.org/licenses/lgpl-3.0.de.html"),
-   MIT("./licenses/The MIT License.txt",
-           "The MIT License",
-           "https://opensource.org/licenses/MIT"),
+   MIT("./licenses/The MIT License.txt", "The MIT License", "https://opensource.org/licenses/MIT"),
 
-   FONTAWESOME("./licenses/Fontawesome Icons — CC BY 4.0 License.txt",
-           "Fontawesome Icons — CC BY 4.0 License ",
-           "http://creativecommons.org/licenses/by/4.0/");
-
+   CC_4_0("./licenses/CC BY 4.0 License.txt", "CC BY 4.0 License", "https://creativecommons.org/licenses/by/4.0/");
 
    private final String path;
    private final String name;
