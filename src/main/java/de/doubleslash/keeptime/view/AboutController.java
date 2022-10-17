@@ -18,14 +18,13 @@ package de.doubleslash.keeptime.view;
 
 import java.util.Comparator;
 
+import de.doubleslash.keeptime.common.*;
+import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.ApplicationProperties;
-import de.doubleslash.keeptime.common.BrowserHelper;
-import de.doubleslash.keeptime.common.FileOpenHelper;
-import de.doubleslash.keeptime.common.Licenses;
 import de.doubleslash.keeptime.view.license.LicenseTableRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -56,6 +55,8 @@ public class AboutController {
    @FXML
    private Button reportBugButton;
 
+   @FXML
+   private SVGPath bugIcon;
    @FXML
    private Label versionNumberLabel;
 
@@ -88,6 +89,9 @@ public class AboutController {
       nameColumn.setMinWidth(160);
 
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+      //set SvgPath content
+      bugIcon.setContent(SvgNodeProvider.getSvgPathWithXMl(Resources.RESOURCE.SVG_BUG_ICON));
 
       // licenseColumn
       final TableColumn<LicenseTableRow, String> licenseColumn = new TableColumn<>("License");
