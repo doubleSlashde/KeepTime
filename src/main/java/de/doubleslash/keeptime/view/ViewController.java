@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import de.doubleslash.keeptime.common.*;
 import javafx.scene.control.*;
+import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,6 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-
 @Component
 public class ViewController {
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
@@ -112,6 +112,19 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
+
+   @FXML
+   private SVGPath calendarIcon;
+
+   @FXML
+   private SVGPath settingsIcon;
+
+   @FXML
+   private SVGPath minimizeIcon;
+
+   @FXML
+   private SVGPath closeIcon;
+
    @FXML
    private TextArea textArea;
 
@@ -154,7 +167,7 @@ public class ViewController {
    }
 
    @FXML
-   private void initialize(){
+   private void initialize() {
 
       availableProjectsListView.setFixedCellSize(13);
 
@@ -184,16 +197,16 @@ public class ViewController {
       calendarButton.setOnAction(ae -> calendarClicked());
 
       calendarButton.textFillProperty().bind(fontColorProperty);
-      calendarButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03 ,0.03));
+      calendarButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03));
 
       closeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03 ,0.03));
+      closeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03));
 
       settingsButton.textFillProperty().bind(fontColorProperty);
-      settingsButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03 ,0.03));
+      settingsButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03));
 
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      minimizeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON , 0.03 ,0.03));
+      minimizeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03));
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
@@ -267,17 +280,18 @@ public class ViewController {
          mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
       });
 
-      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
+      bigTimeLabel.textProperty()
+                  .bind(Bindings.createStringBinding(
+                        () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
+                        activeWorkSecondsProperty));
 
       // update ui each second
       new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
-         final long currentWorkSeconds = Duration
-               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-               .getSeconds();
+         final long currentWorkSeconds = Duration.between(model.activeWorkItem.get().getStartTime(),
+               model.activeWorkItem.get().getEndTime()).getSeconds();
          activeWorkSecondsProperty.set(currentWorkSeconds);
          final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
          final long todaySeconds = controller.calcTodaysSeconds();
@@ -301,8 +315,6 @@ public class ViewController {
 
    }
 
-
-
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {
       dialog.setResultConverter(dialogButton -> {
@@ -321,7 +333,7 @@ public class ViewController {
       settingsStage.show();
    }
 
-   private void calendarClicked(){
+   private void calendarClicked() {
       LOG.info("Calendar clicked");
       this.mainStage.setAlwaysOnTop(false);
       reportStage.setAlwaysOnTop(true);
