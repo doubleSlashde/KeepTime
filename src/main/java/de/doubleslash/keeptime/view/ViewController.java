@@ -27,8 +27,6 @@ import de.doubleslash.keeptime.common.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.shape.SVGPath;
-import org.apache.commons.codec.language.bm.Languages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

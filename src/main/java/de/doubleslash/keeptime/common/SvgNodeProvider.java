@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * class loads SvgPath from a SvgFile because Java can not load the original svg file as it is.
+ * Class loads SvgPath from a SvgFile because Java can not load the original svg file as it is.
  * <p>
  * To load the svg the class extracts the path as string and creates a new SvgPath and returns it.
  */
@@ -42,7 +42,7 @@ public class SvgNodeProvider {
       return svgPath;
    }
 
-   public static Node getSvgNodeWithScale(Resources.RESOURCE resource, Double scaleX , Double scaleY) {
+   public static Node getSvgNodeWithScale(Resources.RESOURCE resource, Double scaleX, Double scaleY) {
       SVGPath iconSvg = new SVGPath();
       iconSvg.setContent(getSvgPathWithXMl(resource));
       iconSvg.setScaleX(scaleX);
