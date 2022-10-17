@@ -22,23 +22,20 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import de.doubleslash.keeptime.common.*;
+import javafx.scene.control.*;
+import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import de.doubleslash.keeptime.common.ColorHelper;
-import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
-import de.doubleslash.keeptime.common.ScreenPosHelper;
-import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -59,13 +56,6 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -124,22 +114,22 @@ public class ViewController {
    private Button calendarButton;
 
    @FXML
+   private SVGPath calendarIcon;
+
+   @FXML
+   private SVGPath settingsIcon;
+
+   @FXML
+   private SVGPath minimizeIcon;
+
+   @FXML
+   private SVGPath closeIcon;
+
+   @FXML
    private TextArea textArea;
 
    @FXML
    private Canvas canvas;
-
-   @FXML
-   private FontAwesomeIconView calendarIcon;
-
-   @FXML
-   private FontAwesomeIconView settingsIcon;
-
-   @FXML
-   private FontAwesomeIconView minimizeIcon;
-
-   @FXML
-   private FontAwesomeIconView closeIcon;
 
    private ColorTimeLine mainColorTimeLine;
 
@@ -206,10 +196,17 @@ public class ViewController {
 
       calendarButton.setOnAction(ae -> calendarClicked());
 
-      calendarIcon.fillProperty().bind(fontColorProperty);
-      settingsIcon.fillProperty().bind(fontColorProperty);
-      minimizeIcon.fillProperty().bind(fontColorProperty);
-      closeIcon.fillProperty().bind(fontColorProperty);
+      calendarButton.textFillProperty().bind(fontColorProperty);
+      calendarButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03));
+
+      closeButton.textFillProperty().bind(fontColorProperty);
+      closeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03));
+
+      settingsButton.textFillProperty().bind(fontColorProperty);
+      settingsButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03));
+
+      minimizeButton.textFillProperty().bind(fontColorProperty);
+      minimizeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03));
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
@@ -283,17 +280,18 @@ public class ViewController {
          mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
       });
 
-      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
+      bigTimeLabel.textProperty()
+                  .bind(Bindings.createStringBinding(
+                        () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
+                        activeWorkSecondsProperty));
 
       // update ui each second
       new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
-         final long currentWorkSeconds = Duration
-               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-               .getSeconds();
+         final long currentWorkSeconds = Duration.between(model.activeWorkItem.get().getStartTime(),
+               model.activeWorkItem.get().getEndTime()).getSeconds();
          activeWorkSecondsProperty.set(currentWorkSeconds);
          final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
          final long todaySeconds = controller.calcTodaysSeconds();

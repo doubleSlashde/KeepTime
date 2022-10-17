@@ -35,6 +35,7 @@ import com.sun.javafx.scene.control.skin.DatePickerSkin;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
@@ -43,8 +44,6 @@ import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.view.worktable.ProjectTableRow;
 import de.doubleslash.keeptime.view.worktable.TableRow;
 import de.doubleslash.keeptime.view.worktable.WorkTableRow;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -56,6 +55,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
@@ -200,19 +200,22 @@ public class ReportController {
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
       final List<Work> currentWorkItems = model.getWorkRepository()
-            .findByStartDateOrderByStartTimeAsc(this.currentReportDate);
+                                               .findByStartDateOrderByStartTimeAsc(this.currentReportDate);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
 
-      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream().map(Work::getProject)
-            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Project::getIndex))));
+      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream()
+                                                                   .map(Work::getProject)
+                                                                   .collect(Collectors.toCollection(() -> new TreeSet<>(
+                                                                         Comparator.comparing(Project::getIndex))));
 
       long currentWorkSeconds = 0;
       long currentSeconds = 0;
 
       for (final Project project : workedProjectsSet) {
-         final List<Work> onlyCurrentProjectWork = currentWorkItems.stream().filter(w -> w.getProject() == project)
-               .collect(Collectors.toList());
+         final List<Work> onlyCurrentProjectWork = currentWorkItems.stream()
+                                                                   .filter(w -> w.getProject() == project)
+                                                                   .collect(Collectors.toList());
 
          final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
 
@@ -282,7 +285,12 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
-      final Button deleteButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.TRASH));
+      final Button deleteButton = new Button("",
+            SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_TRASH_ICON, 0.03, 0.03));
+      deleteButton.setMaxSize(20, 18);
+      deleteButton.setMinSize(20, 18);
+      deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
          final Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -304,7 +312,12 @@ public class ReportController {
    }
 
    private Button createEditWorkButton(final Work work) {
-      final Button editButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.PENCIL));
+      final Button editButton = new Button("",
+            SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_PENCIL_ICON, 0.03, 0.03));
+      editButton.setMaxSize(20, 18);
+      editButton.setMinSize(20, 18);
+      editButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       editButton.setOnAction(e -> {
          LOG.info("Edit work clicked.");
          final Dialog<Work> dialog = setupEditWorkDialog(work);
@@ -361,7 +374,11 @@ public class ReportController {
    }
 
    private Button createCopyProjectButton(final List<Work> projectWork) {
-      final Button copyButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
+      copyButton.setMaxSize(20, 18);
+      copyButton.setMinSize(20, 18);
+      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final ProjectReport pr = new ProjectReport(projectWork.size());
@@ -381,7 +398,11 @@ public class ReportController {
    }
 
    private Node createCopyWorkButton(final Work w) {
-      final Button copyButton = new Button("", new FontAwesomeIconView(FontAwesomeIcon.CLIPBOARD));
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
+      copyButton.setMaxSize(20, 18);
+      copyButton.setMinSize(20, 18);
+      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final Clipboard clipboard = Clipboard.getSystemClipboard();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>de.doubleslash</groupId>
@@ -30,24 +30,6 @@
     <version>2.3.7.RELEASE</version>
     <relativePath /> <!-- lookup parent from repository -->
   </parent>
-
- <repositories>
-   
-    <!-- Including for fontawesome-->
-    <repository>
-      <id>fontawesomefx-repo</id>
-      <name>FontAwesome Repository</name>
-      <url>https://dl.bintray.com/jerady/maven</url>
-    </repository>
-    
-    <!-- needed to resolve against central first-->
-     <repository>
-      <id>central</id>
-      <name>Maven Central</name>
-      <layout>default</layout>
-      <url>https://repo1.maven.org/maven2</url>
-    </repository>
-  </repositories> 
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -110,20 +92,7 @@
       <version>3.3.0</version>
       <type>maven-plugin</type>
     </dependency>
-
-    <dependency>
-      <groupId>de.jensd</groupId>
-      <artifactId>fontawesomefx-commons</artifactId>
-      <version>8.15</version>
-    </dependency>
-
-    <dependency>
-      <groupId>de.jensd</groupId>
-      <artifactId>fontawesomefx-fontawesome</artifactId>
-      <version>4.7.0-5</version>
-    </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
