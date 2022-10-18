@@ -131,7 +131,7 @@ public class Controller {
       settings.setWindowYProportion(newValuedSettings.getWindowYProportion());
       settings.setScreenHash(newValuedSettings.getScreenHash());
       settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
-      settings.setEmptyNoteReminderIsWork(newValuedSettings.isEmptyNoteReminderIsWork());
+      settings.setRemindIfNotesAreEmptyOnlyForWorkEntry(newValuedSettings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
 
       settings = model.getSettingsRepository().save(settings);
 
@@ -148,7 +148,7 @@ public class Controller {
       model.screenSettings.proportionalY.set(settings.getWindowYProportion());
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
-      model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isEmptyNoteReminderIsWork());
+      model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
    }
 
    @PreDestroy

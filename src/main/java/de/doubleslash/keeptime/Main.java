@@ -209,7 +209,7 @@ public class Main extends Application {
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
-      model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isEmptyNoteReminderIsWork());
+      model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
 
    }
 
