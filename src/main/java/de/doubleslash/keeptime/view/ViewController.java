@@ -196,17 +196,21 @@ public class ViewController {
 
       calendarButton.setOnAction(ae -> calendarClicked());
 
-      calendarButton.textFillProperty().bind(fontColorProperty);
-      calendarButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03));
+      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03);
+      calendarSvgPath.fillProperty().bind(fontColorProperty);
+      calendarButton.setGraphic(calendarSvgPath);
 
-      closeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03));
+      SVGPath closeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03);
+      closeSvgPath.fillProperty().bind(fontColorProperty);
+      closeButton.setGraphic(closeSvgPath);
 
-      settingsButton.textFillProperty().bind(fontColorProperty);
-      settingsButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03));
+      SVGPath settingsSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03);
+      settingsSvgPath.fillProperty().bind(fontColorProperty);
+      settingsButton.setGraphic(settingsSvgPath);
 
-      minimizeButton.textFillProperty().bind(fontColorProperty);
-      minimizeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03));
+      SVGPath minimizeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03);
+      minimizeSvgPath.fillProperty().bind(fontColorProperty);
+      minimizeButton.setGraphic(minimizeSvgPath);
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
