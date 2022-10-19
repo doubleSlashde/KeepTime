@@ -298,6 +298,7 @@ public class SettingsController {
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
       saveWindowPositionCheckBox.setSelected(model.screenSettings.saveWindowPosition.get());
       emptyNoteReminderCheckBox.setSelected(model.remindIfNotesAreEmpty.get());
+      emptyNoteReminderOnlyForWorkEntryCheckBox.disableProperty().bind(emptyNoteReminderCheckBox.selectedProperty().not());
       emptyNoteReminderOnlyForWorkEntryCheckBox.setSelected(model.remindIfNotesAreEmptyOnlyForWorkEntry.get());
    }
 
