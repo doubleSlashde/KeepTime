@@ -296,6 +296,36 @@
                   </Group>
                </children>
             </VBox>
+            <VBox styleClass="menuBorder">
+               <children>
+                  <Group>
+                     <children>
+                        <VBox>
+                           <children>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label text="Confirmation on close">
+                                       <font>
+                                          <Font name="Open Sans Bold" size="12.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <CheckBox fx:id="confirmCloseCheckBox" mnemonicParsing="false" text="Open confirmation window when closing application" wrapText="true" HBox.hgrow="NEVER">
+                                       <font>
+                                          <Font name="Open Sans Regular" size="12.0" />
+                                       </font>
+                                    </CheckBox>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                  </Group>
+               </children>
+            </VBox>
             <HBox spacing="10.0">
                <children>
                   <Button fx:id="saveButton" mnemonicParsing="false" text="Save">
