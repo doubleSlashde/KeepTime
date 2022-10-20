@@ -210,6 +210,7 @@ public class Main extends Application {
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
       model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
+      model.confirmClose.set(settings.isConfirmClose());
 
    }
 
