@@ -69,6 +69,7 @@ public class Settings {
 
    private boolean remindIfNotesAreEmpty;
 
+   private boolean remindIfNotesAreEmptyOnlyForWorkEntry;
    public Settings() {
    }
 
@@ -76,7 +77,7 @@ public class Settings {
          final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
          final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit, final double windowPositionX,
          final double windowPositionY, final int screenHash, final boolean saveWindowPosition,
-         final boolean remindIfNotesAreEmpty) {
+         final boolean remindIfNotesAreEmpty, final boolean remindIfNotesAreEmptyOnlyForWorkEntry) {
       this.hoverBackgroundColor = hoverBackgroundColor;
       this.hoverFontColor = hoverFontColor;
       this.defaultBackgroundColor = defaultBackgroundColor;
@@ -90,7 +91,16 @@ public class Settings {
       this.windowScreenhash = screenHash;
       this.saveWindowPosition = saveWindowPosition;
       this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
+      this.remindIfNotesAreEmptyOnlyForWorkEntry = remindIfNotesAreEmptyOnlyForWorkEntry;
 
+   }
+
+   public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
+      return remindIfNotesAreEmptyOnlyForWorkEntry;
+   }
+
+   public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
+      this.remindIfNotesAreEmptyOnlyForWorkEntry = emptyNoteReminderCheckBoxIsWork;
    }
 
    public long getId() {
