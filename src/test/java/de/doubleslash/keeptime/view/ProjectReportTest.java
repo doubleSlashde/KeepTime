@@ -15,15 +15,14 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package de.doubleslash.keeptime.view;
-
-import static org.junit.Assert.assertEquals;
-
 import java.lang.invoke.MethodHandles;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProjectReportTest {
 
@@ -34,8 +33,8 @@ public class ProjectReportTest {
 
    private ProjectReport uut;
 
-   @Before
-   public void setUp() throws Exception {
+   @BeforeEach
+   void setUp(){
       this.uut = new ProjectReport(3);
    }
 

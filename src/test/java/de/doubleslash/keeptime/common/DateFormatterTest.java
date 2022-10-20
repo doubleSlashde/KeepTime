@@ -16,15 +16,15 @@
 
 package de.doubleslash.keeptime.common;
 
-import static org.junit.Assert.assertThat;
-
 import java.time.LocalDateTime;
 
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-@Ignore
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@Disabled
 public class DateFormatterTest {
 
    @Test
@@ -33,9 +33,9 @@ public class DateFormatterTest {
       final LocalDateTime endDate = startDate.plusNanos(10000);
 
       final long secondsBewtween = DateFormatter.getSecondsBewtween(startDate, endDate);
-      assertThat(secondsBewtween, Matchers.is(0l));
+      assertEquals(secondsBewtween, Matchers.is(0l));
 
       final long secondsBewtweenSwitched = DateFormatter.getSecondsBewtween(endDate, startDate);
-      assertThat(secondsBewtweenSwitched, Matchers.is(0l)); // why??
+      assertEquals(secondsBewtweenSwitched, Matchers.is(0l)); // why??
    }
 }

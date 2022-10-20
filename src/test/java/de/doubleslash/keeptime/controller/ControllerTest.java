@@ -17,12 +17,9 @@
 package de.doubleslash.keeptime.controller;
 
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -30,9 +27,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -55,8 +53,8 @@ public class ControllerTest {
 
    private WorkRepository mockedWorkRepository;
 
-   @Before
-   public void beforeTest() {
+   @BeforeEach
+   void beforeTest() {
       mockedWorkRepository = Mockito.mock(WorkRepository.class);
       model = new Model(Mockito.mock(ProjectRepository.class), mockedWorkRepository,
             Mockito.mock(SettingsRepository.class));
@@ -87,7 +85,7 @@ public class ControllerTest {
       testee.resortProjectIndexes(projectList, project3, oldIndex, newIndex);
 
       for (int i = 0; i < projectList.size(); i++) {
-         assertThat(projectList.get(i).getIndex(), Matchers.is(expectedOrderAfter.get(i)));
+         assertEquals(projectList.get(i).getIndex(), expectedOrderAfter.get(i));
       }
 
    }
@@ -114,7 +112,7 @@ public class ControllerTest {
       testee.resortProjectIndexes(projectList, project0, oldIndex, newIndex);
 
       for (int i = 0; i < projectList.size(); i++) {
-         assertThat(projectList.get(i).getIndex(), Matchers.is(expectedOrderAfter.get(i)));
+         assertEquals(projectList.get(i).getIndex(), expectedOrderAfter.get(i));
       }
 
    }
@@ -141,7 +139,7 @@ public class ControllerTest {
       testee.resortProjectIndexes(projectList, project1, oldIndex, newIndex);
 
       for (int i = 0; i < projectList.size(); i++) {
-         assertThat(projectList.get(i).getIndex(), Matchers.is(expectedOrderAfter.get(i)));
+         assertEquals(projectList.get(i).getIndex(), expectedOrderAfter.get(i));
       }
 
    }
@@ -168,7 +166,7 @@ public class ControllerTest {
       testee.resortProjectIndexes(projectList, project2, oldIndex, newIndex);
 
       for (int i = 0; i < projectList.size(); i++) {
-         assertThat(projectList.get(i).getIndex(), is(expectedOrderAfter.get(i)));
+         assertEquals(projectList.get(i).getIndex(), expectedOrderAfter.get(i));
       }
    }
 
@@ -193,7 +191,7 @@ public class ControllerTest {
       }
 
       for (int i = 0; i < projectList.size(); i++) {
-         assertThat(projectList.get(i).getIndex(), is(expectedOrderAfter.get(i)));
+         assertEquals(projectList.get(i).getIndex(), expectedOrderAfter.get(i));
       }
    }
 
@@ -221,11 +219,11 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("Two project should be in the past work items", model.getPastWorkItems().size(), is(2));
-      assertThat("The first project should be the past work project", model.getPastWorkItems().get(0).getProject(),
-            is(firstProject));
-      assertThat("The second project should be the active work project", model.activeWorkItem.get().getProject(),
-            is(secondProject));
+      assertEquals(model.getPastWorkItems().size(), 2, "Two project should be in the past work items");
+      assertEquals( model.getPastWorkItems().get(0).getProject(),
+            firstProject, "The first project should be the past work project");
+      assertEquals(model.activeWorkItem.get().getProject(),
+            secondProject, "The second project should be the active work project");
    }
 
    @Test
@@ -253,11 +251,11 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("'2nd project' should be in the past work items", model.getPastWorkItems().size(), is(1));
-      assertThat("The project should be  '2ndProject'", model.getPastWorkItems().get(0).getProject(),
-            is(secondProject));
-      assertThat("'2ndProject' should be the active work project", model.activeWorkItem.get().getProject(),
-            is(secondProject));
+      assertEquals( model.getPastWorkItems().size(), 1 , "'2nd project' should be in the past work items");
+      assertEquals(model.getPastWorkItems().get(0).getProject(),
+            secondProject, "The project should be  '2ndProject'");
+      assertEquals(model.activeWorkItem.get().getProject(),
+            secondProject, "'2ndProject' should be the active work project");
    }
 
    @Test
@@ -286,15 +284,15 @@ public class ControllerTest {
          return true;
       }));
 
-      assertThat("Two projects should be in the past work items", model.getPastWorkItems().size(), is(2));
-      assertThat("The first project should be '1st Project'", model.getPastWorkItems().get(0).getProject(),
-            is(firstProject));
-      assertThat("The second project should be '2ndProject'", model.getPastWorkItems().get(1).getProject(),
-            is(secondProject));
+      assertEquals( model.getPastWorkItems().size(), 2, "Two projects should be in the past work items");
+      assertEquals( model.getPastWorkItems().get(0).getProject(),
+            firstProject, "The first project should be '1st Project'");
+      assertEquals( model.getPastWorkItems().get(1).getProject(),
+            secondProject , "The second project should be '2ndProject'");
       final Work work = model.activeWorkItem.get();
-      assertThat("'2ndProject' should be the active work project", work.getProject(), is(secondProject));
-      assertThat(work.getStartTime().toLocalDate(), is(firstProjectDateTime.toLocalDate()));
-      assertThat(work.getStartTime(), is(firstProjectPlusOneHour));
+      assertEquals(work.getProject(), secondProject , "'2ndProject' should be the active work project");
+      assertEquals(work.getStartTime().toLocalDate(), firstProjectDateTime.toLocalDate());
+      assertEquals(work.getStartTime(), firstProjectPlusOneHour);
    }
 
    @Test
@@ -318,10 +316,10 @@ public class ControllerTest {
       model.getPastWorkItems().addAll(workItems);
 
       final long totalSeconds = testee.calcSeconds(workItems);
-      assertEquals("Seconds were not calculated correctly.", TimeUnit.HOURS.toSeconds(4), totalSeconds);
+      assertEquals(TimeUnit.HOURS.toSeconds(4), totalSeconds , "Seconds were not calculated correctly.");
 
       final long todaysSeconds = testee.calcTodaysSeconds();
-      assertEquals("Todays seconds were not calulated correctly.", TimeUnit.HOURS.toSeconds(4), todaysSeconds);
+      assertEquals(TimeUnit.HOURS.toSeconds(4), todaysSeconds,"Todays seconds were not calulated correctly.");
 
       // final long todaysWorkSeconds = testee.calcTodaysWorkSeconds();
       // assertEquals("Todays work seconds were not calculated correctly.",TimeUnit.HOURS.toSeconds(2),
@@ -351,14 +349,15 @@ public class ControllerTest {
       testee.editWork(originalWork, newWork);
 
       final Work testWork = model.getPastWorkItems().get(0);
-      assertThat("Start time was not updated", testWork.getStartTime(), equalTo(newWork.getStartTime()));
-      assertThat("End timewas not updated", testWork.getEndTime(), equalTo(newWork.getEndTime()));
-      assertThat("Notes were not updated", testWork.getNotes(), equalTo(newWork.getNotes()));
-      assertThat("Project was not updated", testWork.getProject(), equalTo(newWork.getProject()));
+
+      assertEquals(testWork.getStartTime(), newWork.getStartTime(),"Start time was not updated");
+      assertEquals(testWork.getEndTime(), newWork.getEndTime(), "End timewas not updated");
+      assertEquals(testWork.getNotes(), newWork.getNotes(),"Notes were not updated");
+      assertEquals(testWork.getProject(), newWork.getProject(),"Project was not updated");
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
       Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
-      assertThat("Edited work was not saved persistently", argument.getValue(), is(originalWork));
+      assertEquals(argument.getValue(), originalWork,"Edited work was not saved persistently");
 
    }
 
@@ -389,14 +388,14 @@ public class ControllerTest {
 
       testee.editWork(originalWork, newWork);
 
-      assertThat("Too many or too less work items in past work items", model.getPastWorkItems().size(), equalTo(2));
-      assertThat("Work with new values in past work items instead of updatd work", model.getPastWorkItems(),
-            not(contains(newWork)));
+      assertEquals( 2, model.getPastWorkItems().size(),"Too many or too less work items in past work items");
+      assertNotEquals(model.getPastWorkItems(),
+            contains(newWork),"Work with new values in past work items instead of updatd work");
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
       Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
-      assertThat("Saved other Work persistently than what should be edited", argument.getValue(),
-            not(is(notToBeUpdatedWork)));
+      assertNotEquals(argument.getValue(),
+            notToBeUpdatedWork, "Saved other Work persistently than what should be edited");
 
    }
 
@@ -416,7 +415,7 @@ public class ControllerTest {
 
       final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
       Mockito.verify(mockedWorkRepository, Mockito.times(1)).delete(argument.capture());
-      assertThat("Edited work was not deleted persistently", argument.getValue(), is(work));
+      assertEquals(argument.getValue(), work,"Edited work was not deleted persistently");
 
    }
 
@@ -433,8 +432,7 @@ public class ControllerTest {
       model.getPastWorkItems().add(work);
 
       testee.deleteWork(work);
-
-      assertTrue("work Items contain work when it should have been deleted", model.getPastWorkItems().isEmpty());
+      Assertions.assertTrue(model.getPastWorkItems().isEmpty(),"work Items contain work when it should have been deleted");
 
    }
 
