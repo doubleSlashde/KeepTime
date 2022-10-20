@@ -295,7 +295,8 @@
                      </children>
                   </Group>
                </children>
-            </VBox>   <VBox styleClass="menuBorder">
+            </VBox>
+            <VBox styleClass="menuBorder">
                <children>
                   <Group>
                      <children>
@@ -303,7 +304,7 @@
                            <children>
                               <HBox spacing="10.0">
                                  <children>
-                                    <Label text="confirmation on close">
+                                    <Label text="Confirmation on close">
                                        <font>
                                           <Font name="Open Sans Bold" size="12.0" />
                                        </font>

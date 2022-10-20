@@ -402,6 +402,7 @@ public class ReportController {
       copyButton.setMaxSize(20, 18);
       copyButton.setMinSize(20, 18);
       copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
          final Clipboard clipboard = Clipboard.getSystemClipboard();
