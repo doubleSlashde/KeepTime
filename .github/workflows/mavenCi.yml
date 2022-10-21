@@ -51,7 +51,7 @@ jobs:
           -Dsonar.java.binaries=.
           -Dsonar.qualitygate.wait=true
       - name: Upload Build Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           # Artifact name
           name: keeptime-1.2.0-SNAPSHOT-bin.zip
