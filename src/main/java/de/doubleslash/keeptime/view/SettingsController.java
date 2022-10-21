@@ -247,18 +247,27 @@ public class SettingsController {
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Exported SQl Script");
             File file = fileChooser.showOpenDialog(thisStage);
-
+            if (file == null) {
+               LOG.info("User canceled import.");
+               return;
+            }
             LOG.info(file.toString());
 
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
-            ;
             RunScript.execute(url, username, password, file.toString(), Charset.defaultCharset(), true);
 
 
          } catch (SQLException e) {
-            throw new RuntimeException(e);
+            LOG.error("Could not import script file to db.", e);
+
+            Alert errorDialog = new Alert(AlertType.ERROR);
+            errorDialog.setTitle("Import failed");
+            errorDialog.setHeaderText("The current data could not be imported.");
+            errorDialog.setContentText("Please inform a developer and provide your log file.");
+
+            errorDialog.showAndWait();
          }
 
       });
