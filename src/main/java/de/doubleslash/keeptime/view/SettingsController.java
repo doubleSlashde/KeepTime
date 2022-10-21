@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
+import javafx.scene.control.*;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -42,12 +43,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -244,6 +240,16 @@ public class SettingsController {
       importButton.setOnAction(event ->{
 
          try {
+            Alert confirmationAlert = new Alert(AlertType.CONFIRMATION , "", ButtonType.YES, ButtonType.NO);
+            confirmationAlert.setTitle("Import");
+            confirmationAlert.setHeaderText("Do you want to Override current Data ?");
+            confirmationAlert.showAndWait();
+
+            if(confirmationAlert.getResult()==ButtonType.NO){
+               LOG.info("User canceled import");
+               return;
+            }
+
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Exported SQl Script");
             File file = fileChooser.showOpenDialog(thisStage);
@@ -258,6 +264,11 @@ public class SettingsController {
             final String password = applicationProperties.getSpringDataSourcePassword();
             RunScript.execute(url, username, password, file.toString(), Charset.defaultCharset(), true);
 
+            Alert informationDialog = new Alert(AlertType.INFORMATION);
+            informationDialog.setTitle("Import done");
+            informationDialog.setHeaderText("The data was imported.");
+            informationDialog.setContentText("You have to RESTART KeepTime to see the changes");
+            informationDialog.showAndWait();
 
          } catch (SQLException e) {
             LOG.error("Could not import script file to db.", e);
