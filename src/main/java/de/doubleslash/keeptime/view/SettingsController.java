@@ -18,9 +18,12 @@ package de.doubleslash.keeptime.view;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
+import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,6 +105,9 @@ public class SettingsController {
    private Button exportButton;
 
    @FXML
+   private Button importButton;
+
+   @FXML
    private Button aboutButton;
 
    @FXML
@@ -150,6 +156,7 @@ public class SettingsController {
       }
 
       initExportButton();
+      initImportButton();
 
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
@@ -232,6 +239,31 @@ public class SettingsController {
          aboutStage.show();
       });
    }
+   private void initImportButton(){
+      LOG.debug("Initialize importButton.");
+      importButton.setOnAction(event ->{
+
+         try {
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Exported SQl Script");
+            File file = fileChooser.showOpenDialog(thisStage);
+
+            LOG.info(file.toString());
+
+            final String url = applicationProperties.getSpringDataSourceUrl();
+            final String username = applicationProperties.getSpringDataSourceUserName();
+            final String password = applicationProperties.getSpringDataSourcePassword();
+            ;
+            RunScript.execute(url, username, password, file.toString(), Charset.defaultCharset(), true);
+
+
+         } catch (SQLException e) {
+            throw new RuntimeException(e);
+         }
+
+      });
+
+   }
 
    private void initExportButton() {
       LOG.debug("Initialize exportButton.");
@@ -258,6 +290,8 @@ public class SettingsController {
             LOG.info("Exporting database to '{}'.", fileToSave);
             Script.process(url, username, password, fileToSave.getAbsolutePath(), "DROP", "");
             LOG.info("Export done.");
+
+
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Export done");
