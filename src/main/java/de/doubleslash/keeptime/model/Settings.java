@@ -59,6 +59,62 @@ public class Settings {
 
    private boolean hideProjectsOnMouseExit;
 
+   private double windowXProportion;
+
+   private double windowYProportion;
+
+   private int windowScreenhash;
+
+   private boolean saveWindowPosition;
+
+   private boolean remindIfNotesAreEmpty;
+
+   private boolean remindIfNotesAreEmptyOnlyForWorkEntry;
+
+   private boolean confirmClose;
+
+   public Settings() {}
+
+   public Settings(final Color hoverBackgroundColor, final Color hoverFontColor, final Color defaultBackgroundColor,
+         final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
+         final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit, final double windowPositionX,
+         final double windowPositionY, final int screenHash, final boolean saveWindowPosition,
+         final boolean remindIfNotesAreEmpty, final boolean remindIfNotesAreEmptyOnlyForWorkEntry,
+         final boolean confirmClose) {
+      this.hoverBackgroundColor = hoverBackgroundColor;
+      this.hoverFontColor = hoverFontColor;
+      this.defaultBackgroundColor = defaultBackgroundColor;
+      this.defaultFontColor = defaultFontColor;
+      this.taskBarColor = taskBarColor;
+      this.useHotkey = useHotkey;
+      this.displayProjectsRight = displayProjectsRight;
+      this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
+      this.windowXProportion = windowPositionX;
+      this.windowYProportion = windowPositionY;
+      this.windowScreenhash = screenHash;
+      this.saveWindowPosition = saveWindowPosition;
+      this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
+      this.remindIfNotesAreEmptyOnlyForWorkEntry = remindIfNotesAreEmptyOnlyForWorkEntry;
+      this.confirmClose = confirmClose;
+
+   }
+
+   public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
+      return remindIfNotesAreEmptyOnlyForWorkEntry;
+   }
+
+   public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
+      this.remindIfNotesAreEmptyOnlyForWorkEntry = emptyNoteReminderCheckBoxIsWork;
+   }
+
+   public boolean isConfirmClose() {
+      return confirmClose;
+   }
+
+   public void setConfirmClose(boolean confirmClose) {
+      this.confirmClose = confirmClose;
+   }
+
    public long getId() {
       return id;
    }
@@ -125,6 +181,46 @@ public class Settings {
 
    public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
       this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
+   }
+
+   public double getWindowXProportion() {
+      return windowXProportion;
+   }
+
+   public void setWindowXProportion(final double windowPositionX) {
+      this.windowXProportion = windowPositionX;
+   }
+
+   public double getWindowYProportion() {
+      return windowYProportion;
+   }
+
+   public void setWindowYProportion(final double windowPositionY) {
+      this.windowYProportion = windowPositionY;
+   }
+
+   public int getScreenHash() {
+      return windowScreenhash;
+   }
+
+   public void setScreenHash(final int screenHash) {
+      this.windowScreenhash = screenHash;
+   }
+
+   public boolean isSaveWindowPosition() {
+      return saveWindowPosition;
+   }
+
+   public void setSaveWindowPosition(final boolean saveWindowPosition) {
+      this.saveWindowPosition = saveWindowPosition;
+   }
+
+   public boolean isRemindIfNotesAreEmpty() {
+      return remindIfNotesAreEmpty;
+   }
+
+   public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
+      this.remindIfNotesAreEmpty = emptyNoteReminder;
    }
 
 }

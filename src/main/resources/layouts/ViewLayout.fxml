@@ -24,8 +24,6 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -52,24 +50,8 @@
                      <center>
                         <HBox alignment="CENTER" prefHeight="36.0">
                            <children>
-                              <Button fx:id="calendarButton" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@../css/application.css">
-                                 <graphic>
-                                    <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../icons/icon_calendar.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                              </Button>
-                              <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css">
-                                 <graphic>
-                                    <ImageView fitHeight="24.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@../icons/icon_gear.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                              </Button>
+                              <Button fx:id="calendarButton" contentDisplay="GRAPHIC_ONLY" maxHeight="30.0" maxWidth="30.0" minHeight="30" minWidth="30" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css" />
+                              <Button fx:id="settingsButton" contentDisplay="GRAPHIC_ONLY" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css" />
                            </children>
                         </HBox>
                      </center>
@@ -94,14 +76,16 @@
                         <Font name="Open Sans Regular" size="14.0" />
                      </font>
                   </TextArea>
-                  <Button fx:id="minimizeButton" layoutX="248.0" layoutY="2.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@../css/application.css" text="_">
+                  <Button fx:id="minimizeButton" layoutX="239.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/application.css">
                      <font>
                         <Font name="Open Sans Regular" size="12.0" />
-                     </font></Button>
-                  <Button fx:id="closeButton" layoutX="268.0" layoutY="6.0" mnemonicParsing="false" prefHeight="11.0" prefWidth="21.0" stylesheets="@../css/application.css" text="x">
+                     </font>
+                     </Button>
+                  <Button fx:id="closeButton" layoutX="262.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/application.css">
                      <font>
                         <Font name="Open Sans Regular" size="12.0" />
-                     </font></Button>
+                     </font>
+                  </Button>
                </children>
             </Group>
          </center>

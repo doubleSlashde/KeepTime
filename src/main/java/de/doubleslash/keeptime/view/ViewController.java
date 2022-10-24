@@ -24,19 +24,21 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.DateFormatter;
-import de.doubleslash.keeptime.common.FontProvider;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.ScreenPosHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
+import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.view.time.Interval;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -45,31 +47,26 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.Light;
-import javafx.scene.effect.Lighting;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -81,12 +78,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 @Component
 public class ViewController {
+   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
    private static final String TIME_ZERO = "00:00:00";
 
    @FXML
@@ -144,17 +143,10 @@ public class ViewController {
    private final Delta dragDelta = new Delta();
 
    private Stage mainStage;
-   private Controller controller;
-   private Model model;
 
-   public void setController(final Controller controller, final Model model) {
-      this.controller = controller;
-      this.model = model;
+   private final Controller controller;
 
-      controller.changeProject(model.getIdleProject(), 0);
-
-      updateProjectView();
-   }
+   private final Model model;
 
    private final Canvas taskbarCanvas = new Canvas(32, 32);
 
@@ -169,6 +161,12 @@ public class ViewController {
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
+
+   @Autowired
+   public ViewController(final Model model, final Controller controller) {
+      this.model = model;
+      this.controller = controller;
+   }
 
    @FXML
    private void initialize() {
@@ -191,24 +189,30 @@ public class ViewController {
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setOnAction(ae -> mainStage.close());
+      closeButton.setOnAction(ae -> openConfirmationWindow());
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
 
-      // Add a light to colorize buttons
-      // TODO is there a nicer way for this? (see #12)
-      final Lighting lighting = new Lighting();
-      lighting.lightProperty().bind(Bindings.createObjectBinding(() -> {
-         final Color color = fontColorProperty.get();
-         return new Light.Distant(45, 45, color);
-      }, fontColorProperty));
-
       settingsButton.setOnAction(ae -> settingsClicked());
-      settingsButton.setEffect(lighting);
 
       calendarButton.setOnAction(ae -> calendarClicked());
-      calendarButton.setEffect(lighting);
+
+      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03);
+      calendarSvgPath.fillProperty().bind(fontColorProperty);
+      calendarButton.setGraphic(calendarSvgPath);
+
+      SVGPath closeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03);
+      closeSvgPath.fillProperty().bind(fontColorProperty);
+      closeButton.setGraphic(closeSvgPath);
+
+      SVGPath settingsSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03);
+      settingsSvgPath.fillProperty().bind(fontColorProperty);
+      settingsButton.setGraphic(settingsSvgPath);
+
+      SVGPath minimizeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03);
+      minimizeSvgPath.fillProperty().bind(fontColorProperty);
+      minimizeButton.setGraphic(minimizeSvgPath);
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
@@ -282,17 +286,18 @@ public class ViewController {
          mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
       });
 
-      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
+      bigTimeLabel.textProperty()
+                  .bind(Bindings.createStringBinding(
+                        () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
+                        activeWorkSecondsProperty));
 
       // update ui each second
-      Interval.registerCallBack(() -> {
+      new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
-         final long currentWorkSeconds = Duration
-               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-               .getSeconds();
+         final long currentWorkSeconds = Duration.between(model.activeWorkItem.get().getStartTime(),
+               model.activeWorkItem.get().getEndTime()).getSeconds();
          activeWorkSecondsProperty.set(currentWorkSeconds);
          final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
          final long todaySeconds = controller.calcTodaysSeconds();
@@ -303,23 +308,41 @@ public class ViewController {
 
          projectsListViewController.tick();
 
-         mainColorTimeLine.update(model.getPastWorkItems(), controller.calcTodaysSeconds());
+         mainColorTimeLine.update(model.getSortedPastWorkItems(), controller.calcTodaysSeconds());
          updateTaskbarIcon(currentWorkSeconds);
+
       });
 
       mainColorTimeLine = new ColorTimeLine(canvas);
+
+      controller.changeProject(model.getIdleProject(), 0);
+
+      updateProjectView();
+
    }
 
-   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog, final GridPane grid) {
+   private void openConfirmationWindow() {
+      if (model.confirmClose.get()) {
+         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.CANCEL);
+         alert.setTitle("Confirm exit");
+         alert.setHeaderText("Are you sure you want to close KeepTime?");
+
+         alert.initOwner(mainStage);
+         alert.showAndWait();
+
+         if (alert.getResult() == ButtonType.YES) {
+            mainStage.close();
+         }
+      } else {
+         mainStage.close();
+      }
+   }
+
+   private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
+         final ManageProjectController manageProjectController) {
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
-            final ObservableList<Node> nodes = grid.getChildren();
-            final TextField projectNameTextField = (TextField) nodes.get(1);
-            final ColorPicker colorPicker = (ColorPicker) nodes.get(3);
-            final CheckBox isWorkCheckBox = (CheckBox) nodes.get(5);
-            final Spinner<Integer> indexSpinner = (Spinner<Integer>) nodes.get(7);
-            return new Project(projectNameTextField.getText(), colorPicker.getValue(), isWorkCheckBox.isSelected(),
-                  indexSpinner.getValue()); // temporary (misused) transfer object for project
+            return manageProjectController.getProjectFromUserInput();
          }
          return null;
       });
@@ -387,16 +410,14 @@ public class ViewController {
       try {
          // Report stage
          final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_REPORT);
+         fxmlLoader.setControllerFactory(model.getSpringContext()::getBean);
          final Parent root = fxmlLoader.load();
          root.setFocusTraversable(true);
          root.requestFocus();
          reportController = fxmlLoader.getController();
-         reportController.setModel(model);
-         reportController.setController(controller);
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
-         reportStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
-
+         reportController.setStage(reportStage);
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
@@ -415,13 +436,12 @@ public class ViewController {
 
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_SETTINGS);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
          final Parent settingsRoot = fxmlLoader2.load();
          settingsController = fxmlLoader2.getController();
-         settingsController.setControllerAndModel(controller, model);
          settingsStage = new Stage();
          settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
-         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
 
@@ -450,54 +470,27 @@ public class ViewController {
       dialog.setTitle(title);
       dialog.setHeaderText(headerText);
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      setUpAddNewProjectGridPane(dialog);
+
+      // TODO disable OK button if no name is set
       return dialog;
    }
 
-   private GridPane setUpAddNewProjectGridPane(final String projectName, final Color projectColor,
-         final boolean isWork) {
-      final GridPane grid = setUpGridPane(projectName, projectColor, isWork);
+   private GridPane setUpAddNewProjectGridPane(final Dialog<Project> dialog) {
+      GridPane grid;
+      final FXMLLoader loader = new FXMLLoader(Resources.getResource(RESOURCE.FXML_MANAGE_PROJECT));
+      loader.setControllerFactory(model.getSpringContext()::getBean);
+      try {
+         grid = loader.load();
+      } catch (final IOException e) {
+         throw new FXMLLoaderException(String.format("Error while loading '%s'.", RESOURCE.FXML_MANAGE_PROJECT), e);
+      }
 
-      final Spinner<Integer> indexSpinner = new Spinner<>();
-      final int availableProjectAmount = model.getAvailableProjects().size();
-      indexSpinner.setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
-      grid.add(indexSpinner, 1, 3);
+      dialog.getDialogPane().setContent(grid);
 
-      return grid;
-   }
+      final ManageProjectController manageProjectController = loader.getController();
 
-   private GridPane setUpGridPane(final String projectName, final Color projectColor, final boolean isWork) {
-      final GridPane grid = new GridPane();
-      grid.setHgap(10);
-      grid.setVgap(10);
-      grid.setPadding(new Insets(20, 150, 10, 10));
-
-      final Label nameLabel = new Label("Name:");
-      nameLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(nameLabel, 0, 0);
-
-      final TextField projectNameTextField = new TextField(projectName);
-      projectNameTextField.setFont(FontProvider.getDefaultFont());
-      grid.add(projectNameTextField, 1, 0);
-
-      final Label colorLabel = new Label("Color:");
-      colorLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(colorLabel, 0, 1);
-
-      final ColorPicker colorPicker = new ColorPicker(projectColor);
-      grid.add(colorPicker, 1, 1);
-
-      final Label isWorkLabel = new Label("IsWork:");
-      isWorkLabel.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkLabel, 0, 2);
-
-      final CheckBox isWorkCheckBox = new CheckBox();
-      isWorkCheckBox.setSelected(isWork);
-      isWorkCheckBox.setFont(FontProvider.getDefaultFont());
-      grid.add(isWorkCheckBox, 1, 2);
-
-      final Label sortIndex = new Label("SortIndex:");
-      sortIndex.setFont(FontProvider.getDefaultFont());
-      grid.add(new Label("SortIndex:"), 0, 3);
+      dialogResultConverter(dialog, manageProjectController);
 
       return grid;
    }
@@ -542,6 +535,9 @@ public class ViewController {
 
    public void setStage(final Stage primaryStage) {
       this.mainStage = primaryStage;
+      this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
+            availableProjectsListView, searchTextField, false);
+      setupStagePositioning();
    }
 
    @FXML
@@ -560,13 +556,45 @@ public class ViewController {
       final Optional<Project> result = dialog.showAndWait();
       mainStage.setAlwaysOnTop(true);
 
-      result.ifPresent(project -> {
-         controller.addNewProject(project.getName(), project.isWork(), project.getColor(), project.getIndex());
-      });
+      result.ifPresent(project -> controller.addNewProject(project));
    }
 
-   public void secondInitialize() {
-      this.projectsListViewController = new ProjectsListViewController(model, controller, mainStage,
-            availableProjectsListView, searchTextField, false);
+   private void setupStagePositioning() {
+      final ScreenPosHelper positionHelper = new ScreenPosHelper(model.screenSettings.screenHash.get(),
+            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get());
+      positionHelper.resetPositionIfInvalid();
+
+      // set stage to saved Position
+      if (model.screenSettings.saveWindowPosition.get()) {
+         mainStage.setX(positionHelper.getAbsoluteX());
+         mainStage.setY(positionHelper.getAbsoluteY());
+      }
+
+      // add listeners to record Windowpositionchange
+      final ChangeListener<Number> positionChangeListener = (final ObservableValue<? extends Number> observable,
+            final Number oldValue, final Number newValue) -> {
+         savePosition();
+      };
+
+      mainStage.xProperty().addListener(positionChangeListener);
+      mainStage.yProperty().addListener(positionChangeListener);
    }
+
+   public void savePosition() {
+      // don't save if option disabled
+      if (!model.screenSettings.saveWindowPosition.get()) {
+         return;
+      }
+
+      LOG.debug("Stage position changed '{}'/'{}'.", mainStage.xProperty().doubleValue(),
+            mainStage.yProperty().doubleValue());
+
+      final ScreenPosHelper positionHelper = new ScreenPosHelper(mainStage.xProperty().doubleValue(),
+            mainStage.yProperty().doubleValue());
+      model.screenSettings.screenHash.set(positionHelper.getScreenHash());
+      model.screenSettings.proportionalX.set(positionHelper.getProportionalX());
+      model.screenSettings.proportionalY.set(positionHelper.getProportionalY());
+
+   }
+
 }

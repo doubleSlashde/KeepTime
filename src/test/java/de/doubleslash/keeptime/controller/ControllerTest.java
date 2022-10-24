@@ -16,11 +16,14 @@
 
 package de.doubleslash.keeptime.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +33,9 @@ import java.util.concurrent.TimeUnit;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import de.doubleslash.keeptime.common.DateProvider;
 import de.doubleslash.keeptime.model.Model;
@@ -48,9 +53,12 @@ public class ControllerTest {
    private Model model;
    private DateProvider mockedDateProvider;
 
+   private WorkRepository mockedWorkRepository;
+
    @Before
    public void beforeTest() {
-      model = new Model(Mockito.mock(ProjectRepository.class), Mockito.mock(WorkRepository.class),
+      mockedWorkRepository = Mockito.mock(WorkRepository.class);
+      model = new Model(Mockito.mock(ProjectRepository.class), mockedWorkRepository,
             Mockito.mock(SettingsRepository.class));
       mockedDateProvider = Mockito.mock(DateProvider.class);
       testee = new Controller(model, mockedDateProvider);
@@ -195,8 +203,8 @@ public class ControllerTest {
       final LocalDateTime secondProjectDateTime = LocalDateTime.now();
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
-      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
+      final Project firstProject = new Project("1st Project", "A good description", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", "An even better description", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
       testee.changeProject(secondProject);
@@ -222,12 +230,13 @@ public class ControllerTest {
 
    @Test
    public void changeProjectOtherDayTest() {
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(i -> i.getArguments()[0]);
       final LocalDateTime firstProjectDateTime = LocalDateTime.now();
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
-      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
+      final Project firstProject = new Project("1st Project", "A good description", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", "An even better description", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
       testee.changeProject(secondProject);
@@ -244,7 +253,7 @@ public class ControllerTest {
          }
          return true;
       }));
-      assertThat("'1st project' should be in the past work items", model.getPastWorkItems().size(), is(1));
+      assertThat("'2nd project' should be in the past work items", model.getPastWorkItems().size(), is(1));
       assertThat("The project should be  '2ndProject'", model.getPastWorkItems().get(0).getProject(),
             is(secondProject));
       assertThat("'2ndProject' should be the active work project", model.activeWorkItem.get().getProject(),
@@ -257,8 +266,8 @@ public class ControllerTest {
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
-      final Project firstProject = new Project("1st Project", Color.GREEN, true, 0);
-      final Project secondProject = new Project("2nd Project", Color.RED, true, 1);
+      final Project firstProject = new Project("1st Project", "A good description", Color.GREEN, true, 0);
+      final Project secondProject = new Project("2nd Project", "An even better description", Color.RED, true, 1);
       testee.changeProject(firstProject);
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(secondProjectDateTime);
       testee.changeProject(secondProject, 23 * 60 * 60); // change with -23 hours
@@ -284,29 +293,26 @@ public class ControllerTest {
             is(secondProject));
       final Work work = model.activeWorkItem.get();
       assertThat("'2ndProject' should be the active work project", work.getProject(), is(secondProject));
-      assertThat(work.getCreationDate(), is(firstProjectDateTime.toLocalDate()));
+      assertThat(work.getStartTime().toLocalDate(), is(firstProjectDateTime.toLocalDate()));
       assertThat(work.getStartTime(), is(firstProjectPlusOneHour));
    }
 
    @Test
    public void shouldCalculateSecondsCorrectlyWhenWorkItemsAreGiven() {
-      final Project workProject1 = new Project("workProject1", Color.GREEN, true, 0);
-      final Project workProject2 = new Project("workProject2", Color.RED, true, 1);
-      final Project nonworkProject1 = new Project("nonworkProject1", Color.RED, false, 2);
-      final Project nonworkProject2 = new Project("nonworkProject2", Color.RED, false, 3);
+      final Project workProject1 = new Project("workProject1", "Some description", Color.GREEN, true, 0);
+      final Project workProject2 = new Project("workProject2", "A good description", Color.RED, true, 1);
+      final Project nonworkProject1 = new Project("nonworkProject1", "An even better description", Color.RED, false, 2);
+      final Project nonworkProject2 = new Project("nonworkProject2", "The best description", Color.RED, false, 3);
 
-      final LocalDate localDateNow = LocalDate.now();
       final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
 
       final List<Work> workItems = new ArrayList<>(4);
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
-            workProject1, ""));
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2),
-            workProject2, ""));
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(2), localDateTimeMorning.plusHours(3),
-            nonworkProject1, ""));
-      workItems.add(new Work(localDateNow, localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4),
-            nonworkProject2, ""));
+      workItems.add(new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), workProject1, ""));
+      workItems.add(new Work(localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2), workProject2, ""));
+      workItems
+            .add(new Work(localDateTimeMorning.plusHours(2), localDateTimeMorning.plusHours(3), nonworkProject1, ""));
+      workItems
+            .add(new Work(localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4), nonworkProject2, ""));
 
       model.getAllProjects().addAll(workProject1, workProject2, nonworkProject1, nonworkProject2);
       model.getPastWorkItems().addAll(workItems);
@@ -317,10 +323,119 @@ public class ControllerTest {
       final long todaysSeconds = testee.calcTodaysSeconds();
       assertEquals("Todays seconds were not calulated correctly.", TimeUnit.HOURS.toSeconds(4), todaysSeconds);
 
-      final long todaysWorkSeconds = testee.calcTodaysWorkSeconds();
+      // final long todaysWorkSeconds = testee.calcTodaysWorkSeconds();
       // assertEquals("Todays work seconds were not calculated correctly.",TimeUnit.HOURS.toSeconds(2),
       // todaysWorkSeconds);
       // TODO does not work, as id within project cannot be set
 
    }
+
+   @Test
+   public void shouldUpdateWorkItemPersistentlyWhenWorkItemIsEdited() {
+      Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class)))
+            .thenAnswer(invocation -> invocation.getArguments()[0]);
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work originalWork = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), project1,
+            "originalWork");
+      model.getPastWorkItems().add(originalWork);
+
+      final Work newWork = new Work(localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2), project1,
+            "updated");
+
+      testee.editWork(originalWork, newWork);
+
+      final Work testWork = model.getPastWorkItems().get(0);
+      assertThat("Start time was not updated", testWork.getStartTime(), equalTo(newWork.getStartTime()));
+      assertThat("End timewas not updated", testWork.getEndTime(), equalTo(newWork.getEndTime()));
+      assertThat("Notes were not updated", testWork.getNotes(), equalTo(newWork.getNotes()));
+      assertThat("Project was not updated", testWork.getProject(), equalTo(newWork.getProject()));
+
+      final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
+      Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
+      assertThat("Edited work was not saved persistently", argument.getValue(), is(originalWork));
+
+   }
+
+   @Test
+   public void shouldNotUpdateOthersWhenWorkItemIsEdited() {
+      Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
+      Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class)))
+            .thenAnswer(invocation -> invocation.getArguments()[0]);
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work notToBeUpdatedWork = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1),
+            project1, "originalWork");
+      ReflectionTestUtils.setField(notToBeUpdatedWork, "id", 1);
+      model.getPastWorkItems().add(notToBeUpdatedWork);
+
+      final Work originalWork = new Work(localDateTimeMorning.plusHours(1), localDateTimeMorning.plusHours(2), project1,
+            "originalWork");
+      ReflectionTestUtils.setField(originalWork, "id", 2);
+      model.getPastWorkItems().add(originalWork);
+
+      final Work newWork = new Work(localDateTimeMorning.plusHours(3), localDateTimeMorning.plusHours(4), project1,
+            "updated");
+      ReflectionTestUtils.setField(newWork, "id", 3);
+
+      testee.editWork(originalWork, newWork);
+
+      assertThat("Too many or too less work items in past work items", model.getPastWorkItems().size(), equalTo(2));
+      assertThat("Work with new values in past work items instead of updatd work", model.getPastWorkItems(),
+            not(contains(newWork)));
+
+      final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
+      Mockito.verify(mockedWorkRepository, Mockito.times(1)).save(argument.capture());
+      assertThat("Saved other Work persistently than what should be edited", argument.getValue(),
+            not(is(notToBeUpdatedWork)));
+
+   }
+
+   @Test
+   public void shouldDeleteWorkPersistentlyWhenWorkIsDeleted() {
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work work = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), project1,
+            "originalWork");
+      model.getPastWorkItems().add(work);
+
+      testee.deleteWork(work);
+
+      final ArgumentCaptor<Work> argument = ArgumentCaptor.forClass(Work.class);
+      Mockito.verify(mockedWorkRepository, Mockito.times(1)).delete(argument.capture());
+      assertThat("Edited work was not deleted persistently", argument.getValue(), is(work));
+
+   }
+
+   @Test
+   public void shouldRemoveWorkFromPastWorkItemsWhenWorkIsDeleted() {
+
+      final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
+      model.getAllProjects().add(project1);
+
+      final LocalDateTime localDateTimeMorning = LocalDateTime.now().withHour(4);
+
+      final Work work = new Work(localDateTimeMorning.plusHours(0), localDateTimeMorning.plusHours(1), project1,
+            "originalWork");
+      model.getPastWorkItems().add(work);
+
+      testee.deleteWork(work);
+
+      assertTrue("work Items contain work when it should have been deleted", model.getPastWorkItems().isEmpty());
+
+   }
+
 }

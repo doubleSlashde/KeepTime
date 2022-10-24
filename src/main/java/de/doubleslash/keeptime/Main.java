@@ -42,7 +42,6 @@ import de.doubleslash.keeptime.view.ViewController;
 import de.doubleslash.keeptime.viewpopup.GlobalScreenListener;
 import de.doubleslash.keeptime.viewpopup.ViewControllerPopup;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -61,20 +60,18 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 @SpringBootApplication
 public class Main extends Application {
 
    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-   public static final String VERSION = "v1.1.0";
-
    private ConfigurableApplicationContext springContext;
 
    private Stage popupViewStage;
 
    private Model model;
+
    private Controller controller;
 
    private ViewController viewController;
@@ -83,14 +80,21 @@ public class Main extends Application {
 
    @Override
    public void init() throws Exception {
-      LOG.info("Starting KeepTime {}", VERSION);
+      LOG.info("Starting KeepTime.");
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
       springContext = SpringApplication.run(Main.class);
-      // TODO test if everywhere is used the same model
+      ApplicationProperties applicationProperties = springContext.getBean(ApplicationProperties.class);
+      LOG.info("KeepTime Version: '{}'.", applicationProperties.getBuildVersion());
+      LOG.info("KeepTime Build Timestamp: '{}'.", applicationProperties.getBuildTimestamp());
+      LOG.info("KeepTime Git Infos: id '{}', branch '{}', time '{}', dirty '{}'.",
+            applicationProperties.getGitCommitId(), applicationProperties.getGitBranch(),
+            applicationProperties.getGitCommitTime(), applicationProperties.getGitDirty());
+
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      model.setSpringContext(springContext);
    }
 
    @Override
@@ -138,7 +142,7 @@ public class Main extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository().findByCreationDate(LocalDate.now());
+      final List<Work> todaysWorkItems = model.getWorkRepository().findByStartDateOrderByStartTimeAsc(LocalDate.now());
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -153,7 +157,7 @@ public class Main extends Application {
 
       model.getAllProjects().addAll(projects);
       model.getAvailableProjects()
-            .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
+           .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
 
       // set default project
       final Optional<Project> findAny = projects.stream().filter(Project::isDefault).findAny();
@@ -201,6 +205,14 @@ public class Main extends Application {
       model.useHotkey.set(settings.isUseHotkey());
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
+      model.screenSettings.proportionalX.set(settings.getWindowXProportion());
+      model.screenSettings.proportionalY.set(settings.getWindowYProportion());
+      model.screenSettings.screenHash.set(settings.getScreenHash());
+      model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
+      model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
+      model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
+      model.confirmClose.set(settings.isConfirmClose());
+
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
@@ -216,6 +228,7 @@ public class Main extends Application {
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_POPUP_LAYOUT));
+      loader.setControllerFactory(springContext::getBean);
       final Parent popupLayout = loader.load();
       popupViewStage.initStyle(StageStyle.TRANSPARENT);
       // Show the scene containing the root layout.
@@ -227,21 +240,18 @@ public class Main extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-      viewControllerPopupController.setControllerAndModel(controller, model);
-      viewControllerPopupController.secondInitialize();
 
       globalScreenListener.setViewController(viewControllerPopupController);
    }
 
    private void initialiseUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising main UI.");
-      Pane mainPane;
 
       // Load root layout from fxml file.
       final FXMLLoader loader = new FXMLLoader();
       loader.setLocation(Resources.getResource(RESOURCE.FXML_VIEW_LAYOUT));
       loader.setControllerFactory(springContext::getBean);
-      mainPane = loader.load();
+      final Pane mainPane = loader.load();
       primaryStage.initStyle(StageStyle.TRANSPARENT);
       primaryStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
@@ -256,18 +266,12 @@ public class Main extends Application {
       primaryStage.setAlwaysOnTop(true);
       primaryStage.setResizable(false);
 
-      primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-         @Override
-         public void handle(final WindowEvent event) {
-            LOG.info("On close request");
-         }
-      });
+      primaryStage.setOnCloseRequest(windowEvent -> LOG.info("On close request"));
+
       primaryStage.show();
       viewController = loader.getController();
       // Give the controller access to the main app.
       viewController.setStage(primaryStage);
-      viewController.setController(controller, model);
-      viewController.secondInitialize();
 
    }
 

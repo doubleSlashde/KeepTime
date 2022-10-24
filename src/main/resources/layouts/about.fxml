@@ -27,7 +27,8 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="mainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="507.0" prefWidth="509.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.AboutController">
+<?import javafx.scene.shape.SVGPath?>
+<Pane fx:id="mainContainer" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="507.0" prefWidth="509.0" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.AboutController">
    <children>
       <HBox alignment="CENTER_LEFT" layoutX="150.0" layoutY="14.0" spacing="10.0">
          <children>
@@ -70,11 +71,13 @@
             <Font name="Open Sans Regular" size="14.0" />
          </font>
       </Label>
-      <Button fx:id="reportBugButton" focusTraversable="false" layoutX="355.0" layoutY="237.0" mnemonicParsing="false" prefWidth="110.0" text="report a bug">
-         <font>
-            <Font name="Open Sans Regular" size="14.0" />
-         </font>
-      </Button>
+      <Button  fx:id="reportBugButton" focusTraversable="false" layoutX="396.0" layoutY="237.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" text="report" />
+      <Pane layoutX="280" layoutY="227" maxHeight="50.0" maxWidth="135.0" minHeight="50.0" minWidth="50.0" prefHeight="50.0" prefWidth="135.0">
+         <children>
+            <Label contentDisplay="CENTER" layoutY="-5.0" maxHeight="60.0" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="50.0" prefHeight="60.0" prefWidth="107.0" text="Found a Bug ?" />
+            <SVGPath fx:id="bugIcon"  layoutX="-160.0" layoutY="-231.0" scaleX="0.04" scaleY="0.04" />
+         </children>
+      </Pane>
       <TableView fx:id="licenseTableView" focusTraversable="false" layoutX="39.0" layoutY="302.0" prefHeight="188.0" prefWidth="437.0" />
       <Label fx:id="versionNumberLabel" layoutX="97.0" layoutY="92.0" text="1.0.0">
          <font>

@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import de.doubleslash.keeptime.model.Work;
@@ -27,5 +28,6 @@ import de.doubleslash.keeptime.model.Work;
 @Repository
 public interface WorkRepository extends JpaRepository<Work, Long> {
 
-   List<Work> findByCreationDate(LocalDate creationDate);
+   @Query(value = "SELECT * FROM work WHERE CAST(start_time AS DATE) = ?1 ORDER BY start_time ASC", nativeQuery = true)
+   List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
 }
