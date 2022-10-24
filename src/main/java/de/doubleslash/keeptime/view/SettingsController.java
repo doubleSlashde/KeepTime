@@ -158,6 +158,7 @@ public class SettingsController {
 
       initExportButton();
 
+
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");

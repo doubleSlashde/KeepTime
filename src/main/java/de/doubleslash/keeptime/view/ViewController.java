@@ -157,6 +157,8 @@ public class ViewController {
    private ReportController reportController;
 
    private Stage settingsStage;
+
+   private Stage confirmCloseStage;
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
@@ -185,6 +187,7 @@ public class ViewController {
 
          setProjectListVisible(c);
       });
+
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
@@ -322,9 +325,13 @@ public class ViewController {
 
    private void openConfirmationWindow() {
       if (model.confirmClose.get()) {
+
          Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.CANCEL);
          alert.setTitle("Confirm exit");
          alert.setHeaderText("Are you sure you want to close KeepTime?");
+
+          Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+          stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          alert.initOwner(mainStage);
          alert.showAndWait();
@@ -417,6 +424,8 @@ public class ViewController {
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportController.setStage(reportStage);
+         reportStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
@@ -443,6 +452,7 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          final Scene settingsScene = new Scene(settingsRoot);
          settingsScene.setOnKeyPressed(ke -> {
