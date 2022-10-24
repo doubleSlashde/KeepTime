@@ -307,14 +307,6 @@ public class ProjectsListViewController {
          LOG.info("Edit project");
          final Dialog<Project> dialog = setupEditProjectDialog("Edit project", "Edit project '" + p.getName() + "'", p);
 
-         final Dialog<ButtonType> dialog = setUpDialogButtonType("Edit project", "Edit project '" + p.getName() + "'");
-         final GridPane grid = setUpEditProjectGridPane(p);
-
-         // TODO disable OK button if no name is set
-         dialog.getDialogPane().setContent(grid);
-
-         dialog.setResultConverter(dialogButton -> dialogButton);
-         dialog.initOwner(mainStage);
          mainStage.setAlwaysOnTop(false);
          final Optional<Project> result = dialog.showAndWait();
          mainStage.setAlwaysOnTop(true);
@@ -324,7 +316,7 @@ public class ProjectsListViewController {
 
             projectNameLabel.setText(p.getName());
             projectNameLabel.setTextFill(new Color(p.getColor().getRed() * dimFactor,
-                  p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
+                    p.getColor().getGreen() * dimFactor, p.getColor().getBlue() * dimFactor, 1));
             projectNameLabel.setUnderline(p.isWork());
             projectNameLabel.getTooltip().setText(p.getName());
 

@@ -57,6 +57,8 @@ public class Resources {
 
       SVG_BUG_ICON("/svgs/bug.svg"),
 
+      ICON_MAIN("/icons/icon.png")
+
       ;
 
       String resourceLocation;

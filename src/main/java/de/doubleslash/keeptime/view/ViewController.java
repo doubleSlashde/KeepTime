@@ -133,7 +133,6 @@ public class ViewController {
 
    private ColorTimeLine mainColorTimeLine;
 
-   private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
 
    private class Delta {
       double x;
@@ -546,12 +545,6 @@ public class ViewController {
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
-      final GridPane grid = setUpAddNewProjectGridPane("", Color.WHITE, true);
-
-      // TODO disable OK button if no name is set
-      dialog.getDialogPane().setContent(grid);
-
-      dialogResultConverter(dialog, grid);
       mainStage.setAlwaysOnTop(false);
       final Optional<Project> result = dialog.showAndWait();
       mainStage.setAlwaysOnTop(true);
