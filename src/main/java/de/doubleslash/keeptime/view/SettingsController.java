@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
@@ -274,9 +275,10 @@ public class SettingsController {
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.setContentText("You have to RESTART KeepTime to see the changes");
+            informationDialog.setContentText("KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
             informationDialog.showAndWait();
 
+            Platform.exit();
          } catch (SQLException e) {
             LOG.error("Could not import script file to db.", e);
 
