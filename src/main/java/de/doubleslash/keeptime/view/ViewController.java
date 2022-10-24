@@ -22,15 +22,18 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import de.doubleslash.keeptime.common.*;
-import javafx.scene.control.*;
-import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.DateFormatter;
+import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.ScreenPosHelper;
+import de.doubleslash.keeptime.common.StyleUtils;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
@@ -56,6 +59,14 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -67,6 +78,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -112,19 +124,6 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
-
-   @FXML
-   private SVGPath calendarIcon;
-
-   @FXML
-   private SVGPath settingsIcon;
-
-   @FXML
-   private SVGPath minimizeIcon;
-
-   @FXML
-   private SVGPath closeIcon;
-
    @FXML
    private TextArea textArea;
 
@@ -187,7 +186,7 @@ public class ViewController {
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setOnAction(ae -> mainStage.close());
+      closeButton.setOnAction(ae -> openConfirmationWindow());
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
@@ -196,17 +195,21 @@ public class ViewController {
 
       calendarButton.setOnAction(ae -> calendarClicked());
 
-      calendarButton.textFillProperty().bind(fontColorProperty);
-      calendarButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03));
+      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03);
+      calendarSvgPath.fillProperty().bind(fontColorProperty);
+      calendarButton.setGraphic(calendarSvgPath);
 
-      closeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03));
+      SVGPath closeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03);
+      closeSvgPath.fillProperty().bind(fontColorProperty);
+      closeButton.setGraphic(closeSvgPath);
 
-      settingsButton.textFillProperty().bind(fontColorProperty);
-      settingsButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03));
+      SVGPath settingsSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03);
+      settingsSvgPath.fillProperty().bind(fontColorProperty);
+      settingsButton.setGraphic(settingsSvgPath);
 
-      minimizeButton.textFillProperty().bind(fontColorProperty);
-      minimizeButton.setGraphic(SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03));
+      SVGPath minimizeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03);
+      minimizeSvgPath.fillProperty().bind(fontColorProperty);
+      minimizeButton.setGraphic(minimizeSvgPath);
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
@@ -313,6 +316,23 @@ public class ViewController {
 
       updateProjectView();
 
+   }
+
+   private void openConfirmationWindow() {
+      if (model.confirmClose.get()) {
+         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.CANCEL);
+         alert.setTitle("Confirm exit");
+         alert.setHeaderText("Are you sure you want to close KeepTime?");
+
+         alert.initOwner(mainStage);
+         alert.showAndWait();
+
+         if (alert.getResult() == ButtonType.YES) {
+            mainStage.close();
+         }
+      } else {
+         mainStage.close();
+      }
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
