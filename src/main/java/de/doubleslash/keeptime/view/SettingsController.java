@@ -22,7 +22,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import de.doubleslash.keeptime.Main;
+import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.h2.tools.RunScript;
@@ -270,6 +276,10 @@ public class SettingsController {
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
+
+            model.getAllProjects().clear();
+            model.getAvailableProjects().clear();
+
             RunScript.execute(url, username, password, file.toString(), Charset.defaultCharset(), true);
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
@@ -278,7 +288,12 @@ public class SettingsController {
             informationDialog.setContentText("KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
             informationDialog.showAndWait();
 
-            Platform.exit();
+            final List<Project> projects = model.getProjectRepository().findAll();
+            LOG.debug("Found '{}' projects", projects.size());
+            model.getAllProjects().addAll(projects);
+            model.getAvailableProjects()
+                    .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
+
          } catch (SQLException e) {
             LOG.error("Could not import script file to db.", e);
 
