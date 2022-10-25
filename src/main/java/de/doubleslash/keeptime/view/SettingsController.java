@@ -149,8 +149,6 @@ public class SettingsController {
 
    private Stage thisStage;
 
-   private Stage aboutStage;
-
    @Autowired
    ViewController mainscreen;
 
@@ -168,7 +166,6 @@ public class SettingsController {
       LOG.info("OS: {}", OS.getOSname());
       LOG.debug("set versionLabel text");
       LOG.debug("load substages");
-      loadAboutStage();
       LOG.debug("set version label text");
 
       if (OS.isLinux()) {
@@ -257,10 +254,6 @@ public class SettingsController {
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
       LOG.debug("aboutButton.setOnAction");
-      aboutButton.setOnAction(ae -> {
-         LOG.info("About clicked");
-         aboutStage.show();
-      });
       initializeAbout();
    }
    public void initializeAbout() {
@@ -401,32 +394,7 @@ public class SettingsController {
       this.thisStage = thisStage;
    }
 
-   private void loadAboutStage() {
-      try {
-         // About stage
-         LOG.debug("load about.fxml");
-         final FXMLLoader fxmlLoader3 = createFXMLLoader(RESOURCE.FXML_ABOUT);
-         fxmlLoader3.setControllerFactory(model.getSpringContext()::getBean);
-         LOG.debug("load root");
-         final Parent rootAbout = fxmlLoader3.load();
-         LOG.debug("set stage");
-         aboutStage = new Stage();
-         aboutStage.initModality(Modality.APPLICATION_MODAL);
-         aboutStage.setTitle("About KeepTime");
-         aboutStage.setResizable(false);
-         aboutStage.setScene(new Scene(rootAbout));
-         aboutStage.setOnHiding(e -> this.thisStage.setAlwaysOnTop(true));
-         aboutStage.setOnShowing(e -> {
-            this.thisStage.setAlwaysOnTop(false);
-            aboutStage.setAlwaysOnTop(false);
-         });
 
-         LOG.debug("done setting up stage");
-      } catch (final IOException e) {
-         throw new FXMLLoaderException("Could not load About stage.", e);
-      }
-
-   }
 
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
