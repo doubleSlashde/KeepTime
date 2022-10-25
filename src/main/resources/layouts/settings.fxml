@@ -16,6 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
+<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
@@ -35,19 +36,19 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="551.0" prefWidth="606.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="551.0" prefWidth="606.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
    <children>
-      <TabPane prefHeight="516.0" prefWidth="606.0" side="LEFT" tabClosingPolicy="UNAVAILABLE" tabMinHeight="100.0" tabMinWidth="40.0">
+      <TabPane prefHeight="516.0" prefWidth="606.0" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE" tabMinHeight="100.0" tabMinWidth="40.0">
          <tabs>
             <Tab>
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="393.0" prefWidth="373.0" spacing="5.0" styleClass="menuBorder">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="393.0" prefWidth="478.0" spacing="5.0" styleClass="menuBorder">
                            <children>
                               <Group>
                                  <children>
-                                    <VBox prefHeight="85.0" prefWidth="406.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox prefHeight="85.0" prefWidth="473.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
                                           <Label text="Default">
                                              <font>
@@ -90,7 +91,7 @@
                               </Group>
                               <Group>
                                  <children>
-                                    <VBox prefHeight="84.0" prefWidth="408.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox prefHeight="84.0" prefWidth="476.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
                                           <Label text="Hover">
                                              <font>
@@ -133,7 +134,7 @@
                               </Group>
                               <Group>
                                  <children>
-                                    <VBox prefHeight="54.0" prefWidth="406.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox prefHeight="54.0" prefWidth="476.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
                                           <Label text="Taskbar">
                                              <font>
@@ -175,9 +176,9 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="412.0" prefWidth="408.0" spacing="5.0">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="412.0" prefWidth="483.0" spacing="5.0">
                            <children>
-                              <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                              <VBox prefHeight="59.0" prefWidth="456.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                  <children>
                                     <Group>
                                        <children>
@@ -262,7 +263,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="419.0" prefWidth="412.0" spacing="5.0" stylesheets="@../css/menu.css">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="419.0" prefWidth="482.0" spacing="5.0" stylesheets="@../css/menu.css">
                            <children>
 						     <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                            <children>
@@ -438,8 +439,13 @@
                </graphic>
             </Tab>
          </tabs>
+         <styleClass>
+            <String fx:value="tab-header-area" />
+            <String fx:value="tab-header-background" />
+            <String fx:value="tab-pane" />
+         </styleClass>
       </TabPane>
-      <HBox layoutX="4.0" layoutY="524.0" prefHeight="26.0" prefWidth="598.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <HBox layoutX="4.0" layoutY="524.0" prefHeight="26.0" prefWidth="598.0" spacing="10.0" styleClass="saveCancelHboxBorder" stylesheets="@../css/settingsv2.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
             <Button fx:id="saveButton" mnemonicParsing="false" text="Save">
                <font>
