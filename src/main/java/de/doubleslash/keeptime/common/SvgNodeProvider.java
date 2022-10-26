@@ -24,11 +24,11 @@ public class SvgNodeProvider {
       String svgPath;
       Document document;
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      try {
+   /*   try {
          dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
       } catch (ParserConfigurationException e) {
          throw new RuntimeException(e);
-      }
+      }*/
 
 
       DocumentBuilder db;
