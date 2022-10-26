@@ -54,6 +54,6 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           # Artifact name
-          name: keeptime-*.zip
+          name: keeptime.zip
           path: /home/runner/work/KeepTime/KeepTime/target/
 
