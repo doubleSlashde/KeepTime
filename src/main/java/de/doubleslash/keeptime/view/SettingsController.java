@@ -257,6 +257,11 @@ public class SettingsController {
             Alert confirmationAlert = new Alert(AlertType.CONFIRMATION , "", ButtonType.YES, ButtonType.NO);
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
+            confirmationAlert.setContentText("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
+                    "\n" +
+                    "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n" +
+                    "\n" +
+                    "You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file.");
             confirmationAlert.showAndWait();
 
             if(confirmationAlert.getResult()==ButtonType.NO){
@@ -266,12 +271,12 @@ public class SettingsController {
 
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open Exported SQl Script");
+            fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
             File file = fileChooser.showOpenDialog(thisStage);
             if (file == null) {
                LOG.info("User canceled import.");
                return;
             }
-            LOG.info(file.toString());
 
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
