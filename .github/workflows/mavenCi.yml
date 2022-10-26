@@ -68,9 +68,10 @@ jobs:
         run: |
           mvn package -B clean verify
 
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
           # Artifact name
-          name: Keeptime
-        #  path: /home/runner/work/KeepTime/KeepTime/target/
+          name: ${version}
+          path: /home/runner/work/KeepTime/KeepTime/target/
