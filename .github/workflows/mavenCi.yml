@@ -53,7 +53,7 @@ jobs:
 
 
   build_and_upload:
-    #needs: analyze
+    needs: analyze
     runs-on: ubuntu-latest
 
     steps:
@@ -67,8 +67,6 @@ jobs:
       - name: Build
         run: |
           mvn package -B clean verify
-      - name: Extract filenames
-        run: 7z *  "/home/runner/work/KeepTime/KeepTime/target/"
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
