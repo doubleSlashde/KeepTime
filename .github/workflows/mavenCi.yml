@@ -72,5 +72,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           # Artifact name
-          name: Keeptime.zip
+          name: Keeptime-${{pom.version}
           path: /home/runner/work/KeepTime/KeepTime/target/
