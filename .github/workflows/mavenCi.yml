@@ -52,7 +52,7 @@ jobs:
           -Dsonar.qualitygate.wait=true
 
 
-  build and upload:
+  build_and_upload:
     needs: analyze
     runs-on: ubuntu-latest
 
