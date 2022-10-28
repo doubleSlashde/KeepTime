@@ -282,22 +282,14 @@ public class SettingsController {
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
 
-            model.getAllProjects().clear();
-            model.getAvailableProjects().clear();
 
             RunScript.execute(url, username, password, file.toString(), Charset.defaultCharset(), true);
-
-            List<Project> projects = model.getProjectRepository().findAll();
-            LOG.debug("Found '{}' projects", projects.size());
-            model.getAllProjects().addAll(projects);
-            model.getAvailableProjects()
-                    .addAll(model.getAllProjects().stream().filter(Project::isEnabled).collect(Collectors.toList()));
-
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
             informationDialog.setContentText("KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
             informationDialog.showAndWait();
+            Platform.exit();
 
 
          } catch (SQLException e) {
