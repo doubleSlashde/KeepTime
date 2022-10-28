@@ -282,8 +282,8 @@ public class SettingsController {
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
 
+            new RunScript().runTool("-url", url, "-user",username,"-password",password,"-script",file.toString(),"-options", "FROM_1X");
 
-            RunScript.execute(url, username, password, file.toString(), Charset.defaultCharset(), true);
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
