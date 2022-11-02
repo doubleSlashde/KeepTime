@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +88,7 @@ public class ViewController {
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
    private static final String TIME_ZERO = "00:00:00";
 
+
    @FXML
    private Pane pane;
    @FXML
@@ -151,6 +151,7 @@ public class ViewController {
    private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
    public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
    public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
+   boolean contexMenuOpenBoolean = false;
 
    private Stage reportStage;
    private ReportController reportController;
@@ -269,14 +270,16 @@ public class ViewController {
 
       pane.setOnMouseEntered(a -> mouseHoveringProperty.set(true));
 
-      AtomicReference<Boolean> optionsSelected = new AtomicReference<>();
-      optionsSelected.set(false);
-      projectsVBox.setOnContextMenuRequested(c -> {mouseHoveringProperty.set(true); LOG.info("Options selected"); optionsSelected.set(true);});
+      projectsVBox.setOnContextMenuRequested(c -> { //Is needed because the Context menu loses Focus otherwise
+        mouseHoveringProperty.set(true);
+        LOG.info("Options selected");
+        contexMenuOpenBoolean =true;
+      });
 
-      pane.setOnMouseExited(a -> { if(optionsSelected.get()==false){
+      pane.setOnMouseExited(a -> { if(contexMenuOpenBoolean ==false){
          mouseHoveringProperty.set(false);
       }
-         optionsSelected.set(false);
+         contexMenuOpenBoolean = false;
 
       });
       // Drag stage
