@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -268,8 +269,16 @@ public class ViewController {
 
       pane.setOnMouseEntered(a -> mouseHoveringProperty.set(true));
 
-      pane.setOnMouseExited(a -> mouseHoveringProperty.set(false));
+      AtomicReference<Boolean> optionsSelected = new AtomicReference<>();
+      optionsSelected.set(false);
+      projectsVBox.setOnContextMenuRequested(c -> {mouseHoveringProperty.set(true); LOG.info("Options selected"); optionsSelected.set(true);});
 
+      pane.setOnMouseExited(a -> { if(optionsSelected.get()==false){
+         mouseHoveringProperty.set(false);
+      }
+         optionsSelected.set(false);
+
+      });
       // Drag stage
       pane.setOnMousePressed(mouseEvent -> {
 
