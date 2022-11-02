@@ -44,7 +44,7 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="393.0" prefWidth="478.0" spacing="5.0" styleClass="menuBorder">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="393.0" prefWidth="486.0" spacing="5.0" styleClass="menuBorder">
                            <children>
                               <Group>
                                  <children>
@@ -178,75 +178,67 @@
                      <children>
                         <VBox layoutX="20.0" layoutY="20.0" prefHeight="412.0" prefWidth="483.0" spacing="5.0">
                            <children>
-                              <VBox prefHeight="59.0" prefWidth="456.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                              <Group>
                                  <children>
-                                    <Group>
+                                    <VBox prefHeight="70.0" prefWidth="472.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <VBox>
+                                          <HBox spacing="10.0">
                                              <children>
-                                                <HBox spacing="10.0">
-                                                   <children>
-                                                      <Label text="Layout">
-                                                         <font>
-                                                            <Font name="System Bold" size="12.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </HBox>
-                                                <HBox spacing="10.0">
-                                                   <children>
-                                                      <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" text="Display projects on the right">
-                                                         <font>
-                                                            <Font name="Open Sans Regular" size="12.0" />
-                                                         </font>
-                                                      </CheckBox>
-                                                   </children>
-                                                </HBox>
-                                                <HBox layoutX="10.0" layoutY="27.0" spacing="10.0">
-                                                   <children>
-                                                      <CheckBox fx:id="hideProjectsOnMouseExitCheckBox" mnemonicParsing="false" text="Hide projects on mouse leave">
-                                                         <font>
-                                                            <Font name="Open Sans Regular" size="12.0" />
-                                                         </font>
-                                                      </CheckBox>
-                                                   </children>
-                                                </HBox>
+                                                <Label text="Layout">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
                                              </children>
-                                          </VBox>
+                                          </HBox>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" text="Display projects on the right">
+                                                   <font>
+                                                      <Font name="Open Sans Regular" size="12.0" />
+                                                   </font>
+                                                </CheckBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="10.0" layoutY="27.0" spacing="10.0">
+                                             <children>
+                                                <CheckBox fx:id="hideProjectsOnMouseExitCheckBox" mnemonicParsing="false" text="Hide projects on mouse leave">
+                                                   <font>
+                                                      <Font name="Open Sans Regular" size="12.0" />
+                                                   </font>
+                                                </CheckBox>
+                                             </children>
+                                          </HBox>
                                        </children>
-                                    </Group>
+                                    </VBox>
                                  </children>
-                              </VBox>
-                              <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                              </Group>
+                              <Group>
                                  <children>
-                                    <Group>
+                                    <VBox prefHeight="47.0" prefWidth="473.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <VBox>
+                                          <HBox spacing="10.0">
                                              <children>
-                                                <HBox spacing="10.0">
-                                                   <children>
-                                                      <Label text="Position">
-                                                         <font>
-                                                            <Font name="System Bold" size="12.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </HBox>
-                                                <HBox spacing="10.0">
-                                                   <children>
-                                                      <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="Save Position on Screen">
-                                                         <font>
-                                                            <Font name="Open Sans Regular" size="12.0" />
-                                                         </font>
-                                                      </CheckBox>
-                                                   </children>
-                                                </HBox>
+                                                <Label text="Position">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
                                              </children>
-                                          </VBox>
+                                          </HBox>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <CheckBox fx:id="saveWindowPositionCheckBox" mnemonicParsing="false" text="Save Position on Screen">
+                                                   <font>
+                                                      <Font name="Open Sans Regular" size="12.0" />
+                                                   </font>
+                                                </CheckBox>
+                                             </children>
+                                          </HBox>
                                        </children>
-                                    </Group>
+                                    </VBox>
                                  </children>
-                              </VBox>
+                              </Group>
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -265,97 +257,109 @@
                      <children>
                         <VBox layoutX="20.0" layoutY="20.0" prefHeight="419.0" prefWidth="482.0" spacing="5.0" stylesheets="@../css/menu.css">
                            <children>
-						     <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
-                           <children>
-                              <HBox spacing="10.0">
+                              <Group>
                                  <children>
-                                    <Label fx:id="hotkeyLabel" text="Hotkey">
-                                       <font>
-                                          <Font name="System Bold" size="12.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefHeight="17.0" prefWidth="120.0" text="(global keylistener!)">
-                                       <font>
-                                          <Font name="Open Sans Regular" size="12.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                              <HBox spacing="10.0">
-                                 <children>
-                                    <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)">
-                                       <font>
-                                          <Font name="Open Sans Regular" size="12.0" />
-                                       </font>
-                                    </CheckBox>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                              <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                  						     <VBox prefHeight="47.0" prefWidth="475.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                  <children>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <Label text="Note Reminder">
+                                          <Label fx:id="hotkeyLabel" text="Hotkey">
                                              <font>
                                                 <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="globalKeyloggerLabel" alignment="TOP_LEFT" contentDisplay="TOP" disable="true" prefHeight="17.0" prefWidth="120.0" text="(global keylistener!)">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
                                              </font>
                                           </Label>
                                        </children>
                                     </HBox>
                                     <HBox spacing="10.0">
                                        <children>
-                                          <CheckBox fx:id="emptyNoteReminderCheckBox" mnemonicParsing="false" text="Ask for notes when switching project (if empty)" wrapText="true" HBox.hgrow="NEVER">
+                                          <CheckBox fx:id="useHotkeyCheckBox" mnemonicParsing="false" text="Use Hotkey (Strg+Win)">
                                              <font>
                                                 <Font name="Open Sans Regular" size="12.0" />
                                              </font>
-                                          </CheckBox>
-                                       </children>
-                                    </HBox>
-                                    <HBox spacing="10.0">
-                                       <children>
-                                          <CheckBox fx:id="emptyNoteReminderOnlyForWorkEntryCheckBox" mnemonicParsing="false" text="only for project marked as work" wrapText="true" HBox.hgrow="NEVER">
-                                             <font>
-                                                <Font name="Open Sans Regular" size="12.0" />
-                                             </font>
-                                             <HBox.margin>
-                                                <Insets left="20.0" />
-                                             </HBox.margin>
                                           </CheckBox>
                                        </children>
                                     </HBox>
                                  </children>
                               </VBox>
-                              <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                 </children>
+                              </Group>
+                              <Group>
                                  <children>
-                                    <Group>
+                                    <VBox prefHeight="70.0" prefWidth="480.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <VBox>
+                                          <HBox spacing="10.0">
                                              <children>
-                                                <HBox layoutY="5.0" spacing="10.0">
-                                                   <children>
-                                                      <Label text="Confirmation on close">
-                                                         <font>
-                                                            <Font name="System Bold" size="12.0" />
-                                                         </font>
-                                                      </Label>
-                                                   </children>
-                                                </HBox>
-                                                <HBox spacing="10.0">
-                                                   <children>
-                                                      <CheckBox fx:id="confirmCloseCheckBox" mnemonicParsing="false" text="Open confirmation window when closing application" wrapText="true" HBox.hgrow="NEVER">
-                                                         <font>
-                                                            <Font name="Open Sans Regular" size="12.0" />
-                                                         </font>
-                                                      </CheckBox>
-                                                   </children>
-                                                </HBox>
+                                                <Label text="Note Reminder">
+                                                   <font>
+                                                      <Font name="System Bold" size="12.0" />
+                                                   </font>
+                                                </Label>
                                              </children>
-                                          </VBox>
+                                          </HBox>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <CheckBox fx:id="emptyNoteReminderCheckBox" mnemonicParsing="false" text="Ask for notes when switching project (if empty)" wrapText="true" HBox.hgrow="NEVER">
+                                                   <font>
+                                                      <Font name="Open Sans Regular" size="12.0" />
+                                                   </font>
+                                                </CheckBox>
+                                             </children>
+                                          </HBox>
+                                          <HBox spacing="10.0">
+                                             <children>
+                                                <CheckBox fx:id="emptyNoteReminderOnlyForWorkEntryCheckBox" mnemonicParsing="false" text="only for project marked as work" wrapText="true" HBox.hgrow="NEVER">
+                                                   <font>
+                                                      <Font name="Open Sans Regular" size="12.0" />
+                                                   </font>
+                                                   <HBox.margin>
+                                                      <Insets left="20.0" />
+                                                   </HBox.margin>
+                                                </CheckBox>
+                                             </children>
+                                          </HBox>
                                        </children>
-                                    </Group>
+                                    </VBox>
                                  </children>
-                              </VBox>
+                              </Group>
+                              <Group>
+                                 <children>
+                                    <VBox prefWidth="479.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <Group>
+                                             <children>
+                                                <VBox>
+                                                   <children>
+                                                      <HBox layoutY="5.0" spacing="10.0">
+                                                         <children>
+                                                            <Label text="Confirmation on close">
+                                                               <font>
+                                                                  <Font name="System Bold" size="12.0" />
+                                                               </font>
+                                                            </Label>
+                                                         </children>
+                                                      </HBox>
+                                                      <HBox spacing="10.0">
+                                                         <children>
+                                                            <CheckBox fx:id="confirmCloseCheckBox" mnemonicParsing="false" text="Open confirmation window when closing application" wrapText="true" HBox.hgrow="NEVER">
+                                                               <font>
+                                                                  <Font name="Open Sans Regular" size="12.0" />
+                                                               </font>
+                                                            </CheckBox>
+                                                         </children>
+                                                      </HBox>
+                                                   </children>
+                                                </VBox>
+                                             </children>
+                                          </Group>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
                            </children>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -406,7 +410,7 @@
                                     <Font name="Open Sans Regular" size="14.0" />
                                  </font>
                               </Label>
-                              <Button fx:id="reportBugButton" focusTraversable="false" layoutX="396.0" layoutY="237.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" text="report" />
+                              <Button fx:id="reportBugButton" focusTraversable="false" layoutX="396.0" layoutY="237.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" text="Report" />
                               <Pane layoutX="280" layoutY="227" maxHeight="50.0" maxWidth="135.0" minHeight="50.0" minWidth="50.0" prefHeight="50.0" prefWidth="135.0">
                                  <children>
                                     <Label contentDisplay="CENTER" layoutY="-5.0" maxHeight="60.0" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="50.0" prefHeight="60.0" prefWidth="107.0" text="Found a Bug ?" />

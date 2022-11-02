@@ -13,6 +13,7 @@
 	-fx-border-style: solid hidden hidden hidden;
 	-fx-padding: 2px;
 	-fx-spacing: 15px;
+
 }
 
 .tab-pane .tab-header-area .tab-header-background {
@@ -27,15 +28,20 @@
 	-fx-background-color: white;
 
 }
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+	-fx-border-width: 1;
+	-fx-border-color: none;
+}
 .tab-pane .tab:selected
 {
 	-fx-background-color: lightgrey;
 }
 
+
 .button{
 	-fx-background-color: white;
 	-fx-border-color: lightgrey;
-	-fx-border-radius: 5 5 5 5;
+	-fx-border-radius: 2 2 2 2;
 
 }
 .button:hover{
@@ -45,7 +51,7 @@
 .color-picker{
 	-fx-background-color: white;
 	-fx-border-color: lightgrey;
-	-fx-border-radius: 5 5 5 5;
+	-fx-border-radius: 2 2 2 2;
 }
 .check-box .box{
 	-fx-background-color: white;
