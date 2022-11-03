@@ -16,13 +16,13 @@
 
 package de.doubleslash.keeptime.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,8 +31,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -48,15 +49,15 @@ import javafx.scene.paint.Color;
 
 public class ControllerTest {
 
-   private Controller testee;
+   private static Controller testee;
 
-   private Model model;
-   private DateProvider mockedDateProvider;
+   private  Model model;
+   private  DateProvider mockedDateProvider;
 
    private WorkRepository mockedWorkRepository;
 
-   @Before
-   public void beforeTest() {
+   @BeforeEach
+   void beforeTest() {
       mockedWorkRepository = Mockito.mock(WorkRepository.class);
       model = new Model(Mockito.mock(ProjectRepository.class), mockedWorkRepository,
             Mockito.mock(SettingsRepository.class));
