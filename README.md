@@ -18,7 +18,10 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 **You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved completely to database. (will be last state saved by auto-save)**
 
 ### Settings:
-![Settings Screen](readme/images/settings.png?raw=true "Settings")
+![Settings Screen](readme/images/settingsColor.png?raw=true "Settings")
+![Settings Screen](readme/images/settingsLayout.png?raw=true "Settings")
+![Settings Screen](readme/images/settingsGeneral.png?raw=true "Settings")
+![Settings Screen](readme/images/settingsAbout.png?raw=true "Settings")
 
 + Colors: you can define various colors to use in the UI to customize the application. The Reset resets the color to the default color.
 + Display projects on the right: Will show the list of projects on the right side, instead of the left
