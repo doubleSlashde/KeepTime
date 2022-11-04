@@ -25,21 +25,11 @@ public class SvgNodeProvider {
       Document document;
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       try {
+         // fixes sonar issue RSPEC-2755
          dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
       } catch (ParserConfigurationException e) {
          throw new RuntimeException(e);
       }
-
-      /* Fixes Sonar Vulnerability Issue "XML parsers should not be vulnerable to XXE attacks"
-      * XML standard allows the use of entities, declared in the DOCTYPE of the document, which can be internal or external.
-      Problem:
-      When parsing the XML file, the content of the external entities is retrieved from an external storage such as the file system or network,
-      which may lead, if no restrictions are put in place, to arbitrary file disclosures or server-side request forgery (SSRF) vulnerabilities.
-
-       Solution:
-      *It’s recommended to limit resolution of external entities by using one of these solutions:
-            If DOCTYPE is not necessary, completely disable all DOCTYPE declarations.
-      * */
 
       DocumentBuilder db;
 
