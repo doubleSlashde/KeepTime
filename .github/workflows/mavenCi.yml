@@ -27,7 +27,7 @@ jobs:
           distribution: 'corretto'
           cache: maven
       - name: Build
-        run:  mvn package -B clean verify jacoco:report jacoco:prepare-agent
+        run:  mvn package -B clean verify jacoco:prepare-agent jacoco:report
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
