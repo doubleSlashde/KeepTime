@@ -14,7 +14,7 @@ on:
 
 jobs:
 
-  analyze:
+  Analyze_Build_Upload:
 
     runs-on: ubuntu-latest
 
@@ -35,7 +35,7 @@ jobs:
           -Dsonar.organization=${{ secrets.ORGANIZATION_NAME }}
           -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -X
           -Dsonar.java.binaries=.
-         # -Dsonar.qualitygate.wait=true
+          -Dsonar.qualitygate.wait=true
 
       - name: Build
         run: mvn package -B clean verify
