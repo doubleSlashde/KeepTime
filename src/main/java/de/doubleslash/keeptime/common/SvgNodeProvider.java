@@ -20,10 +20,17 @@ import java.io.InputStream;
 
 public class SvgNodeProvider {
 
-   public static String getSvgPathWithXMl(Resources.RESOURCE resource) {
+   public static String getSvgPathWithXMl(Resources.RESOURCE resource){
       String svgPath;
       Document document;
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      try {
+         // fixes sonar issue RSPEC-2755
+         dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+      } catch (ParserConfigurationException e) {
+         throw new RuntimeException(e);
+      }
+
       DocumentBuilder db;
 
       try {

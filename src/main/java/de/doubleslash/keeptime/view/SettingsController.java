@@ -18,9 +18,14 @@ package de.doubleslash.keeptime.view;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import de.doubleslash.keeptime.common.*;
 import de.doubleslash.keeptime.view.license.LicenseTableRow;
@@ -30,6 +35,12 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.shape.SVGPath;
+import de.doubleslash.keeptime.Main;
+import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
+import javafx.application.Platform;
+import javafx.scene.control.*;
+import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +48,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.ApplicationProperties;
+import de.doubleslash.keeptime.common.OS;
+import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
@@ -46,7 +59,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -108,6 +126,9 @@ public class SettingsController {
 
    @FXML
    private Button exportButton;
+
+   @FXML
+   private Button importButton;
 
    @FXML
    private Button aboutButton;
@@ -176,6 +197,7 @@ public class SettingsController {
       }
 
       initExportButton();
+      initImportButton();
 
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
@@ -321,6 +343,63 @@ public class SettingsController {
          LOG.info("Clicked reportBugButton");
          BrowserHelper.openURL(GITHUB_ISSUE_PAGE);
       });
+   }
+   private void initImportButton(){
+      LOG.debug("Initialize importButton.");
+      importButton.setOnAction(event ->{
+
+         try {
+            Alert confirmationAlert = new Alert(AlertType.CONFIRMATION , "", ButtonType.YES, ButtonType.NO);
+            confirmationAlert.setTitle("Import");
+            confirmationAlert.setHeaderText("Do you want to Override current Data ?");
+            confirmationAlert.setContentText("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
+                    "\n" +
+                    "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n" +
+                    "\n" +
+                    "You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file.");
+            confirmationAlert.showAndWait();
+
+            if(confirmationAlert.getResult()==ButtonType.NO){
+               LOG.info("User canceled import");
+               return;
+            }
+
+            final FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open Exported SQl Script");
+            fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
+            File file = fileChooser.showOpenDialog(thisStage);
+            if (file == null) {
+               LOG.info("User canceled import.");
+               return;
+            }
+
+            final String url = applicationProperties.getSpringDataSourceUrl();
+            final String username = applicationProperties.getSpringDataSourceUserName();
+            final String password = applicationProperties.getSpringDataSourcePassword();
+            //TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
+            new RunScript().runTool("-url", url, "-user",username,"-password",password,"-script",file.toString(),"-options", "FROM_1X");
+
+            Alert informationDialog = new Alert(AlertType.INFORMATION);
+            informationDialog.setTitle("Import done");
+            informationDialog.setHeaderText("The data was imported.");
+            informationDialog.setContentText("KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
+            informationDialog.showAndWait();
+            Platform.exit();
+
+
+         } catch (SQLException e) {
+            LOG.error("Could not import script file to db.", e);
+
+            Alert errorDialog = new Alert(AlertType.ERROR);
+            errorDialog.setTitle("Import failed");
+            errorDialog.setHeaderText("The current data could not be imported.");
+            errorDialog.setContentText("Please inform a developer and provide your log file.");
+
+            errorDialog.showAndWait();
+         }
+
+      });
+
    }
 
    private void initExportButton() {
