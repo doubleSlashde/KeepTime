@@ -83,11 +83,11 @@
       <artifactId>flyway-core</artifactId>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.github.kwhat/jnativehook -->
+    <!-- https://mvnrepository.com/artifact/com.1stleg/jnativehook -->
     <dependency>
-      <groupId>com.github.kwhat</groupId>
+      <groupId>com.1stleg</groupId>
       <artifactId>jnativehook</artifactId>
-      <version>2.2.2</version>
+      <version>2.1.0</version>
     </dependency>
 
     <!-- maven assembly plugin -->
@@ -96,6 +96,11 @@
       <artifactId>maven-assembly-plugin</artifactId>
       <version>3.4.2</version>
       <type>maven-plugin</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonarsource.scanner.maven</groupId>
+      <artifactId>sonar-maven-plugin</artifactId>
+      <version>3.9.1.2184</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
