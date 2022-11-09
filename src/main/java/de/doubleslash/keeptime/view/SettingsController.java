@@ -131,9 +131,6 @@ public class SettingsController {
    private Button importButton;
 
    @FXML
-   private Button aboutButton;
-
-   @FXML
    private Label hotkeyLabel;
    @FXML
    private Label globalKeyloggerLabel;
