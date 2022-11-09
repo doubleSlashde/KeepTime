@@ -24,11 +24,9 @@ class RandomColorPickerTest {
     @Test
     public void colorIsNotAlreadyUsedByProject() throws ClassNotFoundException, IllegalAccessException {
 
-        for (int i=0; i<1000; i++){
-
             String color = RandomColorPicker.getUniqueColorName("BLUE");
             Assertions.assertNotEquals("BLUE", color);
-        }
+
 
     }
 

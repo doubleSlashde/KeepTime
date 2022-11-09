@@ -38,7 +38,6 @@ public class RandomColorPicker {
 
         double v = Math.random() * (colorNames.size() - 0);
         if(color.equals(colorNames.get((int) v))){
-            LOG.info("SAME COLOR ");
             return colorNames.get((int)v+5);
         }
         return colorNames.get((int) v);
