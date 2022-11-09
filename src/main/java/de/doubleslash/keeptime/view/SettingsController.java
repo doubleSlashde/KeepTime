@@ -17,15 +17,9 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import de.doubleslash.keeptime.common.*;
 import de.doubleslash.keeptime.view.license.LicenseTableRow;
@@ -35,11 +29,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.scene.shape.SVGPath;
-import de.doubleslash.keeptime.Main;
-import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
 import javafx.application.Platform;
-import javafx.scene.control.*;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -52,13 +42,10 @@ import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
-import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Settings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -70,7 +57,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 @Component
@@ -149,6 +135,7 @@ public class SettingsController {
 
    @FXML
    private SVGPath bugIcon;
+
    @FXML
    private Label versionNumberLabel;
 
@@ -158,6 +145,21 @@ public class SettingsController {
    @FXML
    private TableView<LicenseTableRow> licenseTableView;
 
+   @FXML
+   private Region colorIcon;
+
+   @FXML
+   private Region layoutIcon;
+
+   @FXML
+   private Region generalIcon;
+
+   @FXML
+   private Region aboutIcon;
+  @FXML
+   private Region importexportIcon;
+
+
    private final ApplicationProperties applicationProperties;
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
@@ -166,6 +168,7 @@ public class SettingsController {
    private final Model model;
 
    private Stage thisStage;
+
 
    @Autowired
    ViewController mainscreen;
@@ -192,6 +195,17 @@ public class SettingsController {
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
       }
+
+
+      double REQUIRED_WIDTH = 15.0;
+      double REQUIRED_HEIGHT = 15.0;
+
+      setTabSvg(colorIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_COLOR_ICON);
+      setTabSvg(layoutIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_LAYOUT_ICON);
+      setTabSvg(generalIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_SETTINGS_ICON);
+      setTabSvg(aboutIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_ABOUT_ICON);
+      setTabSvg(importexportIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_IMPORT_EXPORT_ICON);
+
 
       initExportButton();
       initImportButton();
@@ -275,6 +289,16 @@ public class SettingsController {
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
    }
+
+   private static void setTabSvg(Region region, Double REQUIRED_WIDTH, Double REQUIRED_HEIGHT,RESOURCE resource) {
+
+      region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource,1.0,1.0));
+      region.setMinSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
+      region.setPrefSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
+      region.setMaxSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
+      region.setStyle("-fx-background-color: black;");
+   }
+
    public void initializeAbout() {
       LOG.debug("set version label");
       versionNumberLabel.setText(applicationProperties.getBuildVersion());

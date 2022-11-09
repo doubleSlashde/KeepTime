@@ -30,6 +30,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.SVGPath?>
@@ -40,9 +41,9 @@
    <children>
       <TabPane prefHeight="516.0" prefWidth="606.0" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE" tabMinHeight="100.0" tabMinWidth="40.0">
          <tabs>
-            <Tab>
+            <Tab closable="false">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="436.0">
                      <children>
                         <VBox layoutX="20.0" layoutY="20.0" prefHeight="393.0" prefWidth="486.0" spacing="5.0" styleClass="menuBorder">
                            <children>
@@ -169,7 +170,12 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <Label text="Color" />
+                  <HBox spacing="5.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                     <children>
+                        <Region fx:id="colorIcon" prefHeight="25.0" prefWidth="25.0" />
+                        <Label prefWidth="75.0" text="Color" />
+                     </children>
+                  </HBox>
                </graphic>
             </Tab>
             <Tab>
@@ -248,7 +254,12 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <Label text="Layout" />
+                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                     <children>
+                        <Region fx:id="layoutIcon" prefHeight="25.0" prefWidth="25.0" />
+                        <Label prefWidth="75.0" text="Layout" />
+                     </children>
+                  </HBox>
                </graphic>
             </Tab>
             <Tab>
@@ -369,7 +380,12 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <Label text="General" />
+                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                     <children>
+                        <Region fx:id="generalIcon" prefHeight="25.0" prefWidth="25.0" />
+                        <Label prefWidth="75.0" text="General" />
+                     </children>
+                  </HBox>
                </graphic>
             </Tab>
             <Tab>
@@ -439,25 +455,30 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <Label text="About" />
+                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                     <children>
+                        <Region fx:id="aboutIcon" prefHeight="25.0" prefWidth="25.0" />
+                        <Label prefWidth="75.0" text="About" />
+                     </children>
+                  </HBox>
                </graphic>
             </Tab>
             <Tab>
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="489.0" prefWidth="452.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="328.0" prefWidth="458.0">
                            <children>
                               <Group>
                                  <children>
-                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="132.0" prefWidth="476.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox alignment="BOTTOM_RIGHT" layoutX="30.0" layoutY="81.0" prefHeight="148.0" prefWidth="460.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                          <HBox prefHeight="132.0" prefWidth="457.0">
                                              <children>
-                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Import your prevously exportet Sql script " wrappingWidth="474.13671875" />
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Import your prevously exportet Sql script " />
                                              </children>
                                           </HBox>
-                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="40.0" prefWidth="474.0">
+                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="38.0" prefWidth="432.0">
                                              <children>
                                                 <Button fx:id="importButton" alignment="TOP_LEFT" mnemonicParsing="false" text="Import">
                                                    <font>
@@ -472,9 +493,9 @@
                               </Group>
                               <Group layoutX="10.0" layoutY="10.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                  <children>
-                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="144.0" prefWidth="477.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="144.0" prefWidth="460.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                          <HBox prefHeight="119.0" prefWidth="456.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Export your data to a Sql scrippt" />
                                              </children>
@@ -498,7 +519,12 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <Label text="Import/Export" />
+                  <HBox prefHeight="24.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                     <children>
+                        <Region fx:id="importexportIcon" prefHeight="25.0" prefWidth="25.0" />
+                        <Label prefWidth="75.0" text="Import/Export" />
+                     </children>
+                  </HBox>
                </graphic>
             </Tab>
          </tabs>

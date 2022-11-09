@@ -22,16 +22,20 @@
 }
 .tab{
 	-fx-background-insets: 0 1 0 1,0,0;
-	-fx-tab-min-width: 40;
 
 }
 .tab-pane .tab
 {
 	-fx-background-color: white;
 	-fx-pref-height: 100;
-	-fx-pref-width: 60;
-
+	-fx-pref-width: 70;
 }
+
+.tab-pane .tab .HBox{
+	-fx-spacing: 5;
+}
+
+
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
 	-fx-border-width: 1;
 	-fx-border-color: none;
