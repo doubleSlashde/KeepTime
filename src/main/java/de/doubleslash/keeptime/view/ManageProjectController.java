@@ -16,6 +16,11 @@
 
 package de.doubleslash.keeptime.view;
 
+import de.doubleslash.keeptime.common.RandomColorPicker;
+import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.control.*;
+import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +29,7 @@ import org.springframework.stereotype.Component;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 
 @Component
@@ -57,6 +57,9 @@ public class ManageProjectController {
    @FXML
    private Spinner<Integer> sortIndexSpinner;
 
+   @FXML
+   private Button randomColorButton;
+
    @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
@@ -68,6 +71,23 @@ public class ManageProjectController {
       sortIndexSpinner
             .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
+      randomColorButton.setOnAction(event -> randomColorEvent());
+   }
+
+   private void randomColorEvent() {
+
+      try {
+          textFillColorPicker.setValue(RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), model.getAvailableProjects()));
+         ObservableList<Project> projects = model.getAvailableProjects();
+         for(Project project : projects){
+            LOG.info(project.getColor().toString());
+         }
+          
+      } catch (ClassNotFoundException e) {
+         throw new RuntimeException(e);
+      } catch (IllegalAccessException e) {
+         throw new RuntimeException(e);
+      }
    }
 
    public void initializeWith(final Project project) {
@@ -83,5 +103,6 @@ public class ManageProjectController {
       return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
             isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
    }
+
 
 }
