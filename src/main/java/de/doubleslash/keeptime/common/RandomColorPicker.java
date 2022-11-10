@@ -49,8 +49,7 @@ public class RandomColorPicker {
 
         double divAdd  = divblue+divgreen+divred;
 
-        while (divAdd <0.6) {
-
+        while (divAdd <1) {
              divColor = getUniqueColor(availableProjects);
              divred = Math.abs(divColor.getRed()-backgroundColor.getRed());
              divgreen = Math.abs(divColor.getGreen()-backgroundColor.getGreen());
