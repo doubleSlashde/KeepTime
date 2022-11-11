@@ -135,7 +135,6 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
       initTableView();
-
    }
 
    private void initTableView() {
