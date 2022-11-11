@@ -3,10 +3,10 @@
 	-fx-border-color: lightgrey;
 	-fx-border-style: hidden hidden solid hidden;
 	-fx-spacing: 5px;
-    -fx-padding: 0 0 5 0;	
-	
+    -fx-padding: 0 0 5 0;
 
 }
+
 .saveCancelHboxBorder{
 	
 	-fx-border-color: lightgrey;
@@ -15,6 +15,7 @@
 	-fx-spacing: 15px;
 
 }
+
 
 .tab-pane .tab-header-area .tab-header-background {
 	-fx-opacity: 0;
@@ -30,6 +31,15 @@
 	-fx-pref-height: 100;
 	-fx-pref-width: 70;
 }
+.anchorPane{
+	-fx-background-color: white;
+}
+.scroll-pane{
+	-fx-background-color: white;
+}
+.scroll-bar:vertical{
+	-fx-background-color:white;
+}
 
 .tab-pane .tab .HBox{
 	-fx-spacing: 5;
@@ -41,6 +51,12 @@
 	-fx-border-color: none;
 }
 .tab-pane .tab:selected
+{
+	-fx-border-width: 2;
+	-fx-border-color: blue;
+	-fx-border-style: solid hidden hidden hidden;
+}
+.tab-pane .tab:hover
 {
 	-fx-background-color: lightgrey;
 }
