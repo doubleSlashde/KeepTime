@@ -88,7 +88,6 @@ public class ViewController {
    private static final Logger LOG = LoggerFactory.getLogger(ViewController.class);
    private static final String TIME_ZERO = "00:00:00";
 
-
    @FXML
    private Pane pane;
    @FXML
@@ -270,15 +269,16 @@ public class ViewController {
 
       pane.setOnMouseEntered(a -> mouseHoveringProperty.set(true));
 
-      projectsVBox.setOnContextMenuRequested(c -> { //Is needed because the Context menu loses Focus otherwise
-        mouseHoveringProperty.set(true);
-        LOG.info("Options selected");
-        contexMenuOpenBoolean =true;
+      projectsVBox.setOnContextMenuRequested(c -> { // Is needed because the Context menu loses Focus otherwise
+         mouseHoveringProperty.set(true);
+         LOG.info("Options selected");
+         contexMenuOpenBoolean = true;
       });
 
-      pane.setOnMouseExited(a -> { if(contexMenuOpenBoolean ==false){
-         mouseHoveringProperty.set(false);
-      }
+      pane.setOnMouseExited(a -> {
+         if (contexMenuOpenBoolean == false) {
+            mouseHoveringProperty.set(false);
+         }
          contexMenuOpenBoolean = false;
 
       });
