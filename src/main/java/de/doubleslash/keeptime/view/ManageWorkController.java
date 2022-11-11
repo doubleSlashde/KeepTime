@@ -21,10 +21,11 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 
+import javafx.scene.control.skin.ComboBoxListViewSkin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.javafx.scene.control.skin.ComboBoxListViewSkin;
+
 
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
