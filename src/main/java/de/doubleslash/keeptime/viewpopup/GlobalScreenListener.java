@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import de.doubleslash.keeptime.common.OS;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -65,11 +66,12 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseMotio
    private Point mouseLocation = new Point(0, 0);
 
    public GlobalScreenListener() {
+      if(!OS.isLinux()) {
+         disableJNativeHookLogger();
 
-      disableJNativeHookLogger();
-
-      GlobalScreen.addNativeKeyListener(this);
-      GlobalScreen.addNativeMouseMotionListener(this);
+         GlobalScreen.addNativeKeyListener(this);
+         GlobalScreen.addNativeMouseMotionListener(this);
+      }
    }
 
    public void register(final boolean register) {
