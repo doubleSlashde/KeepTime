@@ -27,20 +27,18 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
-<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="467.0" prefWidth="606.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="467.0" prefWidth="503.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
    <children>
-      <TabPane layoutY="6.0" prefHeight="459.0" prefWidth="606.0" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE" tabMinHeight="100.0" tabMinWidth="40.0">
+      <TabPane layoutY="6.0" prefHeight="459.0" prefWidth="500.0" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE" tabMinHeight="100.0" tabMinWidth="40.0">
          <tabs>
             <Tab closable="false">
               <content>
@@ -166,7 +164,7 @@
                   <HBox spacing="5.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Region fx:id="colorIcon" prefHeight="25.0" prefWidth="25.0" />
-                        <Label prefWidth="75.0" text="Color" />
+                        <Label contentDisplay="TOP" prefWidth="75.0" text="Color" />
                      </children>
                   </HBox>
                </graphic>
@@ -190,9 +188,9 @@
                                                 </Label>
                                              </children>
                                           </HBox>
-                                          <HBox spacing="10.0">
+                                          <HBox prefHeight="18.0" prefWidth="405.0" spacing="10.0">
                                              <children>
-                                                <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" text="Display projects on the right">
+                                                <CheckBox fx:id="displayProjectsRightCheckBox" mnemonicParsing="false" prefHeight="18.0" prefWidth="199.0" text="Display projects on the right">
                                                    <font>
                                                       <Font name="Open Sans Regular" size="12.0" />
                                                    </font>
@@ -247,7 +245,7 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                  <HBox spacing="5.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Region fx:id="layoutIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="Layout" />
@@ -373,7 +371,7 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                  <HBox spacing="5.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Region fx:id="generalIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="General" />
@@ -385,13 +383,13 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="489.0" prefWidth="452.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="328.0" prefWidth="458.0" spacing="5.0">
+                        <VBox layoutX="20.0" layoutY="19.0" prefHeight="376.0" prefWidth="343.0" spacing="5.0">
                            <children>
                               <Group>
                                  <children>
-                                    <VBox alignment="BOTTOM_RIGHT" layoutX="30.0" layoutY="81.0" prefHeight="184.0" prefWidth="472.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox alignment="BOTTOM_RIGHT" layoutX="30.0" layoutY="81.0" prefHeight="164.0" prefWidth="370.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox prefHeight="38.0" prefWidth="470.0">
+                                          <HBox prefHeight="18.0" prefWidth="431.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Import">
                                                    <font>
@@ -401,10 +399,10 @@
                                           </HBox>
                                           <HBox prefHeight="88.0" prefWidth="470.0">
                                              <children>
-                                                <TextArea editable="false" prefHeight="98.0" prefWidth="470.0" stylesheets="@../css/settingsv2.css" text="Import previously exported .sql file.&#10;This will overwrite the currently used database contents.               &#10;You will need to restart the application after this action.&#10;If you proceed you need to select the previouls exported .sql file." />
+                                                <Label prefHeight="72.0" prefWidth="368.0" text="Import previously exported .sql file. This will overwrite the currently used database contents. You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file." textOverrun="CLIP" wrapText="true" HBox.hgrow="NEVER" />
                                              </children>
                                           </HBox>
-                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="44.0" prefWidth="470.0">
+                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="43.0" prefWidth="428.0">
                                              <children>
                                                 <Button fx:id="importButton" alignment="TOP_LEFT" mnemonicParsing="false" text="Import">
                                                    <font>
@@ -419,9 +417,9 @@
                               </Group>
                               <Group layoutX="10.0" layoutY="10.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                  <children>
-                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="184.0" prefWidth="472.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="165.0" prefWidth="368.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox prefHeight="29.0" prefWidth="470.0">
+                                          <HBox prefHeight="19.0" prefWidth="434.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Export">
                                                    <font>
@@ -429,12 +427,12 @@
                                                    </font></Text>
                                              </children>
                                           </HBox>
-                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                          <HBox prefHeight="94.0" prefWidth="366.0">
                                              <children>
-                                                <TextArea editable="false" prefHeight="92.0" prefWidth="473.0" text="Export your current Data to an Sql script. &#10;This is needed if you go from the Snapshot-1.2.0-KeepTime version to the recent &#10;release version. " />
+                                                <Label text="Export your current Data to an Sql script. This is needed if you go from the Snapshot-1.2.0-KeepTimeto the recent release version. " wrapText="true" />
                                              </children>
                                           </HBox>
-                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="475.0">
+                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="367.0">
                                              <children>
                                                 <Button fx:id="exportButton" mnemonicParsing="false" text="Export">
                                                    <font>
@@ -456,7 +454,7 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                  <HBox spacing="5.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Region fx:id="importexportIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="Import/Export" />
@@ -468,16 +466,16 @@
               <content>
                 <AnchorPane layoutX="20.0" layoutY="20.0" minHeight="0.0" minWidth="0.0" prefHeight="438.0" prefWidth="489.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="387.0" prefWidth="440.0" spacing="5.0">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="387.0" prefWidth="376.0" spacing="5.0">
                            <children>
                               <Group />
-                              <VBox prefHeight="305.0" prefWidth="523.0" spacing="5.0" stylesheets="@../css/settingsv2.css">
+                              <VBox prefHeight="354.0" prefWidth="375.0" spacing="5.0" stylesheets="@../css/settingsv2.css">
                                  <children>
                                     <Label fx:id="thirdPartyLabel" text="Third party software">
                                        <font>
                                           <Font name="System Bold" size="12.0" />
                                        </font></Label>
-                                    <TableView fx:id="licenseTableView" fixedCellSize="0.0" focusTraversable="false" prefHeight="283.0" prefWidth="421.0" />
+                                    <TableView fx:id="licenseTableView" fixedCellSize="0.0" focusTraversable="false" prefHeight="283.0" prefWidth="357.0" />
                                  </children>
                               </VBox>
                            </children>
@@ -489,7 +487,7 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <HBox>
+                  <HBox spacing="5.0">
                      <children>
                         <Region fx:id="licensesIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="Licenses" />
@@ -503,12 +501,12 @@
                      <children>
                         <Pane fx:id="mainContainer" layoutX="-20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="492.0" prefWidth="478.0" styleClass="tab-pane" stylesheets="@../css/settingsv2.css">
                            <children>
-                              <Label fx:id="keepTimeLabel" layoutX="197.0" layoutY="11.0" text="KeepTime">
+                              <Label fx:id="keepTimeLabel" layoutX="138.0" layoutY="14.0" text="KeepTime">
                                  <font>
                                     <Font name="Open Sans Regular" size="26.0" />
                                  </font>
                               </Label>
-                              <Line fx:id="bigLine" endX="497.0" endY="111.0" fill="BLACK" layoutX="-23.0" layoutY="-39.0" smooth="false" startX="62.0" startY="111.0" strokeWidth="2.0" />
+                              <Line fx:id="bigLine" endX="428.0" endY="111.0" fill="BLACK" layoutX="-23.0" layoutY="-39.0" smooth="false" startX="62.0" startY="111.0" strokeWidth="2.0" />
                               <Label fx:id="versionLabel" layoutX="39.0" layoutY="92.0" text="Version:">
                                  <font>
                                     <Font name="Open Sans Regular" size="14.0" />
@@ -529,12 +527,15 @@
                                     <Font name="Open Sans Regular" size="14.0" />
                                  </font>
                               </Hyperlink>
-                              <Line fx:id="smallLine" endX="497.0" endY="273.0" layoutX="-23.0" layoutY="1.0" startX="62.0" startY="273.0" strokeWidth="2.0" />
-                              <Button fx:id="reportBugButton" focusTraversable="false" layoutX="396.0" layoutY="237.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" text="Report" />
-                              <Pane layoutX="280" layoutY="227" maxHeight="50.0" maxWidth="135.0" minHeight="50.0" minWidth="50.0" prefHeight="50.0" prefWidth="135.0">
+                              <Line fx:id="smallLine" endX="428.0" endY="273.0" layoutX="-23.0" layoutY="1.0" startX="62.0" startY="273.0" strokeWidth="2.0" />
+                              <Pane layoutX="212.0" layoutY="227.0" maxHeight="50.0" maxWidth="135.0" minHeight="50.0" minWidth="50.0" prefHeight="50.0" prefWidth="117.0">
                                  <children>
-                                    <Label contentDisplay="CENTER" layoutY="-5.0" maxHeight="60.0" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="50.0" prefHeight="60.0" prefWidth="107.0" text="Found a Bug ?" />
-                                    <SVGPath fx:id="bugIcon" layoutX="-160.0" layoutY="-231.0" scaleX="0.04" scaleY="0.04" />
+                                    <Region fx:id="bugIcon" layoutX="4.0" layoutY="16.0" prefHeight="15.0" prefWidth="15.0" />
+                                    <Button fx:id="reportBugButton" focusTraversable="false" layoutX="28.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" text="Report">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Button>
                                  </children>
                               </Pane>
                               <Label fx:id="versionNumberLabel" layoutX="97.0" layoutY="92.0" text="1.0.0">
@@ -552,13 +553,18 @@
                                     <Font name="Open Sans Regular" size="14.0" />
                                  </font>
                               </Label>
+                              <Label contentDisplay="CENTER" layoutX="97.0" layoutY="222.0" maxHeight="60.0" maxWidth="1.7976931348623157E308" minHeight="50.0" minWidth="50.0" prefHeight="60.0" prefWidth="107.0" text="Found a Bug ?">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
                            </children>
                         </Pane>
                      </children>
                   </AnchorPane>
               </content>
                <graphic>
-                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                  <HBox spacing="5.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Region fx:id="aboutIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="About" />

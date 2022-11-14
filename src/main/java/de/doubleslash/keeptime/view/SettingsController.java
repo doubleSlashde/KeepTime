@@ -28,7 +28,6 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
-import javafx.scene.shape.SVGPath;
 import javafx.application.Platform;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
@@ -134,7 +133,7 @@ public class SettingsController {
    private Button reportBugButton;
 
    @FXML
-   private SVGPath bugIcon;
+   private Region bugIcon;
 
    @FXML
    private Label versionNumberLabel;
@@ -202,12 +201,12 @@ public class SettingsController {
       double REQUIRED_WIDTH = 15.0;
       double REQUIRED_HEIGHT = 15.0;
 
-      setTabSvg(colorIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_COLOR_ICON);
-      setTabSvg(layoutIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_LAYOUT_ICON);
-      setTabSvg(generalIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_SETTINGS_ICON);
-      setTabSvg(aboutIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_ABOUT_ICON);
-      setTabSvg(importexportIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_IMPORT_EXPORT_ICON);
-      setTabSvg(licensesIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_LICENSES_ICON);
+      setRegionSvg(colorIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_COLOR_ICON);
+      setRegionSvg(layoutIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_LAYOUT_ICON);
+      setRegionSvg(generalIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_SETTINGS_ICON);
+      setRegionSvg(aboutIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_ABOUT_ICON);
+      setRegionSvg(importexportIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_IMPORT_EXPORT_ICON);
+      setRegionSvg(licensesIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_LICENSES_ICON);
 
       initExportButton();
       initImportButton();
@@ -292,7 +291,7 @@ public class SettingsController {
       initializeAbout();
    }
 
-   private static void setTabSvg(Region region, Double REQUIRED_WIDTH, Double REQUIRED_HEIGHT,RESOURCE resource) {
+   private static void setRegionSvg(Region region, Double REQUIRED_WIDTH, Double REQUIRED_HEIGHT, RESOURCE resource) {
 
       region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource,1.0,1.0));
       region.setMinSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
@@ -317,7 +316,7 @@ public class SettingsController {
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
       //set SvgPath content
-      bugIcon.setContent(SvgNodeProvider.getSvgPathWithXMl(Resources.RESOURCE.SVG_BUG_ICON));
+      setRegionSvg(bugIcon,20.0 ,20.0 , RESOURCE.SVG_BUG_ICON);
 
       // licenseColumn
       final TableColumn<LicenseTableRow, String> licenseColumn = new TableColumn<>("License");

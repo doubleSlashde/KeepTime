@@ -24,7 +24,7 @@
 
 .tab-pane .tab
 {
-	-fx-background-color: white;
+	-fx-background-color: lightgrey;
 	-fx-pref-height: 100;
 	-fx-pref-width: 70;
 }
@@ -35,13 +35,14 @@
 }
 .tab-pane .tab:selected
 {
-	-fx-border-width: 2;
-	-fx-border-color: blue;
-	-fx-border-style: solid hidden hidden hidden;
+	-fx-background-color: white;
 }
 .tab-pane .tab:hover
 {
-	-fx-background-color: lightgrey;
+	-fx-border-width: 2;
+   -fx-border-color: blue;
+   -fx-border-style: solid hidden hidden hidden;
+
 }
 
 
