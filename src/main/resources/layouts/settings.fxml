@@ -27,6 +27,7 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -384,13 +385,13 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="489.0" prefWidth="452.0">
                      <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="328.0" prefWidth="458.0">
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="328.0" prefWidth="458.0" spacing="5.0">
                            <children>
                               <Group>
                                  <children>
-                                    <VBox alignment="BOTTOM_RIGHT" layoutX="30.0" layoutY="81.0" prefHeight="148.0" prefWidth="479.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox alignment="BOTTOM_RIGHT" layoutX="30.0" layoutY="81.0" prefHeight="184.0" prefWidth="472.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox prefHeight="132.0" prefWidth="457.0">
+                                          <HBox prefHeight="38.0" prefWidth="470.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Import">
                                                    <font>
@@ -398,7 +399,12 @@
                                                    </font></Text>
                                              </children>
                                           </HBox>
-                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="38.0" prefWidth="432.0">
+                                          <HBox prefHeight="88.0" prefWidth="470.0">
+                                             <children>
+                                                <TextArea editable="false" prefHeight="98.0" prefWidth="470.0" stylesheets="@../css/settingsv2.css" text="Import previously exported .sql file.&#10;This will overwrite the currently used database contents.               &#10;You will need to restart the application after this action.&#10;If you proceed you need to select the previouls exported .sql file." />
+                                             </children>
+                                          </HBox>
+                                          <HBox alignment="BOTTOM_RIGHT" prefHeight="44.0" prefWidth="470.0">
                                              <children>
                                                 <Button fx:id="importButton" alignment="TOP_LEFT" mnemonicParsing="false" text="Import">
                                                    <font>
@@ -413,14 +419,19 @@
                               </Group>
                               <Group layoutX="10.0" layoutY="10.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                  <children>
-                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="144.0" prefWidth="478.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                    <VBox alignment="BOTTOM_RIGHT" prefHeight="184.0" prefWidth="472.0" styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox prefHeight="105.0" prefWidth="474.0">
+                                          <HBox prefHeight="29.0" prefWidth="470.0">
                                              <children>
                                                 <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Export">
                                                    <font>
                                                       <Font name="System Bold" size="12.0" />
                                                    </font></Text>
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="100.0" prefWidth="200.0">
+                                             <children>
+                                                <TextArea editable="false" prefHeight="92.0" prefWidth="473.0" text="Export your current Data to an Sql script. &#10;This is needed if you go from the Snapshot-1.2.0-KeepTime version to the recent &#10;release version. " />
                                              </children>
                                           </HBox>
                                           <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="475.0">
@@ -437,12 +448,15 @@
                                  </children>
                               </Group>
                            </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
                         </VBox>
                      </children>
                   </AnchorPane>
               </content>
                <graphic>
-                  <HBox prefHeight="24.0" styleClass="HBox" stylesheets="@../css/settingsv2.css">
+                  <HBox styleClass="HBox" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Region fx:id="importexportIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="Import/Export" />
@@ -452,7 +466,40 @@
             </Tab>
             <Tab>
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="446.0" prefWidth="501.0" styleClass="anchorPane" stylesheets="@../css/settingsv2.css">
+                <AnchorPane layoutX="20.0" layoutY="20.0" minHeight="0.0" minWidth="0.0" prefHeight="438.0" prefWidth="489.0">
+                     <children>
+                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="387.0" prefWidth="440.0" spacing="5.0">
+                           <children>
+                              <Group />
+                              <VBox prefHeight="305.0" prefWidth="523.0" spacing="5.0" stylesheets="@../css/settingsv2.css">
+                                 <children>
+                                    <Label fx:id="thirdPartyLabel" text="Third party software">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font></Label>
+                                    <TableView fx:id="licenseTableView" fixedCellSize="0.0" focusTraversable="false" prefHeight="283.0" prefWidth="421.0" />
+                                 </children>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </content>
+               <graphic>
+                  <HBox>
+                     <children>
+                        <Region fx:id="licensesIcon" prefHeight="25.0" prefWidth="25.0" />
+                        <Label prefWidth="75.0" text="Licenses" />
+                     </children>
+                  </HBox>
+               </graphic>
+            </Tab>
+            <Tab>
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="446.0" prefWidth="501.0" stylesheets="@../css/settingsv2.css">
                      <children>
                         <Pane fx:id="mainContainer" layoutX="-20.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="492.0" prefWidth="478.0" styleClass="tab-pane" stylesheets="@../css/settingsv2.css">
                            <children>
@@ -515,33 +562,6 @@
                      <children>
                         <Region fx:id="aboutIcon" prefHeight="25.0" prefWidth="25.0" />
                         <Label prefWidth="75.0" text="About" />
-                     </children>
-                  </HBox>
-               </graphic>
-            </Tab>
-            <Tab>
-              <content>
-                <AnchorPane layoutX="20.0" layoutY="20.0" minHeight="0.0" minWidth="0.0" prefHeight="438.0" prefWidth="489.0">
-                     <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefHeight="387.0" prefWidth="411.0">
-                           <children>
-                              <Group />
-                              <VBox prefHeight="305.0" prefWidth="391.0" spacing="5.0" stylesheets="@../css/settingsv2.css">
-                                 <children>
-                                    <Label fx:id="thirdPartyLabel" text="Third party software" />
-                                    <TableView fx:id="licenseTableView" focusTraversable="false" prefHeight="283.0" prefWidth="391.0" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </VBox>
-                     </children>
-                  </AnchorPane>
-              </content>
-               <graphic>
-                  <HBox>
-                     <children>
-                        <Region prefHeight="25.0" prefWidth="25.0" />
-                        <Label prefWidth="75.0" text="Licenses" />
                      </children>
                   </HBox>
                </graphic>

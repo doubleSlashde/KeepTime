@@ -156,9 +156,11 @@ public class SettingsController {
 
    @FXML
    private Region aboutIcon;
-  @FXML
+   @FXML
    private Region importexportIcon;
 
+   @FXML
+   private Region licensesIcon;
 
    private final ApplicationProperties applicationProperties;
 
@@ -205,7 +207,7 @@ public class SettingsController {
       setTabSvg(generalIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_SETTINGS_ICON);
       setTabSvg(aboutIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_ABOUT_ICON);
       setTabSvg(importexportIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_IMPORT_EXPORT_ICON);
-
+      setTabSvg(licensesIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_LICENSES_ICON);
 
       initExportButton();
       initImportButton();

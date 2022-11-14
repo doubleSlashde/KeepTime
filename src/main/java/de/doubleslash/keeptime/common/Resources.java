@@ -63,7 +63,9 @@ public class Resources {
 
       SVG_COLOR_ICON("/svgs/palette.svg"),
 
-      SVG_IMPORT_EXPORT_ICON("/svgs/sort.svg")
+      SVG_IMPORT_EXPORT_ICON("/svgs/sort.svg"),
+
+      SVG_LICENSES_ICON("/svgs/closed-captioning.svg")
 
       ;
 
