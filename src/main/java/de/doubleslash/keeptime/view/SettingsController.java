@@ -17,6 +17,7 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
@@ -25,6 +26,7 @@ import de.doubleslash.keeptime.common.*;
 import de.doubleslash.keeptime.view.license.LicenseTableRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
