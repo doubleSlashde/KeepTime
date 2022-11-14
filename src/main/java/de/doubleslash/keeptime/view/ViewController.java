@@ -150,7 +150,7 @@ public class ViewController {
    private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
    public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
    public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
-   boolean contexMenuOpenBoolean = false;
+   private static boolean contextMenuOpenBoolean = false;
 
    private Stage reportStage;
    private ReportController reportController;
@@ -271,15 +271,15 @@ public class ViewController {
 
       projectsVBox.setOnContextMenuRequested(c -> { // Is needed because the Context menu loses Focus otherwise
          mouseHoveringProperty.set(true);
-         LOG.info("Options selected");
-         contexMenuOpenBoolean = true;
+         LOG.trace("Options selected");
+         contextMenuOpenBoolean = true;
       });
 
       pane.setOnMouseExited(a -> {
-         if (contexMenuOpenBoolean == false) {
+         if (contextMenuOpenBoolean == false) {
             mouseHoveringProperty.set(false);
          }
-         contexMenuOpenBoolean = false;
+         contextMenuOpenBoolean = false;
 
       });
       // Drag stage
