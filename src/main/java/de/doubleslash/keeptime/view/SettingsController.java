@@ -162,6 +162,7 @@ public class SettingsController {
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
+         hideProjectsOnMouseExitCheckBox.setDisable(true);
       }
 
       initExportButton();
