@@ -25,12 +25,12 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.skin.DatePickerSkin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.sun.javafx.scene.control.skin.DatePickerSkin;
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
@@ -135,6 +135,7 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
       initTableView();
+
    }
 
    private void initTableView() {
@@ -165,26 +166,26 @@ public class ReportController {
             (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
                   entry.getValue().getValue()));
       noteColumn.setMinWidth(200);
-      noteColumn.impl_setReorderable(false);
+      noteColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(noteColumn);
 
       final TreeTableColumn<TableRow, String> timeRangeColumn = new TreeTableColumn<>("Timeslot");
       timeRangeColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeRange"));
       timeRangeColumn.setMinWidth(120);
-      timeRangeColumn.impl_setReorderable(false);
+      timeRangeColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
       final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
       timeSumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeSum"));
       timeSumColumn.setMinWidth(60);
-      timeSumColumn.impl_setReorderable(false);
+      timeSumColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
 
       final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>("Controls");
       buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, Button>("buttonBox"));
       buttonColumn.setMinWidth(100);
       buttonColumn.setSortable(false);
-      buttonColumn.impl_setReorderable(false);
+      buttonColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(buttonColumn);
 
       workTableTreeView.setShowRoot(false);
