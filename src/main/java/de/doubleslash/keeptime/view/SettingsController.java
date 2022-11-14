@@ -257,11 +257,11 @@ public class SettingsController {
             Alert confirmationAlert = new Alert(AlertType.CONFIRMATION , "", ButtonType.YES, ButtonType.NO);
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.setContentText("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
+            confirmationAlert.getDialogPane().setContent(new Label("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
                     "\n" +
                     "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n" +
                     "\n" +
-                    "You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file.");
+                    "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
             confirmationAlert.initOwner(thisStage);
             confirmationAlert.showAndWait();
 
@@ -288,7 +288,7 @@ public class SettingsController {
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.setContentText("KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
+            informationDialog.getDialogPane().setContent(new Label("KeepTime will now be CLOSED!\n" + "You have to RESTART it again to see the changes"));
             informationDialog.initOwner(thisStage);
             informationDialog.showAndWait();
             Platform.exit();
@@ -340,7 +340,7 @@ public class SettingsController {
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Export done");
             informationDialog.setHeaderText("The current data was exported.");
-            informationDialog.setContentText("The data was exported to '" + fileToSave + "'.");
+            informationDialog.getDialogPane().setContent(new Label("The data was exported to '\n" + fileToSave + "'."));
             informationDialog.initOwner(thisStage);
             informationDialog.showAndWait();
          } catch (final SQLException e) {
