@@ -150,7 +150,7 @@ public class ViewController {
    private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
    public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
    public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
-   private static boolean contextMenuOpenBoolean = false;
+   private boolean contextMenuOpenBoolean = false;
 
    private Stage reportStage;
    private ReportController reportController;
@@ -276,7 +276,7 @@ public class ViewController {
       });
 
       pane.setOnMouseExited(a -> {
-         if (contextMenuOpenBoolean == false) {
+         if (!contextMenuOpenBoolean) {
             mouseHoveringProperty.set(false);
          }
          contextMenuOpenBoolean = false;
@@ -589,7 +589,7 @@ public class ViewController {
          return;
       }
 
-      LOG.debug("Stage position changed '{}'/'{}'.", mainStage.xProperty().doubleValue(),
+      LOG.trace("Stage position changed '{}'/'{}'.", mainStage.xProperty().doubleValue(),
             mainStage.yProperty().doubleValue());
 
       final ScreenPosHelper positionHelper = new ScreenPosHelper(mainStage.xProperty().doubleValue(),
