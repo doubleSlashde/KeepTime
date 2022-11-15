@@ -62,9 +62,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 @SpringBootApplication
-public class Main extends Application {
+public class App extends Application {
 
-   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+   private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
    private ConfigurableApplicationContext springContext;
 
@@ -84,7 +84,7 @@ public class Main extends Application {
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
-      springContext = SpringApplication.run(Main.class);
+      springContext = SpringApplication.run(App.class);
       ApplicationProperties applicationProperties = springContext.getBean(ApplicationProperties.class);
       LOG.info("KeepTime Version: '{}'.", applicationProperties.getBuildVersion());
       LOG.info("KeepTime Build Timestamp: '{}'.", applicationProperties.getBuildTimestamp());
@@ -300,7 +300,4 @@ public class Main extends Application {
       springContext.stop();
    }
 
-   public static void main(final String[] args) {
-      launch(Main.class, args);
-   }
 }
