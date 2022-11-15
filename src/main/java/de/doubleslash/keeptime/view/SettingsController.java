@@ -18,17 +18,9 @@ package de.doubleslash.keeptime.view;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import de.doubleslash.keeptime.Main;
-import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.h2.tools.RunScript;
