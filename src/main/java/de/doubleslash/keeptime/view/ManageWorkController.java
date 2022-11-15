@@ -25,8 +25,6 @@ import javafx.scene.control.skin.ComboBoxListViewSkin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
 import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
 import de.doubleslash.keeptime.model.Model;
@@ -230,21 +228,22 @@ public class ManageWorkController {
       // needs to set again because editable is ignored from fxml because of custom preselection of current Project
       projectComboBox.setEditable(true);
 
-      projectComboBox.valueProperty().addListener(
-            (final ObservableValue<? extends Project> observable, final Project oldValue, final Project newValue) -> {
-               if (newValue == null) {
-                  return;
-               }
+      projectComboBox.valueProperty()
+                     .addListener((final ObservableValue<? extends Project> observable, final Project oldValue,
+                           final Project newValue) -> {
+                        if (newValue == null) {
+                           return;
+                        }
 
-               selectedProject = newValue;
-               comboChange = true;
-               // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-               Platform.runLater(() -> {
-                  setTextColor(projectComboBox.getEditor(), newValue.getColor());
-               });
-            }
+                        selectedProject = newValue;
+                        comboChange = true;
+                        // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
+                        Platform.runLater(() -> {
+                           setTextColor(projectComboBox.getEditor(), newValue.getColor());
+                        });
+                     }
 
-      );
+                     );
 
       enableStrgA_combo();
 
@@ -291,17 +290,21 @@ public class ManageWorkController {
       });
 
       // manages Focusbehaviour
-      projectComboBox.getEditor().focusedProperty().addListener((final ObservableValue<? extends Boolean> observable,
-            final Boolean oldIsFocused, final Boolean newIsFocused) -> {
-         if (newIsFocused) {
-            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-            Platform.runLater(() -> projectComboBox.getEditor().selectAll());
-         } else {
-            // needed to avoid exception on empty textfield https://bugs.openjdk.java.net/browse/JDK-8081700
-            Platform.runLater(() -> projectComboBox.hide());
-         }
+      projectComboBox.getEditor()
+                     .focusedProperty()
+                     .addListener((final ObservableValue<? extends Boolean> observable, final Boolean oldIsFocused,
+                           final Boolean newIsFocused) -> {
+                        if (newIsFocused) {
+                           // needed to avoid exception on empty textfield
+                           // https://bugs.openjdk.java.net/browse/JDK-8081700
+                           Platform.runLater(() -> projectComboBox.getEditor().selectAll());
+                        } else {
+                           // needed to avoid exception on empty textfield
+                           // https://bugs.openjdk.java.net/browse/JDK-8081700
+                           Platform.runLater(() -> projectComboBox.hide());
+                        }
 
-      });
+                     });
 
       // on
       projectComboBox.setOnKeyReleased(ke -> {
