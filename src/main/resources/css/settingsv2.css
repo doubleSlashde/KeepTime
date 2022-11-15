@@ -15,7 +15,9 @@
 	-fx-spacing: 15px;
 
 }
-
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container {
+	-fx-rotate: 90;
+}
 
 .tab-pane .tab-header-area .tab-header-background {
 	-fx-opacity: 0;
@@ -24,9 +26,10 @@
 
 .tab-pane .tab
 {
+	-fx-translate-y: -50;
 	-fx-background-color: lightgrey;
-	-fx-pref-height: 100;
-	-fx-pref-width: 70;
+	-fx-pref-height: 170;
+	-fx-pref-width: 40;
 }
 
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
@@ -37,15 +40,13 @@
 {
 	-fx-background-color: white;
 }
+
 .tab-pane .tab:hover
 {
+	-fx-border-style: hidden hidden solid hidden;
+	-fx-border-color: black;
 	-fx-border-width: 2;
-   -fx-border-color: blue;
-   -fx-border-style: solid hidden hidden hidden;
-
 }
-
-
 .button{
 	-fx-background-color: white;
 	-fx-border-color: lightgrey;
@@ -54,7 +55,6 @@
 }
 .button:hover{
 	-fx-border-color: grey;
-
 }
 .color-picker{
 	-fx-background-color: white;
