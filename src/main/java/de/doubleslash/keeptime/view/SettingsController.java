@@ -30,7 +30,6 @@ import javafx.application.Platform;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
-import javafx.application.Platform;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -200,15 +199,15 @@ public class SettingsController {
       }
 
 
-      double REQUIRED_WIDTH = 15.0;
-      double REQUIRED_HEIGHT = 15.0;
+      double requiredWidth = 15.0;
+      double requiredHeight = 15.0;
 
-      setRegionSvg(colorIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_COLOR_ICON);
-      setRegionSvg(layoutIcon,REQUIRED_WIDTH, REQUIRED_HEIGHT,RESOURCE.SVG_LAYOUT_ICON);
-      setRegionSvg(generalIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_SETTINGS_ICON);
-      setRegionSvg(aboutIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_ABOUT_ICON);
-      setRegionSvg(importexportIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_IMPORT_EXPORT_ICON);
-      setRegionSvg(licensesIcon,REQUIRED_WIDTH,REQUIRED_HEIGHT,RESOURCE.SVG_LICENSES_ICON);
+      setRegionSvg(colorIcon,requiredWidth, requiredHeight,RESOURCE.SVG_COLOR_ICON);
+      setRegionSvg(layoutIcon,requiredWidth, requiredHeight,RESOURCE.SVG_LAYOUT_ICON);
+      setRegionSvg(generalIcon,requiredWidth,requiredHeight,RESOURCE.SVG_SETTINGS_ICON);
+      setRegionSvg(aboutIcon,requiredWidth,requiredHeight,RESOURCE.SVG_ABOUT_ICON);
+      setRegionSvg(importexportIcon,requiredWidth,requiredHeight,RESOURCE.SVG_IMPORT_EXPORT_ICON);
+      setRegionSvg(licensesIcon,requiredWidth,requiredHeight,RESOURCE.SVG_LICENSES_ICON);
 
       initExportButton();
       initImportButton();
@@ -293,12 +292,12 @@ public class SettingsController {
       initializeAbout();
    }
 
-   private static void setRegionSvg(Region region, Double REQUIRED_WIDTH, Double REQUIRED_HEIGHT, RESOURCE resource) {
+   private static void setRegionSvg(Region region, Double requiredWidth, Double requiredHeight, RESOURCE resource) {
 
       region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource,1.0,1.0));
-      region.setMinSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
-      region.setPrefSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
-      region.setMaxSize(REQUIRED_WIDTH, REQUIRED_HEIGHT);
+      region.setMinSize(requiredWidth, requiredHeight);
+      region.setPrefSize(requiredWidth, requiredHeight);
+      region.setMaxSize(requiredWidth, requiredHeight);
       region.setStyle("-fx-background-color: black;");
    }
 
