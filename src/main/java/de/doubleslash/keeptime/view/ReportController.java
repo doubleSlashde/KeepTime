@@ -136,6 +136,7 @@ public class ReportController {
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
       initTableView();
 
+      workTableTreeView.expandedItemCountProperty().addListener(observable -> workTableTreeView.refresh());
    }
 
    private void initTableView() {
