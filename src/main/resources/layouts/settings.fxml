@@ -439,7 +439,7 @@
                   </AnchorPane>
               </content>
                <graphic>
-                  <Region fx:id="importexportIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
+                  <Region fx:id="importExportIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
                </graphic>
             </Tab>
             <Tab text="Licenses">

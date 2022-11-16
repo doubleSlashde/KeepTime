@@ -17,7 +17,6 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
@@ -123,9 +122,6 @@ public class SettingsController {
 
    @FXML
    private AnchorPane settingsRoot;
-   private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
-   private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
-   private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
 
    @FXML
    private Hyperlink gitHubHyperlink;
@@ -157,11 +153,14 @@ public class SettingsController {
    @FXML
    private Region aboutIcon;
    @FXML
-   private Region importexportIcon;
+   private Region importExportIcon;
 
    @FXML
    private Region licensesIcon;
 
+   private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
+   private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
+   private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
    private final ApplicationProperties applicationProperties;
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
@@ -206,7 +205,7 @@ public class SettingsController {
       setRegionSvg(layoutIcon,requiredWidth, requiredHeight,RESOURCE.SVG_LAYOUT_ICON);
       setRegionSvg(generalIcon,requiredWidth,requiredHeight,RESOURCE.SVG_SETTINGS_ICON);
       setRegionSvg(aboutIcon,requiredWidth,requiredHeight,RESOURCE.SVG_ABOUT_ICON);
-      setRegionSvg(importexportIcon,requiredWidth,requiredHeight,RESOURCE.SVG_IMPORT_EXPORT_ICON);
+      setRegionSvg(importExportIcon,requiredWidth,requiredHeight,RESOURCE.SVG_IMPORT_EXPORT_ICON);
       setRegionSvg(licensesIcon,requiredWidth,requiredHeight,RESOURCE.SVG_LICENSES_ICON);
 
       initExportButton();
@@ -292,7 +291,7 @@ public class SettingsController {
       initializeAbout();
    }
 
-   private static void setRegionSvg(Region region, Double requiredWidth, Double requiredHeight, RESOURCE resource) {
+   private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
 
       region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource,1.0,1.0));
       region.setMinSize(requiredWidth, requiredHeight);
