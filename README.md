@@ -67,4 +67,7 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 
 * Windows 7, 10
 * Linux (tested on Ubuntu 18.04)
-* Java 8 + JavaFX
+* Java 11
+
+
+
