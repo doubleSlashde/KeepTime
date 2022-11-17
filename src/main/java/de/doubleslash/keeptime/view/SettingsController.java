@@ -191,6 +191,10 @@ public class SettingsController {
 
                alert.showAndWait();
             }
+            if(hideProjectsOnMouseExitCheckBox.isSelected()){
+               hideProjectsOnMouseExitCheckBox.setSelected(false);
+               hideProjectsOnMouseExitCheckBox.setDisable(true);
+            }
          }
 
          if (saveWindowPositionCheckBox.isSelected()) {
