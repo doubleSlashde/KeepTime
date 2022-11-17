@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
+import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,11 +153,11 @@ public class ReportController {
                      setText(null);
                   } else {
                      final String notes = item.getNotes();
-                     final Label label = new Label(notes.isEmpty() ? EMPTY_NOTE : notes);
-                     label.setUnderline(item.isUnderlined());
-                     label.setTooltip(new Tooltip(notes));
-                     this.setGraphic(label);
-                     workTableTreeView.refresh();
+                     final Text text = new Text(notes.isEmpty() ? EMPTY_NOTE : notes);
+                     this.setText(text.getText());
+
+                     final Circle circle = new Circle(6, item.getProjectColor());
+                     this.setGraphic(circle);
                   }
                }
             };
@@ -229,10 +230,9 @@ public class ReportController {
          final HBox projectButtonBox = new HBox();
          projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
 
-         final Circle circle = new Circle(6, project.getColor());
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
-               new ProjectTableRow(project, projectWorkSeconds, projectButtonBox), circle);
+               new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
 
          for (final Work w : onlyCurrentProjectWork) {
             final HBox workButtonBox = new HBox(5.0);
