@@ -24,7 +24,7 @@
 
 .tab-pane .tab
 {
-	-fx-translate-y: -50;
+	-fx-translate-y: -10;
 	-fx-background-color: lightgrey;
 	-fx-pref-height: 170;
 	-fx-pref-width: 40;
@@ -41,9 +41,7 @@
 
 .tab-pane .tab:hover
 {
-	-fx-border-style: hidden hidden solid hidden;
-	-fx-border-color: black;
-	-fx-border-width: 2;
+	-fx-background-color: #eaeaea;
 }
 .button{
 	-fx-background-color: white;
