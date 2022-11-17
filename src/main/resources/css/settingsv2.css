@@ -4,7 +4,6 @@
 	-fx-border-style: hidden hidden solid hidden;
 	-fx-spacing: 5px;
 	-fx-padding: 0 0 5 0;
-
 }
 
 .saveCancelHboxBorder{
@@ -13,7 +12,6 @@
 	-fx-border-style: solid hidden hidden hidden;
 	-fx-padding: 2px;
 	-fx-spacing: 15px;
-
 }
 .tab-pane > .tab-header-area > .headers-region > .tab > .tab-container {
 	-fx-rotate: 90;
