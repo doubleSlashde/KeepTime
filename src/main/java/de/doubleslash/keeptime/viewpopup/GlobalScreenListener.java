@@ -67,10 +67,10 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseMotio
 
    public GlobalScreenListener() {
 
-         disableJNativeHookLogger();
+      disableJNativeHookLogger();
 
-         GlobalScreen.addNativeKeyListener(this);
-         GlobalScreen.addNativeMouseMotionListener(this);
+      GlobalScreen.addNativeKeyListener(this);
+      GlobalScreen.addNativeMouseMotionListener(this);
    }
 
    public void register(final boolean register) {
