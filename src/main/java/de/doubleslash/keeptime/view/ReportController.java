@@ -135,8 +135,6 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
       initTableView();
-
-      workTableTreeView.expandedItemCountProperty().addListener(observable -> workTableTreeView.refresh());
    }
 
    private void initTableView() {
@@ -157,6 +155,7 @@ public class ReportController {
                      label.setUnderline(item.isUnderlined());
                      label.setTooltip(new Tooltip(notes));
                      this.setGraphic(label);
+                     workTableTreeView.refresh();
                   }
                }
             };
