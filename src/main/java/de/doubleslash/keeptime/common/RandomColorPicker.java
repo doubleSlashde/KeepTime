@@ -2,7 +2,7 @@ package de.doubleslash.keeptime.common;
 
 
 
-import de.doubleslash.keeptime.Main;
+
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import javafx.beans.property.ObjectProperty;
