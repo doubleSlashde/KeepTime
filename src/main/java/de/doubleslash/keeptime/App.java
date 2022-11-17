@@ -168,7 +168,9 @@ public class App extends Application {
 
       primaryStage.setOnHiding(we -> {
          popupViewStage.close();
-         globalScreenListener.shutdown(); // deregister, as this will keep app running
+         if (globalScreenListener != null) {
+            globalScreenListener.shutdown(); // deregister, as this will keep app running
+         }
       });
 
       initialiseUI(primaryStage);
@@ -218,8 +220,11 @@ public class App extends Application {
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising popup UI.");
 
-      globalScreenListener = new GlobalScreenListener();
+
       if(!OS.isLinux()) {
+         globalScreenListener = new GlobalScreenListener();
+      }
+      if(globalScreenListener!=null){
          model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
          globalScreenListener.register(model.useHotkey.get());
       }
@@ -240,8 +245,9 @@ public class App extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-
-      globalScreenListener.setViewController(viewControllerPopupController);
+      if (globalScreenListener != null) {
+         globalScreenListener.setViewController(viewControllerPopupController);
+      }
    }
 
    private void initialiseUI(final Stage primaryStage) throws IOException {
