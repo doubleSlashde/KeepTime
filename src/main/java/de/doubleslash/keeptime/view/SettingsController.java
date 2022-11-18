@@ -21,14 +21,6 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
 
-import de.doubleslash.keeptime.common.*;
-import de.doubleslash.keeptime.view.license.LicenseTableRow;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.application.Platform;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseButton;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -37,20 +29,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.ApplicationProperties;
+import de.doubleslash.keeptime.common.BrowserHelper;
+import de.doubleslash.keeptime.common.FileOpenHelper;
+import de.doubleslash.keeptime.common.Licenses;
 import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Settings;
+import de.doubleslash.keeptime.view.license.LicenseTableRow;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -170,7 +177,6 @@ public class SettingsController {
 
    private Stage thisStage;
 
-
    @Autowired
    ViewController mainscreen;
 
@@ -195,18 +201,18 @@ public class SettingsController {
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
+         hideProjectsOnMouseExitCheckBox.setDisable(true);
       }
-
 
       double requiredWidth = 15.0;
       double requiredHeight = 15.0;
 
-      setRegionSvg(colorIcon,requiredWidth, requiredHeight,RESOURCE.SVG_COLOR_ICON);
-      setRegionSvg(layoutIcon,requiredWidth, requiredHeight,RESOURCE.SVG_LAYOUT_ICON);
-      setRegionSvg(generalIcon,requiredWidth,requiredHeight,RESOURCE.SVG_SETTINGS_ICON);
-      setRegionSvg(aboutIcon,requiredWidth,requiredHeight,RESOURCE.SVG_ABOUT_ICON);
-      setRegionSvg(importExportIcon,requiredWidth,requiredHeight,RESOURCE.SVG_IMPORT_EXPORT_ICON);
-      setRegionSvg(licensesIcon,requiredWidth,requiredHeight,RESOURCE.SVG_LICENSES_ICON);
+      setRegionSvg(colorIcon, requiredWidth, requiredHeight, RESOURCE.SVG_COLOR_ICON);
+      setRegionSvg(layoutIcon, requiredWidth, requiredHeight, RESOURCE.SVG_LAYOUT_ICON);
+      setRegionSvg(generalIcon, requiredWidth, requiredHeight, RESOURCE.SVG_SETTINGS_ICON);
+      setRegionSvg(aboutIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ABOUT_ICON);
+      setRegionSvg(importExportIcon, requiredWidth, requiredHeight, RESOURCE.SVG_IMPORT_EXPORT_ICON);
+      setRegionSvg(licensesIcon, requiredWidth, requiredHeight, RESOURCE.SVG_LICENSES_ICON);
 
       initExportButton();
       initImportButton();
@@ -242,15 +248,8 @@ public class SettingsController {
 
                alert.showAndWait();
             }
-            if (!displayProjectsRightCheckBox.isSelected() && hideProjectsOnMouseExitCheckBox.isSelected()) {
+            if (hideProjectsOnMouseExitCheckBox.isSelected()) {
                hideProjectsOnMouseExitCheckBox.setSelected(false);
-               final Alert warning = new Alert(AlertType.WARNING);
-               warning.setTitle("Warning!");
-               warning.setHeaderText("No Linux Support");
-               warning.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
-               warning.setContentText(
-                     "The project list on the left side has no Linux support if projects should be hidden. Disabling hiding of project list.");
-               warning.showAndWait();
             }
          }
 
@@ -293,7 +292,7 @@ public class SettingsController {
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
 
-      region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource,1.0,1.0));
+      region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource, 1.0, 1.0));
       region.setMinSize(requiredWidth, requiredHeight);
       region.setPrefSize(requiredWidth, requiredHeight);
       region.setMaxSize(requiredWidth, requiredHeight);
@@ -315,8 +314,8 @@ public class SettingsController {
 
       nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-      //set SvgPath content
-      setRegionSvg(bugIcon,20.0 ,20.0 , RESOURCE.SVG_BUG_ICON);
+      // set SvgPath content
+      setRegionSvg(bugIcon, 20.0, 20.0, RESOURCE.SVG_BUG_ICON);
 
       // licenseColumn
       final TableColumn<LicenseTableRow, String> licenseColumn = new TableColumn<>("License");
@@ -366,22 +365,24 @@ public class SettingsController {
          BrowserHelper.openURL(GITHUB_ISSUE_PAGE);
       });
    }
-   private void initImportButton(){
+
+   private void initImportButton() {
       LOG.debug("Initialize importButton.");
-      importButton.setOnAction(event ->{
+      importButton.setOnAction(event -> {
 
          try {
-            Alert confirmationAlert = new Alert(AlertType.CONFIRMATION , "", ButtonType.YES, ButtonType.NO);
+            Alert confirmationAlert = new Alert(AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.NO);
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.setContentText("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
-                    "\n" +
-                    "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n" +
-                    "\n" +
-                    "You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file.");
+            confirmationAlert.setContentText(
+                  "Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n"
+                        + "\n"
+                        + "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n"
+                        + "\n"
+                        + "You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file.");
             confirmationAlert.showAndWait();
 
-            if(confirmationAlert.getResult()==ButtonType.NO){
+            if (confirmationAlert.getResult() == ButtonType.NO) {
                LOG.info("User canceled import");
                return;
             }
@@ -398,16 +399,18 @@ public class SettingsController {
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
-            //TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
-            new RunScript().runTool("-url", url, "-user",username,"-password",password,"-script",file.toString(),"-options", "FROM_1X");
+            // TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in
+            // the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
+            new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
+                  "-options", "FROM_1X");
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.setContentText("KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
+            informationDialog.setContentText(
+                  "KeepTime will now be CLOSED! You have to RESTART it again to see the changes");
             informationDialog.showAndWait();
             Platform.exit();
-
 
          } catch (SQLException e) {
             LOG.error("Could not import script file to db.", e);
@@ -486,7 +489,8 @@ public class SettingsController {
       hideProjectsOnMouseExitCheckBox.setSelected(model.hideProjectsOnMouseExit.get());
       saveWindowPositionCheckBox.setSelected(model.screenSettings.saveWindowPosition.get());
       emptyNoteReminderCheckBox.setSelected(model.remindIfNotesAreEmpty.get());
-      emptyNoteReminderOnlyForWorkEntryCheckBox.disableProperty().bind(emptyNoteReminderCheckBox.selectedProperty().not());
+      emptyNoteReminderOnlyForWorkEntryCheckBox.disableProperty()
+                                               .bind(emptyNoteReminderCheckBox.selectedProperty().not());
       emptyNoteReminderOnlyForWorkEntryCheckBox.setSelected(model.remindIfNotesAreEmptyOnlyForWorkEntry.get());
       confirmCloseCheckBox.setSelected(model.confirmClose.get());
    }
@@ -495,11 +499,10 @@ public class SettingsController {
       this.thisStage = thisStage;
    }
 
-
-
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
+
    public ObservableList<LicenseTableRow> loadLicenseRows() {
       final ObservableList<LicenseTableRow> licenseRows = FXCollections.observableArrayList();
       licenseRows.add(new LicenseTableRow("Open Sans", Licenses.APACHEV2));
@@ -523,8 +526,8 @@ public class SettingsController {
          alert.setTitle("Ooops");
          alert.setHeaderText("Could not find the license file");
          alert.setContentText(String.format(
-                 "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
-                 license.getPath(), license.getUrl()));
+               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
+               license.getPath(), license.getUrl()));
 
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
