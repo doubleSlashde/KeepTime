@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import de.doubleslash.keeptime.common.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -167,7 +168,9 @@ public class App extends Application {
 
       primaryStage.setOnHiding(we -> {
          popupViewStage.close();
-         globalScreenListener.shutdown(); // deregister, as this will keep app running
+         if (globalScreenListener != null) {
+            globalScreenListener.shutdown(); // deregister, as this will keep app running
+         }
       });
 
       initialiseUI(primaryStage);
@@ -217,11 +220,14 @@ public class App extends Application {
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising popup UI.");
 
-      globalScreenListener = new GlobalScreenListener();
 
-      model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
-      globalScreenListener.register(model.useHotkey.get());
-
+      if(!OS.isLinux()) {
+         globalScreenListener = new GlobalScreenListener();
+      }
+      if(globalScreenListener!=null){
+         model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
+         globalScreenListener.register(model.useHotkey.get());
+      }
       popupViewStage = new Stage();
       popupViewStage.initOwner(primaryStage);
       // Load root layout from fxml file.
@@ -239,8 +245,9 @@ public class App extends Application {
       popupViewStage.setAlwaysOnTop(true);
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
-
-      globalScreenListener.setViewController(viewControllerPopupController);
+      if (globalScreenListener != null) {
+         globalScreenListener.setViewController(viewControllerPopupController);
+      }
    }
 
    private void initialiseUI(final Stage primaryStage) throws IOException {
