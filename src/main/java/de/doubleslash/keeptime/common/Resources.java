@@ -57,6 +57,16 @@ public class Resources {
 
       SVG_BUG_ICON("/svgs/bug.svg"),
 
+      SVG_LAYOUT_ICON("/svgs/border-all.svg"),
+
+      SVG_ABOUT_ICON("/svgs/info.svg"),
+
+      SVG_COLOR_ICON("/svgs/palette.svg"),
+
+      SVG_IMPORT_EXPORT_ICON("/svgs/sort.svg"),
+
+      SVG_LICENSES_ICON("/svgs/closed-captioning.svg")
+
       ;
 
       String resourceLocation;

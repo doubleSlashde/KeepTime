@@ -17,12 +17,18 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Comparator;
 
+import de.doubleslash.keeptime.common.*;
+import de.doubleslash.keeptime.view.license.LicenseTableRow;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.application.Platform;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -35,20 +41,21 @@ import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
-import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Settings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 @Component
@@ -109,9 +116,6 @@ public class SettingsController {
    private Button importButton;
 
    @FXML
-   private Button aboutButton;
-
-   @FXML
    private Label hotkeyLabel;
    @FXML
    private Label globalKeyloggerLabel;
@@ -119,15 +123,53 @@ public class SettingsController {
    @FXML
    private AnchorPane settingsRoot;
 
+   @FXML
+   private Hyperlink gitHubHyperlink;
+
+   @FXML
+   private Button reportBugButton;
+
+   @FXML
+   private Region bugIcon;
+
+   @FXML
+   private Label versionNumberLabel;
+
+   @FXML
+   private Hyperlink ourLicenseHyperLink;
+
+   @FXML
+   private TableView<LicenseTableRow> licenseTableView;
+
+   @FXML
+   private Region colorIcon;
+
+   @FXML
+   private Region layoutIcon;
+
+   @FXML
+   private Region generalIcon;
+
+   @FXML
+   private Region aboutIcon;
+   @FXML
+   private Region importExportIcon;
+
+   @FXML
+   private Region licensesIcon;
+
+   private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
+   private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
+   private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
+   private final ApplicationProperties applicationProperties;
+
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
    private final Controller controller;
    private final Model model;
-   private final ApplicationProperties applicationProperties;
 
    private Stage thisStage;
 
-   private Stage aboutStage;
 
    @Autowired
    ViewController mainscreen;
@@ -146,7 +188,6 @@ public class SettingsController {
       LOG.info("OS: {}", OS.getOSname());
       LOG.debug("set versionLabel text");
       LOG.debug("load substages");
-      loadAboutStage();
       LOG.debug("set version label text");
 
       if (OS.isLinux()) {
@@ -155,6 +196,17 @@ public class SettingsController {
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
       }
+
+
+      double requiredWidth = 15.0;
+      double requiredHeight = 15.0;
+
+      setRegionSvg(colorIcon,requiredWidth, requiredHeight,RESOURCE.SVG_COLOR_ICON);
+      setRegionSvg(layoutIcon,requiredWidth, requiredHeight,RESOURCE.SVG_LAYOUT_ICON);
+      setRegionSvg(generalIcon,requiredWidth,requiredHeight,RESOURCE.SVG_SETTINGS_ICON);
+      setRegionSvg(aboutIcon,requiredWidth,requiredHeight,RESOURCE.SVG_ABOUT_ICON);
+      setRegionSvg(importExportIcon,requiredWidth,requiredHeight,RESOURCE.SVG_IMPORT_EXPORT_ICON);
+      setRegionSvg(licensesIcon,requiredWidth,requiredHeight,RESOURCE.SVG_LICENSES_ICON);
 
       initExportButton();
       initImportButton();
@@ -236,9 +288,82 @@ public class SettingsController {
       resetTaskBarFontButton.setOnAction(ae -> taskBarColor.setValue(Model.ORIGINAL_TASK_BAR_FONT_COLOR));
 
       LOG.debug("aboutButton.setOnAction");
-      aboutButton.setOnAction(ae -> {
-         LOG.info("About clicked");
-         aboutStage.show();
+      initializeAbout();
+   }
+
+   private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
+
+      region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource,1.0,1.0));
+      region.setMinSize(requiredWidth, requiredHeight);
+      region.setPrefSize(requiredWidth, requiredHeight);
+      region.setMaxSize(requiredWidth, requiredHeight);
+      region.setStyle("-fx-background-color: black;");
+   }
+
+   public void initializeAbout() {
+      LOG.debug("set version label");
+      versionNumberLabel.setText(applicationProperties.getBuildVersion());
+
+      ourLicenseHyperLink.setFocusTraversable(false);
+      ourLicenseHyperLink.setOnAction(ae -> showLicense(Licenses.GPLV3));
+
+      LOG.debug("set up table");
+      // name column
+      TableColumn<LicenseTableRow, String> nameColumn;
+      nameColumn = new TableColumn<>("Name");
+      nameColumn.setMinWidth(160);
+
+      nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+      //set SvgPath content
+      setRegionSvg(bugIcon,20.0 ,20.0 , RESOURCE.SVG_BUG_ICON);
+
+      // licenseColumn
+      final TableColumn<LicenseTableRow, String> licenseColumn = new TableColumn<>("License");
+      licenseColumn.setMinWidth(260);
+      licenseColumn.setCellFactory(param -> new TableCell<LicenseTableRow, String>() {
+         @Override
+         protected void updateItem(final String item, final boolean empty) {
+            super.updateItem(item, empty);
+
+            setText(empty ? null : item);
+            setTextFill(HYPERLINK_COLOR);
+
+            setOnMouseEntered(e -> setUnderline(true));
+
+            setOnMouseExited(e -> setUnderline(false));
+
+            setOnMouseClicked(eventOnMouseClicked -> {
+               if (!empty && eventOnMouseClicked.getButton() == MouseButton.PRIMARY) {
+                  final LicenseTableRow row = (LicenseTableRow) getTableRow().getItem();
+                  final Licenses license = row.getLicense();
+                  LOG.debug("License file name: {}", license);
+
+                  showLicense(license);
+               }
+            });
+         }
+
+      });
+      licenseColumn.setCellValueFactory(new PropertyValueFactory<>("licenseName"));
+
+      final ObservableList<LicenseTableRow> licenses = loadLicenseRows();
+
+      licenseTableView.setItems(licenses);
+
+      licenseTableView.getColumns().add(nameColumn);
+      licenseTableView.getColumns().add(licenseColumn);
+
+      LOG.debug("hyperlink setonaction");
+      gitHubHyperlink.setOnAction(ae -> {
+         LOG.debug("hyperlink clicked");
+         BrowserHelper.openURL(GITHUB_PAGE);
+      });
+
+      LOG.debug("roportbugbutton setonaction");
+      reportBugButton.setOnAction(ae -> {
+         LOG.info("Clicked reportBugButton");
+         BrowserHelper.openURL(GITHUB_ISSUE_PAGE);
       });
    }
    private void initImportButton(){
@@ -325,8 +450,6 @@ public class SettingsController {
             Script.process(url, username, password, fileToSave.getAbsolutePath(), "DROP", "");
             LOG.info("Export done.");
 
-
-
             Alert informationDialog = new Alert(AlertType.INFORMATION);
             informationDialog.setTitle("Export done");
             informationDialog.setHeaderText("The current data was exported.");
@@ -372,34 +495,40 @@ public class SettingsController {
       this.thisStage = thisStage;
    }
 
-   private void loadAboutStage() {
-      try {
-         // About stage
-         LOG.debug("load about.fxml");
-         final FXMLLoader fxmlLoader3 = createFXMLLoader(RESOURCE.FXML_ABOUT);
-         fxmlLoader3.setControllerFactory(model.getSpringContext()::getBean);
-         LOG.debug("load root");
-         final Parent rootAbout = fxmlLoader3.load();
-         LOG.debug("set stage");
-         aboutStage = new Stage();
-         aboutStage.initModality(Modality.APPLICATION_MODAL);
-         aboutStage.setTitle("About KeepTime");
-         aboutStage.setResizable(false);
-         aboutStage.setScene(new Scene(rootAbout));
-         aboutStage.setOnHiding(e -> this.thisStage.setAlwaysOnTop(true));
-         aboutStage.setOnShowing(e -> {
-            this.thisStage.setAlwaysOnTop(false);
-            aboutStage.setAlwaysOnTop(false);
-         });
 
-         LOG.debug("done setting up stage");
-      } catch (final IOException e) {
-         throw new FXMLLoaderException("Could not load About stage.", e);
-      }
-
-   }
 
    private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
+   }
+   public ObservableList<LicenseTableRow> loadLicenseRows() {
+      final ObservableList<LicenseTableRow> licenseRows = FXCollections.observableArrayList();
+      licenseRows.add(new LicenseTableRow("Open Sans", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("jnativehook", Licenses.GPLV3));
+      licenseRows.add(new LicenseTableRow("jnativehook", Licenses.LGPLV3));
+      licenseRows.add(new LicenseTableRow("commons-lang3", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("flyway-maven-plugin", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-data-jpa", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
+      licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
+      licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
+
+      licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
+
+      return licenseRows;
+   }
+
+   private void showLicense(final Licenses license) {
+      if (!FileOpenHelper.openFile(license.getPath())) {
+         final Alert alert = new Alert(AlertType.ERROR);
+         alert.setTitle("Ooops");
+         alert.setHeaderText("Could not find the license file");
+         alert.setContentText(String.format(
+                 "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
+                 license.getPath(), license.getUrl()));
+
+         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+
+         alert.show();
+      }
    }
 }
