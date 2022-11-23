@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import de.doubleslash.keeptime.common.OS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -32,6 +31,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import de.doubleslash.keeptime.common.FontProvider;
+import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -168,7 +168,9 @@ public class App extends Application {
 
       primaryStage.setOnHiding(we -> {
          popupViewStage.close();
-         globalScreenListener.shutdown(); // deregister, as this will keep app running
+         if (globalScreenListener != null) {
+            globalScreenListener.shutdown(); // deregister, as this will keep app running
+         }
       });
 
       initialiseUI(primaryStage);
@@ -218,11 +220,6 @@ public class App extends Application {
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising popup UI.");
 
-      globalScreenListener = new GlobalScreenListener();
-      if(!OS.isLinux()) {
-         model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
-         globalScreenListener.register(model.useHotkey.get());
-      }
       popupViewStage = new Stage();
       popupViewStage.initOwner(primaryStage);
       // Load root layout from fxml file.
@@ -241,7 +238,12 @@ public class App extends Application {
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
 
-      globalScreenListener.setViewController(viewControllerPopupController);
+      if (!OS.isLinux()) {
+         globalScreenListener = new GlobalScreenListener();
+         globalScreenListener.register(model.useHotkey.get());
+         globalScreenListener.setViewController(viewControllerPopupController);
+         model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
+      }
    }
 
    private void initialiseUI(final Stage primaryStage) throws IOException {

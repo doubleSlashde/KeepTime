@@ -66,12 +66,11 @@ public class GlobalScreenListener implements NativeKeyListener, NativeMouseMotio
    private Point mouseLocation = new Point(0, 0);
 
    public GlobalScreenListener() {
-      if(!OS.isLinux()) {
-         disableJNativeHookLogger();
 
-         GlobalScreen.addNativeKeyListener(this);
-         GlobalScreen.addNativeMouseMotionListener(this);
-      }
+      disableJNativeHookLogger();
+
+      GlobalScreen.addNativeKeyListener(this);
+      GlobalScreen.addNativeMouseMotionListener(this);
    }
 
    public void register(final boolean register) {

@@ -12,13 +12,13 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + You can move the window by dragging it around
 + Open the context menu (with a right-click) for a project to edit/delete or change the project and transfer n minutes of the current running one
 + In the taskbar you will also see the current time + the color of the active project
-+ The current Project will be saved eyery minute to mitigate loss on system crash or shutdown without closing window manually first. 
++ The current Project will be saved every minute to mitigate loss on system crash or shutdown without closing window manually first. 
 + After a day you can open the Reports, which will summarize the work done for the different projects during the day
 
-**You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved completely to database. (will be last state saved by auto-save)**
+**You need to close the application manually before you shut down your PC. Otherwise, the last running project is not saved completely to database. (will be last state saved by auto-save)**
 
 ### Settings:
-![Settings Screen](readme/images/settings.png?raw=true "Settings")
+![Settings Screen](readme/images/settingsColor.PNG?raw=true "Settings")
 
 + Colors: you can define various colors to use in the UI to customize the application. The Reset resets the color to the default color.
 + Display projects on the right: Will show the list of projects on the right side, instead of the left
@@ -39,7 +39,7 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 * Extract the downloaded .zip
 * Copy the downloaded keeptime.bat file next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
 
-It is recommended to run the application at computer start so you do not forget to track your time. For autostart also execute the following steps (for windows)
+It is recommended to run the application at computer start, so you do not forget to track your time. For autostart also execute the following steps (for windows)
 * Open the autostart folder: Press *Windows+R*, execute *shell:startup*
 * Create a shortcut to the *.bat* in the autostart folder
 
@@ -68,6 +68,3 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 * Windows 7, 10
 * Linux (tested on Ubuntu 18.04)
 * Java 11
-
-
-
