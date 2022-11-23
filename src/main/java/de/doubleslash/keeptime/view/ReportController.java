@@ -108,6 +108,9 @@ public class ReportController {
    @FXML
    private Canvas colorTimeLineCanvas;
 
+   @FXML
+   private Button expandColapseButton;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private final Model model;
@@ -134,8 +137,21 @@ public class ReportController {
       currentReportDate = LocalDate.now();
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
-      initTableView();
 
+      expandColapseButton.setOnMouseClicked(event ->{
+
+           for (int i=0; i<rootItem.getChildren().size(); i++){
+
+             if( rootItem.getChildren().get(i).isExpanded()){
+                rootItem.getChildren().get(i).setExpanded(false);
+                expandColapseButton.setText("Expand");
+             }else {
+                rootItem.getChildren().get(i).setExpanded(true);
+                expandColapseButton.setText("Collapse");
+             }
+        }
+      });
+      initTableView();
    }
 
    private void initTableView() {
@@ -191,7 +207,8 @@ public class ReportController {
       workTableTreeView.setShowRoot(false);
 
       workTableTreeView.setRoot(rootItem);
-      rootItem.setExpanded(true);
+      //rootItem.setExpanded(false);
+
    }
 
    private void updateReport(final LocalDate dateToShow) {
