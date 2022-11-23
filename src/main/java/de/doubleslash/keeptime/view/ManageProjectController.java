@@ -104,5 +104,4 @@ public class ManageProjectController {
             isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
    }
 
-
 }
