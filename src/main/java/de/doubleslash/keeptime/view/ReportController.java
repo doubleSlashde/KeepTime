@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -153,11 +154,14 @@ public class ReportController {
                      setText(null);
                   } else {
                      final String notes = item.getNotes();
-                     final Text text = new Text(notes.isEmpty() ? EMPTY_NOTE : notes);
-                     this.setText(text.getText());
-
-                     final Circle circle = new Circle(6, item.getProjectColor());
-                     this.setGraphic(circle);
+                     final String text = notes.isEmpty() ? EMPTY_NOTE : notes;
+                     this.setText(text);
+                     if(item.getProjectColor()!=null){
+                        final Circle circle = new Circle(6, item.getProjectColor());
+                        this.setGraphic(circle);
+                     }else {
+                        this.setGraphic(null);
+                     }
                   }
                }
             };
@@ -178,7 +182,35 @@ public class ReportController {
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
       final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
-      timeSumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeSum"));
+      timeSumColumn.setCellFactory(new Callback<TreeTableColumn<TableRow, String>, TreeTableCell<TableRow, String>>() {
+         @Override
+         public TreeTableCell<TableRow, String> call(TreeTableColumn<TableRow, String> tableRowStringTreeTableColumn) {
+
+            return new TreeTableCell<TableRow,String>(){
+
+               @Override
+               protected void updateItem(String s, boolean b) {
+                  super.updateItem(s, b);
+                  Label l1 = new Label(s);
+                  if(b){
+                     this.setGraphic(null);
+                  }else if (l1.getText()!=null) {
+
+                        if (l1.getText().equals(currentDayWorkTimeLabel.getText())) {
+                           l1.setUnderline(true);
+                           this.setGraphic(l1);
+
+                        } else {
+                           Label label = new Label(s);
+                           this.setGraphic(label);
+                        }
+                  }
+               }
+            };
+         }
+      });
+      timeSumColumn.setCellValueFactory( (final TreeTableColumn.CellDataFeatures<TableRow, String> entry) -> new ReadOnlyObjectWrapper<>(
+              entry.getValue().getValue().getTimeSum()));
       timeSumColumn.setMinWidth(60);
       timeSumColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
