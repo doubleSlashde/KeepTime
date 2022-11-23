@@ -124,7 +124,6 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
-
    @FXML
    private TextArea textArea;
 
@@ -132,7 +131,6 @@ public class ViewController {
    private Canvas canvas;
 
    private ColorTimeLine mainColorTimeLine;
-
 
    private class Delta {
       double x;
@@ -188,7 +186,6 @@ public class ViewController {
 
          setProjectListVisible(c);
       });
-
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
@@ -337,13 +334,12 @@ public class ViewController {
 
    private void openConfirmationWindow() {
       if (model.confirmClose.get()) {
-
          Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.CANCEL);
          alert.setTitle("Confirm exit");
          alert.setHeaderText("Are you sure you want to close KeepTime?");
 
-          Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-          stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          alert.initOwner(mainStage);
          alert.showAndWait();
