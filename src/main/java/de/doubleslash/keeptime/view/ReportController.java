@@ -293,7 +293,6 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
-
       final Button deleteButton = new Button("",
             SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_TRASH_ICON, 0.03, 0.03));
       deleteButton.setMaxSize(20, 18);
