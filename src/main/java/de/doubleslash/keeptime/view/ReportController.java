@@ -138,19 +138,7 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
 
-      expandColapseButton.setOnMouseClicked(event ->{
-
-           for (int i=0; i<rootItem.getChildren().size(); i++){
-
-             if( rootItem.getChildren().get(i).isExpanded()){
-                rootItem.getChildren().get(i).setExpanded(false);
-                expandColapseButton.setText("Expand");
-             }else {
-                rootItem.getChildren().get(i).setExpanded(true);
-                expandColapseButton.setText("Collapse");
-             }
-        }
-      });
+      expandColapseButton.setOnMouseClicked(event ->collapseExpandTable());
       initTableView();
    }
 
@@ -211,6 +199,18 @@ public class ReportController {
 
    }
 
+   private void collapseExpandTable(){
+      for (int i=0; i<rootItem.getChildren().size(); i++){
+
+         if( rootItem.getChildren().get(i).isExpanded()){
+            rootItem.getChildren().get(i).setExpanded(false);
+            expandColapseButton.setText("Expand");
+         }else {
+            rootItem.getChildren().get(i).setExpanded(true);
+            expandColapseButton.setText("Collapse");
+         }
+      }
+   }
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
       rootItem.getChildren().clear();
