@@ -195,8 +195,7 @@ public class ReportController {
       workTableTreeView.setShowRoot(false);
 
       workTableTreeView.setRoot(rootItem);
-      //rootItem.setExpanded(false);
-
+      rootItem.setExpanded(true);
    }
 
    private void collapseExpandTable(){
