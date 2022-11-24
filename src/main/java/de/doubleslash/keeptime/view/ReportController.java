@@ -26,6 +26,8 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
+import javafx.scene.text.Text;
+import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -240,6 +242,11 @@ public class ReportController {
             workButtonBox.getChildren().add(createDeleteWorkButton(w));
             final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
             projectRow.getChildren().add(workRow);
+            if(w.getId()==model.activeWorkItem.get().getId()){
+               workButtonBox.getChildren().remove(0,3);
+               Text text = new Text("Active Work");
+               workButtonBox.getChildren().add(text);
+            }
          }
 
          projectRow.setExpanded(true);
@@ -286,6 +293,7 @@ public class ReportController {
    }
 
    private Button createDeleteWorkButton(final Work w) {
+
       final Button deleteButton = new Button("",
             SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_TRASH_ICON, 0.03, 0.03));
       deleteButton.setMaxSize(20, 18);
