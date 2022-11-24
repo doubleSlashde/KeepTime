@@ -26,7 +26,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
-import javafx.scene.text.Font
+import javafx.scene.text.Font;
 import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
