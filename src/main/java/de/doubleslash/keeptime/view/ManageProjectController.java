@@ -77,14 +77,7 @@ public class ManageProjectController {
    private void randomColorEvent() {
 
       try {
-            textFillColorPicker.setValue(RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), model.getAvailableProjects()));
-            ObservableList<Project> projects = model.getAvailableProjects();
-            for(Project project : projects){
-            LOG.info(project.getColor().toString());
-         }
-          
-      } catch (ClassNotFoundException e) {
-         throw new RuntimeException(e);
+         textFillColorPicker.setValue(RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), model.getAvailableProjects()));
       } catch (IllegalAccessException e) {
          throw new RuntimeException(e);
       }
