@@ -54,12 +54,15 @@ class RandomColorPickerTest {
     }
 
     @Test
-    public void testest(){
+    public void shouldReturnUniqueColorWhenGiveBackgroundAndProjectColor(){
         Project p = new Project();
         p.setColor(Color.RED);
+        Project p1 = new Project();
+        p1.setColor(Color.GREEN);
 
-        RandomColorPicker.colors=Arrays.asList(Color.RED,Color.BLUE,Color.GREEN);
-        RandomColorPicker.getUniqueColor(Arrays.asList(p),Color.BLUE);
+        RandomColorPicker.colors=new ArrayList<>(Arrays.asList(Color.RED,Color.BLUE,Color.GREEN,Color.GRAY));
+
+        Assertions.assertEquals(Color.GRAY,RandomColorPicker.getUniqueColor(Arrays.asList(p,p1),Color.BLUE));
     }
 
 

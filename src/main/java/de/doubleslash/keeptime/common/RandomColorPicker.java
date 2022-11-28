@@ -23,9 +23,22 @@ import java.util.Random;
 public class RandomColorPicker {
     private static final Logger LOG = LoggerFactory.getLogger(RandomColorPicker.class);
 
-   public static Color getRandomColor() throws IllegalAccessException {
+    public static List<Color> colors = new ArrayList<>();
 
-        List<Color> colors = new ArrayList<>();
+    static {
+        try {
+            fillColorList();
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+   public static Color getRandomColor(List<Color> colorList) {
+
+        int rnd = new Random().nextInt(colorList.size());
+        return colorList.get(rnd);
+    }
+    private static void fillColorList() throws IllegalAccessException {
         Field[] field = Color.class.getFields();
         if (field != null) {
             for (int i = 0; i < field.length; i++) {
@@ -36,44 +49,39 @@ public class RandomColorPicker {
                 }
             }
         }
-        int rnd = new Random().nextInt(colors.size());
-        return colors.get(rnd);
     }
 
     public static Color chooseContrastColor(Color backgroundColor, ObservableList<Project> availableProjects) throws IllegalAccessException {
 
         double divAdd=0;
         Color divColor=null;
+        int maxTrys=0;
 
-        while (divAdd <1) {
-            divColor = getUniqueColor(availableProjects);
+        while (divAdd <1 && maxTrys<10) {
+            divColor = getUniqueColor(availableProjects,backgroundColor);
             double divred = Math.abs(divColor.getRed()-backgroundColor.getRed());
             double divgreen = Math.abs(divColor.getGreen()-backgroundColor.getGreen());
             double divblue = Math.abs(divColor.getBlue()- backgroundColor.getBlue());
             divAdd  = divblue+divgreen+divred;
-
+            maxTrys++;
         }
         return divColor;
     }
 
-    public static Color getUniqueColor(ObservableList<Project> availableProjects) throws IllegalAccessException {
+    public static Color getUniqueColor(List<Project> availableProjects, Color backgroundColor) {
 
-       Color color = getRandomColor();
-       int tempInt=0;
-       while(true){
+        List<Color> uniqueColorList = colors;
+        uniqueColorList.remove(backgroundColor); //List should remove all already used colors.
 
            for(Project project : availableProjects){
+                for (int i=0; i<uniqueColorList.size(); i++){
 
-               if (project.getColor().toString().equals(color.toString())) {
-                   tempInt++;
-                   break;
-               }
+                    if (project.getColor().toString().equals(uniqueColorList.get(i).toString())) {
+                        uniqueColorList.remove(i);
+                    }
+                }
            }
-           if(tempInt==0){
-               return color;
-           }
-           color = getRandomColor();
-           tempInt=0;
+           return getRandomColor(uniqueColorList);
        }
-    }
+
 }
