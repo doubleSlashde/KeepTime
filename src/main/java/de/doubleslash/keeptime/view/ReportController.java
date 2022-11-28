@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.text.Font;
-import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -243,7 +242,7 @@ public class ReportController {
             final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
             projectRow.getChildren().add(workRow);
             if(w.getId()==model.activeWorkItem.get().getId()){
-               workButtonBox.getChildren().remove(0,3);
+               workButtonBox.getChildren().clear();
                Label label = new Label("Active Work");
                label.setTooltip(new Tooltip("The active work item cannot be edited as it is currently active. To edit it you need to switch to another work first."));
                label.getTooltip().setFont(Font.font(15));
