@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
+import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +126,8 @@ public class ReportController {
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
+   private static boolean pressed= false;
+
    @Autowired
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
@@ -199,16 +202,23 @@ public class ReportController {
    }
 
    private void collapseExpandTable(){
-      for (int i=0; i<rootItem.getChildren().size(); i++){
 
-         if( rootItem.getChildren().get(i).isExpanded()){
+      pressed=!pressed;
+
+      if(pressed){
+         //CollapseAll
+         for (int i=0; i<rootItem.getChildren().size(); i++){
             rootItem.getChildren().get(i).setExpanded(false);
-            expandColapseButton.setText("Expand");
-         }else {
-            rootItem.getChildren().get(i).setExpanded(true);
+         }
+         expandColapseButton.setText("Expand");
+
+      }else {
+         //ExpandAll
+            for (int i=0; i<rootItem.getChildren().size(); i++){
+               rootItem.getChildren().get(i).setExpanded(true);
+            }
             expandColapseButton.setText("Collapse");
          }
-      }
    }
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
