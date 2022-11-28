@@ -16,24 +16,6 @@
 
 package de.doubleslash.keeptime.view;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import javafx.scene.control.skin.DatePickerSkin;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -53,21 +35,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
@@ -77,6 +48,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class ReportController {
@@ -123,6 +103,8 @@ public class ReportController {
    private LocalDate currentReportDate;
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
+
+   private static List<String> workTime = new ArrayList<>();
 
    @Autowired
    public ReportController(final Model model, final Controller controller) {
@@ -182,28 +164,32 @@ public class ReportController {
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
       final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
-      timeSumColumn.setCellFactory(new Callback<TreeTableColumn<TableRow, String>, TreeTableCell<TableRow, String>>() {
+      timeSumColumn.setCellFactory(new Callback<>() {
          @Override
          public TreeTableCell<TableRow, String> call(TreeTableColumn<TableRow, String> tableRowStringTreeTableColumn) {
 
-            return new TreeTableCell<TableRow,String>(){
+            return new TreeTableCell<>() {
 
                @Override
-               protected void updateItem(String s, boolean b) {
-                  super.updateItem(s, b);
-                  Label l1 = new Label(s);
-                  if(b){
+               protected void updateItem(String timeString, boolean empty) {
+                  super.updateItem(timeString, empty);
+
+                  if (timeString == null || empty) {
                      this.setGraphic(null);
-                  }else if (l1.getText()!=null) {
+                     this.setText(null);
 
-                        if (l1.getText().equals(currentDayWorkTimeLabel.getText())) {
-                           l1.setUnderline(true);
-                           this.setGraphic(l1);
+                  } else {
+                     this.setGraphic(new Label(timeString));
 
-                        } else {
-                           Label label = new Label(s);
-                           this.setGraphic(label);
+                     for (String workTime : workTime) {
+
+                        if (timeString.equals(workTime)) {
+                           Label workLabel = new Label(timeString);
+                           workLabel.setUnderline(true);
+                           this.setGraphic(workLabel);
                         }
+
+                     }
                   }
                }
             };
@@ -253,6 +239,10 @@ public class ReportController {
                                                                    .collect(Collectors.toList());
 
          final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
+
+         if(project.isWork()){
+            workTime.add(DateFormatter.secondsToHHMMSS(projectWorkSeconds));
+         }
 
          currentSeconds += projectWorkSeconds;
          if (project.isWork()) {
