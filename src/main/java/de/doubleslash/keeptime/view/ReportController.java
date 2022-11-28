@@ -177,7 +177,6 @@ public class ReportController {
                   if (timeString == null || empty) {
                      this.setGraphic(null);
                      this.setText(null);
-
                   } else {
                      this.setGraphic(new Label(timeString));
 
@@ -188,7 +187,6 @@ public class ReportController {
                            workLabel.setUnderline(true);
                            this.setGraphic(workLabel);
                         }
-
                      }
                   }
                }
