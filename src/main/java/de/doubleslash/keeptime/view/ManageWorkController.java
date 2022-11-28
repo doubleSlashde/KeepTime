@@ -110,7 +110,12 @@ public class ManageWorkController {
 
       setProjectUpComboBox();
 
-      Platform.runLater(() -> projectComboBox.requestFocus());
+      Platform.runLater(() -> {
+         noteTextArea.end();
+         noteTextArea.requestFocus();
+      });
+
+
    }
 
    private void setUpTimeRestriction() {
