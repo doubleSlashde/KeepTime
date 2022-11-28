@@ -157,7 +157,6 @@ public class ViewController {
 
    private Stage settingsStage;
 
-   private Stage confirmCloseStage;
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
