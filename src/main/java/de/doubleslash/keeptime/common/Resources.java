@@ -65,7 +65,9 @@ public class Resources {
 
       SVG_IMPORT_EXPORT_ICON("/svgs/sort.svg"),
 
-      SVG_LICENSES_ICON("/svgs/closed-captioning.svg")
+      SVG_LICENSES_ICON("/svgs/closed-captioning.svg"),
+
+      SVG_RANDOM_COLOR_BUTTON("/svgs/dice.svg")
 
       ;
 
