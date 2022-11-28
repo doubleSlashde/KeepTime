@@ -257,7 +257,6 @@ public class App extends Application {
       final Pane mainPane = loader.load();
       primaryStage.initStyle(StageStyle.TRANSPARENT);
       primaryStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
-
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 

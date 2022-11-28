@@ -247,7 +247,6 @@ public class ProjectsListViewController {
          projectNameLabel.setEffect(null);
       });
 
-
       final MenuItem changeWithTimeMenuItem = new MenuItem("Change with time");
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,

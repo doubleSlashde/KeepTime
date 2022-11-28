@@ -156,7 +156,6 @@ public class ViewController {
    private ReportController reportController;
 
    private Stage settingsStage;
-
    private SettingsController settingsController;
 
    private ProjectsListViewController projectsListViewController;
