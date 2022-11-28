@@ -1,33 +1,18 @@
 package de.doubleslash.keeptime.common;
 
 
-import ch.qos.logback.core.pattern.color.BlueCompositeConverter;
 import de.doubleslash.keeptime.model.Project;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.scene.paint.Color;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 class RandomColorPickerTest {
-    private static final Logger LOG = LoggerFactory.getLogger(RandomColorPickerTest.class);
-
-    @Test
-    public void shouldGetARandomColor() {
-      // Color color =   RandomColorPicker.getRandomColor();
-      // Assertions.assertTrue(color!=null);
-    }
 
     @Test
     public void shouldGetUniqueColor() {
@@ -40,7 +25,7 @@ class RandomColorPickerTest {
 
         RandomColorPicker.colors=Arrays.asList(Color.RED,Color.BLUE);
 
-        Assertions.assertNotEquals(p.getColor().toString(),RandomColorPicker.getUniqueColor(Arrays.asList(p),Color.BLUE).toString());
+        Assertions.assertNotEquals(p.getColor().toString(),RandomColorPicker.getUniqueColor(List.of(p),Color.BLUE).toString());
 
     }
     @Test
@@ -48,9 +33,9 @@ class RandomColorPickerTest {
         Project p = new Project();
         p.setColor(Color.RED);
 
-        RandomColorPicker.colors=Arrays.asList(Color.RED);
+        RandomColorPicker.colors= List.of(Color.RED);
 
-        Assertions.assertEquals(Color.BLACK,RandomColorPicker.getUniqueColor(Arrays.asList(p),Color.BLUE));
+        Assertions.assertEquals(Color.BLACK,RandomColorPicker.getUniqueColor(List.of(p),Color.BLUE));
     }
 
     @Test

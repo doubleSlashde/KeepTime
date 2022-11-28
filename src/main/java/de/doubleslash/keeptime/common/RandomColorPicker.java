@@ -1,21 +1,13 @@
 package de.doubleslash.keeptime.common;
 
 
-
-
 import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Settings;
-import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.lang.reflect.Field;
-import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
