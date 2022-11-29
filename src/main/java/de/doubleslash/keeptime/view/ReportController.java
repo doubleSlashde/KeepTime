@@ -236,20 +236,20 @@ public class ReportController {
 
          for (final Work w : onlyCurrentProjectWork) {
             final HBox workButtonBox = new HBox(5.0);
-            workButtonBox.getChildren().add(createCopyWorkButton(w));
-            workButtonBox.getChildren().add(createEditWorkButton(w));
-            workButtonBox.getChildren().add(createDeleteWorkButton(w));
-            final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
-            projectRow.getChildren().add(workRow);
             if(w.getId()==model.activeWorkItem.get().getId()){
-               workButtonBox.getChildren().clear();
                Label label = new Label("Active Work");
                label.setTooltip(new Tooltip("The active work item cannot be edited as it is currently active. To edit it you need to switch to another work first."));
                label.getTooltip().setFont(Font.font(15));
                label.setFont(Font.font(12.0));
                label.setStyle("-fx-font-weight: bold");
                workButtonBox.getChildren().add(label);
+            }else {
+               workButtonBox.getChildren().add(createCopyWorkButton(w));
+               workButtonBox.getChildren().add(createEditWorkButton(w));
+               workButtonBox.getChildren().add(createDeleteWorkButton(w));
             }
+            final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
+            projectRow.getChildren().add(workRow);
          }
 
          projectRow.setExpanded(true);
