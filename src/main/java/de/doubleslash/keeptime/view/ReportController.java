@@ -212,7 +212,7 @@ public class ReportController {
          expand(true);
          expandCollapseButton.setText("Collapse");
       }
-      expanded =!expanded;
+      expanded = !expanded;
    }
 
    private void expand(boolean expand){
