@@ -26,7 +26,6 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javafx.scene.control.skin.DatePickerSkin;
-import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +109,7 @@ public class ReportController {
    private Canvas colorTimeLineCanvas;
 
    @FXML
-   private Button expandColapseButton;
+   private Button expandCollapseButton;
 
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
@@ -126,7 +125,7 @@ public class ReportController {
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
-   private static boolean pressed= false;
+   private static boolean expanded = true;
 
    @Autowired
    public ReportController(final Model model, final Controller controller) {
@@ -141,7 +140,7 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
 
-      expandColapseButton.setOnMouseClicked(event ->collapseExpandTable());
+      expandCollapseButton.setOnMouseClicked(event ->collapseExpandTable());
       initTableView();
    }
 
@@ -203,22 +202,23 @@ public class ReportController {
 
    private void collapseExpandTable(){
 
-      pressed=!pressed;
-
-      if(pressed){
+      if(expanded){
          //CollapseAll
-         for (int i=0; i<rootItem.getChildren().size(); i++){
-            rootItem.getChildren().get(i).setExpanded(false);
-         }
-         expandColapseButton.setText("Expand");
+         expand(false);
+         expandCollapseButton.setText("Expand");
 
       }else {
          //ExpandAll
-            for (int i=0; i<rootItem.getChildren().size(); i++){
-               rootItem.getChildren().get(i).setExpanded(true);
-            }
-            expandColapseButton.setText("Collapse");
-         }
+         expand(true);
+         expandCollapseButton.setText("Collapse");
+      }
+      expanded =!expanded;
+   }
+
+   private void expand(boolean expand){
+      for (int i=0; i<rootItem.getChildren().size(); i++){
+         rootItem.getChildren().get(i).setExpanded(expand);
+      }
    }
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
