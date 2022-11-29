@@ -104,7 +104,7 @@ public class ReportController {
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
-   private static List<String> workTime = new ArrayList<>();
+   private static List<String> workTimeList = new ArrayList<>();
 
    @Autowired
    public ReportController(final Model model, final Controller controller) {
@@ -180,7 +180,7 @@ public class ReportController {
                   } else {
                      this.setGraphic(new Label(timeString));
 
-                     for (String workTime : workTime) {
+                     for (String workTime : workTimeList) {
 
                         if (timeString.equals(workTime)) {
                            Label workLabel = new Label(timeString);
@@ -239,7 +239,7 @@ public class ReportController {
          final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
 
          if(project.isWork()){
-            workTime.add(DateFormatter.secondsToHHMMSS(projectWorkSeconds));
+            workTimeList.add(DateFormatter.secondsToHHMMSS(projectWorkSeconds));
          }
 
          currentSeconds += projectWorkSeconds;
