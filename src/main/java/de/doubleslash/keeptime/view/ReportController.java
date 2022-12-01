@@ -180,10 +180,12 @@ public class ReportController {
                   } else {
                      this.setGraphic(new Label(timeString.getTimeSum()));
 
-                           Label workLabel = new Label(timeString.getTimeSum());
-                           workLabel.setUnderline(true);
-                           this.setGraphic(workLabel);
+                     if(timeString.isUnderlined()){
+                        Label workLabel = new Label(timeString.getTimeSum());
+                        workLabel.setUnderline(true);
+                        this.setGraphic(workLabel);
 
+                     }
                   }
                }
             };
