@@ -339,7 +339,7 @@ public class ViewController {
          Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
          stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-         alert.initOwner(mainStage);
+         stage.setAlwaysOnTop(true);
          alert.showAndWait();
 
          if (alert.getResult() == ButtonType.YES) {
@@ -560,6 +560,9 @@ public class ViewController {
       LOG.info("Add new project clicked");
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+
+      Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+      stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
       mainStage.setAlwaysOnTop(false);
       final Optional<Project> result = dialog.showAndWait();

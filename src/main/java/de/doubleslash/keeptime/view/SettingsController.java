@@ -373,6 +373,9 @@ public class SettingsController {
 
          try {
             Alert confirmationAlert = new Alert(AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.NO);
+            Stage importConfirmationStage = (Stage) confirmationAlert.getDialogPane().getScene().getWindow();
+            importConfirmationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
             confirmationAlert.setContentText(
@@ -380,7 +383,7 @@ public class SettingsController {
                         + "\n"
                         + "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n"
                         + "\n"
-                        + "You will need to restart the application after this action. If you proceed you need to select the previouls exported .sql file.");
+                        + "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.");
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -406,6 +409,10 @@ public class SettingsController {
                   "-options", "FROM_1X");
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
+
+            Stage informationStage = (Stage) informationDialog.getDialogPane().getScene().getWindow();
+            informationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
             informationDialog.setContentText(

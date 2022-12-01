@@ -30,6 +30,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.effect.Bloom;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -251,11 +252,14 @@ public class ProjectsListViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
                ViewController.activeWorkSecondsProperty, p);
-         changeWithTimeDialog.initOwner(mainStage);
-         mainStage.setAlwaysOnTop(false);
+         //changeWithTimeDialog.initOwner(mainStage);
+
+         Stage stage = (Stage) changeWithTimeDialog.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         stage.setAlwaysOnTop(true);
+
          final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
-         mainStage.setAlwaysOnTop(true);
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
@@ -285,6 +289,9 @@ public class ProjectsListViewController {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
          final Dialog<Project> dialog = setupEditProjectDialog("Edit project", "Edit project '" + p.getName() + "'", p);
+
+         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          mainStage.setAlwaysOnTop(false);
          final Optional<Project> result = dialog.showAndWait();
