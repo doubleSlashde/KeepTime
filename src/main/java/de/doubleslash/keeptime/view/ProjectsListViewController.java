@@ -270,7 +270,9 @@ public class ProjectsListViewController {
          alert.setHeaderText("Delete project '" + p.getName() + "'.");
          alert.setContentText(
                "The project will just be hidden from display, as there may be work references to this project.");
-         alert.initOwner(mainStage);
+         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = alert.showAndWait();
          mainStage.setAlwaysOnTop(true);
