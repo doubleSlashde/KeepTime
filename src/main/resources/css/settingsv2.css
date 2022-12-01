@@ -1,0 +1,64 @@
+.settingsBorder{
+	
+	-fx-border-color: lightgrey;
+	-fx-border-style: hidden hidden solid hidden;
+	-fx-spacing: 5px;
+	-fx-padding: 0 0 5 0;
+}
+
+.saveCancelHboxBorder{
+	
+	-fx-border-color: lightgrey;
+	-fx-border-style: solid hidden hidden hidden;
+	-fx-padding: 2px;
+	-fx-spacing: 15px;
+}
+.tab-pane > .tab-header-area > .headers-region > .tab > .tab-container {
+	-fx-rotate: 90;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+	-fx-opacity: 0;
+	-fx-background-color: white;
+}
+
+.tab-pane .tab
+{
+	-fx-translate-y: -10;
+	-fx-background-color: lightgrey;
+	-fx-pref-height: 170;
+	-fx-pref-width: 40;
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+	-fx-border-width: 1;
+	-fx-border-color: none;
+}
+.tab-pane .tab:selected
+{
+	-fx-background-color: white;
+}
+
+.tab-pane .tab:hover
+{
+	-fx-background-color: #eaeaea;
+}
+.button{
+	-fx-background-color: white;
+	-fx-border-color: lightgrey;
+	-fx-border-radius: 2 2 2 2;
+
+}
+.button:hover{
+	-fx-border-color: grey;
+}
+.color-picker{
+	-fx-background-color: white;
+	-fx-border-color: lightgrey;
+	-fx-border-radius: 2 2 2 2;
+}
+.check-box .box{
+	-fx-background-color: white;
+	-fx-border-color: lightgrey;
+	-fx-border-radius: 2 2 2 2;
+}
