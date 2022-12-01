@@ -252,7 +252,6 @@ public class ProjectsListViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
                ViewController.activeWorkSecondsProperty, p);
-         //changeWithTimeDialog.initOwner(mainStage);
 
          Stage stage = (Stage) changeWithTimeDialog.getDialogPane().getScene().getWindow();
          stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
