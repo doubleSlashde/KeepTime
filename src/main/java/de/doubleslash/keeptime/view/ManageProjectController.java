@@ -19,9 +19,10 @@ package de.doubleslash.keeptime.view;
 import de.doubleslash.keeptime.common.RandomColorPicker;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.SvgNodeProvider;
-import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableList;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
@@ -34,6 +35,11 @@ import de.doubleslash.keeptime.model.Project;
 import javafx.fxml.FXML;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.GridPane;
+
+
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import static de.doubleslash.keeptime.view.ViewController.fontColorProperty;
 
@@ -76,20 +82,23 @@ public class ManageProjectController {
       sortIndexSpinner
             .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
-      randomColorButton.setOnAction(event -> randomColorEvent());
+      randomColorButton.setOnAction(event -> setRandomColor());
 
       SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_RANDOM_COLOR_BUTTON, 0.04, 0.04);
       calendarSvgPath.fillProperty().bind(fontColorProperty);
       randomColorButton.setGraphic(calendarSvgPath);
    }
 
-   private void randomColorEvent() {
+   private void setRandomColor() {
+         textFillColorPicker.setValue(RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), getProjectColorList()));
+   }
 
-      try {
-         textFillColorPicker.setValue(RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), model.getAvailableProjects()));
-      } catch (IllegalAccessException e) {
-         throw new RuntimeException(e);
+   private List getProjectColorList(){
+      List<Color> colorList = new ArrayList<>();
+      for(Project project: model.getAllProjects()){
+         colorList.add(project.getColor());
       }
+      return colorList;
    }
 
    public void initializeWith(final Project project) {

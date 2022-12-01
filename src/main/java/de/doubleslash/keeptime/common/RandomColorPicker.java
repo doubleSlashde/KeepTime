@@ -43,32 +43,32 @@ public class RandomColorPicker {
         }
     }
 
-    public static Color chooseContrastColor(Color backgroundColor, ObservableList<Project> availableProjects) throws IllegalAccessException {
+    public static Color chooseContrastColor(Color backgroundColor, List<Color> availableColors){
 
         double divAdd=0;
         Color divColor=null;
-        int maxTrys=0;
+        int maxTries=0;
 
-        while (divAdd <1 && maxTrys<10) {
-            divColor = getUniqueColor(availableProjects,backgroundColor);
+        while (divAdd <1 && maxTries<10) {
+            divColor = getUniqueColor(availableColors,backgroundColor);
             double divred = Math.abs(divColor.getRed()-backgroundColor.getRed());
             double divgreen = Math.abs(divColor.getGreen()-backgroundColor.getGreen());
             double divblue = Math.abs(divColor.getBlue()- backgroundColor.getBlue());
             divAdd  = divblue+divgreen+divred;
-            maxTrys++;
+            maxTries++;
         }
         return divColor;
     }
 
-    public static Color getUniqueColor(List<Project> availableProjects, Color backgroundColor) {
+    public static Color getUniqueColor(List<Color> availableColors, Color backgroundColor) {
 
-        List<Color> uniqueColorList = colors;
+        List<Color> uniqueColorList = new ArrayList<>(colors);
         uniqueColorList.remove(backgroundColor); //List should remove all already used colors.
 
-           for(Project project : availableProjects){
+           for(Color color : availableColors){
                 for (int i=0; i<uniqueColorList.size(); i++){
 
-                    if (project.getColor().toString().equals(uniqueColorList.get(i).toString())) {
+                    if (color.toString().equals(uniqueColorList.get(i).toString())) {
                         uniqueColorList.remove(i);
                     }
                 }
