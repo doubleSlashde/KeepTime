@@ -163,38 +163,34 @@ public class ReportController {
       timeRangeColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
-      final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
+      final TreeTableColumn<TableRow, TableRow> timeSumColumn = new TreeTableColumn<>("Duration");
       timeSumColumn.setCellFactory(new Callback<>() {
          @Override
-         public TreeTableCell<TableRow, String> call(TreeTableColumn<TableRow, String> tableRowStringTreeTableColumn) {
+         public TreeTableCell<TableRow, TableRow> call(TreeTableColumn<TableRow, TableRow> tableRowStringTreeTableColumn) {
 
             return new TreeTableCell<>() {
 
                @Override
-               protected void updateItem(String timeString, boolean empty) {
+               protected void updateItem(TableRow timeString, boolean empty) {
                   super.updateItem(timeString, empty);
 
                   if (timeString == null || empty) {
                      this.setGraphic(null);
                      this.setText(null);
                   } else {
-                     this.setGraphic(new Label(timeString));
+                     this.setGraphic(new Label(timeString.getTimeSum()));
 
-                     for (String workTime : workTimeList) {
-
-                        if (timeString.equals(workTime)) {
-                           Label workLabel = new Label(timeString);
+                           Label workLabel = new Label(timeString.getTimeSum());
                            workLabel.setUnderline(true);
                            this.setGraphic(workLabel);
-                        }
-                     }
+
                   }
                }
             };
          }
       });
-      timeSumColumn.setCellValueFactory( (final TreeTableColumn.CellDataFeatures<TableRow, String> entry) -> new ReadOnlyObjectWrapper<>(
-              entry.getValue().getValue().getTimeSum()));
+      timeSumColumn.setCellValueFactory( (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
+              entry.getValue().getValue()));
       timeSumColumn.setMinWidth(60);
       timeSumColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
