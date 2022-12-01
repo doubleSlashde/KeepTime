@@ -171,17 +171,17 @@ public class ReportController {
             return new TreeTableCell<>() {
 
                @Override
-               protected void updateItem(TableRow timeString, boolean empty) {
-                  super.updateItem(timeString, empty);
+               protected void updateItem(TableRow workItem, boolean empty) {
+                  super.updateItem(workItem, empty);
 
-                  if (timeString == null || empty) {
+                  if (workItem == null || empty) {
                      this.setGraphic(null);
                      this.setText(null);
                   } else {
-                     this.setGraphic(new Label(timeString.getTimeSum()));
+                     this.setGraphic(new Label(workItem.getTimeSum()));
 
-                     if(timeString.isUnderlined()){
-                        Label workLabel = new Label(timeString.getTimeSum());
+                     if(workItem.isUnderlined()){
+                        Label workLabel = new Label(workItem.getTimeSum());
                         workLabel.setUnderline(true);
                         this.setGraphic(workLabel);
 
