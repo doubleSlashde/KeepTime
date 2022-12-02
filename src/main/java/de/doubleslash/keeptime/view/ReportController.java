@@ -125,7 +125,7 @@ public class ReportController {
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
-   private static boolean expanded = true;
+   private boolean expanded = true;
 
    @Autowired
    public ReportController(final Model model, final Controller controller) {
@@ -268,7 +268,7 @@ public class ReportController {
             projectRow.getChildren().add(workRow);
          }
 
-         projectRow.setExpanded(true);
+         projectRow.setExpanded(expanded);
          rootItem.getChildren().add(projectRow);
 
       }
