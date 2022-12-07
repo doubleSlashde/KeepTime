@@ -37,7 +37,7 @@ public class Resources {
       FXML_SETTINGS("/layouts/settings.fxml"),
       FXML_VIEW_POPUP_LAYOUT("/layouts/ViewLayoutPopup.fxml"),
       FXML_REPORT("/layouts/report.fxml"),
-      FXML_ABOUT("/layouts/about.fxml"),
+
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
       FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
 
