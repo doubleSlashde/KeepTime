@@ -200,7 +200,7 @@ public class ReportController {
       rootItem.setExpanded(true);
    }
 
-   private void collapseExpandTable(){
+   private void toggleCollapseExpandReport(){
 
       if(expanded){
          //CollapseAll
