@@ -104,8 +104,6 @@ public class ReportController {
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
-   private static List<String> workTimeList = new ArrayList<>();
-
    @Autowired
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
@@ -178,14 +176,10 @@ public class ReportController {
                      this.setGraphic(null);
                      this.setText(null);
                   } else {
-                     this.setGraphic(new Label(workItem.getTimeSum()));
-
-                     if(workItem.isUnderlined()){
-                        Label workLabel = new Label(workItem.getTimeSum());
-                        workLabel.setUnderline(true);
-                        this.setGraphic(workLabel);
-
-                     }
+                     Label workLabel = new Label(workItem.getTimeSum());
+                     workLabel.setUnderline(workItem.isUnderlined());
+                     this.setGraphic(workLabel);
+                     this.setText(null);
                   }
                }
             };
@@ -235,10 +229,6 @@ public class ReportController {
                                                                    .collect(Collectors.toList());
 
          final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
-
-         if(project.isWork()){
-            workTimeList.add(DateFormatter.secondsToHHMMSS(projectWorkSeconds));
-         }
 
          currentSeconds += projectWorkSeconds;
          if (project.isWork()) {
