@@ -239,8 +239,6 @@ public class ReportController {
             if(w.getId()==model.activeWorkItem.get().getId()){
                Label label = new Label("Active Work");
                label.setTooltip(new Tooltip("The active work item cannot be edited as it is currently active. To edit it you need to switch to another work first."));
-               label.getTooltip().setFont(Font.font(15));
-               label.setFont(Font.font(12.0));
                label.setStyle("-fx-font-weight: bold");
                workButtonBox.getChildren().add(label);
             }else {
