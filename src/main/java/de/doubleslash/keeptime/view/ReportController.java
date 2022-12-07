@@ -215,7 +215,7 @@ public class ReportController {
       expanded = !expanded;
    }
 
-   private void expand(boolean expand){
+   private void expandAll(boolean expand){
       for (int i=0; i<rootItem.getChildren().size(); i++){
          rootItem.getChildren().get(i).setExpanded(expand);
       }
