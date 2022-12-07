@@ -80,7 +80,7 @@
                         </HBox>
                         <HBox prefHeight="26.0" prefWidth="210.0">
                            <children>
-                              <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="79.0" text="Collapse" />
+                              <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="140.0" text="Collapse Report list " />
                            </children>
                         </HBox>
                      </children>

@@ -140,7 +140,7 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
 
-      expandCollapseButton.setOnMouseClicked(event ->collapseExpandTable());
+      expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
       initTableView();
    }
 
@@ -203,14 +203,12 @@ public class ReportController {
    private void toggleCollapseExpandReport(){
 
       if(expanded){
-         //CollapseAll
-         expand(false);
-         expandCollapseButton.setText("Expand");
+         expandAll(false);
+         expandCollapseButton.setText("Expand Report list");
 
       }else {
-         //ExpandAll
-         expand(true);
-         expandCollapseButton.setText("Collapse");
+         expandAll(true);
+         expandCollapseButton.setText("Collapse Report list");
       }
       expanded = !expanded;
    }
