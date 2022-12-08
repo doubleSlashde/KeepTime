@@ -37,7 +37,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <maven-dependency-check.version>6.0.5</maven-dependency-check.version>
+    <maven-dependency-check.version>7.1.1</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -154,21 +154,6 @@
   </profiles>
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>7.1.1</version>
-        <configuration>
-          <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
