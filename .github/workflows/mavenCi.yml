@@ -5,7 +5,7 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "master", "develop" ]
+   # branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master", "develop" ]
 
@@ -36,6 +36,9 @@ jobs:
         
       - name: Build
         run:  mvn -V -B clean verify org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
+
+      - name: dependencyCheck
+        run: mvn verify dependency-check-maven:check
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
