@@ -5,7 +5,7 @@ name: Java CI with Maven
 
 on:
   push:
-   # branches: [ "master", "develop" ]
+    branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master", "develop" ]
 
@@ -30,15 +30,15 @@ jobs:
           java-version: '11'
           distribution: 'corretto'
           cache: maven
-      # Initializes the CodeQL tools for scanning.
 
+      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
           languages: 'java'
 
       - name: Build
-        run:  mvn -V -B clean verify org.owasp:dependency-check-maven:7.1.1:check org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
+        run:  mvn -V -B clean verify org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3

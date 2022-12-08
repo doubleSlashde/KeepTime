@@ -133,7 +133,7 @@
               <cveUrlModified>https://nvdmirror.apps.doubleslash.org/nvdcve-1.1-modified.json.gz</cveUrlModified>
               <cveUrlBase>https://nvdmirror.apps.doubleslash.org/nvdcve-1.1-%d.json.gz</cveUrlBase>
             </configuration>
-           <executions>
+            <executions>
               <execution>
                 <goals>
                   <goal>check</goal>
@@ -141,7 +141,7 @@
               </execution>
             </executions>
            </plugin>
-          </plugins>
+         </plugins>
       </build>
     </profile>
     <profile>
