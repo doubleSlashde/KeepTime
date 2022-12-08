@@ -16,32 +16,27 @@
 
 package de.doubleslash.keeptime.view;
 
-import de.doubleslash.keeptime.common.RandomColorPicker;
-import de.doubleslash.keeptime.common.Resources;
-import de.doubleslash.keeptime.common.SvgNodeProvider;
-import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.SVGPath;
+import static de.doubleslash.keeptime.view.ViewController.fontColorProperty;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.common.RandomColorPicker;
+import de.doubleslash.keeptime.common.Resources;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.GridPane;
-
-
-import java.sql.Array;
-import java.util.ArrayList;
-import java.util.List;
-
-import static de.doubleslash.keeptime.view.ViewController.fontColorProperty;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.SVGPath;
 
 @Component
 public class ManageProjectController {
@@ -79,23 +74,25 @@ public class ManageProjectController {
    @FXML
    private void initialize() {
       final int availableProjectAmount = model.getAllProjects().size();
-      sortIndexSpinner
-            .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
+      sortIndexSpinner.setValueFactory(
+            new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
       randomColorButton.setOnAction(event -> setRandomColor());
 
-      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_RANDOM_COLOR_BUTTON, 0.04, 0.04);
+      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_RANDOM_COLOR_BUTTON, 0.04,
+            0.04);
       calendarSvgPath.fillProperty().bind(fontColorProperty);
       randomColorButton.setGraphic(calendarSvgPath);
    }
 
    private void setRandomColor() {
-         textFillColorPicker.setValue(RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), getProjectColorList()));
+      textFillColorPicker.setValue(
+            RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), getProjectColorList()));
    }
 
-   private List getProjectColorList(){
+   private List getProjectColorList() {
       List<Color> colorList = new ArrayList<>();
-      for(Project project: model.getAllProjects()){
+      for (Project project : model.getAllProjects()) {
          colorList.add(project.getColor());
       }
       return colorList;
