@@ -36,10 +36,10 @@ jobs:
           languages: 'java'
 
       - name: Build
-        run:  mvn -V -B clean verify org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
+        run:  mvn -V -B clean verify org.owasp:dependency-check-maven:7.1.1:check org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
 
-      - name: dependencyCheck
-        run: mvn org.owasp:dependency-check-maven:7.1.1:check
+      #- name: dependencyCheck
+       # run:  mvn org.owasp:dependency-check-maven:7.1.1:check
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
