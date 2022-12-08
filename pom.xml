@@ -191,8 +191,9 @@
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
-        <version>${maven-dependency-check.version}</version>
+        <version>7.1.1</version>
         <configuration>
+            <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
           <!--<format>${maven-dependency-check.format}</format>
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
