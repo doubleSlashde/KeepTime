@@ -16,6 +16,16 @@
 
 package de.doubleslash.keeptime.view;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -48,15 +58,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class ReportController {
@@ -136,10 +137,10 @@ public class ReportController {
                      final String notes = item.getNotes();
                      final String text = notes.isEmpty() ? EMPTY_NOTE : notes;
                      this.setText(text);
-                     if(item.getProjectColor()!=null){
+                     if (item.getProjectColor() != null) {
                         final Circle circle = new Circle(6, item.getProjectColor());
                         this.setGraphic(circle);
-                     }else {
+                     } else {
                         this.setGraphic(null);
                      }
                   }
@@ -164,7 +165,8 @@ public class ReportController {
       final TreeTableColumn<TableRow, TableRow> timeSumColumn = new TreeTableColumn<>("Duration");
       timeSumColumn.setCellFactory(new Callback<>() {
          @Override
-         public TreeTableCell<TableRow, TableRow> call(TreeTableColumn<TableRow, TableRow> tableRowStringTreeTableColumn) {
+         public TreeTableCell<TableRow, TableRow> call(
+               TreeTableColumn<TableRow, TableRow> tableRowStringTreeTableColumn) {
 
             return new TreeTableCell<>() {
 
@@ -185,8 +187,9 @@ public class ReportController {
             };
          }
       });
-      timeSumColumn.setCellValueFactory( (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
-              entry.getValue().getValue()));
+      timeSumColumn.setCellValueFactory(
+            (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
+                  entry.getValue().getValue()));
       timeSumColumn.setMinWidth(60);
       timeSumColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
@@ -237,7 +240,6 @@ public class ReportController {
 
          final HBox projectButtonBox = new HBox();
          projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
-
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
