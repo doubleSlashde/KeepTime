@@ -40,7 +40,7 @@
     <maven-dependency-check.version>7.4.1</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
-    <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
+    <maven-dependency-check.failOnError>false</maven-dependency-check.failOnError>
     <!-- 11 is the default -->
     <maven-dependency-check.failBuildOnCVSS>8.9</maven-dependency-check.failBuildOnCVSS>
   </properties>
