@@ -193,7 +193,8 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
+          <suppressionFile>suppressionFile.xml</suppressionFile>
+          <!--suppressionFile.xml>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile.xml -->
         </configuration>
         <executions>
           <execution>
@@ -234,7 +235,7 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
+          <!--suppressionFile.xml>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile.xml -->
         </configuration>
       </plugin>
     </plugins>
