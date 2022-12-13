@@ -42,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: KeepTime-${{ env.version }}
-          path: /home/runner/work/KeepTime/KeepTime/target/keeptime-*-bin.zip
+          path: /home/runner/work/KeepTime/KeepTime/target/*-bin.zip
 
       - name: Analyze
         env:
