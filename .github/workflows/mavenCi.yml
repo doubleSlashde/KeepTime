@@ -36,12 +36,12 @@ jobs:
           languages: 'java'
         
       - name: Build
-        run:  mvn -V -B clean verify org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
+        run:  mvn -V -B clean verify  org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage -Djar.finalName=KeepTime-${{ env.version }}-SNAPSHOT
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: KeepTime-${{ env.version }}-SNAPSHOT
+          name: KeepTime-${{ env.version }}
           path: /home/runner/work/KeepTime/KeepTime/target/keeptime-*-bin.zip
 
       - name: Analyze
