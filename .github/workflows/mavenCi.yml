@@ -36,7 +36,7 @@ jobs:
           languages: 'java'
         
       - name: Build
-        run:  mvn -V -B clean -Djar.finalName=KeepTime-${{ env.version }}-SNAPSHOT verify  org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage
+        run:  mvn -V -B clean verify  org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage -Pversion=KeepTime-${{ env.version }}-SNAPSHOT
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
