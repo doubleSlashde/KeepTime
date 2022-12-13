@@ -16,8 +16,6 @@
 
 package de.doubleslash.keeptime.view;
 
-import java.util.Optional;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +35,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class ChangeWithTimeDialog {
+public class ChangeWithTimeDialog extends Dialog<Integer> {
 
    private static final Logger LOG = LoggerFactory.getLogger(ChangeWithTimeDialog.class);
    private static final String TIME_ZERO = "00:00:00";
@@ -47,7 +45,6 @@ public class ChangeWithTimeDialog {
    private final LongProperty activeWorkSecondsProperty;
    private final Project projectToChangeTo;
 
-   private Dialog<Integer> dialog;
    private boolean ctrlIsPressed = false;
 
    public ChangeWithTimeDialog(final Model model, final LongProperty activeWorkSecondsProperty,
@@ -60,13 +57,12 @@ public class ChangeWithTimeDialog {
    }
 
    private void setUpDialog() {
-      dialog = new Dialog<>();
-      dialog.setTitle("Change project with time transfer");
-      dialog.setHeaderText("Choose the time to transfer");
-      dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-      final Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+      setTitle("Change project with time transfer");
+      setHeaderText("Choose the time to transfer");
+      getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      final Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
       okButton.setDefaultButton(true);
-      final Button cancelButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.CANCEL);
+      final Button cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
       cancelButton.setDefaultButton(false);
 
       final VBox vBox = new VBox();
@@ -120,31 +116,21 @@ public class ChangeWithTimeDialog {
       slider.valueProperty().addListener((obs, oldValue, newValue) -> updateLabelsRunnable.run());
       vBox.getChildren().add(grid);
 
-      dialog.setOnShown(de -> {
+      setOnShown(de -> {
          // workaround to set focus to slider when showing the dialog
          // onShown is actually called before the dialog is shown
          Platform.runLater(slider::requestFocus);
       });
 
-      dialog.getDialogPane().setContent(vBox);
+      getDialogPane().setContent(vBox);
 
-      dialog.setResultConverter(dialogButton -> {
+      setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return slider.valueProperty().intValue() * 60;
          }
          return null;
       });
 
-   }
-
-   /**
-    * Shows the dialog to the user.
-    * 
-    * @return optional with the amount of seconds to transfer to the new project or null if the user does not confirm
-    */
-   public Optional<Integer> showAndWait() {
-      LOG.info("Showing dialog");
-      return dialog.showAndWait();
    }
 
    private Slider setupSlider() {
