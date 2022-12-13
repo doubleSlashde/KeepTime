@@ -184,6 +184,7 @@
           </execution>
         </executions>
       </plugin>
+
       <!-- see https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
       <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
       <plugin>
@@ -197,7 +198,7 @@
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
           <suppressionFile>suppressionFile.xml</suppressionFile>
-          <!--suppressionFile.xml>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile.xml -->
+          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
         </configuration>
         <executions>
           <execution>
@@ -238,7 +239,7 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile.xml>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile.xml -->
+          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
         </configuration>
       </plugin>
     </plugins>
