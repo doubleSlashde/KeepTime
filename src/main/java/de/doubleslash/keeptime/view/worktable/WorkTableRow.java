@@ -4,6 +4,7 @@ package de.doubleslash.keeptime.view.worktable;
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.model.Work;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 
 public class WorkTableRow implements TableRow {
    private final Work work;
@@ -39,6 +40,11 @@ public class WorkTableRow implements TableRow {
    @Override
    public boolean isUnderlined() {
       return false;
+   }
+
+   @Override
+   public Color getProjectColor() {
+      return null;
    }
 
 }

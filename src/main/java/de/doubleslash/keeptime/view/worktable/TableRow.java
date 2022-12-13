@@ -1,6 +1,7 @@
 package de.doubleslash.keeptime.view.worktable;
 
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 
 public interface TableRow {
 
@@ -14,4 +15,5 @@ public interface TableRow {
 
    public boolean isUnderlined();
 
+   public Color getProjectColor();
 }
