@@ -387,7 +387,6 @@ public class SettingsController {
                     "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n" +
                     "\n" +
                     "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
-            confirmationAlert.initOwner(thisStage);
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -420,7 +419,6 @@ public class SettingsController {
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
             informationDialog.getDialogPane().setContent(new Label("KeepTime will now be CLOSED!\n" + "You have to RESTART it again to see the changes"));
-            informationDialog.initOwner(thisStage);
             informationDialog.showAndWait();
             Platform.exit();
 
@@ -469,7 +467,6 @@ public class SettingsController {
             informationDialog.setTitle("Export done");
             informationDialog.setHeaderText("The current data was exported.");
             informationDialog.getDialogPane().setContent(new Label("The data was exported to '\n" + fileToSave + "'."));
-            informationDialog.initOwner(thisStage);
             informationDialog.showAndWait();
          } catch (final SQLException e) {
             LOG.error("Could not export db to script file.", e);
