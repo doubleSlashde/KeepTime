@@ -16,18 +16,6 @@
 
 package de.doubleslash.keeptime.view;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javafx.scene.control.skin.DatePickerSkin;
-import javafx.scene.text.Font;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
@@ -60,6 +48,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class ReportController {
