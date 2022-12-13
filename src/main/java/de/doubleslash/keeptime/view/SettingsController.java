@@ -61,6 +61,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -376,6 +377,9 @@ public class SettingsController {
 
          try {
             Alert confirmationAlert = new Alert(AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.NO);
+            Stage importConfirmationStage = (Stage) confirmationAlert.getDialogPane().getScene().getWindow();
+            importConfirmationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
             confirmationAlert.getDialogPane().setContent(new Label("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
@@ -409,6 +413,10 @@ public class SettingsController {
                   "-options", "FROM_1X");
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
+
+            Stage informationStage = (Stage) informationDialog.getDialogPane().getScene().getWindow();
+            informationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
             informationDialog.getDialogPane().setContent(new Label("KeepTime will now be CLOSED!\n" + "You have to RESTART it again to see the changes"));

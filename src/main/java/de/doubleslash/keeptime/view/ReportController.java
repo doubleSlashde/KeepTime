@@ -18,19 +18,13 @@ package de.doubleslash.keeptime.view;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import javafx.scene.control.skin.DatePickerSkin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 
 import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
@@ -51,21 +45,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContentDisplay;
-import javafx.scene.control.DateCell;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
 import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
@@ -152,10 +135,14 @@ public class ReportController {
                      setText(null);
                   } else {
                      final String notes = item.getNotes();
-                     final Label label = new Label(notes.isEmpty() ? EMPTY_NOTE : notes);
-                     label.setUnderline(item.isUnderlined());
-                     label.setTooltip(new Tooltip(notes));
-                     this.setGraphic(label);
+                     final String text = notes.isEmpty() ? EMPTY_NOTE : notes;
+                     this.setText(text);
+                     if (item.getProjectColor() != null) {
+                        final Circle circle = new Circle(6, item.getProjectColor());
+                        this.setGraphic(circle);
+                     } else {
+                        this.setGraphic(null);
+                     }
                   }
                }
             };
@@ -175,8 +162,34 @@ public class ReportController {
       timeRangeColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeRangeColumn);
 
-      final TreeTableColumn<TableRow, String> timeSumColumn = new TreeTableColumn<>("Duration");
-      timeSumColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, String>("timeSum"));
+      final TreeTableColumn<TableRow, TableRow> timeSumColumn = new TreeTableColumn<>("Duration");
+      timeSumColumn.setCellFactory(new Callback<>() {
+         @Override
+         public TreeTableCell<TableRow, TableRow> call(
+               TreeTableColumn<TableRow, TableRow> tableRowStringTreeTableColumn) {
+
+            return new TreeTableCell<>() {
+
+               @Override
+               protected void updateItem(TableRow workItem, boolean empty) {
+                  super.updateItem(workItem, empty);
+
+                  if (workItem == null || empty) {
+                     this.setGraphic(null);
+                     this.setText(null);
+                  } else {
+                     Label workLabel = new Label(workItem.getTimeSum());
+                     workLabel.setUnderline(workItem.isUnderlined());
+                     this.setGraphic(workLabel);
+                     this.setText(null);
+                  }
+               }
+            };
+         }
+      });
+      timeSumColumn.setCellValueFactory(
+            (final TreeTableColumn.CellDataFeatures<TableRow, TableRow> entry) -> new ReadOnlyObjectWrapper<>(
+                  entry.getValue().getValue()));
       timeSumColumn.setMinWidth(60);
       timeSumColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(timeSumColumn);
@@ -228,10 +241,8 @@ public class ReportController {
          final HBox projectButtonBox = new HBox();
          projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
 
-         final Circle circle = new Circle(6, project.getColor());
-
          final TreeItem<TableRow> projectRow = new TreeItem<>(
-               new ProjectTableRow(project, projectWorkSeconds, projectButtonBox), circle);
+               new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
 
          for (final Work w : onlyCurrentProjectWork) {
             final HBox workButtonBox = new HBox(5.0);
