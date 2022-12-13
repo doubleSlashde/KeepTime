@@ -364,11 +364,13 @@ public class SettingsController {
 
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.getDialogPane().setContent(new Label("Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n" +
-                    "\n" +
-                    "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n" +
-                    "\n" +
-                    "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
+            confirmationAlert.getDialogPane()
+                             .setContent(new Label(
+                                   "Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n"
+                                         + "\n"
+                                         + "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n"
+                                         + "\n"
+                                         + "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -400,7 +402,9 @@ public class SettingsController {
 
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.getDialogPane().setContent(new Label("KeepTime will now be CLOSED!\n" + "You have to RESTART it again to see the changes"));
+            informationDialog.getDialogPane()
+                             .setContent(new Label("KeepTime will now be CLOSED!\n"
+                                   + "You have to RESTART it again to see the changes"));
             informationDialog.showAndWait();
             Platform.exit();
 
