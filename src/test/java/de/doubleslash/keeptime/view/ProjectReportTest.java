@@ -47,7 +47,7 @@ public class ProjectReportTest {
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       this.uut.appendToWorkNotes("note 2 ");
       final String expected = "note 1; note 2";
-      assertEquals(expected, this.uut.getNotes(false));
+      assertEquals(expected, this.uut.getNotes());
    }
 
    @Test
@@ -56,7 +56,7 @@ public class ProjectReportTest {
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       this.uut.appendToWorkNotes("note 2 ");
       final String expected = "3 Notes: note 1; note 2";
-      assertEquals(expected, this.uut.getNotes(true));
+      assertEquals(expected, this.uut.getNotes());
    }
 
    @Test
@@ -66,7 +66,7 @@ public class ProjectReportTest {
       this.uut.appendToWorkNotes("note 2");
       this.uut.appendToWorkNotes("note 3");
       final String expected = "3 Notes: note 1; note 2; note 3";
-      assertEquals(expected, this.uut.getNotes(true));
+      assertEquals(expected, this.uut.getNotes());
    }
 
    @Test
@@ -77,7 +77,7 @@ public class ProjectReportTest {
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       final String expected = "4 Notes: note 1; note 2";
-      assertEquals(expected, this.uut.getNotes(true));
+      assertEquals(expected, this.uut.getNotes());
    }
 
 }
