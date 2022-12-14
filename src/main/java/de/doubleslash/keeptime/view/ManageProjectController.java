@@ -96,7 +96,7 @@ public class ManageProjectController {
 
    public Project getProjectFromUserInput() {
       return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
-              isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
+            isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
    }
 
 }
