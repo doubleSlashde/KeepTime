@@ -10,7 +10,8 @@ on:
     branches: [ "master", "develop" ]
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   schedule:
-    - cron: "*/1 * * * *" #Runs pipeline every 10 minutes for testing
+    - cron: '* * * * */6' #Runs pipeline once a week https://jasonet.co/posts/scheduled-actions/
+
 jobs:
 
   Analyze_Build_Upload:
