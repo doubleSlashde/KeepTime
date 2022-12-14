@@ -10,7 +10,7 @@ on:
     branches: [ "master", "develop" ]
   workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
   schedule:
-    - cron: '*/1 * * * *' #Runs pipeline once a week https://jasonet.co/posts/scheduled-actions/
+    - cron: '* * * * */6' #Runs pipeline once a week https://jasonet.co/posts/scheduled-actions/
 
 jobs:
 
