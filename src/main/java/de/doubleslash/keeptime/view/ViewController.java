@@ -507,12 +507,11 @@ public class ViewController {
 
       dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 
-      ManageProjectController.projectNameIsValid.addListener(observable ->{
-         if(ManageProjectController.projectNameIsValid.get()) {
+      ManageProjectController.projectNameIsValid.addListener((observable, oldValue, isValid) -> {
+         if(isValid) {
             dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
          }else {
             dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
-
          }
       });
       dialogResultConverter(dialog, manageProjectController);
@@ -569,7 +568,7 @@ public class ViewController {
    public void addNewProject(final ActionEvent ae) {
       LOG.info("Add new project clicked");
       // TODO somewhat duplicate dialog of create and edit
-      final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+      final Dialog<Project> dialog = setUpDialogProject("Create new project", null);
 
       Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
       stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
