@@ -352,7 +352,6 @@ public class ViewController {
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {
-      //dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true)
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
