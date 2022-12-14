@@ -408,7 +408,7 @@ public class ReportController {
          }
          final Clipboard clipboard = Clipboard.getSystemClipboard();
          final ClipboardContent content = new ClipboardContent();
-         content.putString(pr.getNotes(true));
+         content.putString(pr.getNotes());
          clipboard.setContent(content);
       };
 
