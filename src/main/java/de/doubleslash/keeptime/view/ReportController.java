@@ -204,11 +204,11 @@ public class ReportController {
 
       if(expanded){
          expandAll(false);
-         expandCollapseButton.setText("Expand Report list");
+         expandCollapseButton.setText("Expand");
 
       }else {
          expandAll(true);
-         expandCollapseButton.setText("Collapse Report list");
+         expandCollapseButton.setText("Collapse");
       }
       expanded = !expanded;
    }
