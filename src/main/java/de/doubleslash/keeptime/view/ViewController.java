@@ -352,6 +352,7 @@ public class ViewController {
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
          final ManageProjectController manageProjectController) {
+      //dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true)
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
@@ -505,6 +506,16 @@ public class ViewController {
 
       final ManageProjectController manageProjectController = loader.getController();
 
+      dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+
+      ManageProjectController.projectNameIsValid.addListener(observable ->{
+         if(ManageProjectController.projectNameIsValid.get()) {
+            dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
+         }else {
+            dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+
+         }
+      });
       dialogResultConverter(dialog, manageProjectController);
 
       return grid;

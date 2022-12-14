@@ -16,6 +16,8 @@
 
 package de.doubleslash.keeptime.view;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import org.slf4j.Logger;
@@ -57,7 +59,7 @@ public class ManageProjectController {
    @FXML
    private Label validateTextAlert;
 
-   private boolean validate;
+   public static BooleanProperty projectNameIsValid = new SimpleBooleanProperty(false);
    @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
@@ -69,7 +71,7 @@ public class ManageProjectController {
       sortIndexSpinner
             .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
-      validate=false;
+      projectNameIsValid.set(false);
       nameTextField.setOnKeyTyped(event -> validateName());
    }
 
@@ -85,19 +87,16 @@ public class ManageProjectController {
       if(nameTextField.getText().isBlank()){
          validateTextAlert.setText("Please enter a project name!");
          validateTextAlert.setTextFill(Color.RED);
-         validate=false;
+         projectNameIsValid.set(false);
       }else{
          validateTextAlert.setText(" ");
-         validate=true;
+         projectNameIsValid.set(true);
       }
    }
 
    public Project getProjectFromUserInput() {
-      if(validate){
          return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
                  isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
-      }
-      return null;
    }
 
 }
