@@ -19,7 +19,6 @@ package de.doubleslash.keeptime.view;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.*;
-import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +58,23 @@ public class ManageProjectController {
    @FXML
    private Label validateTextAlert;
 
-   public static BooleanProperty projectNameIsValid = new SimpleBooleanProperty(false);
+   public boolean isProjectNameIsValid() {
+      return projectNameIsValid.get();
+   }
+
+   public BooleanProperty projectNameIsValidProperty() {
+      return projectNameIsValid;
+   }
+
+   public void setProjectNameIsValid(boolean projectNameIsValid) {
+      this.projectNameIsValid.set(projectNameIsValid);
+   }
+
+   private BooleanProperty projectNameIsValid = new SimpleBooleanProperty(false);
+
+   public BooleanProperty formValid() {
+      return projectNameIsValid;
+   }
    @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
@@ -71,7 +86,8 @@ public class ManageProjectController {
       sortIndexSpinner
             .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
-      projectNameIsValid.set(false);
+      validateTextAlert.visibleProperty().bind(projectNameIsValid.not()); //if valid don't show text
+      setProjectNameIsValid(false); //default value of valid status
       nameTextField.setOnKeyTyped(event -> validateName());
    }
 
@@ -85,12 +101,9 @@ public class ManageProjectController {
    }
    public void validateName(){
       if(nameTextField.getText().isBlank()){
-         validateTextAlert.setText("Please enter a project name!");
-         validateTextAlert.setTextFill(Color.RED);
-         projectNameIsValid.set(false);
+         setProjectNameIsValid(false);
       }else{
-         validateTextAlert.setText(" ");
-         projectNameIsValid.set(true);
+         setProjectNameIsValid(true);
       }
    }
 

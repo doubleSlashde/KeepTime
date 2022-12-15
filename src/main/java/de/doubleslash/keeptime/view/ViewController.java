@@ -507,7 +507,7 @@ public class ViewController {
 
       dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
 
-      ManageProjectController.projectNameIsValid.addListener((observable, oldValue, isValid) -> {
+      manageProjectController.formValid().addListener((observable, oldValue, isValid) -> {
          if(isValid) {
             dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
          }else {
