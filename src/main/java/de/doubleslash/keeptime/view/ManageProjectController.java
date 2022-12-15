@@ -59,14 +59,6 @@ public class ManageProjectController {
    @FXML
    private Label validateTextAlert;
 
-   public boolean isProjectNameIsValid() {
-      return projectNameIsValid.get();
-   }
-
-   public void setProjectNameIsValid(boolean projectNameIsValid) {
-      this.projectNameIsValid.set(projectNameIsValid);
-   }
-
    private BooleanProperty projectNameIsValid = new SimpleBooleanProperty(false);
 
    public BooleanProperty formValid() {
