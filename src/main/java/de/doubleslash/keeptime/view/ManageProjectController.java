@@ -18,6 +18,7 @@ package de.doubleslash.keeptime.view;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,10 +63,6 @@ public class ManageProjectController {
       return projectNameIsValid.get();
    }
 
-   public BooleanProperty projectNameIsValidProperty() {
-      return projectNameIsValid;
-   }
-
    public void setProjectNameIsValid(boolean projectNameIsValid) {
       this.projectNameIsValid.set(projectNameIsValid);
    }
@@ -86,9 +83,8 @@ public class ManageProjectController {
       sortIndexSpinner
             .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
-      validateTextAlert.visibleProperty().bind(projectNameIsValid.not()); //if valid don't show text
-      setProjectNameIsValid(false); //default value of valid status
-      nameTextField.setOnKeyTyped(event -> validateName());
+      nameTextField.onKeyTypedProperty().set(event -> validateName());
+      projectNameIsValid.bind(validateTextAlert.visibleProperty());
    }
 
    public void initializeWith(final Project project) {
@@ -101,9 +97,9 @@ public class ManageProjectController {
    }
    public void validateName(){
       if(nameTextField.getText().isBlank()){
-         setProjectNameIsValid(false);
+         validateTextAlert.visibleProperty().set(true);
       }else{
-         setProjectNameIsValid(true);
+         validateTextAlert.visibleProperty().set(false);
       }
    }
 

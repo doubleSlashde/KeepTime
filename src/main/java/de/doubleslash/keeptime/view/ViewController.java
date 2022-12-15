@@ -505,15 +505,8 @@ public class ViewController {
 
       final ManageProjectController manageProjectController = loader.getController();
 
-      dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValid());
 
-      manageProjectController.formValid().addListener((observable, oldValue, isValid) -> {
-         if(isValid) {
-            dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(false);
-         }else {
-            dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
-         }
-      });
       dialogResultConverter(dialog, manageProjectController);
 
       return grid;
