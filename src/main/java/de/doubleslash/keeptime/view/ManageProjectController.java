@@ -16,9 +16,9 @@
 
 package de.doubleslash.keeptime.view;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,24 +59,20 @@ public class ManageProjectController {
    @FXML
    private Label validateTextAlert;
 
-   private BooleanProperty projectNameIsValid = new SimpleBooleanProperty(false);
+   private BooleanProperty formValidProperty = new SimpleBooleanProperty(false);
 
-   public BooleanProperty formValid() {
-      return projectNameIsValid;
-   }
    @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
    }
-
    @FXML
    private void initialize() {
       final int availableProjectAmount = model.getAllProjects().size();
       sortIndexSpinner
-            .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
+              .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
-      nameTextField.onKeyTypedProperty().set(event -> validateName());
-      projectNameIsValid.bind(validateTextAlert.visibleProperty());
+      formValidProperty.bind(Bindings.createBooleanBinding(() -> !nameTextField.getText().isBlank(),nameTextField.textProperty()));
+      validateTextAlert.visibleProperty().bind(formValidProperty.not());
    }
 
    public void initializeWith(final Project project) {
@@ -87,17 +83,14 @@ public class ManageProjectController {
       isWorkCheckBox.setSelected(project.isWork());
       sortIndexSpinner.getValueFactory().setValue(project.getIndex());
    }
-   public void validateName(){
-      if(nameTextField.getText().isBlank()){
-         validateTextAlert.visibleProperty().set(true);
-      }else{
-         validateTextAlert.visibleProperty().set(false);
-      }
-   }
 
    public Project getProjectFromUserInput() {
       return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
             isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
+   }
+
+   public BooleanProperty formValidProperty() {
+      return formValidProperty;
    }
 
 }

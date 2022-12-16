@@ -487,7 +487,6 @@ public class ViewController {
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
       setUpAddNewProjectGridPane(dialog);
 
-      // TODO disable OK button if no name is set
       return dialog;
    }
 
@@ -505,7 +504,7 @@ public class ViewController {
 
       final ManageProjectController manageProjectController = loader.getController();
 
-      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValid());
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
 
       dialogResultConverter(dialog, manageProjectController);
 
@@ -561,7 +560,7 @@ public class ViewController {
    public void addNewProject(final ActionEvent ae) {
       LOG.info("Add new project clicked");
       // TODO somewhat duplicate dialog of create and edit
-      final Dialog<Project> dialog = setUpDialogProject("Create new project", null);
+      final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
       Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
       stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
