@@ -8,9 +8,9 @@ on:
     branches: [ "master", "develop" ]
   pull_request:
     branches: [ "master", "develop" ]
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to run this workflow manually from the Actions tab
+  schedule:
+    - cron: "0 8 * * 1" #Runs pipeline once a week https://jasonet.co/posts/scheduled-actions/
 
 jobs:
 
