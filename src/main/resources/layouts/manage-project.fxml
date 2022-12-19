@@ -43,7 +43,7 @@
             <Label disable="true" prefWidth="100.0" text="(will be matched at search)" wrapText="true" />
          </children>
       </VBox>
-      <Label fx:id="validateTextAlert" prefHeight="17.0" prefWidth="201.0" text="Please enter a project name!" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Label fx:id="validateTextAlert" prefHeight="17.0" prefWidth="201.0" text="Please enter a project name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
    </children>
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
