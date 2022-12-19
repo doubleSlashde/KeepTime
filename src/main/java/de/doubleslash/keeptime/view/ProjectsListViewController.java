@@ -365,7 +365,7 @@ public class ProjectsListViewController {
       }
       final ManageProjectController manageProjectController = loader.getController();
       manageProjectController.initializeWith(p);
-
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
