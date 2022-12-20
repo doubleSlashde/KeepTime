@@ -42,14 +42,14 @@ public class RandomColorPicker {
       }
    }
 
-   public static Color chooseContrastColor(Color backgroundColor, List<Color> availableColors) {
+   public static Color chooseContrastColor(List<Color> availableColors, Color backgroundColor,Color hoverbackgroundColor) {
 
       double divAdd = 0;
       Color divColor = null;
       int maxTries = 0;
 
       while (divAdd < 1 && maxTries < 10) {
-         divColor = getUniqueColor(availableColors, backgroundColor);
+         divColor = getUniqueColor(availableColors, backgroundColor, hoverbackgroundColor);
          double divred = Math.abs(divColor.getRed() - backgroundColor.getRed());
          double divgreen = Math.abs(divColor.getGreen() - backgroundColor.getGreen());
          double divblue = Math.abs(divColor.getBlue() - backgroundColor.getBlue());
@@ -59,11 +59,11 @@ public class RandomColorPicker {
       return divColor;
    }
 
-   public static Color getUniqueColor(List<Color> availableColors, Color backgroundColor) {
+   public static Color getUniqueColor(List<Color> availableColors, Color backgroundColor, Color hoverbackgroundColor) {
 
       List<Color> uniqueColorList = new ArrayList<>(colors);
       uniqueColorList.remove(backgroundColor); // List should remove all already used colors.
-
+      uniqueColorList.remove(hoverbackgroundColor);
       for (Color color : availableColors) {
          for (int i = 0; i < uniqueColorList.size(); i++) {
 
@@ -71,6 +71,10 @@ public class RandomColorPicker {
                uniqueColorList.remove(i);
             }
          }
+      }
+      if(uniqueColorList.isEmpty()){
+         LOG.info("Empty uniqueColorList return Black");
+         return Color.BLACK;
       }
       return getRandomColor(uniqueColorList);
    }

@@ -97,7 +97,7 @@ public class ManageProjectController {
 
    private void setRandomColor() {
       textFillColorPicker.setValue(
-            RandomColorPicker.chooseContrastColor(model.defaultBackgroundColor.get(), getProjectColorList()));
+            RandomColorPicker.chooseContrastColor( getProjectColorList(), model.defaultBackgroundColor.get(), model.hoverBackgroundColor.get()));
    }
 
    private List getProjectColorList() {
