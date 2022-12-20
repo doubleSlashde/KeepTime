@@ -21,6 +21,10 @@ import static de.doubleslash.keeptime.view.ViewController.fontColorProperty;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,17 +70,23 @@ public class ManageProjectController {
    @FXML
    private Button randomColorButton;
 
+   @FXML
+   private Label validateTextAlert;
+
+   private BooleanProperty formValidProperty = new SimpleBooleanProperty(false);
+
    @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
    }
-
    @FXML
    private void initialize() {
       final int availableProjectAmount = model.getAllProjects().size();
-      sortIndexSpinner.setValueFactory(
-            new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
+      sortIndexSpinner
+              .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
+      formValidProperty.bind(Bindings.createBooleanBinding(() -> !nameTextField.getText().isBlank(),nameTextField.textProperty()));
+      validateTextAlert.visibleProperty().bind(formValidProperty.not());
       randomColorButton.setOnAction(event -> setRandomColor());
 
       SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_RANDOM_COLOR_BUTTON, 0.04,
@@ -110,6 +120,10 @@ public class ManageProjectController {
    public Project getProjectFromUserInput() {
       return new Project(nameTextField.getText(), descriptionTextArea.getText(), textFillColorPicker.getValue(),
             isWorkCheckBox.isSelected(), sortIndexSpinner.getValue());
+   }
+
+   public BooleanProperty formValidProperty() {
+      return formValidProperty;
    }
 
 }

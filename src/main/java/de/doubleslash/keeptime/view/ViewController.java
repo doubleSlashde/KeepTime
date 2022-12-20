@@ -487,7 +487,6 @@ public class ViewController {
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
       setUpAddNewProjectGridPane(dialog);
 
-      // TODO disable OK button if no name is set
       return dialog;
    }
 
@@ -504,6 +503,8 @@ public class ViewController {
       dialog.getDialogPane().setContent(grid);
 
       final ManageProjectController manageProjectController = loader.getController();
+
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
 
       dialogResultConverter(dialog, manageProjectController);
 

@@ -91,6 +91,9 @@ public class ReportController {
    @FXML
    private Canvas colorTimeLineCanvas;
 
+   @FXML
+   private Button expandCollapseButton;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private final Model model;
@@ -105,6 +108,8 @@ public class ReportController {
 
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
+   private boolean expanded = true;
+
    @Autowired
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
@@ -117,8 +122,9 @@ public class ReportController {
       currentReportDate = LocalDate.now();
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
-      initTableView();
 
+      expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
+      initTableView();
    }
 
    private void initTableView() {
@@ -207,6 +213,24 @@ public class ReportController {
       rootItem.setExpanded(true);
    }
 
+   private void toggleCollapseExpandReport(){
+
+      if(expanded){
+         expandAll(false);
+         expandCollapseButton.setText("Expand");
+
+      }else {
+         expandAll(true);
+         expandCollapseButton.setText("Collapse");
+      }
+      expanded = !expanded;
+   }
+
+   private void expandAll(boolean expand){
+      for (int i=0; i<rootItem.getChildren().size(); i++){
+         rootItem.getChildren().get(i).setExpanded(expand);
+      }
+   }
    private void updateReport(final LocalDate dateToShow) {
       this.currentReportDate = dateToShow;
       rootItem.getChildren().clear();
@@ -246,14 +270,21 @@ public class ReportController {
 
          for (final Work w : onlyCurrentProjectWork) {
             final HBox workButtonBox = new HBox(5.0);
-            workButtonBox.getChildren().add(createCopyWorkButton(w));
-            workButtonBox.getChildren().add(createEditWorkButton(w));
-            workButtonBox.getChildren().add(createDeleteWorkButton(w));
+            if(w.getId()==model.activeWorkItem.get().getId()){
+               Label label = new Label("Active Work");
+               label.setTooltip(new Tooltip("The active work item cannot be edited as it is currently active. To edit it you need to switch to another work first."));
+               label.setStyle("-fx-font-weight: bold");
+               workButtonBox.getChildren().add(label);
+            }else {
+               workButtonBox.getChildren().add(createCopyWorkButton(w));
+               workButtonBox.getChildren().add(createEditWorkButton(w));
+               workButtonBox.getChildren().add(createDeleteWorkButton(w));
+            }
             final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
             projectRow.getChildren().add(workRow);
          }
 
-         projectRow.setExpanded(true);
+         projectRow.setExpanded(expanded);
          rootItem.getChildren().add(projectRow);
 
       }
@@ -401,7 +432,7 @@ public class ReportController {
          }
          final Clipboard clipboard = Clipboard.getSystemClipboard();
          final ClipboardContent content = new ClipboardContent();
-         content.putString(pr.getNotes(true));
+         content.putString(pr.getNotes());
          clipboard.setContent(content);
       };
 
