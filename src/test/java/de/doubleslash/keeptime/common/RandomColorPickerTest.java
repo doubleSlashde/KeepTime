@@ -10,25 +10,11 @@ import org.junit.jupiter.api.Test;
 import javafx.scene.paint.Color;
 
 class RandomColorPickerTest {
-
-   @Test
-   public void shouldGetUniqueColor() {
-
-      // RED, BLUE
-      // assert unique color is BLUE
-
-      RandomColorPicker.colors = Arrays.asList(Color.RED, Color.BLUE);
-
-      Assertions.assertNotEquals(Color.RED.toString(),
-            RandomColorPicker.getUniqueColor(List.of(Color.RED), Color.BLUE).toString());
-
-   }
-
    @Test
    public void shouldReturnBlackWhenAllColorsTakenAlready() {
       RandomColorPicker.colors = List.of(Color.RED);
 
-      Assertions.assertEquals(Color.BLACK, RandomColorPicker.getUniqueColor(List.of(Color.RED), Color.BLUE));
+      Assertions.assertEquals(Color.BLACK, RandomColorPicker.getUniqueColor(List.of(Color.RED), Color.BLUE, Color.YELLOW));
    }
 
    @Test
@@ -36,7 +22,7 @@ class RandomColorPickerTest {
       RandomColorPicker.colors = new ArrayList<>(Arrays.asList(Color.RED, Color.BLUE, Color.GREEN, Color.GRAY));
 
       Assertions.assertEquals(Color.GRAY,
-            RandomColorPicker.getUniqueColor(Arrays.asList(Color.RED, Color.GREEN), Color.BLUE));
+            RandomColorPicker.getUniqueColor(Arrays.asList(Color.RED, Color.GREEN), Color.BLUE,Color.YELLOW));
    }
 
 }
