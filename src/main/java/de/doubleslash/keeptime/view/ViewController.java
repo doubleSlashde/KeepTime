@@ -336,7 +336,10 @@ public class ViewController {
          alert.setTitle("Confirm exit");
          alert.setHeaderText("Are you sure you want to close KeepTime?");
 
-         alert.initOwner(mainStage);
+         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+         stage.setAlwaysOnTop(true);
          alert.showAndWait();
 
          if (alert.getResult() == ButtonType.YES) {
@@ -427,6 +430,8 @@ public class ViewController {
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportController.setStage(reportStage);
+         reportStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
@@ -453,6 +458,7 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          final Scene settingsScene = new Scene(settingsRoot);
          settingsScene.setOnKeyPressed(ke -> {
@@ -481,7 +487,6 @@ public class ViewController {
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
       setUpAddNewProjectGridPane(dialog);
 
-      // TODO disable OK button if no name is set
       return dialog;
    }
 
@@ -498,6 +503,8 @@ public class ViewController {
       dialog.getDialogPane().setContent(grid);
 
       final ManageProjectController manageProjectController = loader.getController();
+
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
 
       dialogResultConverter(dialog, manageProjectController);
 
@@ -554,6 +561,9 @@ public class ViewController {
       LOG.info("Add new project clicked");
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
+
+      Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+      stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
       mainStage.setAlwaysOnTop(false);
       final Optional<Project> result = dialog.showAndWait();

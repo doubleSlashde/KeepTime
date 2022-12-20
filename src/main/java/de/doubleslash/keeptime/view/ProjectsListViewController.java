@@ -38,21 +38,10 @@ import de.doubleslash.keeptime.model.Work;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -141,12 +130,8 @@ public class ProjectsListViewController {
 
       final String lowerCaseFilter = searchText.toLowerCase();
 
-      if (project.getName().toLowerCase().contains(lowerCaseFilter)
-            || project.getDescription().toLowerCase().contains(lowerCaseFilter)) {
-         return true;
-      }
-
-      return false;
+      return project.getName().toLowerCase().contains(lowerCaseFilter)
+              || project.getDescription().toLowerCase().contains(lowerCaseFilter);
    }
 
    /**
@@ -157,8 +142,12 @@ public class ProjectsListViewController {
          final Project p = entry.getKey();
          final Label label = entry.getValue();
 
-         final long seconds = model.getPastWorkItems().stream().filter(work -> work.getProject().getId() == p.getId())
-               .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+         final long seconds = model.getPastWorkItems()
+                                   .stream()
+                                   .filter(work -> work.getProject().getId() == p.getId())
+                                   .mapToLong(
+                                         work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds())
+                                   .sum();
          label.setText(DateFormatter.secondsToHHMMSS(seconds));
       }
    }
@@ -188,7 +177,8 @@ public class ProjectsListViewController {
       noteDialog.setTitle("Empty Notes");
       noteDialog.setHeaderText("Switch projects without notes?");
       noteDialog.setContentText("What did you do for project '" + currentWork.getProject().getName() + "' ?");
-      noteDialog.initOwner(mainStage);
+      Stage importConfirmationStage = (Stage) noteDialog.getDialogPane().getScene().getWindow();
+      importConfirmationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
       final Optional<String> result = noteDialog.showAndWait();
       return result;
@@ -264,10 +254,13 @@ public class ProjectsListViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
                ViewController.activeWorkSecondsProperty, p);
-         mainStage.setAlwaysOnTop(false);
+
+         Stage stage = (Stage) changeWithTimeDialog.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         stage.setAlwaysOnTop(true);
+
          final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
-         mainStage.setAlwaysOnTop(true);
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
@@ -279,6 +272,8 @@ public class ProjectsListViewController {
          alert.setHeaderText("Delete project '" + p.getName() + "'.");
          alert.setContentText(
                "The project will just be hidden from display, as there may be work references to this project.");
+         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = alert.showAndWait();
@@ -297,6 +292,9 @@ public class ProjectsListViewController {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
          final Dialog<Project> dialog = setupEditProjectDialog("Edit project", "Edit project '" + p.getName() + "'", p);
+
+         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          mainStage.setAlwaysOnTop(false);
          final Optional<Project> result = dialog.showAndWait();
@@ -367,7 +365,7 @@ public class ProjectsListViewController {
       }
       final ManageProjectController manageProjectController = loader.getController();
       manageProjectController.initializeWith(p);
-
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
