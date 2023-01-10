@@ -38,7 +38,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <maven-dependency-check.version>6.0.5</maven-dependency-check.version>
+    <maven-dependency-check.version>7.4.4</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -112,6 +112,11 @@
       <groupId>org.sonarsource.scanner.maven</groupId>
       <artifactId>sonar-maven-plugin</artifactId>
       <version>3.9.1.2184</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>3.8.7</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -218,7 +223,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.12.1</version>
       </plugin>
 
       <plugin>
