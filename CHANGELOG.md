@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 - replaced deprecated fontawesome dependencies
 - updated dependencies 
 - isWork is now the default when creating a new project
-- autofocus the note field when editing a project instead of the project name 
+- autofocus the note field instead of the project name when editing a project
 - active work item is not editable anymore
 - simplify note format
 
