@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.3.TODO - 2023-01-11
+
+### Added 
+- option to receive notification when switching from a work project without notes
+- confirmation on closing KeepTime 
+- import functionality of database
+- icons for dialogs
+- Collapse / Expand button for the project report 
+
+### Changed
+- updated the Settings design
+- replaced deprecated fontawesome dependencies
+- updated dependencies 
+- isWork is now the default when creating a new project
+- autofocus the note field when editing a project instead of the project name 
+- active work item is not editable anymore
+- simplify note format
+
+### Fixed 
+- "hide projects" on linux 
+- notes disappear after an auto safe 
+- creating a project without a name
+
 ## v1.2.0 - yyyy-mm-dd
 
 ### Added
