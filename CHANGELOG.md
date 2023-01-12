@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added 
 - option to show note reminder only when switching from a work project without notes
 - option to show a 'are you sure' confirmation before closing KeepTime
-- import functionality of database
+- import functionality of database (to be used with an export of the export functionality)
 - icons for dialogs
 - Collapse / Expand button for the project report 
 
