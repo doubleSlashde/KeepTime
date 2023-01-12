@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
@@ -9,6 +10,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
@@ -33,7 +35,6 @@
       <Label text="IsWork:" GridPane.rowIndex="5" />
       <Label text="SortIndex:" GridPane.rowIndex="6" />
       <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
-      <ColorPicker fx:id="textFillColorPicker" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <CheckBox fx:id="isWorkCheckBox" mnemonicParsing="false" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
       <Spinner fx:id="sortIndexSpinner" GridPane.columnIndex="1" GridPane.rowIndex="6" />
       <TextArea fx:id="descriptionTextArea" prefHeight="120.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
@@ -43,6 +44,12 @@
             <Label disable="true" prefWidth="100.0" text="(will be matched at search)" wrapText="true" />
          </children>
       </VBox>
+      <HBox prefHeight="16.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+         <children>
+            <ColorPicker fx:id="textFillColorPicker" />
+            <Button fx:id="randomColorButton" contentDisplay="GRAPHIC_ONLY" maxHeight="30.0" maxWidth="30.0" minHeight="25.0" minWidth="50.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="30.0" />
+         </children>
+      </HBox>
       <Label fx:id="validateTextAlert" prefHeight="17.0" prefWidth="201.0" text="Please enter a project name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
    </children>
    <padding>

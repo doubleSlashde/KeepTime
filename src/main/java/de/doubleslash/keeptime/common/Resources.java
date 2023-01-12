@@ -67,7 +67,9 @@ public class Resources {
 
       SVG_LICENSES_ICON("/svgs/closed-captioning.svg"),
 
-      ICON_MAIN("/icons/icon.png")
+      SVG_RANDOM_COLOR_BUTTON("/svgs/dice.svg"),
+
+      ICON_MAIN("/icons/icon.png"),
 
       ;
 

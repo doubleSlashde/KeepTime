@@ -16,6 +16,11 @@
 
 package de.doubleslash.keeptime.view;
 
+import static de.doubleslash.keeptime.view.ViewController.fontColorProperty;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -25,11 +30,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import de.doubleslash.keeptime.common.RandomColorPicker;
+import de.doubleslash.keeptime.common.Resources;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory.IntegerSpinnerValueFactory;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.SVGPath;
 
 @Component
 public class ManageProjectController {
@@ -57,6 +68,9 @@ public class ManageProjectController {
    private Spinner<Integer> sortIndexSpinner;
 
    @FXML
+   private Button randomColorButton;
+
+   @FXML
    private Label validateTextAlert;
 
    private BooleanProperty formValidProperty = new SimpleBooleanProperty(false);
@@ -73,6 +87,25 @@ public class ManageProjectController {
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
       formValidProperty.bind(Bindings.createBooleanBinding(() -> !nameTextField.getText().isBlank(),nameTextField.textProperty()));
       validateTextAlert.visibleProperty().bind(formValidProperty.not());
+      randomColorButton.setOnAction(event -> setRandomColor());
+
+      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_RANDOM_COLOR_BUTTON, 0.04,
+            0.04);
+      calendarSvgPath.fillProperty().bind(fontColorProperty);
+      randomColorButton.setGraphic(calendarSvgPath);
+   }
+
+   private void setRandomColor() {
+      textFillColorPicker.setValue(
+            RandomColorPicker.chooseContrastColor( getProjectColorList(), model.defaultBackgroundColor.get(), model.hoverBackgroundColor.get()));
+   }
+
+   private List getProjectColorList() {
+      List<Color> colorList = new ArrayList<>();
+      for (Project project : model.getAllProjects()) {
+         colorList.add(project.getColor());
+      }
+      return colorList;
    }
 
    public void initializeWith(final Project project) {
