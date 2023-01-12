@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 - option to show a 'are you sure' confirmation before closing KeepTime
 - import functionality of database (to be used with an export of the export functionality)
 - app icon shown in dialogs
-- Collapse / Expand button for the project report 
+- in the report a collapse / expand button was added
 
 ### Changed
 - updated the Settings design
