@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## v1.3.TODO - 2023-01-11
 
 ### Added 
-- option to receive notification when switching from a work project without notes
+- option to show note reminder only when switching from a work project without notes
 - confirmation on closing KeepTime 
 - import functionality of database
 - icons for dialogs
