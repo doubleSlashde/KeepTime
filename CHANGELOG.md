@@ -18,7 +18,9 @@ All notable changes to this project will be documented in this file.
 - when creating a new project 'isWork' is selected by default
 - when editing a note the note field will be in focus instead of the project
 - in the report dialog the currently active work item is not editable anymore (marked as 'active work' instead)
-- simplify note format
+- in report dialog simplified the note format when copying them (removed the note count)
+- when creating/editing a project the name cannot be empty anymore
+- moved CI to github actions
 
 ### Fixed 
 - "hide projects" on linux 
