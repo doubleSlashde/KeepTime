@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 - in the report a collapse / expand button was added
 
 ### Changed
-- updated the Settings design
+- updated the settings dialog design
 - replaced deprecated fontawesome dependencies
 - updated dependencies 
 - isWork is now the default when creating a new project
