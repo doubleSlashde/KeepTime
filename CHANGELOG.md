@@ -23,9 +23,7 @@ All notable changes to this project will be documented in this file.
 - moved CI to github actions
 
 ### Fixed 
-- "hide projects" on linux 
-- notes disappear after an auto safe 
-- creating a project without a name
+- 'hide projects' setting was not working correctly on linux. we disabled the setting for linux
 
 ## v1.2.0 - yyyy-mm-dd
 
