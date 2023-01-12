@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - updated the settings dialog design
 - replaced deprecated fontawesome dependencies
-- updated dependencies 
+- updated dependencies - we now also require Java 11 (instead of 8). **note** migration of data of previous version. see section 'Migrate from old version' in readme before updating
 - when creating a new project 'isWork' is selected by default
 - autofocus the note field instead of the project name when editing a project
 - active work item is not editable anymore
