@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
 - updated dependencies - we now also require Java 11 (instead of 8). **note** migration of data of previous version. see section 'Migrate from old version' in readme before updating
 - when creating a new project 'isWork' is selected by default
 - when editing a note the note field will be in focus instead of the project
-- active work item is not editable anymore
+- in the report dialog the currently active work item is not editable anymore (marked as 'active work' instead)
 - simplify note format
 
 ### Fixed 
