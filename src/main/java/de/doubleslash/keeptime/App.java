@@ -239,7 +239,7 @@ public class App extends Application {
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
 
-      if (!OS.isLinux()) {
+      if (OS.isWindows()) {
          globalScreenListener = new GlobalScreenListener();
          globalScreenListener.register(model.useHotkey.get());
          globalScreenListener.setViewController(viewControllerPopupController);

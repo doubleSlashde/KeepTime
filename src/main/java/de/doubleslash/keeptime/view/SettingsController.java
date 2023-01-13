@@ -183,7 +183,7 @@ public class SettingsController {
       LOG.debug("load substages");
       LOG.debug("set version label text");
 
-      if (OS.isLinux()) {
+      if (!OS.isWindows()) {
          LOG.info("Disabling unsupported settings for Linux.");
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
@@ -208,7 +208,7 @@ public class SettingsController {
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         if (OS.isLinux()) {
+         if (!OS.isWindows()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
                hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
                      (int) (hoverBackgroundColor.getValue().getGreen() * 255),
