@@ -1,4 +1,3 @@
-package de.doubleslash.keeptime.common;
 // Copyright 2019 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
@@ -14,6 +13,8 @@ package de.doubleslash.keeptime.common;
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+package de.doubleslash.keeptime.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
