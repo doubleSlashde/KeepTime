@@ -177,9 +177,9 @@ public class ProjectsListViewController {
       noteDialog.setTitle("Empty Notes");
       noteDialog.setHeaderText("Switch projects without notes?");
       noteDialog.setContentText("What did you do for project '" + currentWork.getProject().getName() + "' ?");
-      Stage importConfirmationStage = (Stage) noteDialog.getDialogPane().getScene().getWindow();
-      importConfirmationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
-
+      Stage noNoteSelectedStage = (Stage) noteDialog.getDialogPane().getScene().getWindow();
+      noNoteSelectedStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+      noNoteSelectedStage.setAlwaysOnTop(true);
       final Optional<String> result = noteDialog.showAndWait();
       return result;
    }
