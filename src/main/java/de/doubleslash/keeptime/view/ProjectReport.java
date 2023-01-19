@@ -46,6 +46,8 @@ public class ProjectReport {
          if (this.size>1) {
             this.sb.append(NOTE_DELIMETER);
          }
+      }else {
+         LOG.debug("Skipping empty note.");
       }
    }
 
