@@ -414,7 +414,7 @@
                                           </HBox>
                                           <HBox prefHeight="42.0" prefWidth="366.0">
                                              <children>
-                                                <Label text="Export your current Data to an Sql script. This is needed if you upgrade to an newer KeepTime version. " wrapText="true" />
+                                                <Label text="Export your current Data to an Sql script. This is needed if you upgrade to a newer KeepTime version. " wrapText="true" />
                                              </children>
                                           </HBox>
                                           <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="367.0">
