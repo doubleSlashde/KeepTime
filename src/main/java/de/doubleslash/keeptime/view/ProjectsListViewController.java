@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +84,7 @@ public class ProjectsListViewController {
          availableProjectsListView.scrollTo(0);
       });
 
+
       searchTextField.setOnKeyPressed(eh -> {
          final MultipleSelectionModel<Project> selectionModel = availableProjectsListView.getSelectionModel();
          switch (eh.getCode()) {
@@ -115,6 +117,12 @@ public class ProjectsListViewController {
          if (selectedItem != null) {
             changeProject(selectedItem, 0);
             searchTextField.setText("");
+         }
+      });
+      searchTextField.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
+         searchTextField.selectAll();
+         if(e.getClickCount()>1){
+          searchTextField.deselect();
          }
       });
 
