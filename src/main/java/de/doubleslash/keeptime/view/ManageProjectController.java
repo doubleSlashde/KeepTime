@@ -76,11 +76,8 @@ public class ManageProjectController {
       validateTextAlert.visibleProperty().bind(formValidProperty.not());
       
       Platform.runLater(() ->{
-         if(nameTextField.getText().isBlank()){
             nameTextField.requestFocus();
-         }else {
-            descriptionTextArea.requestFocus();
-         }
+            nameTextField.end();
       });
    }
 
