@@ -16,6 +16,7 @@
 
 package de.doubleslash.keeptime.view;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -73,6 +74,14 @@ public class ManageProjectController {
       sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
       formValidProperty.bind(Bindings.createBooleanBinding(() -> !nameTextField.getText().isBlank(),nameTextField.textProperty()));
       validateTextAlert.visibleProperty().bind(formValidProperty.not());
+      
+      Platform.runLater(() ->{
+         if(nameTextField.getText().isBlank()){
+            nameTextField.requestFocus();
+         }else {
+            descriptionTextArea.requestFocus();
+         }
+      });
    }
 
    public void initializeWith(final Project project) {
