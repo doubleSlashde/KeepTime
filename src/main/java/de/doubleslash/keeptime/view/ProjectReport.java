@@ -49,6 +49,14 @@ public class ProjectReport {
       } else {
          LOG.debug("Skipping empty note.");
       }
+
+      if(numberOfNotes==this.size){
+         int lastSemiColonIndex = this.sb.lastIndexOf(";");
+         if (lastSemiColonIndex != -1) {
+            this.sb.deleteCharAt(lastSemiColonIndex);
+            this.sb.setLength(this.sb.length()-1); //Removes a blank space at the end
+         }
+      }
    }
 
    public int getNumberOfNotes() {
