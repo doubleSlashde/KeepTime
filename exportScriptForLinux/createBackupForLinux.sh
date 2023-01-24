@@ -5,23 +5,22 @@ DB_USER=sa
 DB_PASSWD=
 SQL_BACKUP_FILENAME=KeepTime_database-export_H2-version-$H2_VERSION.sql
 
-echo Get H2 jar from KeepTime jar ....
-jar xf keeptime-1.2.0-SNAPSHOT.jar
-rm -r org 
-rm -r META-INF
-echo 
+echo "Script to export the content of H2 databse from KeepTime version 1.2.0-SNAPSHOT to .sql file."
+echo "The script should be placed next to the .jar file."
+read -p "Press enter to continue"
 
+echo -e "\nExtracting H2 driver from KeepTime .jar file."
 DRIVER_JAR_FROM_KEEPTIME=BOOT-INF/lib/h2-$H2_VERSION.jar
+jar xfv keeptime-1.2.0-SNAPSHOT.jar $DRIVER_JAR_FROM_KEEPTIME
 
-echo Filename : $SQL_BACKUP_FILENAME
-echo 
-echo Location : 
-pwd  
-echo 
+echo -e "\nTriggering database backup."
+java -cp $DRIVER_JAR_FROM_KEEPTIME org.h2.tools.Script -url $DB_URL -user $DB_USER -script $SQL_BACKUP_FILENAME -options DROP
 
-     
-	java -cp $DRIVER_JAR_FROM_KEEPTIME org.h2.tools.Script -url $DB_URL -user $DB_USER -script $SQL_BACKUP_FILENAME -options DROP
-rm -r BOOT-INF
+echo -e "\nCleanup of extracted .jar file."
+rm -rv BOOT-INF
 
-echo delete Files from unzipping KeepTime
-echo Export succeeded 
+echo -e "\nIf no error occured the export has succeeded."
+echo "The exported file was created at '$(pwd)/$SQL_BACKUP_FILENAME'."
+echo -e "\nYou can now import this file in a new version of KeepTime.\n"
+
+read -p "All set. Press enter to exit script."
