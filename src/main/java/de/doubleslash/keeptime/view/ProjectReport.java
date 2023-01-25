@@ -19,6 +19,7 @@ package de.doubleslash.keeptime.view;
 import static de.doubleslash.keeptime.view.ReportController.NOTE_DELIMETER;
 
 import java.lang.invoke.MethodHandles;
+import java.util.StringJoiner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,35 +29,23 @@ public class ProjectReport {
    /** The slf4j-logger for this class. */
    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-   private int numberOfNotEmptyNotes;
+   private final StringJoiner sb;
 
-   private final int size;
-
-   private final StringBuilder sb;
-
-   public ProjectReport(final int size) {
-      this.size = size;
-      this.sb = new StringBuilder(2 * 1024);
+   public ProjectReport() {
+      this.sb = new StringJoiner(NOTE_DELIMETER);
    }
 
    public void appendToWorkNotes(final String currentWorkNote) {
+
       if (!currentWorkNote.isEmpty()) {
-         this.numberOfNotEmptyNotes++;
-         if (this.numberOfNotEmptyNotes >1) {
-            this.sb.append(NOTE_DELIMETER);
-         }
-         this.sb.append(currentWorkNote.trim());
+         this.sb.add(currentWorkNote.trim());
       } else {
          LOG.debug("Skipping empty note.");
       }
    }
 
-   public int getNumberOfNotEmptyNotes() {
-      return this.numberOfNotEmptyNotes;
-   }
-
    public String getNotes() {
-      return this.sb.toString();
+      return sb.toString();
    }
 
 }
