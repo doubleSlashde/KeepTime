@@ -28,7 +28,7 @@ public class ProjectReport {
    /** The slf4j-logger for this class. */
    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-   private int numberOfNotes;
+   private int numberOfNotEmptyNotes;
 
    private final int size;
 
@@ -40,27 +40,19 @@ public class ProjectReport {
    }
 
    public void appendToWorkNotes(final String currentWorkNote) {
-      this.numberOfNotes++;
-      this.sb.append(currentWorkNote.trim());
       if (!currentWorkNote.isEmpty()) {
-         if (this.size>1) {
+         this.numberOfNotEmptyNotes++;
+         if (this.numberOfNotEmptyNotes >1) {
             this.sb.append(NOTE_DELIMETER);
          }
+         this.sb.append(currentWorkNote.trim());
       } else {
          LOG.debug("Skipping empty note.");
       }
-
-      if(numberOfNotes==this.size){
-         int lastSemiColonIndex = this.sb.lastIndexOf(";");
-         if (lastSemiColonIndex != -1) {
-            this.sb.deleteCharAt(lastSemiColonIndex);
-            this.sb.setLength(this.sb.length()-1); //Removes a blank space at the end
-         }
-      }
    }
 
-   public int getNumberOfNotes() {
-      return this.numberOfNotes;
+   public int getNumberOfNotEmptyNotes() {
+      return this.numberOfNotEmptyNotes;
    }
 
    public String getNotes() {
