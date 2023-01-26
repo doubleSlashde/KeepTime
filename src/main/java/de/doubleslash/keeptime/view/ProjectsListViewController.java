@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,7 @@ public class ProjectsListViewController {
    private final FilteredList<Project> filteredData;
 
    private final boolean hideable;
+
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
          final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
@@ -117,6 +119,11 @@ public class ProjectsListViewController {
             searchTextField.setText("");
          }
       });
+      searchTextField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> Platform.runLater(() -> {
+         if (isNowFocused) {
+            searchTextField.selectAll();
+         }
+      }));
 
       availableProjectsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       availableProjectsListView.getSelectionModel().selectFirst();
