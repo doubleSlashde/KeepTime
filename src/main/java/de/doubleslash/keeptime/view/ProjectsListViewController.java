@@ -84,7 +84,6 @@ public class ProjectsListViewController {
          availableProjectsListView.scrollTo(0);
       });
 
-
       searchTextField.setOnKeyPressed(eh -> {
          final MultipleSelectionModel<Project> selectionModel = availableProjectsListView.getSelectionModel();
          switch (eh.getCode()) {
