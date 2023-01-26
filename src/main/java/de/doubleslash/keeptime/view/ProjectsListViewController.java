@@ -24,6 +24,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.input.MouseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +64,7 @@ public class ProjectsListViewController {
    private final FilteredList<Project> filteredData;
 
    private final boolean hideable;
+
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
          final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
@@ -118,12 +122,15 @@ public class ProjectsListViewController {
             searchTextField.setText("");
          }
       });
-      searchTextField.addEventFilter(MouseEvent.MOUSE_CLICKED, e -> {
-         searchTextField.selectAll();
-         if(e.getClickCount()>1){
-          searchTextField.deselect();
-         }
+      //From https://stackoverflow.com/questions/14965318/javafx-method-selectall-just-works-by-focus-with-keyboard
+      searchTextField.focusedProperty().addListener(observable -> {
+         Platform.runLater(() -> {
+            if(searchTextField.isFocused()){
+               searchTextField.selectAll();
+            }
+         });
       });
+
 
       availableProjectsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       availableProjectsListView.getSelectionModel().selectFirst();
