@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.lang.invoke.MethodHandles;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -38,11 +37,20 @@ public class ProjectReportTest {
 
    @BeforeEach
    void setUp() {
-      this.uut = new ProjectReport(3);
+      this.uut = new ProjectReport();
    }
 
    @Test
-   public void testAppendToWorkNotes() {
+   public void testAppendToWorkNotes_EmptyNoteAtStart() {
+      this.uut.appendToWorkNotes(EMPTY_NOTE);
+      this.uut.appendToWorkNotes("note 1 ");
+      this.uut.appendToWorkNotes("note 2 ");
+      final String expected = "note 1; note 2";
+      assertEquals(expected, this.uut.getNotes());
+   }
+
+   @Test
+   public void testAppendToWorkNotes_EmptyNoteInTheMiddle() {
       this.uut.appendToWorkNotes("note 1 ");
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       this.uut.appendToWorkNotes("note 2 ");
@@ -51,17 +59,8 @@ public class ProjectReportTest {
    }
 
    @Test
-   public void testAppendToWorkNotesAddNumberOfNotes() {
-      this.uut.appendToWorkNotes("note 1 ");
-      this.uut.appendToWorkNotes(EMPTY_NOTE);
-      this.uut.appendToWorkNotes("note 2 ");
-      final String expected = "note 1; note 2";
-      assertEquals(expected, this.uut.getNotes());
-   }
-
-   @Test
-   public void testAppendToWorkNotesAddNumberOfNotes_2() {
-      this.uut = new ProjectReport(3);
+   public void testAppendToWorkNotes_NoEmptyNote() {
+      this.uut = new ProjectReport();
       this.uut.appendToWorkNotes("note 1");
       this.uut.appendToWorkNotes("note 2");
       this.uut.appendToWorkNotes("note 3");
@@ -70,8 +69,8 @@ public class ProjectReportTest {
    }
 
    @Test
-   public void testAppendToWorkNotesAddNumberOfNotes_EmptyNotesAtTheEnd() {
-      this.uut = new ProjectReport(4);
+   public void testAppendToWorkNotes_EmptyNotesAtTheEnd() {
+      this.uut = new ProjectReport();
       this.uut.appendToWorkNotes("note 1");
       this.uut.appendToWorkNotes("note 2");
       this.uut.appendToWorkNotes(EMPTY_NOTE);

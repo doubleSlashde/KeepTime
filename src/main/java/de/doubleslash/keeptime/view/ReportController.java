@@ -424,7 +424,7 @@ public class ReportController {
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
-         final ProjectReport pr = new ProjectReport(projectWork.size());
+         final ProjectReport pr = new ProjectReport();
          for (int j = 0; j < projectWork.size(); j++) {
             final Work work = projectWork.get(j);
             final String currentWorkNote = work.getNotes();
