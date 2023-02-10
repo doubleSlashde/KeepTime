@@ -34,7 +34,6 @@ jobs:
           distribution: 'corretto'
           cache: maven
 
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
