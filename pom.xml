@@ -38,7 +38,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <maven-dependency-check.version>7.4.1</maven-dependency-check.version>
+    <maven-dependency-check.version>8.0.2</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -186,11 +186,7 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>
-  </build>
 
-  <reporting>
-    <plugins>
       <!-- needed for mvn site - see https://stackoverflow.com/a/51099913 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -198,8 +194,34 @@
         <version>3.12.1</version>
       </plugin>
 
+      <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (run with mvn dependency-check:check ) -->
       <plugin>
-        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${maven-dependency-check.version}</version>
+        <configuration>
+          <format>${maven-dependency-check.format}</format>
+          <failOnError>${maven-dependency-check.failOnError}</failOnError>
+          <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
+          <outputDirectory>target/site</outputDirectory>
+          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
+        </configuration>
+        <executions>
+            <execution>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+            </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <!-- generate site with mvn site (including dependency check) -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (redefinition to run also with site) -->
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
         <version>${maven-dependency-check.version}</version>

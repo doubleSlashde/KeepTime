@@ -13,6 +13,16 @@
    <suppress>
       <notes>
       <![CDATA[
+      file name: maven-settings-3.0.jar
+      suppression-reason: referenced from 'maven-assembly-plugin' which is executed in build step (no runtime vulnerability). no assembly-plugin update available.
+      ]]>
+      </notes>
+      <packageUrl regex="true">^pkg:maven/org\.apache\.maven/maven\-settings@.*$</packageUrl>
+      <vulnerabilityName>CVE-2021-26291</vulnerabilityName>
+   </suppress>
+   <suppress>
+      <notes>
+      <![CDATA[
       file name: snakeyaml-1.30.jar
       suppression-reason: we are not using .yaml files
       ]]>
