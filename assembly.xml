@@ -4,7 +4,7 @@
   <id>bin</id>
   
   <formats>
-  	<format>zip</format>
+    <format>zip</format>
   </formats>
   
   <includeBaseDirectory>false</includeBaseDirectory>
@@ -15,12 +15,19 @@
       <outputDirectory>licenses</outputDirectory>
     </fileSet>
   </fileSets>
+  <files>
+    <file>
+      <source>${project.basedir}/keeptime.bat</source>
+    </file>
+  </files>
   
   <dependencySets>
     <dependencySet>
       <includes>
         <include>de.doubleslash:keeptime</include>
       </includes>
+      <!-- default value is ${artifact.artifactId}-${artifact.version}${dashClassifier?}.${artifact.extension} - #152 removed version-->
+      <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
     </dependencySet>
   </dependencySets>
 </assembly>

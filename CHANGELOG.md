@@ -2,7 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
-## v1.2.0 - yyyy-mm-dd
+## v1.3.x - 2023-02-14
+
+### Added 
+- option to show note reminder only when switching from a work project without notes
+- option to show a 'are you sure' confirmation before closing KeepTime
+- import functionality of database (to be used with an export of the export functionality)
+- app icon shown in dialogs
+- in the report a collapse / expand button was added
+
+### Changed
+- updated the settings dialog design
+- replaced deprecated fontawesome dependencies
+- updated dependencies - we now also require Java 11 (instead of 8). **note** migration of data of previous version. see section 'Migrate from old version' in readme before updating
+- when creating a new project 'isWork' is selected by default
+- when editing a note the note field will be in focus instead of the project
+- in the report dialog the currently active work item is not editable anymore (marked as 'active work' instead)
+- in report dialog simplified the note format when copying them (removed the note count)
+- when creating/editing a project the name cannot be empty anymore
+- moved CI to github actions
+
+### Fixed 
+- 'hide projects' setting was not working correctly on linux. we disabled the setting for linux
+
+## v1.2.0 - 2021-04-14
 
 ### Added
 

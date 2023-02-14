@@ -33,12 +33,12 @@ import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.common.ScreenPosHelper;
 import de.doubleslash.keeptime.common.StyleUtils;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.common.time.Interval;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -59,6 +59,7 @@ import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -77,6 +78,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.SVGPath;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -122,24 +124,11 @@ public class ViewController {
    private Button settingsButton;
    @FXML
    private Button calendarButton;
-
    @FXML
    private TextArea textArea;
 
    @FXML
    private Canvas canvas;
-
-   @FXML
-   private FontAwesomeIconView calendarIcon;
-
-   @FXML
-   private FontAwesomeIconView settingsIcon;
-
-   @FXML
-   private FontAwesomeIconView minimizeIcon;
-
-   @FXML
-   private FontAwesomeIconView closeIcon;
 
    private ColorTimeLine mainColorTimeLine;
 
@@ -161,6 +150,7 @@ public class ViewController {
    private final BooleanProperty mouseHoveringProperty = new SimpleBooleanProperty(false);
    public static final LongProperty activeWorkSecondsProperty = new SimpleLongProperty(0);
    public static final ObjectProperty<Color> fontColorProperty = new SimpleObjectProperty<>();
+   private boolean contextMenuOpenBoolean = false;
 
    private Stage reportStage;
    private ReportController reportController;
@@ -197,7 +187,7 @@ public class ViewController {
 
       minimizeButton.setOnAction(ae -> mainStage.setIconified(true));
       minimizeButton.textFillProperty().bind(fontColorProperty);
-      closeButton.setOnAction(ae -> mainStage.close());
+      closeButton.setOnAction(ae -> openConfirmationWindow());
       closeButton.textFillProperty().bind(fontColorProperty);
 
       addNewProjectButton.textFillProperty().bind(fontColorProperty);
@@ -206,10 +196,21 @@ public class ViewController {
 
       calendarButton.setOnAction(ae -> calendarClicked());
 
-      calendarIcon.fillProperty().bind(fontColorProperty);
-      settingsIcon.fillProperty().bind(fontColorProperty);
-      minimizeIcon.fillProperty().bind(fontColorProperty);
-      closeIcon.fillProperty().bind(fontColorProperty);
+      SVGPath calendarSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CALENDAR_DAYS_ICON, 0.03, 0.03);
+      calendarSvgPath.fillProperty().bind(fontColorProperty);
+      calendarButton.setGraphic(calendarSvgPath);
+
+      SVGPath closeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLOSE_ICON, 0.03, 0.03);
+      closeSvgPath.fillProperty().bind(fontColorProperty);
+      closeButton.setGraphic(closeSvgPath);
+
+      SVGPath settingsSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_SETTINGS_ICON, 0.03, 0.03);
+      settingsSvgPath.fillProperty().bind(fontColorProperty);
+      settingsButton.setGraphic(settingsSvgPath);
+
+      SVGPath minimizeSvgPath = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MINUS_ICON, 0.03, 0.03);
+      minimizeSvgPath.fillProperty().bind(fontColorProperty);
+      minimizeButton.setGraphic(minimizeSvgPath);
 
       final Runnable updateMainBackgroundColor = this::runUpdateMainBackgroundColor;
 
@@ -268,8 +269,19 @@ public class ViewController {
 
       pane.setOnMouseEntered(a -> mouseHoveringProperty.set(true));
 
-      pane.setOnMouseExited(a -> mouseHoveringProperty.set(false));
+      projectsVBox.setOnContextMenuRequested(c -> { // Is needed because the Context menu loses Focus otherwise
+         mouseHoveringProperty.set(true);
+         LOG.trace("Options selected");
+         contextMenuOpenBoolean = true;
+      });
 
+      pane.setOnMouseExited(a -> {
+         if (!contextMenuOpenBoolean) {
+            mouseHoveringProperty.set(false);
+         }
+         contextMenuOpenBoolean = false;
+
+      });
       // Drag stage
       pane.setOnMousePressed(mouseEvent -> {
 
@@ -283,17 +295,18 @@ public class ViewController {
          mainStage.setY(mouseEvent.getScreenY() + dragDelta.y);
       });
 
-      bigTimeLabel.textProperty().bind(Bindings.createStringBinding(
-            () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()), activeWorkSecondsProperty));
+      bigTimeLabel.textProperty()
+                  .bind(Bindings.createStringBinding(
+                        () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
+                        activeWorkSecondsProperty));
 
       // update ui each second
       new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
          model.activeWorkItem.get().setEndTime(now); // FIXME not good to change model
 
-         final long currentWorkSeconds = Duration
-               .between(model.activeWorkItem.get().getStartTime(), model.activeWorkItem.get().getEndTime())
-               .getSeconds();
+         final long currentWorkSeconds = Duration.between(model.activeWorkItem.get().getStartTime(),
+               model.activeWorkItem.get().getEndTime()).getSeconds();
          activeWorkSecondsProperty.set(currentWorkSeconds);
          final long todayWorkingSeconds = controller.calcTodaysWorkSeconds();
          final long todaySeconds = controller.calcTodaysSeconds();
@@ -315,6 +328,26 @@ public class ViewController {
 
       updateProjectView();
 
+   }
+
+   private void openConfirmationWindow() {
+      if (model.confirmClose.get()) {
+         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "", ButtonType.YES, ButtonType.CANCEL);
+         alert.setTitle("Confirm exit");
+         alert.setHeaderText("Are you sure you want to close KeepTime?");
+
+         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+         stage.setAlwaysOnTop(true);
+         alert.showAndWait();
+
+         if (alert.getResult() == ButtonType.YES) {
+            mainStage.close();
+         }
+      } else {
+         mainStage.close();
+      }
    }
 
    private Dialog<Project> dialogResultConverter(final Dialog<Project> dialog,
@@ -397,6 +430,8 @@ public class ViewController {
          reportStage = new Stage();
          reportStage.initModality(Modality.APPLICATION_MODAL);
          reportController.setStage(reportStage);
+         reportStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
          final Scene reportScene = new Scene(root);
          reportScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
@@ -423,6 +458,7 @@ public class ViewController {
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("Settings");
          settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          final Scene settingsScene = new Scene(settingsRoot);
          settingsScene.setOnKeyPressed(ke -> {
@@ -451,7 +487,6 @@ public class ViewController {
       dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
       setUpAddNewProjectGridPane(dialog);
 
-      // TODO disable OK button if no name is set
       return dialog;
    }
 
@@ -468,6 +503,8 @@ public class ViewController {
       dialog.getDialogPane().setContent(grid);
 
       final ManageProjectController manageProjectController = loader.getController();
+
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
 
       dialogResultConverter(dialog, manageProjectController);
 
@@ -525,6 +562,9 @@ public class ViewController {
       // TODO somewhat duplicate dialog of create and edit
       final Dialog<Project> dialog = setUpDialogProject("Create new project", "Create a new project");
 
+      Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+      stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
       mainStage.setAlwaysOnTop(false);
       final Optional<Project> result = dialog.showAndWait();
       mainStage.setAlwaysOnTop(true);
@@ -559,7 +599,7 @@ public class ViewController {
          return;
       }
 
-      LOG.debug("Stage position changed '{}'/'{}'.", mainStage.xProperty().doubleValue(),
+      LOG.trace("Stage position changed '{}'/'{}'.", mainStage.xProperty().doubleValue(),
             mainStage.yProperty().doubleValue());
 
       final ScreenPosHelper positionHelper = new ScreenPosHelper(mainStage.xProperty().doubleValue(),

@@ -16,7 +16,6 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
-<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
@@ -31,7 +30,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.202-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
+<Pane fx:id="pane" prefHeight="175.0" style="-fx-background-color: rgba(54,143,179,0.01); -fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ViewController">
    <children>
       <BorderPane fx:id="borderPane" layoutX="5.0" layoutY="-15.0">
          <center>
@@ -51,16 +50,8 @@
                      <center>
                         <HBox alignment="CENTER" prefHeight="36.0">
                            <children>
-                              <Button fx:id="calendarButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css">
-                                 <graphic>
-                                    <FontAwesomeIconView fx:id="calendarIcon" glyphName="CALENDAR" glyphStyle="fas" size="20" text="" />
-                                 </graphic>
-                              </Button>
-                              <Button fx:id="settingsButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css">
-                                 <graphic>
-                                    <FontAwesomeIconView fx:id="settingsIcon" glyphName="COG" glyphStyle="fas" size="20" />
-                                 </graphic>
-                              </Button>
+                              <Button fx:id="calendarButton" contentDisplay="GRAPHIC_ONLY" maxHeight="30.0" maxWidth="30.0" minHeight="30" minWidth="30" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css" />
+                              <Button fx:id="settingsButton" contentDisplay="GRAPHIC_ONLY" maxHeight="30.0" maxWidth="30.0" minHeight="30.0" minWidth="30.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="22.0" stylesheets="@../css/application.css" />
                            </children>
                         </HBox>
                      </center>
@@ -85,20 +76,15 @@
                         <Font name="Open Sans Regular" size="14.0" />
                      </font>
                   </TextArea>
-                  <Button fx:id="minimizeButton" layoutX="243.0" layoutY="8.0" mnemonicParsing="false" stylesheets="@../css/application.css">
+                  <Button fx:id="minimizeButton" layoutX="239.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/application.css">
                      <font>
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
-                     <graphic>
-                        <FontAwesomeIconView fx:id="minimizeIcon" glyphName="WINDOW_MINIMIZE" glyphStyle="fas" size="10" text="" />
-                     </graphic></Button>
-                  <Button fx:id="closeButton" layoutX="266.0" layoutY="8.0" mnemonicParsing="false" stylesheets="@../css/application.css">
+                     </Button>
+                  <Button fx:id="closeButton" layoutX="262.0" layoutY="9.0" maxHeight="30.0" maxWidth="30.0" minHeight="20.0" minWidth="20.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" stylesheets="@../css/application.css">
                      <font>
                         <Font name="Open Sans Regular" size="12.0" />
                      </font>
-                     <graphic>
-                        <FontAwesomeIconView fx:id="closeIcon" glyphName="TIMES" glyphStyle="fas" size="10" />
-                     </graphic>
                   </Button>
                </children>
             </Group>

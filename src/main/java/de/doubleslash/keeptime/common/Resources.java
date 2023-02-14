@@ -37,9 +37,37 @@ public class Resources {
       FXML_SETTINGS("/layouts/settings.fxml"),
       FXML_VIEW_POPUP_LAYOUT("/layouts/ViewLayoutPopup.fxml"),
       FXML_REPORT("/layouts/report.fxml"),
-      FXML_ABOUT("/layouts/about.fxml"),
+
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
       FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
+
+      SVG_CALENDAR_DAYS_ICON("/svgs/calendar-days.svg"),
+
+      SVG_CLOSE_ICON("/svgs/xmark.svg"),
+
+      SVG_SETTINGS_ICON("/svgs/gear.svg"),
+
+      SVG_MINUS_ICON("/svgs/minus.svg"),
+
+      SVG_TRASH_ICON("/svgs/trash-can.svg"),
+
+      SVG_PENCIL_ICON("/svgs/pencil.svg"),
+
+      SVG_CLIPBOARD("/svgs/clipboard.svg"),
+
+      SVG_BUG_ICON("/svgs/bug.svg"),
+
+      SVG_LAYOUT_ICON("/svgs/border-all.svg"),
+
+      SVG_ABOUT_ICON("/svgs/info.svg"),
+
+      SVG_COLOR_ICON("/svgs/palette.svg"),
+
+      SVG_IMPORT_EXPORT_ICON("/svgs/sort.svg"),
+
+      SVG_LICENSES_ICON("/svgs/closed-captioning.svg"),
+
+      ICON_MAIN("/icons/icon.png")
 
       ;
 

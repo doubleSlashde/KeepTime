@@ -31,6 +31,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import de.doubleslash.keeptime.common.FontProvider;
+import de.doubleslash.keeptime.common.OS;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
@@ -49,6 +50,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -61,9 +63,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 @SpringBootApplication
-public class Main extends Application {
+public class App extends Application {
 
-   private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+   private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
    private ConfigurableApplicationContext springContext;
 
@@ -83,7 +85,7 @@ public class Main extends Application {
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
-      springContext = SpringApplication.run(Main.class);
+      springContext = SpringApplication.run(App.class);
       ApplicationProperties applicationProperties = springContext.getBean(ApplicationProperties.class);
       LOG.info("KeepTime Version: '{}'.", applicationProperties.getBuildVersion());
       LOG.info("KeepTime Build Timestamp: '{}'.", applicationProperties.getBuildTimestamp());
@@ -167,7 +169,9 @@ public class Main extends Application {
 
       primaryStage.setOnHiding(we -> {
          popupViewStage.close();
-         globalScreenListener.shutdown(); // deregister, as this will keep app running
+         if (globalScreenListener != null) {
+            globalScreenListener.shutdown(); // deregister, as this will keep app running
+         }
       });
 
       initialiseUI(primaryStage);
@@ -209,16 +213,13 @@ public class Main extends Application {
       model.screenSettings.screenHash.set(settings.getScreenHash());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
+      model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
+      model.confirmClose.set(settings.isConfirmClose());
 
    }
 
    private void initialisePopupUI(final Stage primaryStage) throws IOException {
       LOG.debug("Initialising popup UI.");
-
-      globalScreenListener = new GlobalScreenListener();
-
-      model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
-      globalScreenListener.register(model.useHotkey.get());
 
       popupViewStage = new Stage();
       popupViewStage.initOwner(primaryStage);
@@ -238,7 +239,12 @@ public class Main extends Application {
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
 
-      globalScreenListener.setViewController(viewControllerPopupController);
+      if (!OS.isLinux()) {
+         globalScreenListener = new GlobalScreenListener();
+         globalScreenListener.register(model.useHotkey.get());
+         globalScreenListener.setViewController(viewControllerPopupController);
+         model.useHotkey.addListener((a, b, newValue) -> globalScreenListener.register(newValue));
+      }
    }
 
    private void initialiseUI(final Stage primaryStage) throws IOException {
@@ -250,6 +256,7 @@ public class Main extends Application {
       loader.setControllerFactory(springContext::getBean);
       final Pane mainPane = loader.load();
       primaryStage.initStyle(StageStyle.TRANSPARENT);
+      primaryStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
       // Show the scene containing the root layout.
       final Scene mainScene = new Scene(mainPane, Color.TRANSPARENT);
 
@@ -297,7 +304,4 @@ public class Main extends Application {
       springContext.stop();
    }
 
-   public static void main(final String[] args) {
-      launch(Main.class, args);
-   }
 }

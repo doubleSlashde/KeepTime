@@ -12,13 +12,13 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + You can move the window by dragging it around
 + Open the context menu (with a right-click) for a project to edit/delete or change the project and transfer n minutes of the current running one
 + In the taskbar you will also see the current time + the color of the active project
-+ The current Project will be saved eyery minute to mitigate loss on system crash or shutdown without closing window manually first. 
++ The current Project will be saved every minute to mitigate loss on system crash or shutdown without closing window manually first. 
 + After a day you can open the Reports, which will summarize the work done for the different projects during the day
 
-**You need to close the application manualy before you shutdown your PC. Otherwise the last running project is not saved completely to database. (will be last state saved by auto-save)**
+**You need to close the application manually before you shut down your PC. Otherwise, the last running project is not saved completely to database. (will be last state saved by auto-save)**
 
 ### Settings:
-![Settings Screen](readme/images/settings.png?raw=true "Settings")
+![Settings Screen](readme/images/settingsColor.PNG?raw=true "Settings")
 
 + Colors: you can define various colors to use in the UI to customize the application. The Reset resets the color to the default color.
 + Display projects on the right: Will show the list of projects on the right side, instead of the left
@@ -37,15 +37,15 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 
 * Download keeptime.bat and keeptime-<version>-bin.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
 * Extract the downloaded .zip
-* Copy the downloaded keeptime.bat file next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
+* Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
 
-It is recommended to run the application at computer start so you do not forget to track your time. For autostart also execute the following steps (for windows)
+It is recommended to run the application at computer start, so you do not forget to track your time. For autostart also execute the following steps (for windows)
 * Open the autostart folder: Press *Windows+R*, execute *shell:startup*
 * Create a shortcut to the *.bat* in the autostart folder
 
 You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
 
-### Migrate from old version
+### Migrate from older version than v1.2.0
 
 1. Download new version and replace the .jar file.
 2. Start new version of KeepTime. Notice that your old data is not available.
@@ -53,8 +53,18 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 4. Copy the files (not directories) of directory `db` (next to the .jar file) into `db/1.4.197/` (path now includes the database version).
 5. Start KeepTime again. Notice that your data is available again.
 
+### Migrate from KeepTime v1.2.0
+
+1. Start your current version of KeepTime (v1.2.0)
+2. Go to the settings and export your KeepTime data 
+3. Download new version and replace the .jar file. 
+4. Start new version of KeepTime. Notice that your old data is not available. 
+5. Open the new version and import the exported sql script 
+6. After the import KeepTime closes automatically
+7. To see the changes just start the new KeepTime again
+
 ## Requirements
 
 * Windows 7, 10
 * Linux (tested on Ubuntu 18.04)
-* Java 8 + JavaFX
+* Java 11

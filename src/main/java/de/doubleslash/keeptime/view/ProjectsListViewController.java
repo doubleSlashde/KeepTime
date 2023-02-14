@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,21 +39,10 @@ import de.doubleslash.keeptime.model.Work;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.MultipleSelectionModel;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
 import javafx.scene.effect.Bloom;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -71,6 +61,7 @@ public class ProjectsListViewController {
    private final FilteredList<Project> filteredData;
 
    private final boolean hideable;
+
 
    public ProjectsListViewController(final Model model, final Controller controller, final Stage mainStage,
          final ListView<Project> availableProjectsListView, final TextField searchTextField, final boolean hideable) {
@@ -128,6 +119,11 @@ public class ProjectsListViewController {
             searchTextField.setText("");
          }
       });
+      searchTextField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> Platform.runLater(() -> {
+         if (isNowFocused) {
+            searchTextField.selectAll();
+         }
+      }));
 
       availableProjectsListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
       availableProjectsListView.getSelectionModel().selectFirst();
@@ -141,12 +137,8 @@ public class ProjectsListViewController {
 
       final String lowerCaseFilter = searchText.toLowerCase();
 
-      if (project.getName().toLowerCase().contains(lowerCaseFilter)
-            || project.getDescription().toLowerCase().contains(lowerCaseFilter)) {
-         return true;
-      }
-
-      return false;
+      return project.getName().toLowerCase().contains(lowerCaseFilter)
+              || project.getDescription().toLowerCase().contains(lowerCaseFilter);
    }
 
    /**
@@ -157,8 +149,12 @@ public class ProjectsListViewController {
          final Project p = entry.getKey();
          final Label label = entry.getValue();
 
-         final long seconds = model.getPastWorkItems().stream().filter(work -> work.getProject().getId() == p.getId())
-               .mapToLong(work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds()).sum();
+         final long seconds = model.getPastWorkItems()
+                                   .stream()
+                                   .filter(work -> work.getProject().getId() == p.getId())
+                                   .mapToLong(
+                                         work -> Duration.between(work.getStartTime(), work.getEndTime()).getSeconds())
+                                   .sum();
          label.setText(DateFormatter.secondsToHHMMSS(seconds));
       }
    }
@@ -167,17 +163,11 @@ public class ProjectsListViewController {
       if (hideable) {
          mainStage.hide();
       }
-      if (model.remindIfNotesAreEmpty.get()) {
-         final Work currentWork = model.activeWorkItem.get();
-         if (currentWork != null && currentWork.getNotes().isEmpty()) {
-            final TextInputDialog noteDialog = new TextInputDialog();
-            noteDialog.setTitle("Empty Notes");
-            noteDialog.setHeaderText("Switch projects without notes?");
-            noteDialog.setContentText(
-                  "What did you do for project '" + model.activeWorkItem.get().getProject().getName() + "' ?");
-            noteDialog.initOwner(mainStage);
+      final Work currentWork = model.activeWorkItem.get();
+      if (model.remindIfNotesAreEmpty.get() && currentWork != null && currentWork.getNotes().isEmpty()) {
 
-            final Optional<String> result = noteDialog.showAndWait();
+         if (!model.remindIfNotesAreEmptyOnlyForWorkEntry.get() || currentWork.getProject().isWork()) {
+            Optional<String> result = showDialogNoNoteSelected(currentWork);
             if (result.isPresent()) {
                currentWork.setNotes(result.get());
             } else {
@@ -187,7 +177,18 @@ public class ProjectsListViewController {
          }
       }
       controller.changeProject(newProject, minusSeconds);
+   }
 
+   private Optional<String> showDialogNoNoteSelected(Work currentWork) {
+      final TextInputDialog noteDialog = new TextInputDialog();
+      noteDialog.setTitle("Empty Notes");
+      noteDialog.setHeaderText("Switch projects without notes?");
+      noteDialog.setContentText("What did you do for project '" + currentWork.getProject().getName() + "' ?");
+      Stage noNoteSelectedStage = (Stage) noteDialog.getDialogPane().getScene().getWindow();
+      noNoteSelectedStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+      noNoteSelectedStage.setAlwaysOnTop(true);
+      final Optional<String> result = noteDialog.showAndWait();
+      return result;
    }
 
    private void addProjectToProjectSelectionNodeMap(final Project project) {
@@ -260,10 +261,13 @@ public class ProjectsListViewController {
       changeWithTimeMenuItem.setOnAction(e -> {
          final ChangeWithTimeDialog changeWithTimeDialog = new ChangeWithTimeDialog(model,
                ViewController.activeWorkSecondsProperty, p);
-         mainStage.setAlwaysOnTop(false);
+
+         Stage stage = (Stage) changeWithTimeDialog.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         stage.setAlwaysOnTop(true);
+
          final Optional<Integer> result = changeWithTimeDialog.showAndWait();
          result.ifPresent(minusSeconds -> changeProject(p, minusSeconds));
-         mainStage.setAlwaysOnTop(true);
       });
       final MenuItem deleteMenuItem = new MenuItem("Delete");
       deleteMenuItem.setDisable(p.isDefault());
@@ -275,6 +279,8 @@ public class ProjectsListViewController {
          alert.setHeaderText("Delete project '" + p.getName() + "'.");
          alert.setContentText(
                "The project will just be hidden from display, as there may be work references to this project.");
+         Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          mainStage.setAlwaysOnTop(false);
          final Optional<ButtonType> result = alert.showAndWait();
@@ -293,6 +299,9 @@ public class ProjectsListViewController {
          // TODO refactor to use "add project" controls
          LOG.info("Edit project");
          final Dialog<Project> dialog = setupEditProjectDialog("Edit project", "Edit project '" + p.getName() + "'", p);
+
+         Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+         stage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          mainStage.setAlwaysOnTop(false);
          final Optional<Project> result = dialog.showAndWait();
@@ -363,7 +372,7 @@ public class ProjectsListViewController {
       }
       final ManageProjectController manageProjectController = loader.getController();
       manageProjectController.initializeWith(p);
-
+      dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == ButtonType.OK) {
             return manageProjectController.getProjectFromUserInput();
