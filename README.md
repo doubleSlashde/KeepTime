@@ -35,7 +35,7 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 
 ## Install
 
-* Download keeptime.bat and keeptime-<version>-bin.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
+* Download keeptime-<version>.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
 * Extract the downloaded .zip
 * Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
 
