@@ -33,10 +33,10 @@
       <Label text="IsWork:" GridPane.rowIndex="5" />
       <Label text="SortIndex:" GridPane.rowIndex="6" />
       <TextField fx:id="nameTextField" GridPane.columnIndex="1" />
+      <TextArea fx:id="descriptionTextArea" prefHeight="120.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <ColorPicker fx:id="textFillColorPicker" GridPane.columnIndex="1" GridPane.rowIndex="4" />
       <CheckBox fx:id="isWorkCheckBox" mnemonicParsing="false" selected="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
       <Spinner fx:id="sortIndexSpinner" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-      <TextArea fx:id="descriptionTextArea" prefHeight="120.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <VBox alignment="CENTER_LEFT" GridPane.rowIndex="2">
          <children>
             <Label text="Description:" />

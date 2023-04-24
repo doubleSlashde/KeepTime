@@ -35,9 +35,9 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 
 ## Install
 
-* Download keeptime.bat and keeptime-<version>-bin.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
+* Download keeptime-<version>.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
 * Extract the downloaded .zip
-* Copy the downloaded keeptime.bat file next to the *.jar*. Adapt the path inside the *keeptime.bat* to the name of the *.jar* file (if needed). Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
+* Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
 
 It is recommended to run the application at computer start, so you do not forget to track your time. For autostart also execute the following steps (for windows)
 * Open the autostart folder: Press *Windows+R*, execute *shell:startup*

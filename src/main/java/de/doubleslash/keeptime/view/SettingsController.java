@@ -450,6 +450,8 @@ public class SettingsController {
             LOG.info("Export done.");
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
+            Stage informationStage = (Stage) informationDialog.getDialogPane().getScene().getWindow();
+            informationStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
             informationDialog.setTitle("Export done");
             informationDialog.setHeaderText("The current data was exported.");
             informationDialog.getDialogPane().setContent(new Label("The data was exported to '\n" + fileToSave + "'."));

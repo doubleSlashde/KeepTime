@@ -32,13 +32,13 @@
   </parent>
 
   <properties>
-    <project.version>1.2.0-SNAPSHOT</project.version>
+    <project.version>1.3.0-SNAPSHOT</project.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
 
-    <maven-dependency-check.version>6.0.5</maven-dependency-check.version>
+    <maven-dependency-check.version>8.0.2</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -193,8 +193,14 @@
         </executions>
       </plugin>
 
-      <!-- see https://jeremylong.github.io/DependencyCheck/dependency-check-maven/ -->
-      <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
+      <!-- needed for mvn site - see https://stackoverflow.com/a/51099913 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.12.1</version>
+      </plugin>
+
+      <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (run with mvn dependency-check:check ) -->
       <plugin>
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
@@ -204,31 +210,24 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
+          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
         </configuration>
         <executions>
-          <execution>
-            <goals>
-              <goal>update-only</goal>
-            </goals>
-          </execution>
+            <execution>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+            </execution>
         </executions>
       </plugin>
-
     </plugins>
   </build>
 
+  <!-- generate site with mvn site (including dependency check) -->
   <reporting>
     <plugins>
-      <!-- needed for mvn site - see https://stackoverflow.com/a/51099913 -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.12.1</version>
-      </plugin>
-
-      <plugin>
-        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven -->
+        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (redefinition to run also with site) -->
         <groupId>org.owasp</groupId>
         <artifactId>dependency-check-maven</artifactId>
         <version>${maven-dependency-check.version}</version>
@@ -244,7 +243,7 @@
           <failOnError>${maven-dependency-check.failOnError}</failOnError>
           <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
           <outputDirectory>target/site</outputDirectory>
-          <!--suppressionFile>${project.basedir}/dependency-check-report_suppressions.xml</suppressionFile -->
+          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
         </configuration>
       </plugin>
     </plugins>

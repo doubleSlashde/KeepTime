@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## v1.3.TODO - 2023-01-11
+## v1.3.x - 2023-02-14
 
 ### Added 
 - option to show note reminder only when switching from a work project without notes
@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed 
 - 'hide projects' setting was not working correctly on linux. we disabled the setting for linux
 
-## v1.2.0 - yyyy-mm-dd
+## v1.2.0 - 2021-04-14
 
 ### Added
 
