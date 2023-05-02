@@ -37,7 +37,7 @@ jobs:
           languages: 'java'
 
       - name: Build
-        run:  mvn -V -B clean package org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage -Dproject.version=${{ env.version }}-SNAPSHOT
+        run:  mvn -V -B clean package org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent org.jacoco:jacoco-maven-plugin:0.8.7:report -Pcoverage -Dproject.version=${{ env.version }}-SNAPSHOT -Djava.awt.headless=true -Dtestfx.robot=glass -Dtestfx.headless=true
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
