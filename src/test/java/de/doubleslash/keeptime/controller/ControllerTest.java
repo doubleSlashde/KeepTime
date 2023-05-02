@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javafx.application.Platform;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -265,7 +264,7 @@ class ControllerTest {
 
    @Test
    void changeProjectOtherDayWithTimeTest() {
-      final LocalDateTime firstProjectDateTime = LocalDateTime.of(2018, 02, 14, 14, 0);
+      final LocalDateTime firstProjectDateTime = LocalDateTime.of(2018, 2, 14, 14, 0);
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
