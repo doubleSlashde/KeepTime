@@ -143,7 +143,8 @@ public class App extends Application {
       FontProvider.loadFonts();
       readSettings();
 
-      final List<Work> todaysWorkItems = model.getWorkRepository().findByStartDateOrderByStartTimeAsc(LocalDate.now());
+      final List<Work> todaysWorkItems = model.findWorkByStartDateOrderByStartTimeAsc(LocalDate.now());
+
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -184,6 +185,7 @@ public class App extends Application {
       final List<Settings> settingsList = model.getSettingsRepository().findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
+         LOG.info("Empty settings. Set default");
          settings = new Settings();
          settings.setTaskBarColor(model.taskBarColor.get());
 
@@ -197,6 +199,7 @@ public class App extends Application {
          settings.setHideProjectsOnMouseExit(false);
          model.getSettingsRepository().save(settings);
       } else {
+         LOG.info("Got settings from database");
          settings = settingsList.get(0);
       }
 

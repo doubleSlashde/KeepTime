@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.DateFormatter;
@@ -110,7 +109,6 @@ public class ReportController {
 
    private boolean expanded = true;
 
-   @Autowired
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
       this.controller = controller;

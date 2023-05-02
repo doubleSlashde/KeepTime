@@ -16,9 +16,14 @@
 
 package de.doubleslash.keeptime.model;
 
+import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import de.doubleslash.keeptime.App;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -34,11 +39,11 @@ import javafx.scene.paint.Color;
 
 @Component
 public class Model {
+   private static final Logger LOG = LoggerFactory.getLogger(Model.class);
    private ProjectRepository projectRepository;
    private WorkRepository workRepository;
    private SettingsRepository settingsRepository;
 
-   @Autowired
    public Model(final ProjectRepository projectRepository, final WorkRepository workRepository,
          final SettingsRepository settingsRepository) {
       super();
@@ -152,6 +157,16 @@ public class Model {
 
    public SortedList<Work> getSortedPastWorkItems() {
       return sortedPastWorkItems;
+   }
+
+   public List<Work> findWorkByStartDateOrderByStartTimeAsc(LocalDate date) {
+      List<Work> workList = workRepository.findByStartDateOrderByStartTimeAsc(date);
+
+      for (final Work work : workList) {
+         Project project = work.getProject();
+         LOG.debug("color {} ", project.getColor());
+      }
+      return workList;
    }
 
 }
