@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.0.6</version>
+    <relativePath />
+    <!-- lookup parent from repository -->
+  </parent>
   <groupId>de.doubleslash</groupId>
   <artifactId>keeptime</artifactId>
   <version>2.0.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
+  <packaging>jar</packaging>
   <name>KeepTime</name>
+
   <description>Time tracker</description>
+
+  <organization>
+    <name>doubleSlash Net-Business GmbH</name>
+    <url>https://www.doubleslash.de/</url>
+  </organization>
 
   <licenses>
     <license>
@@ -18,18 +31,6 @@
       <distribution>manual</distribution>
     </license>
   </licenses>
-
-  <organization>
-    <name>doubleSlash Net-Business GmbH</name>
-    <url>https://www.doubleslash.de/</url>
-  </organization>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.0.6</version>
-    <relativePath /> <!-- lookup parent from repository -->
-  </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -142,39 +143,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <profiles>
-    <profile>
-      <id>coverage</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.8.7</version>
-            <executions>
-              <execution>
-                <id>prepare-agent</id>
-                <goals>
-                  <goal>prepare-agent</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>report</id>
-                <goals>
-                  <goal>report</goal>
-                </goals>
-                <configuration>
-                  <formats>
-                    <format>XML</format>
-                  </formats>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
   <build>
     <plugins>
       <plugin>
@@ -229,16 +197,15 @@
           <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
         </configuration>
         <executions>
-            <execution>
-                <goals>
-                    <goal>check</goal>
-                </goals>
-            </execution>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
-
   <!-- generate site with mvn site (including dependency check) -->
   <reporting>
     <plugins>
@@ -264,4 +231,38 @@
       </plugin>
     </plugins>
   </reporting>
+
+  <profiles>
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.7</version>
+            <executions>
+              <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>report</id>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <configuration>
+                  <formats>
+                    <format>XML</format>
+                  </formats>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

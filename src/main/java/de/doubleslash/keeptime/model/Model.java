@@ -159,14 +159,4 @@ public class Model {
       return sortedPastWorkItems;
    }
 
-   public List<Work> findWorkByStartDateOrderByStartTimeAsc(LocalDate date) {
-      List<Work> workList = workRepository.findByStartDateOrderByStartTimeAsc(date);
-
-      for (final Work work : workList) {
-         Project project = work.getProject();
-         LOG.debug("color {} ", project.getColor());
-      }
-      return workList;
-   }
-
 }
