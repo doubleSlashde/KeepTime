@@ -16,17 +16,6 @@
 
 package de.doubleslash.keeptime.model;
 
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-
-import de.doubleslash.keeptime.App;
-import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
-
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.SettingsRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
@@ -36,10 +25,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
 
 @Component
 public class Model {
-   private static final Logger LOG = LoggerFactory.getLogger(Model.class);
    private ProjectRepository projectRepository;
    private WorkRepository workRepository;
    private SettingsRepository settingsRepository;
