@@ -186,6 +186,31 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
 
+      <!-- https://mvnrepository.com/artifact/io.swagger.codegen.v3/swagger-codegen-maven-plugin -->
+      <plugin>
+        <groupId>io.swagger.codegen.v3</groupId>
+        <artifactId>swagger-codegen-maven-plugin</artifactId>
+        <version>3.0.46</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <inputSpec>src/main/resources/swagger_api.yml</inputSpec>
+          <language>java</language>
+          <configOptions>
+            <sourceFolder>src/gen/java/main</sourceFolder>
+          </configOptions>
+          <importMappings>
+            <importMapping>Project=de.doubleslash.keeptime.model.Project</importMapping>
+          </importMappings>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>pl.project13.maven</groupId>
         <artifactId>git-commit-id-plugin</artifactId>
