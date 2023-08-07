@@ -26,8 +26,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Project'
-        '404':
-          description: Projects not found
 components:
   schemas:
     Project:
