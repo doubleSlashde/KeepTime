@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="root" prefHeight="350.0" prefWidth="145.0" style="-fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.viewpopup.ViewControllerPopup">
+<VBox fx:id="root" prefHeight="350.0" prefWidth="145.0" style="-fx-background-radius: 10 10 10 10; -fx-border-radius: 10 10 10 10; -fx-border-color: rgba(54,143,179,.0.01);" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.app.viewpopup.ViewControllerPopup">
    <children>
       <TextField fx:id="searchTextField" maxHeight="15.0" minHeight="0.0" prefHeight="15.0" promptText="Search" stylesheets="@../css/application.css">
          <font>
