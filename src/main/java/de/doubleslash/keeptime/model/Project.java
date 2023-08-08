@@ -24,7 +24,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.PositiveOrZero;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import javafx.scene.paint.Color;
 
@@ -32,112 +36,118 @@ import javafx.scene.paint.Color;
 @Table(name = "Project")
 public class Project {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name = "id", updatable = false, nullable = false)
-   private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
+    private long id;
 
-   private String name;
+    @NotEmpty(message = "Name must not be null or empty")
+    private String name;
 
-   @Lob
-   private String description;
+    @Lob
+    private String description;
 
-   @Convert(converter = ColorConverter.class, disableConversion = false)
-   private Color color;
+    @Convert(converter = ColorConverter.class, disableConversion = false)
+    private Color color;
 
-   private boolean isWork;
+    private boolean isWork;
 
-   private boolean isDefault;
+    private boolean isDefault;
 
-   private boolean isEnabled;
+    private boolean isEnabled;
+@PositiveOrZero(message = "Index must not be negative")
+    private int index;
 
-   private int index;
+    public Project() {
+        // Needed for jpa
+    }
 
-   public Project() {
-      // Needed for jpa
-   }
+    public Project(final String name, final String description, final Color color, final boolean isWork, final int index,
+                   final boolean isDefault) {
+        super();
+        this.name = name;
+        this.description = description;
+        this.color = color;
+        this.isWork = isWork;
+        this.isDefault = isDefault;
+        this.isEnabled = true;
+        this.index = index;
+    }
 
-   public Project(final String name, final String description, final Color color, final boolean isWork, final int index,
-         final boolean isDefault) {
-      super();
-      this.name = name;
-      this.description = description;
-      this.color = color;
-      this.isWork = isWork;
-      this.isDefault = isDefault;
-      this.isEnabled = true;
-      this.index = index;
-   }
+    public Project(final String name, final String description, final Color color, final boolean isWork,
+                   final int index) {
+        this(name, description, color, isWork, index, false);
+    }
 
-   public Project(final String name, final String description, final Color color, final boolean isWork,
-         final int index) {
-      this(name, description, color, isWork, index, false);
-   }
+    public String getName() {
+        return name;
+    }
 
-   public String getName() {
-      return name;
-   }
+    public void setName(final String name) {
+        this.name = name;
+    }
 
-   public void setName(final String name) {
-      this.name = name;
-   }
+    public Color getColor() {
+        return color;
+    }
 
-   public Color getColor() {
-      return color;
-   }
+    public void setColor(final Color color) {
+        this.color = color;
+    }
 
-   public void setColor(final Color color) {
-      this.color = color;
-   }
+    @JsonSetter
+    public void setColor(final java.awt.Color color) {
+        this.color = new Color(color.getRed(), color.getGreen(),color.getBlue(),color.getAlpha());
+    }
 
-   public boolean isWork() {
-      return isWork;
-   }
+    public boolean isWork() {
+        return isWork;
+    }
 
-   public void setWork(final boolean isWork) {
-      this.isWork = isWork;
-   }
+    public void setWork(final boolean isWork) {
+        this.isWork = isWork;
+    }
 
-   public boolean isDefault() {
-      return isDefault;
-   }
+    public boolean isDefault() {
+        return isDefault;
+    }
 
-   public void setDefault(final boolean isDefault) {
-      this.isDefault = isDefault;
-   }
+    public void setDefault(final boolean isDefault) {
+        this.isDefault = isDefault;
+    }
 
-   public boolean isEnabled() {
-      return isEnabled;
-   }
+    public boolean isEnabled() {
+        return isEnabled;
+    }
 
-   public void setEnabled(final boolean isEnabled) {
-      this.isEnabled = isEnabled;
-   }
+    public void setEnabled(final boolean isEnabled) {
+        this.isEnabled = isEnabled;
+    }
 
-   public long getId() {
-      return id;
-   }
+    public long getId() {
+        return id;
+    }
 
-   public int getIndex() {
-      return index;
-   }
+    public int getIndex() {
+        return index;
+    }
 
-   public void setIndex(final int index) {
-      this.index = index;
-   }
+    public void setIndex(final int index) {
+        this.index = index;
+    }
 
-   public String getDescription() {
-      return description;
-   }
+    public String getDescription() {
+        return description;
+    }
 
-   public void setDescription(final String description) {
-      this.description = description;
-   }
+    public void setDescription(final String description) {
+        this.description = description;
+    }
 
-   @Override
-   public String toString() {
-      return "Project [id=" + id + ", name=" + name + ", description=" + description + ", color=" + color + ", isWork="
-            + isWork + ", isDefault=" + isDefault + ", isEnabled=" + isEnabled + ", index=" + index + "]";
-   }
+    @Override
+    public String toString() {
+        return "Project [id=" + id + ", name=" + name + ", description=" + description + ", color=" + color + ", isWork="
+                + isWork + ", isDefault=" + isDefault + ", isEnabled=" + isEnabled + ", index=" + index + "]";
+    }
 
 }
