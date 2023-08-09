@@ -24,7 +24,7 @@ public class ProjectController {
     private ProjectRepository projectRepository;
     private WorkRepository workRepository;
     private Controller controller;
-    
+
     public ProjectController(final ProjectRepository projectRepository, final WorkRepository workRepository, final Controller controller) {
         this.projectRepository = projectRepository;
         this.workRepository = workRepository;
@@ -71,9 +71,8 @@ public class ProjectController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Project> updateEmployee(@PathVariable long id, @RequestBody Project project) {
-        Project updateProject = projectRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Project with id '" + id + "' related to project '" + project + "' not found"));
+    public ResponseEntity<Project> updateProject(@PathVariable long id, @RequestBody Project project) {
+        Project updateProject = projectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Project with id '" + id + "' related to project '" + project + "' not found"));
 
         updateProject.setName(project.getName());
         updateProject.setDescription(project.getDescription());
@@ -86,6 +85,20 @@ public class ProjectController {
         projectRepository.save(updateProject);
 
         return ResponseEntity.ok(updateProject);
+    }
+    
+    @PutMapping("/{id}/works")
+    public ResponseEntity<Work> updateWork(@PathVariable long id, @RequestBody Work work) {
+        Work updateWork = workRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Work with id '" + id + "' related to project '" + work + "' not found"));
+
+        updateWork.setProject(work.getProject());
+        updateWork.setNotes(work.getNotes());
+        updateWork.setEndTime(work.getEndTime());
+        updateWork.setStartTime(work.getStartTime());
+
+        workRepository.save(updateWork);
+
+        return ResponseEntity.ok(updateWork);
     }
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
