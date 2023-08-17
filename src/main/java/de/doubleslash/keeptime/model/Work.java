@@ -27,6 +27,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Work")
@@ -36,9 +37,10 @@ public class Work {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
+   @NotNull
    private LocalDateTime startTime;
+   @NotNull
    private LocalDateTime endTime;
-
    @ManyToOne
    private Project project;
    @Lob
