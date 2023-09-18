@@ -263,7 +263,8 @@ public class ReportController {
          }
 
          final HBox projectButtonBox = new HBox();
-         projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
+         projectButtonBox.getChildren().add(createCopyProjectNotesButton(onlyCurrentProjectWork));
+         projectButtonBox.getChildren().add(createCopyProjectNameButton(onlyCurrentProjectWork));
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
@@ -416,11 +417,13 @@ public class ReportController {
       return grid;
    }
 
-   private Button createCopyProjectButton(final List<Work> projectWork) {
-      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
-      copyButton.setMaxSize(20, 18);
-      copyButton.setMinSize(20, 18);
-      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+   private Button createCopyProjectNotesButton(final List<Work> projectWork) {
+      final Button copyNotesButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
+      copyNotesButton.setMaxSize(20, 18);
+      copyNotesButton.setMinSize(20, 18);
+      copyNotesButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      copyNotesButton.setTooltip(new Tooltip("Copy Project Notes"));
+
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
@@ -436,8 +439,29 @@ public class ReportController {
          clipboard.setContent(content);
       };
 
-      copyButton.setOnAction(eventListener);
-      return copyButton;
+      copyNotesButton.setOnAction(eventListener);
+      return copyNotesButton;
+   }
+   private Button createCopyProjectNameButton(final List<Work> projectWork) {
+      final Button copyProjectNameButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.COPY_PROJECT_NAME, 0.03, 0.03));
+      copyProjectNameButton.setMaxSize(20, 18);
+      copyProjectNameButton.setMinSize(20, 18);
+      copyProjectNameButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      copyProjectNameButton.setTooltip(new Tooltip("Copy Project Name"));
+
+      final EventHandler<ActionEvent> eventListener = actionEvent -> {
+         LOG.debug("Copy to Clipboard clicked.");
+         final ProjectReport pr = new ProjectReport();
+         pr.appendToWorkNotes(projectWork.get(0).getProject().getName());
+
+         final Clipboard clipboard = Clipboard.getSystemClipboard();
+         final ClipboardContent content = new ClipboardContent();
+         content.putString(pr.getNotes());
+         clipboard.setContent(content);
+      };
+
+      copyProjectNameButton.setOnAction(eventListener);
+      return copyProjectNameButton;
    }
 
    private Node createCopyWorkButton(final Work w) {
