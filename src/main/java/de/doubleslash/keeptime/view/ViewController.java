@@ -398,9 +398,7 @@ public class ViewController {
 
    private void setUpTextArea() {
       textArea.setWrapText(true);
-      textArea.setEditable(false);
-      textArea.editableProperty().bind(mouseHoveringProperty);
-
+      textArea.setEditable(true);
       textArea.textProperty().addListener((a, b, c) -> controller.setComment(textArea.getText()));
    }
 
