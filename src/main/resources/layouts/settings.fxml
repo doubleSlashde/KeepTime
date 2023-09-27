@@ -27,6 +27,8 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -36,7 +38,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
    <children>
       <TabPane layoutX="-50.0" layoutY="3.0" prefHeight="383.0" prefWidth="608.0" rotateGraphic="true" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE">
          <tabs>
@@ -362,6 +364,29 @@
               </content>
                <graphic>
                   <Region fx:id="generalIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
+               </graphic>
+            </Tab>
+            <Tab text="REST API">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
+                     <children>
+                        <Label layoutX="24.0" layoutY="169.0" text="Username:" />
+                        <Label layoutX="14.0" layoutY="14.0" prefHeight="28.0" prefWidth="279.0" text="Rest API Authentication">
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="24.0" layoutY="219.0" text="Password:" />
+                        <TextField fx:id="authName" layoutX="97.0" layoutY="166.0" prefHeight="26.0" prefWidth="298.0" promptText="User" />
+                        <TextField fx:id="authPassword" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" promptText="1234" />
+                        <Label layoutX="24.0" layoutY="70.0" text="Label" />
+                        <ToggleButton layoutX="83.0" layoutY="64.0" mnemonicParsing="false" text="ToggleButton" />
+                        <Label layoutX="26.0" layoutY="124.0" text="Port:" />
+                        <TextField fx:id="authName1" layoutX="97.0" layoutY="120.0" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
+                     </children></AnchorPane>
+               </content>
+               <graphic>
+                  <Region fx:id="generalIcon1" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
                </graphic>
             </Tab>
             <Tab text="Import/Export">

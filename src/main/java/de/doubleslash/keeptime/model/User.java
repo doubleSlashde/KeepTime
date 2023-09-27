@@ -18,7 +18,19 @@ public class User {
    @Column(name = "ENABLED")
    private boolean enabled;
 
+   public void setUserName(final String userName) {
+      this.userName = userName;
+   }
 
+   public void setPassword(final String password) {
+      this.password = password;
+   }
 
+   public void setEnabled(final boolean enabled) {
+      this.enabled = enabled;
+   }
 
+   public String getUserName() {
+      return userName;
+   }
 }

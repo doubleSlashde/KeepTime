@@ -16,11 +16,16 @@
 
 package de.doubleslash.keeptime.view;
 
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
 
+import de.doubleslash.keeptime.model.Authorities;
+import de.doubleslash.keeptime.model.User;
+import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
+import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -152,6 +157,18 @@ public class SettingsController {
    @FXML
    private Region licensesIcon;
 
+   @FXML
+   private TextField authName;
+
+   @FXML
+   private TextField authPassword;
+
+   @Autowired
+   private UserRepository userRepository;
+
+   @Autowired
+   private AuthoritiesRepository authoritiesRepository;
+
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
@@ -207,6 +224,25 @@ public class SettingsController {
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
+
+         //*******************************************************************************
+         String username = authName.getText();
+         String password = authPassword.getText();
+
+         User user = new User();
+         Authorities authorities = new Authorities();
+         userRepository.deleteAll();
+         authoritiesRepository.deleteAll();
+         user.setUserName(username);
+         user.setPassword("{noop}" + password);
+         user.setEnabled(true);
+
+         authorities.setUserName(username);
+         authorities.setAuthority("ROLE_USER");
+
+         userRepository.save(user);
+         authoritiesRepository.save(authorities);
+         //*******************************************************************************
 
          if (OS.isLinux()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
@@ -531,6 +567,5 @@ public class SettingsController {
          alert.show();
       }
    }
-
 
 }

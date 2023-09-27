@@ -15,4 +15,20 @@ public class Authorities {
 
    @Column(name = "AUTHORITY")
    private String authority;
+
+
+
+   public void setAuthority(final String authority) {
+      this.authority = authority;
+   }
+
+   public void setUserName(final String userName) {
+      this.userName = userName;
+
+
+   }
+
+   public String getAuthority() {
+      return authority;
+   }
 }
