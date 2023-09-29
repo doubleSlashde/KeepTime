@@ -28,6 +28,7 @@ import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
 import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
+import org.hamcrest.text.IsEmptyString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,11 +164,23 @@ public class SettingsController {
    @FXML
    private TextField authPassword;
 
+   private ToggleGroup toggleGroup;
+
+   @FXML
+   private RadioButton radioApiOff;
+
+   @FXML
+   private RadioButton radioApiOn;
+
    @Autowired
    private UserRepository userRepository;
 
    @Autowired
    private AuthoritiesRepository authoritiesRepository;
+
+   @FXML
+   private TextField authPort;
+
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
@@ -180,6 +193,9 @@ public class SettingsController {
    private final Model model;
 
    private Stage thisStage;
+
+   private String username;
+   private String password;
 
    @Autowired
    ViewController mainscreen;
@@ -221,14 +237,29 @@ public class SettingsController {
       initExportButton();
       initImportButton();
 
+      toggleGroup = new ToggleGroup();
+      radioApiOff.setToggleGroup(toggleGroup);
+      radioApiOn.setToggleGroup(toggleGroup);
+
       LOG.debug("saveButton.setOnAction");
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
          //*******************************************************************************
-         String username = authName.getText();
-         String password = authPassword.getText();
 
+
+
+
+         RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
+
+         if (selectedRadioButton == radioApiOff) {
+            handleApiOff();
+            System.out.println("#########");
+         } else if (selectedRadioButton == radioApiOn) {
+            handleApiOn();
+            System.out.println("---------");
+         }
+/*
          User user = new User();
          Authorities authorities = new Authorities();
          userRepository.deleteAll();
@@ -241,7 +272,8 @@ public class SettingsController {
          authorities.setAuthority("ROLE_USER");
 
          userRepository.save(user);
-         authoritiesRepository.save(authorities);
+         authoritiesRepository.save(authorities);*/
+
          //*******************************************************************************
 
          if (OS.isLinux()) {
@@ -311,6 +343,37 @@ public class SettingsController {
 
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
+   }
+
+
+
+   private void handleApiOff() {
+
+      userRepository.deleteAll();
+      authoritiesRepository.deleteAll();
+      System.out.println("API ist ausgeschaltet");
+   }
+
+   private void handleApiOn() {
+      // Hier den Code ausführen, der bei Auswahl von "On" ausgeführt werden soll
+      username = authName.getText();
+      password = authPassword.getText();
+
+
+      User user = new User();
+      Authorities authorities = new Authorities();
+      userRepository.deleteAll();
+      authoritiesRepository.deleteAll();
+      user.setUserName(username);
+      user.setPassword("{noop}" + password);
+      user.setEnabled(true);
+
+      authorities.setUserName(username);
+      authorities.setAuthority("ROLE_USER");
+
+      userRepository.save(user);
+      authoritiesRepository.save(authorities);
+      System.out.println("API ist eingeschaltet und Benutzer erstellt.");
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
