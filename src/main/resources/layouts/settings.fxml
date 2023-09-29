@@ -24,11 +24,12 @@
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -379,10 +380,15 @@
                         <Label layoutX="24.0" layoutY="219.0" text="Password:" />
                         <TextField fx:id="authName" layoutX="97.0" layoutY="166.0" prefHeight="26.0" prefWidth="298.0" promptText="User" />
                         <TextField fx:id="authPassword" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" promptText="1234" />
-                        <Label layoutX="24.0" layoutY="70.0" text="Label" />
-                        <ToggleButton layoutX="83.0" layoutY="64.0" mnemonicParsing="false" text="ToggleButton" />
+                        <Label layoutX="24.0" layoutY="70.0" text="Auth" />
                         <Label layoutX="26.0" layoutY="124.0" text="Port:" />
-                        <TextField fx:id="authName1" layoutX="97.0" layoutY="120.0" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
+                        <TextField fx:id="authPort" layoutX="97.0" layoutY="120.0" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
+                        <RadioButton fx:id="radioApiOn" layoutX="88.0" layoutY="64.0" mnemonicParsing="false" text="ON">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="authAPI" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="radioApiOff" layoutX="219.0" layoutY="64.0" mnemonicParsing="false" text="OFF" toggleGroup="$authAPI" />
                      </children></AnchorPane>
                </content>
                <graphic>
