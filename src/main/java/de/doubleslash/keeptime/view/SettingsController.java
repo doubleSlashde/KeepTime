@@ -18,9 +18,12 @@ package de.doubleslash.keeptime.view;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.Properties;
 
 import de.doubleslash.keeptime.model.Authorities;
 import de.doubleslash.keeptime.model.User;
@@ -181,6 +184,7 @@ public class SettingsController {
    @FXML
    private TextField authPort;
 
+   private String propertiesFilePath = "application.properties";
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
@@ -247,7 +251,21 @@ public class SettingsController {
 
          //*******************************************************************************
 
+        Properties properties = new Properties();
+         try {
+            properties.load(getClass().getClassLoader().getResourceAsStream(propertiesFilePath));
 
+            String authPortValue = authPort.getText();
+
+            properties.setProperty("server.port", authPortValue);
+
+            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
+            properties.store(outputStream, null);
+            outputStream.close();
+
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
 
 
          RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
@@ -345,8 +363,6 @@ public class SettingsController {
       initializeAbout();
    }
 
-
-
    private void handleApiOff() {
 
       userRepository.deleteAll();
@@ -358,7 +374,6 @@ public class SettingsController {
       // Hier den Code ausführen, der bei Auswahl von "On" ausgeführt werden soll
       username = authName.getText();
       password = authPassword.getText();
-
 
       User user = new User();
       Authorities authorities = new Authorities();
