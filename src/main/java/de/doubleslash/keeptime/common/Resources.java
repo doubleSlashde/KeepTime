@@ -67,8 +67,9 @@ public class Resources {
 
       SVG_LICENSES_ICON("/svgs/closed-captioning.svg"),
 
-      ICON_MAIN("/icons/icon.png"),
-      COPY_PROJECT_NAME("/svgs/copy.svg")
+      SVG_COPY_PROJECT_NAME_ICON("/svgs/copy.svg"),
+
+      ICON_MAIN("/icons/icon.png")
 
       ;
 

@@ -264,7 +264,7 @@ public class ReportController {
 
          final HBox projectButtonBox = new HBox();
          projectButtonBox.getChildren().add(createCopyProjectNotesButton(onlyCurrentProjectWork));
-         projectButtonBox.getChildren().add(createCopyProjectNameButton(onlyCurrentProjectWork));
+         projectButtonBox.getChildren().add(createCopyProjectNameButton(onlyCurrentProjectWork.get(0).getProject().getName()));
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
@@ -442,8 +442,8 @@ public class ReportController {
       copyNotesButton.setOnAction(eventListener);
       return copyNotesButton;
    }
-   private Button createCopyProjectNameButton(final List<Work> projectWork) {
-      final Button copyProjectNameButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.COPY_PROJECT_NAME, 0.03, 0.03));
+   private Button createCopyProjectNameButton(String projectName) {
+      final Button copyProjectNameButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_COPY_PROJECT_NAME_ICON, 0.03, 0.03));
       copyProjectNameButton.setMaxSize(20, 18);
       copyProjectNameButton.setMinSize(20, 18);
       copyProjectNameButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -451,12 +451,9 @@ public class ReportController {
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
-         final ProjectReport pr = new ProjectReport();
-         pr.appendToWorkNotes(projectWork.get(0).getProject().getName());
-
          final Clipboard clipboard = Clipboard.getSystemClipboard();
          final ClipboardContent content = new ClipboardContent();
-         content.putString(pr.getNotes());
+         content.putString(projectName);
          clipboard.setContent(content);
       };
 
