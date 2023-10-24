@@ -264,7 +264,7 @@ public class ReportController {
 
          final HBox projectButtonBox = new HBox();
          projectButtonBox.getChildren().add(createCopyProjectNotesButton(onlyCurrentProjectWork));
-         projectButtonBox.getChildren().add(createCopyProjectNameButton(onlyCurrentProjectWork.get(0).getProject().getName()));
+         projectButtonBox.getChildren().add(createCopyProjectNameButton(project.getName()));
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
