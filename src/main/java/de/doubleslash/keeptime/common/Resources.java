@@ -53,7 +53,7 @@ public class Resources {
 
       SVG_PENCIL_ICON("/svgs/pencil.svg"),
 
-      SVG_CLIPBOARD("/svgs/clipboard.svg"),
+      SVG_CLIPBOARD_ICON("/svgs/clipboard.svg"),
 
       SVG_BUG_ICON("/svgs/bug.svg"),
 
@@ -67,7 +67,7 @@ public class Resources {
 
       SVG_LICENSES_ICON("/svgs/closed-captioning.svg"),
 
-      SVG_COPY_PROJECT_NAME_ICON("/svgs/copy.svg"),
+      SVG_MULTIPLE_CLIPBOARD_ICON("/svgs/copy.svg"),
 
       ICON_MAIN("/icons/icon.png")
 
