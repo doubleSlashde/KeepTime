@@ -263,8 +263,8 @@ public class ReportController {
          }
 
          final HBox projectButtonBox = new HBox();
-         projectButtonBox.getChildren().add(createCopyProjectNotesButton(onlyCurrentProjectWork));
          projectButtonBox.getChildren().add(createCopyProjectNameButton(project.getName()));
+         projectButtonBox.getChildren().add(createCopyProjectNotesButton(onlyCurrentProjectWork));
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
@@ -418,7 +418,7 @@ public class ReportController {
    }
 
    private Button createCopyProjectNotesButton(final List<Work> projectWork) {
-      final Button copyNotesButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
+      final Button copyNotesButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MULTIPLE_CLIPBOARD, 0.03, 0.03));
       copyNotesButton.setMaxSize(20, 18);
       copyNotesButton.setMinSize(20, 18);
       copyNotesButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -443,7 +443,7 @@ public class ReportController {
       return copyNotesButton;
    }
    private Button createCopyProjectNameButton(String projectName) {
-      final Button copyProjectNameButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_COPY_PROJECT_NAME_ICON, 0.03, 0.03));
+      final Button copyProjectNameButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
       copyProjectNameButton.setMaxSize(20, 18);
       copyProjectNameButton.setMinSize(20, 18);
       copyProjectNameButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
