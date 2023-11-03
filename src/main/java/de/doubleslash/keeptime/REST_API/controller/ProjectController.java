@@ -103,10 +103,24 @@ public class ProjectController {
       return work;
    }
 
+   @DeleteMapping("/{id}")
+   public ResponseEntity<String> deleteProject(@PathVariable final long id) {
+      Project project = getProjectById(id);
+
+      if (project != null) {
+         controller.deleteProject(project);
+         projectRepository.delete(project);
+         return new ResponseEntity<>("Projekt erfolgreich gelöscht", HttpStatus.OK);
+      } else {
+         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt mit der ID '" + id + "' nicht gefunden");
+      }
+   }
+
    @ResponseStatus(value = HttpStatus.NOT_FOUND)
    public class ResourceNotFoundException extends RuntimeException {
       public ResourceNotFoundException(String message) {
          super(message);
       }
    }
+
 }
