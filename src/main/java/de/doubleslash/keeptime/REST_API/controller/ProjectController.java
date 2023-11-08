@@ -106,15 +106,24 @@ public class ProjectController {
    @DeleteMapping("/{id}")
    public ResponseEntity<String> deleteProject(@PathVariable final long id) {
       Project project = getProjectById(id);
-
-      if (project != null) {
+      if (project == null) {
+         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project with the ID '" + id + "' not found");
+      } else if (project.isDefault()) {
+         return new ResponseEntity<>("Project cannot be deleted as it is the default", HttpStatus.BAD_REQUEST);
+      } else {
          controller.deleteProject(project);
          projectRepository.delete(project);
-         return new ResponseEntity<>("Projekt erfolgreich gelöscht", HttpStatus.OK);
-      } else {
-         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Projekt mit der ID '" + id + "' nicht gefunden");
+         return new ResponseEntity<>("Project successfully deleted", HttpStatus.OK);
       }
    }
+
+   @GetMapping("/current")
+   public List<Project> getWorkProjects() {
+      List<Project> workProjects = projectRepository.findByIsWork(true);
+      return workProjects;
+   }
+
+
 
    @ResponseStatus(value = HttpStatus.NOT_FOUND)
    public class ResourceNotFoundException extends RuntimeException {
