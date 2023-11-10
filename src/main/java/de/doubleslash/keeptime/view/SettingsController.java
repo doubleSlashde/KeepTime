@@ -392,9 +392,10 @@ public class SettingsController {
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
 
-            if (file.getName().contains("version-1")) {
+            if (file.getName().contains("H2-version-1")) {
                new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
                        "-options", "FROM_1X");
+               LOG.info("FROM_1X feature is used");
             }else {
                new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString());
             }
