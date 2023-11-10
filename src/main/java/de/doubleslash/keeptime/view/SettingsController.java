@@ -391,10 +391,14 @@ public class SettingsController {
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
-            // TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in
-            // the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
-            new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
-                  "-options", "FROM_1X");
+
+            if (file.getName().contains("H2-version-1")) {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
+                       "-options", "FROM_1X");
+               LOG.info("FROM_1X feature is used");
+            }else {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString());
+            }
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
 
