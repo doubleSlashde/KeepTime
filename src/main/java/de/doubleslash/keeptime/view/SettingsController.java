@@ -16,7 +16,6 @@
 
 package de.doubleslash.keeptime.view;
 
-import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -25,13 +24,13 @@ import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Properties;
 
+import de.doubleslash.keeptime.REST_API.controller.apiPort;
 import de.doubleslash.keeptime.model.Authorities;
 import de.doubleslash.keeptime.model.User;
 import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
 import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
-import org.hamcrest.text.IsEmptyString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,6 +130,7 @@ public class SettingsController {
 
    @FXML
    private Button reportBugButton;
+   private Button changePortButton;
 
    @FXML
    private Region bugIcon;
@@ -201,6 +201,7 @@ public class SettingsController {
    private String username;
    private String password;
 
+apiPort customContainer;
    @Autowired
    ViewController mainscreen;
 
@@ -246,6 +247,10 @@ public class SettingsController {
       radioApiOn.setToggleGroup(toggleGroup);
 
       LOG.debug("saveButton.setOnAction");
+
+
+
+
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
@@ -258,7 +263,7 @@ public class SettingsController {
             String authPortValue = authPort.getText();
 
             properties.setProperty("server.port", authPortValue);
-
+System.err.println(authPortValue);
             FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
             properties.store(outputStream, null);
             outputStream.close();
@@ -268,7 +273,14 @@ public class SettingsController {
          }
 
 
+
+
+
          RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
+
+
+
+
 
          if (selectedRadioButton == radioApiOff) {
             handleApiOff();
@@ -276,8 +288,18 @@ public class SettingsController {
          } else if (selectedRadioButton == radioApiOn) {
             handleApiOn();
             System.out.println("---------");
+
+
+
          }
 /*
+
+
+
+
+
+
+
          User user = new User();
          Authorities authorities = new Authorities();
          userRepository.deleteAll();
@@ -361,12 +383,11 @@ public class SettingsController {
 
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
+
    }
 
    private void handleApiOff() {
 
-      userRepository.deleteAll();
-      authoritiesRepository.deleteAll();
       System.out.println("API ist ausgeschaltet");
    }
 
@@ -645,5 +666,6 @@ public class SettingsController {
          alert.show();
       }
    }
+
 
 }

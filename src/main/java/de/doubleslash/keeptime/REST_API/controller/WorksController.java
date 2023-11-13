@@ -66,9 +66,9 @@ public class WorksController {
       if (optionalWork.isPresent()) {
          Work workToBeDeleted = optionalWork.get();
          workRepository.delete(workToBeDeleted);
-         return new ResponseEntity<>("Arbeit erfolgreich gelöscht", HttpStatus.OK);
+         return new ResponseEntity<>("Work successfully deleted", HttpStatus.OK);
       } else {
-         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Arbeit mit der ID '" + id + "' nicht gefunden");
+         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Work with the ID " + id + " not found");
       }
    }
 }
