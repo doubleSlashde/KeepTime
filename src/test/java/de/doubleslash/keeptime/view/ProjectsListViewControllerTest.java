@@ -23,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.doubleslash.keeptime.model.Project;
 import org.junit.jupiter.api.Test;
 
-public class ProjectsListViewControllerTest {
+class ProjectsListViewControllerTest {
 
    @Test
-   public void shouldMatchWhenSearchTermIsInDescription() {
+   void shouldMatchWhenSearchTermIsInDescription() {
       final Project project = new Project();
 
       project.setName("NotSearchTerm");
@@ -36,7 +36,7 @@ public class ProjectsListViewControllerTest {
    }
 
    @Test
-   public void shouldMatchWhenSearchTermIsInName() {
+   void shouldMatchWhenSearchTermIsInName() {
       final Project project = new Project();
 
       project.setName("SearchTerm_CZ");
@@ -46,7 +46,7 @@ public class ProjectsListViewControllerTest {
    }
 
    @Test
-   public void shouldMatchWhenSearchTermIsNameAndDescription() {
+   void shouldMatchWhenSearchTermIsNameAndDescription() {
       final Project project = new Project();
 
       project.setName("SearchTerm_Peter");
@@ -56,7 +56,7 @@ public class ProjectsListViewControllerTest {
    }
 
    @Test
-   public void shouldMatchWhenCaseDiffersInNameAsSearchTerm() {
+   void shouldMatchWhenCaseDiffersInNameAsSearchTerm() {
       final Project project = new Project();
 
       project.setName("PeTerPAn");
@@ -66,7 +66,7 @@ public class ProjectsListViewControllerTest {
    }
 
    @Test
-   public void shouldMatchWhenCaseDiffersInDescriptionAsSearchTerm() {
+   void shouldMatchWhenCaseDiffersInDescriptionAsSearchTerm() {
       final Project project = new Project();
 
       project.setName("");
@@ -76,7 +76,7 @@ public class ProjectsListViewControllerTest {
    }
 
    @Test
-   public void shouldNotMatchWhenDescriptionAndNameAreNotMatching() {
+   void shouldNotMatchWhenDescriptionAndNameAreNotMatching() {
       final Project project = new Project();
 
       project.setName("MyNameIsJohn");

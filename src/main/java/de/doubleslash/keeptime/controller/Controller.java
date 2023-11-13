@@ -22,11 +22,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.doubleslash.keeptime.common.DateFormatter;
@@ -36,6 +33,7 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
+import jakarta.annotation.PreDestroy;
 import javafx.collections.ObservableList;
 
 @Service
@@ -48,7 +46,6 @@ public class Controller {
 
    private final DateProvider dateProvider;
 
-   @Autowired
    public Controller(final Model model, final DateProvider dateProvider) {
       this.model = model;
       this.dateProvider = dateProvider;
