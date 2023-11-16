@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Properties;
 
 @Configuration
-public class apiPort {
+public class ApiPort {
    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
    public static final String filePath = "application.properties";
@@ -26,28 +26,8 @@ public class apiPort {
       try (final FileReader fr = new FileReader(filePath)) {
          final Properties properties = new Properties();
          properties.load(fr);
-         setPort(Integer.parseInt(properties.getProperty("server.port")));
       } catch (IOException e) {
          LOG.error("Properties could not be loaded from file '{}'", filePath, e);
       }
-   }
-
-   @Autowired
-   private ConfigurableServletWebServerFactory serverFactory;
-
-   public void customize() {
-      if (serverFactory instanceof TomcatServletWebServerFactory) {
-         ((TomcatServletWebServerFactory) serverFactory).setPort(port);
-         loadSettings();
-      }
-   }
-
-   public void setPort(int newPort) {
-      this.port = newPort;
-      customize();
-   }
-
-   public int getPort() {
-      return port;
    }
 }

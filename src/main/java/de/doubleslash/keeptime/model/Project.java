@@ -88,7 +88,7 @@ public class Project {
     }
 
     public Color getColor() {
-        return color;
+       return color;
     }
 
     public void setColor(final Color color) {

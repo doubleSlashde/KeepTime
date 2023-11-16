@@ -1,15 +1,22 @@
 package de.doubleslash.keeptime.REST_API.controller;
 
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.paint.Color;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.Convert;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +29,14 @@ public class ProjectController {
    private WorkRepository workRepository;
    private Controller controller;
 
+   private Model model;
+
    public ProjectController(final ProjectRepository projectRepository, final WorkRepository workRepository,
-         final Controller controller) {
+         final Controller controller,Model model) {
       this.projectRepository = projectRepository;
       this.workRepository = workRepository;
       this.controller = controller;
+      this.model= model;
    }
 
    @GetMapping("")
@@ -77,18 +87,57 @@ public class ProjectController {
       return project;
    }
 
+   //   @Convert(converter = ColorConverter.class, disableConversion = false)
+   //   private Color color;
+   //
+   //   @PutMapping("{id}")
+   //   public ResponseEntity<Project> updateProject(@PathVariable final long id,
+   //         @Valid @RequestBody final Project newValuedProject) {
+   //      final Project updateProject = getProjectById(id);
+   //
+   //      updateProject.setName(newValuedProject.getName());
+   //      updateProject.setDescription(newValuedProject.getDescription());
+   //      updateProject.setIndex(newValuedProject.getIndex());
+   //      updateProject.setWork(newValuedProject.isWork());
+   //      color = newValuedProject.getColor();
+   //      updateProject.setColor(color);
+   //      //      project.setColor(Color.RED);
+   //      System.err.println(newValuedProject.getColor().getRed() + " R " + updateProject.getColor().getRed());
+   //      System.err.println(newValuedProject.getColor().getGreen() + " G " + updateProject.getColor().getGreen());
+   //      System.err.println(newValuedProject.getColor().getBlue() + " B " + updateProject.getColor().getBlue());
+   //
+   //
+   //      updateProject.setDefault(newValuedProject.isDefault());
+   //      updateProject.setEnabled(newValuedProject.isEnabled());
+   //
+   //      projectRepository.save(updateProject);
+   //
+   //      return ResponseEntity.ok(updateProject);
+   //   }
+   //
+
+   ColorConverter colorConverter;
+
    @PutMapping("{id}")
    public ResponseEntity<Project> updateProject(@PathVariable final long id,
-         @Valid @RequestBody final Project project) {
+         @Valid @RequestBody final Project newValuedProject) {
       final Project updateProject = getProjectById(id);
 
-      updateProject.setName(project.getName());
-      updateProject.setDescription(project.getDescription());
-      updateProject.setIndex(project.getIndex());
-      updateProject.setWork(project.isWork());
-      updateProject.setColor(project.getColor());
-      updateProject.setDefault(project.isDefault());
-      updateProject.setEnabled(project.isEnabled());
+      updateProject.setName(newValuedProject.getName());
+      updateProject.setDescription(newValuedProject.getDescription());
+      updateProject.setIndex(newValuedProject.getIndex());
+      updateProject.setWork(newValuedProject.isWork());
+
+//      System.err.println(newValuedProject.getColor());
+//      Color newColor = newValuedProject.getColor();
+
+//      System.out.println("'"+colorConverter.convertToDatabaseColumn(newColor)+"'");
+//      String colorString = colorConverter.convertToDatabaseColumn(newColor);
+//
+//      updateProject.setColor(colorConverter.convertToEntityAttribute(colorString));
+
+      updateProject.setDefault(newValuedProject.isDefault());
+      updateProject.setEnabled(newValuedProject.isEnabled());
 
       projectRepository.save(updateProject);
 
@@ -118,12 +167,20 @@ public class ProjectController {
    }
 
    @GetMapping("/current")
-   public List<Project> getWorkProjects() {
-      List<Project> workProjects = projectRepository.findByIsWork(true);
+   public Project getWorkProjects() {
+      Project workProjects = model.activeWorkItem.get().getProject();
       return workProjects;
    }
 
-
+   @PutMapping("/current")
+   public ResponseEntity<Project> changeProject(@Valid @RequestBody Project newProject) {
+      try {
+            controller.changeProject(newProject);
+         return ResponseEntity.ok(newProject);
+      } catch (Exception e) {
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+      }
+   }
 
    @ResponseStatus(value = HttpStatus.NOT_FOUND)
    public class ResourceNotFoundException extends RuntimeException {

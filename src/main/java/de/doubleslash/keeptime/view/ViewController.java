@@ -257,9 +257,11 @@ public class ViewController {
          textAreaColorRunnable.run();
 
          model.activeWorkItem.addListener((a, b, c) -> {
-            updateProjectView();
-            textArea.setText("");
-            textArea.requestFocus();
+            Platform.runLater(() -> {
+               updateProjectView();
+               textArea.setText("");
+               textArea.requestFocus();
+            });
          });
 
          model.defaultBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());

@@ -1,6 +1,8 @@
 package de.doubleslash.keeptime.REST_API.controller;
 
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
 import org.springframework.http.HttpStatus;
@@ -23,10 +25,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/works")
 
 public class WorksController {
-   private WorkRepository workRepository;
 
-   public WorksController(final WorkRepository workRepository, final Controller controller) {
+   private WorkRepository workRepository;
+   private Model model;
+
+   public WorksController(final WorkRepository workRepository, final Controller controller,Model model) {
       this.workRepository = workRepository;
+      this.model= model;
    }
 
    @GetMapping("")
@@ -36,8 +41,10 @@ public class WorksController {
       if (project != null) {
          return works.stream().filter(work -> work.getProject().equals(project)).collect(Collectors.toList());
       }
-      return works;
+      return  works;
    }
+
+
 
    @PutMapping("/{id}")
    public ResponseEntity<Work> editWork(@PathVariable("id") Long workId, @RequestBody Work newValuedWork) {
@@ -52,7 +59,6 @@ public class WorksController {
          workToBeEdited.setProject(newValuedWork.getProject());
 
          Work editedWork = workRepository.save(workToBeEdited);
-
          return ResponseEntity.ok(editedWork);
       } else {
          return ResponseEntity.notFound().build();
@@ -70,5 +76,11 @@ public class WorksController {
       } else {
          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Work with the ID " + id + " not found");
       }
+   }
+
+   @GetMapping("/current")
+   public Work getWorkProjects() {
+      Work workProjects = model.activeWorkItem.get();
+      return workProjects;
    }
 }

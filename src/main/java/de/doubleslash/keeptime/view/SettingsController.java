@@ -24,7 +24,7 @@ import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Properties;
 
-import de.doubleslash.keeptime.REST_API.controller.apiPort;
+import de.doubleslash.keeptime.REST_API.controller.ApiPort;
 import de.doubleslash.keeptime.model.Authorities;
 import de.doubleslash.keeptime.model.User;
 import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
@@ -201,7 +201,6 @@ public class SettingsController {
    private String username;
    private String password;
 
-apiPort customContainer;
    @Autowired
    ViewController mainscreen;
 
