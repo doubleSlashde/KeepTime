@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.Properties;
 
-import de.doubleslash.keeptime.REST_API.controller.ApiPort;
 import de.doubleslash.keeptime.model.Authorities;
 import de.doubleslash.keeptime.model.User;
 import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
@@ -254,7 +253,8 @@ public class SettingsController {
          LOG.info("Save clicked");
 
          //*******************************************************************************
-
+//         String authPortValue = authPort.getText();
+//         propertyWrite("server.port",authPortValue);
         Properties properties = new Properties();
          try {
             properties.load(getClass().getClassLoader().getResourceAsStream(propertiesFilePath));
@@ -262,6 +262,8 @@ public class SettingsController {
             String authPortValue = authPort.getText();
 
             properties.setProperty("server.port", authPortValue);
+            // properties.setProperty("spring.main.web-application-type", "none");
+
 System.err.println(authPortValue);
             FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
             properties.store(outputStream, null);
@@ -283,37 +285,9 @@ System.err.println(authPortValue);
 
          if (selectedRadioButton == radioApiOff) {
             handleApiOff();
-            System.out.println("#########");
          } else if (selectedRadioButton == radioApiOn) {
             handleApiOn();
-            System.out.println("---------");
-
-
-
          }
-/*
-
-
-
-
-
-
-
-         User user = new User();
-         Authorities authorities = new Authorities();
-         userRepository.deleteAll();
-         authoritiesRepository.deleteAll();
-         user.setUserName(username);
-         user.setPassword("{noop}" + password);
-         user.setEnabled(true);
-
-         authorities.setUserName(username);
-         authorities.setAuthority("ROLE_USER");
-
-         userRepository.save(user);
-         authoritiesRepository.save(authorities);*/
-
-         //*******************************************************************************
 
          if (OS.isLinux()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
@@ -386,11 +360,16 @@ System.err.println(authPortValue);
    }
 
    private void handleApiOff() {
+      propertyWrite("spring.main.web-application-type", "none");
+
 
       System.out.println("API ist ausgeschaltet");
    }
 
    private void handleApiOn() {
+
+
+
       // Hier den Code ausführen, der bei Auswahl von "On" ausgeführt werden soll
       username = authName.getText();
       password = authPassword.getText();
@@ -409,6 +388,8 @@ System.err.println(authPortValue);
       userRepository.save(user);
       authoritiesRepository.save(authorities);
       System.out.println("API ist eingeschaltet und Benutzer erstellt.");
+      propertyWrite("spring.main.web-application-type", "");
+
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
@@ -666,5 +647,16 @@ System.err.println(authPortValue);
       }
    }
 
-
+private void propertyWrite(String key,String value){
+   Properties properties = new Properties();
+   try {
+      properties.load(getClass().getClassLoader().getResourceAsStream(propertiesFilePath));
+      properties.setProperty(key, value);
+        FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
+      properties.store(outputStream, null);
+      outputStream.close();
+   } catch (IOException e) {
+      e.printStackTrace();
+   }
+}
 }
