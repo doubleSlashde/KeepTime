@@ -19,6 +19,7 @@ package de.doubleslash.keeptime.view;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
@@ -246,16 +247,13 @@ public class SettingsController {
 
       LOG.debug("saveButton.setOnAction");
 
-
-
-
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
          //*******************************************************************************
-//         String authPortValue = authPort.getText();
-//         propertyWrite("server.port",authPortValue);
-        Properties properties = new Properties();
+         //         String authPortValue = authPort.getText();
+         //         propertyWrite("server.port",authPortValue);
+         Properties properties = new Properties();
          try {
             properties.load(getClass().getClassLoader().getResourceAsStream(propertiesFilePath));
 
@@ -264,7 +262,7 @@ public class SettingsController {
             properties.setProperty("server.port", authPortValue);
             // properties.setProperty("spring.main.web-application-type", "none");
 
-System.err.println(authPortValue);
+            System.err.println(authPortValue);
             FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
             properties.store(outputStream, null);
             outputStream.close();
@@ -273,15 +271,7 @@ System.err.println(authPortValue);
             e.printStackTrace();
          }
 
-
-
-
-
          RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
-
-
-
-
 
          if (selectedRadioButton == radioApiOff) {
             handleApiOff();
@@ -359,38 +349,7 @@ System.err.println(authPortValue);
 
    }
 
-   private void handleApiOff() {
-      propertyWrite("spring.main.web-application-type", "none");
 
-
-      System.out.println("API ist ausgeschaltet");
-   }
-
-   private void handleApiOn() {
-
-
-
-      // Hier den Code ausführen, der bei Auswahl von "On" ausgeführt werden soll
-      username = authName.getText();
-      password = authPassword.getText();
-
-      User user = new User();
-      Authorities authorities = new Authorities();
-      userRepository.deleteAll();
-      authoritiesRepository.deleteAll();
-      user.setUserName(username);
-      user.setPassword("{noop}" + password);
-      user.setEnabled(true);
-
-      authorities.setUserName(username);
-      authorities.setAuthority("ROLE_USER");
-
-      userRepository.save(user);
-      authoritiesRepository.save(authorities);
-      System.out.println("API ist eingeschaltet und Benutzer erstellt.");
-      propertyWrite("spring.main.web-application-type", "");
-
-   }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
 
@@ -646,17 +605,53 @@ System.err.println(authPortValue);
          alert.show();
       }
    }
-
-private void propertyWrite(String key,String value){
-   Properties properties = new Properties();
-   try {
-      properties.load(getClass().getClassLoader().getResourceAsStream(propertiesFilePath));
-      properties.setProperty(key, value);
-        FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
-      properties.store(outputStream, null);
-      outputStream.close();
-   } catch (IOException e) {
-      e.printStackTrace();
+   private void handleApiOff() {
+      setWebApplicationType("none");
+      System.out.println("API ist ausgeschaltet");
    }
-}
+
+   private void handleApiOn() {
+      username = authName.getText();
+      password = authPassword.getText();
+
+      createAndSaveUser(username, password);
+
+      System.out.println("API ist eingeschaltet und Benutzer erstellt.");
+      setWebApplicationType("");
+      propertyWrite("server.port",authPort.getText());
+   }
+
+   private void setWebApplicationType(String value) {
+      propertyWrite("spring.main.web-application-type", value);
+   }
+
+   private void createAndSaveUser(String username, String password) {
+      User user = new User();
+      Authorities authorities = new Authorities();
+
+      userRepository.deleteAll();
+      authoritiesRepository.deleteAll();
+
+      user.setUserName(username);
+      user.setPassword("{noop}" + password);
+      user.setEnabled(true);
+
+      authorities.setUserName(username);
+      authorities.setAuthority("ROLE_USER");
+
+      userRepository.save(user);
+      authoritiesRepository.save(authorities);
+   }
+
+   private void propertyWrite(String key, String value) {
+      Properties properties = new Properties();
+      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
+            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
+         properties.load(inputStream);
+         properties.setProperty(key, value);
+         properties.store(outputStream, null);
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
 }
