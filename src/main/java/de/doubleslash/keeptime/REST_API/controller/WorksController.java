@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/works")
@@ -34,15 +35,28 @@ public class WorksController {
       this.model= model;
    }
 
-   @GetMapping("")
-   public List<Work> getWorks(@RequestParam(name = "name", required = false) final String project) {
-      List<Work> works = workRepository.findAll();
+//   @GetMapping("")
+//   public List<Work> getWorks(@RequestParam(name = "name", required = false) final String project) {
+//      List<Work> works = workRepository.findAll();
+//
+//      if (project != null) {
+//         return works.stream().filter(work -> work.getProject().equals(project)).collect(Collectors.toList());
+//      }
+//      return  works;
+//   }
+@GetMapping("")
+public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) final String projectName) {
+   List<Work> works = workRepository.findAll();
 
-      if (project != null) {
-         return works.stream().filter(work -> work.getProject().equals(project)).collect(Collectors.toList());
-      }
-      return  works;
+   Stream<Work> workStream = works.stream();
+
+   if (projectName != null) {
+      workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
    }
+
+   return workStream.map(WorkMapper.INSTANCE::workToWorkDTO)
+                    .collect(Collectors.toList());
+}
 
 
 

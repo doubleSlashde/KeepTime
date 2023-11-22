@@ -29,11 +29,15 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.doubleslash.keeptime.REST_API.controller.ColorJsonSerializer;
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import javafx.scene.paint.Color;
 
 @Entity
 @Table(name = "Project")
+//@JsonSerialize(using = ColorJsonSerializer.class)
+
 public class Project {
 
     @Id
@@ -49,6 +53,7 @@ public class Project {
 
     @Convert(converter = ColorConverter.class, disableConversion = false)
     private Color color;
+
 
     private boolean isWork;
 

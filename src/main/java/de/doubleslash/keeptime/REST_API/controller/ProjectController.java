@@ -32,11 +32,11 @@ public class ProjectController {
    private Model model;
 
    public ProjectController(final ProjectRepository projectRepository, final WorkRepository workRepository,
-         final Controller controller,Model model) {
+         final Controller controller, Model model) {
       this.projectRepository = projectRepository;
       this.workRepository = workRepository;
       this.controller = controller;
-      this.model= model;
+      this.model = model;
    }
 
    @GetMapping("")
@@ -128,14 +128,7 @@ public class ProjectController {
       updateProject.setIndex(newValuedProject.getIndex());
       updateProject.setWork(newValuedProject.isWork());
 
-//      System.err.println(newValuedProject.getColor());
-//      Color newColor = newValuedProject.getColor();
-
-//      System.out.println("'"+colorConverter.convertToDatabaseColumn(newColor)+"'");
-//      String colorString = colorConverter.convertToDatabaseColumn(newColor);
-//
-//      updateProject.setColor(colorConverter.convertToEntityAttribute(colorString));
-
+      updateProject.setColor(newValuedProject.getColor());
       updateProject.setDefault(newValuedProject.isDefault());
       updateProject.setEnabled(newValuedProject.isEnabled());
 
@@ -175,7 +168,7 @@ public class ProjectController {
    @PutMapping("/current")
    public ResponseEntity<Project> changeProject(@Valid @RequestBody Project newProject) {
       try {
-            controller.changeProject(newProject);
+         controller.changeProject(newProject);
          return ResponseEntity.ok(newProject);
       } catch (Exception e) {
          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
