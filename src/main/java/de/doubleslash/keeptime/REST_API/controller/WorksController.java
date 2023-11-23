@@ -31,35 +31,23 @@ public class WorksController {
    private WorkRepository workRepository;
    private Model model;
 
-   public WorksController(final WorkRepository workRepository, final Controller controller,Model model) {
+   public WorksController(final WorkRepository workRepository, final Controller controller, Model model) {
       this.workRepository = workRepository;
-      this.model= model;
+      this.model = model;
    }
 
-//   @GetMapping("")
-//   public List<Work> getWorks(@RequestParam(name = "name", required = false) final String project) {
-//      List<Work> works = workRepository.findAll();
-//
-//      if (project != null) {
-//         return works.stream().filter(work -> work.getProject().equals(project)).collect(Collectors.toList());
-//      }
-//      return  works;
-//   }
-@GetMapping("")
-public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) final String projectName) {
-   List<Work> works = workRepository.findAll();
+   @GetMapping("")
+   public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) final String projectName) {
+      List<Work> works = workRepository.findAll();
 
-   Stream<Work> workStream = works.stream();
+      Stream<Work> workStream = works.stream();
 
-   if (projectName != null) {
-      workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
+      if (projectName != null) {
+         workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
+      }
+
+      return workStream.map(WorkMapper.INSTANCE::workToWorkDTO).collect(Collectors.toList());
    }
-
-   return workStream.map(WorkMapper.INSTANCE::workToWorkDTO)
-                    .collect(Collectors.toList());
-}
-
-
 
    @PutMapping("/{id}")
    public ResponseEntity<WorkDTO> editWork(@PathVariable("id") Long workId, @RequestBody WorkDTO newValuedWorkDTO) {
@@ -74,7 +62,6 @@ public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) fin
          workToBeEdited.setNotes(newValuedWork.getNotes());
          workToBeEdited.setProject(newValuedWork.getProject());
 
-
          Work editedWork = workRepository.save(workToBeEdited);
 
          return ResponseEntity.ok(WorkMapper.INSTANCE.workToWorkDTO(editedWork));
@@ -82,7 +69,6 @@ public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) fin
          return ResponseEntity.notFound().build();
       }
    }
-
 
    @DeleteMapping("/{id}")
    public ResponseEntity<String> deleteWork(@PathVariable final long id) {
@@ -96,8 +82,7 @@ public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) fin
          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Work with the ID " + id + " not found");
       }
    }
-
-
+   
    @GetMapping("/current")
    public ResponseEntity<WorkDTO> getCurrentWork() {
       Work workProjects = model.activeWorkItem.get();
