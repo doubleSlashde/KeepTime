@@ -1,8 +1,9 @@
 package de.doubleslash.keeptime.REST_API.controller;
 
+import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
+import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
-import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
 import org.springframework.http.HttpStatus;

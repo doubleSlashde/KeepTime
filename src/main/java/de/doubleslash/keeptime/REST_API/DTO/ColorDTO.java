@@ -1,4 +1,4 @@
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.REST_API.DTO;
 
 public class ColorDTO {
    private double red;

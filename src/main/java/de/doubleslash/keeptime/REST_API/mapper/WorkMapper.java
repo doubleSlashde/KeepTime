@@ -1,9 +1,9 @@
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.REST_API.mapper;
 
 
+import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
 import de.doubleslash.keeptime.model.Work;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper

@@ -1,5 +1,6 @@
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.REST_API.mapper;
 
+import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
 import javafx.scene.paint.Color;
 import org.mapstruct.Mapper;
 

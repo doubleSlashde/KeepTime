@@ -1,6 +1,6 @@
 package de.doubleslash.keeptime.REST_API;
 
-import de.doubleslash.keeptime.REST_API.controller.ColorDTO;
+import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
 
 public class ProjectColorDTO {
 
