@@ -36,4 +36,13 @@ public class ColorConverter implements AttributeConverter<Color, String> {
       return arg0.toString();
    }
 
+
+
+
+
+   // Diese Methode konvertiert einen String in eine Color-Instanz
+   public static Color convertToColor(String colorString) {
+      return Color.web(colorString);
+   }
+
 }

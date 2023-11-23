@@ -1,26 +1,23 @@
 package de.doubleslash.keeptime.REST_API.controller;
 
+import de.doubleslash.keeptime.REST_API.ProjectColorDTO;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
-import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
-import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.paint.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.persistence.Convert;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/projects")
@@ -31,6 +28,8 @@ public class ProjectController {
 
    private Model model;
 
+   private ProjectMapper projectMapper;
+
    public ProjectController(final ProjectRepository projectRepository, final WorkRepository workRepository,
          final Controller controller, Model model) {
       this.projectRepository = projectRepository;
@@ -40,13 +39,21 @@ public class ProjectController {
    }
 
    @GetMapping("")
-   public List<Project> getProjects(@RequestParam(name = "name", required = false) final String name) {
-      List<Project> projects = projectRepository.findAll();
+   public ResponseEntity<List<ProjectColorDTO>> getProjectColorDTOsByName(
+         @RequestParam(name = "name", required = false) final String name) {
+      List<Project> projects;
 
       if (name != null) {
-         return projects.stream().filter(project -> project.getName().equals(name)).collect(Collectors.toList());
+         projects = projectRepository.findByName(name);
+      } else {
+         projects = projectRepository.findAll();
       }
-      return projects;
+
+      List<ProjectColorDTO> projectColorDTOs = projects.stream()
+                                                       .map(ProjectMapper.INSTANCE::projectToProjectDTO)
+                                                       .collect(Collectors.toList());
+
+      return ResponseEntity.ok(projectColorDTOs);
    }
 
    @GetMapping("/{id}")
@@ -87,54 +94,51 @@ public class ProjectController {
       return project;
    }
 
-   //   @Convert(converter = ColorConverter.class, disableConversion = false)
-   //   private Color color;
+   //@PutMapping("/{id}")
+   //public ResponseEntity<ProjectColorDTO> updateProjectColorDTO(@PathVariable final long id,
+   //      @Valid @RequestBody final ProjectColorDTO newValuedProjectDTO) {
+   //   final Project updateProject = getProjectById(id);
    //
-   //   @PutMapping("{id}")
-   //   public ResponseEntity<Project> updateProject(@PathVariable final long id,
-   //         @Valid @RequestBody final Project newValuedProject) {
-   //      final Project updateProject = getProjectById(id);
+   //   Project newValuedProject = ProjectMapper.INSTANCE.projectDTOToProject(newValuedProjectDTO);
    //
-   //      updateProject.setName(newValuedProject.getName());
-   //      updateProject.setDescription(newValuedProject.getDescription());
-   //      updateProject.setIndex(newValuedProject.getIndex());
-   //      updateProject.setWork(newValuedProject.isWork());
-   //      color = newValuedProject.getColor();
-   //      updateProject.setColor(color);
-   //      //      project.setColor(Color.RED);
-   //      System.err.println(newValuedProject.getColor().getRed() + " R " + updateProject.getColor().getRed());
-   //      System.err.println(newValuedProject.getColor().getGreen() + " G " + updateProject.getColor().getGreen());
-   //      System.err.println(newValuedProject.getColor().getBlue() + " B " + updateProject.getColor().getBlue());
+   //   updateProject.setName(newValuedProject.getName());
+   //   updateProject.setDescription(newValuedProject.getDescription());
+   //   updateProject.setIndex(newValuedProject.getIndex());
+   //   updateProject.setWork(newValuedProject.isWork());
    //
+   //   updateProject.setDefault(newValuedProject.isDefault());
+   //   updateProject.setEnabled(newValuedProject.isEnabled());
    //
-   //      updateProject.setDefault(newValuedProject.isDefault());
-   //      updateProject.setEnabled(newValuedProject.isEnabled());
+   //   projectRepository.save(updateProject);
    //
-   //      projectRepository.save(updateProject);
+   //   ProjectColorDTO updatedProjectDTO = ProjectMapper.INSTANCE.projectToProjectDTO(updateProject);
    //
-   //      return ResponseEntity.ok(updateProject);
-   //   }
-   //
+   //   return ResponseEntity.ok(updatedProjectDTO);
+   //}
+   @PutMapping("/{id}")
+   public ResponseEntity<ProjectColorDTO> updateProjectColorDTO(@PathVariable final long id,
+         @Valid @RequestBody final ProjectColorDTO newValuedProjectDTO) {
+      try {
+         final Project updateProject = getProjectById(id);
 
-   ColorConverter colorConverter;
+         Project newValuedProject = ProjectMapper.INSTANCE.projectDTOToProject(newValuedProjectDTO);
 
-   @PutMapping("{id}")
-   public ResponseEntity<Project> updateProject(@PathVariable final long id,
-         @Valid @RequestBody final Project newValuedProject) {
-      final Project updateProject = getProjectById(id);
+         updateProject.setName(newValuedProject.getName());
+         updateProject.setDescription(newValuedProject.getDescription());
+         updateProject.setIndex(newValuedProject.getIndex());
+         updateProject.setWork(newValuedProject.isWork());
+         updateProject.setColor(newValuedProject.getColor());
+         updateProject.setDefault(newValuedProject.isDefault());
+         updateProject.setEnabled(newValuedProject.isEnabled());
 
-      updateProject.setName(newValuedProject.getName());
-      updateProject.setDescription(newValuedProject.getDescription());
-      updateProject.setIndex(newValuedProject.getIndex());
-      updateProject.setWork(newValuedProject.isWork());
+         projectRepository.save(updateProject);
 
-      updateProject.setColor(newValuedProject.getColor());
-      updateProject.setDefault(newValuedProject.isDefault());
-      updateProject.setEnabled(newValuedProject.isEnabled());
+         ProjectColorDTO updatedProjectDTO = ProjectMapper.INSTANCE.projectToProjectDTO(updateProject);
 
-      projectRepository.save(updateProject);
-
-      return ResponseEntity.ok(updateProject);
+         return ResponseEntity.ok(updatedProjectDTO);
+      } catch (Exception e) {
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+      }
    }
 
    @PostMapping("/{id}/works")

@@ -61,7 +61,8 @@ public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) fin
 
 
    @PutMapping("/{id}")
-   public ResponseEntity<Work> editWork(@PathVariable("id") Long workId, @RequestBody Work newValuedWork) {
+   public ResponseEntity<WorkDTO> editWork(@PathVariable("id") Long workId, @RequestBody WorkDTO newValuedWorkDTO) {
+      Work newValuedWork = WorkMapper.INSTANCE.workDTOToWork(newValuedWorkDTO);
       Optional<Work> optionalWork = workRepository.findById(workId);
 
       if (optionalWork.isPresent()) {
@@ -72,12 +73,15 @@ public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) fin
          workToBeEdited.setNotes(newValuedWork.getNotes());
          workToBeEdited.setProject(newValuedWork.getProject());
 
+
          Work editedWork = workRepository.save(workToBeEdited);
-         return ResponseEntity.ok(editedWork);
+
+         return ResponseEntity.ok(WorkMapper.INSTANCE.workToWorkDTO(editedWork));
       } else {
          return ResponseEntity.notFound().build();
       }
    }
+
 
    @DeleteMapping("/{id}")
    public ResponseEntity<String> deleteWork(@PathVariable final long id) {
@@ -92,9 +96,15 @@ public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) fin
       }
    }
 
+
    @GetMapping("/current")
-   public Work getWorkProjects() {
+   public ResponseEntity<WorkDTO> getCurrentWork() {
       Work workProjects = model.activeWorkItem.get();
-      return workProjects;
+
+      if (workProjects != null) {
+         return ResponseEntity.ok(WorkMapper.INSTANCE.workToWorkDTO(workProjects));
+      } else {
+         return ResponseEntity.notFound().build();
+      }
    }
 }
