@@ -26,7 +26,6 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -98,5 +97,4 @@ public class Work {
       return "Work [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", projectName="
             + project.getName() + ", notes=" + notes + "]";
    }
-
 }

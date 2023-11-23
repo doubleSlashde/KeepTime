@@ -29,7 +29,7 @@ import javafx.scene.paint.Color;
 
 /**
  * Object holding settings
- * 
+ *
  * @author nmutter
  */
 @Entity
@@ -73,7 +73,8 @@ public class Settings {
 
    private boolean confirmClose;
 
-   public Settings() {}
+   public Settings() {
+   }
 
    public Settings(final Color hoverBackgroundColor, final Color hoverFontColor, final Color defaultBackgroundColor,
          final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
@@ -96,7 +97,6 @@ public class Settings {
       this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
       this.remindIfNotesAreEmptyOnlyForWorkEntry = remindIfNotesAreEmptyOnlyForWorkEntry;
       this.confirmClose = confirmClose;
-
    }
 
    public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
@@ -222,5 +222,4 @@ public class Settings {
    public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
       this.remindIfNotesAreEmpty = emptyNoteReminder;
    }
-
 }

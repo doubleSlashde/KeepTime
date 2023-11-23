@@ -11,10 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
-import de.doubleslash.keeptime.model.persistenceconverter.ColorGuiConverter;
 import javafx.scene.paint.Color;
 
 @Entity
@@ -72,15 +69,8 @@ public class Project {
       return color;
    }
 
-
-
    public void setColor(Color color) {
       this.color = color;
-   }
-
-   @JsonSetter
-   public void setColor(java.awt.Color color) {
-      this.color = new Color(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
    }
 
    public boolean isWork() {

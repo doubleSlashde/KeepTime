@@ -1,6 +1,5 @@
 package de.doubleslash.keeptime.REST_API.DTO;
 
-
 import java.time.LocalDateTime;
 
 public class WorkDTO {
@@ -17,7 +16,6 @@ public class WorkDTO {
       this.project = project;
       this.notes = notes;
    }
-
 
    public long getId() {
       return id;

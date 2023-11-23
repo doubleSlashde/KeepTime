@@ -21,7 +21,6 @@ import javax.persistence.AttributeConverter;
 import javafx.scene.paint.Color;
 
 public class ColorConverter implements AttributeConverter<Color, String> {
-
    @Override
    public Color convertToEntityAttribute(final String arg0) {
       try {
@@ -35,14 +34,4 @@ public class ColorConverter implements AttributeConverter<Color, String> {
    public String convertToDatabaseColumn(final Color arg0) {
       return arg0.toString();
    }
-
-
-
-
-
-   // Diese Methode konvertiert einen String in eine Color-Instanz
-   public static Color convertToColor(String colorString) {
-      return Color.web(colorString);
-   }
-
 }
