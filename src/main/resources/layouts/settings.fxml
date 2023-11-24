@@ -389,7 +389,6 @@
                            </toggleGroup>
                         </RadioButton>
                         <RadioButton fx:id="radioApiOff" layoutX="219.0" layoutY="64.0" mnemonicParsing="false" text="OFF" toggleGroup="$authAPI" />
-                        <Button fx:id="changePortButton" layoutX="41.0" layoutY="284.0" mnemonicParsing="false" text="Button" />
                      </children></AnchorPane>
                </content>
                <graphic>
