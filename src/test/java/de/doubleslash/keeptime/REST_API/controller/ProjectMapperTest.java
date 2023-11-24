@@ -1,6 +1,6 @@
 package de.doubleslash.keeptime.REST_API.controller;
 
-import de.doubleslash.keeptime.REST_API.ProjectColorDTO;
+import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
 import de.doubleslash.keeptime.REST_API.mapper.ProjectMapper;
 import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;

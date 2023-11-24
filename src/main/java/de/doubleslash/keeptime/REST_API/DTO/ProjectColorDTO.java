@@ -1,9 +1,9 @@
-package de.doubleslash.keeptime.REST_API;
+package de.doubleslash.keeptime.REST_API.DTO;
 
 import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
 
 public class ProjectColorDTO {
-
+   private long id;
    private String name;
    private String description;
    private ColorDTO color;
@@ -12,7 +12,9 @@ public class ProjectColorDTO {
    private boolean isEnabled;
    private int index;
 
-   public ProjectColorDTO(String name, String description, ColorDTO color, boolean isWork, int index, boolean isDefault) {
+
+   public ProjectColorDTO( long id, String name, String description, ColorDTO color, boolean isWork, int index, boolean isDefault) {
+      this.id= id;
       this.name = name;
       this.description = description;
       this.color = color;
@@ -20,6 +22,14 @@ public class ProjectColorDTO {
       this.index = index;
       this.isDefault = isDefault;
       this.isEnabled = true;
+   }
+
+   public long getId() {
+      return id;
+   }
+
+   public void setId(final long id) {
+      this.id = id;
    }
 
    public String getName() {
@@ -77,4 +87,6 @@ public class ProjectColorDTO {
    public void setIndex(int index) {
       this.index = index;
    }
+
+
 }

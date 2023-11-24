@@ -45,7 +45,6 @@ public class WorksController {
       if (projectName != null) {
          workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
       }
-
       return workStream.map(WorkMapper.INSTANCE::workToWorkDTO).collect(Collectors.toList());
    }
 
@@ -82,7 +81,7 @@ public class WorksController {
          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Work with the ID " + id + " not found");
       }
    }
-   
+
    @GetMapping("/current")
    public ResponseEntity<WorkDTO> getCurrentWork() {
       Work workProjects = model.activeWorkItem.get();

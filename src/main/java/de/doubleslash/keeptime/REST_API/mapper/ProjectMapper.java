@@ -1,6 +1,6 @@
 package de.doubleslash.keeptime.REST_API.mapper;
 
-import de.doubleslash.keeptime.REST_API.ProjectColorDTO;
+import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
 import de.doubleslash.keeptime.model.Project;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
