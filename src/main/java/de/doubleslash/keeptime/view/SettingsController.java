@@ -250,27 +250,6 @@ public class SettingsController {
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         //*******************************************************************************
-         //         String authPortValue = authPort.getText();
-         //         propertyWrite("server.port",authPortValue);
-         Properties properties = new Properties();
-         try {
-            properties.load(getClass().getClassLoader().getResourceAsStream(propertiesFilePath));
-
-            String authPortValue = authPort.getText();
-
-            properties.setProperty("server.port", authPortValue);
-            // properties.setProperty("spring.main.web-application-type", "none");
-
-            System.err.println(authPortValue);
-            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath);
-            properties.store(outputStream, null);
-            outputStream.close();
-
-         } catch (IOException e) {
-            e.printStackTrace();
-         }
-
          RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
 
          if (selectedRadioButton == radioApiOff) {
@@ -348,8 +327,6 @@ public class SettingsController {
       initializeAbout();
 
    }
-
-
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
 
@@ -492,9 +469,7 @@ public class SettingsController {
 
             errorDialog.showAndWait();
          }
-
       });
-
    }
 
    private void initExportButton() {
@@ -605,9 +580,9 @@ public class SettingsController {
          alert.show();
       }
    }
+
    private void handleApiOff() {
       setWebApplicationType("none");
-      System.out.println("API ist ausgeschaltet");
    }
 
    private void handleApiOn() {
@@ -616,9 +591,8 @@ public class SettingsController {
 
       createAndSaveUser(username, password);
 
-      System.out.println("API ist eingeschaltet und Benutzer erstellt.");
+      propertyWrite("server.port", authPort.getText());
       setWebApplicationType("");
-      propertyWrite("server.port",authPort.getText());
    }
 
    private void setWebApplicationType(String value) {
