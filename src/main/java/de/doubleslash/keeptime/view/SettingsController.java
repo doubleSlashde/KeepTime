@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import de.doubleslash.keeptime.model.Authorities;
@@ -591,8 +593,11 @@ public class SettingsController {
 
       createAndSaveUser(username, password);
 
-      propertyWrite("server.port", authPort.getText());
-      setWebApplicationType("");
+      Map<String, String> propertiesToUpdate = new HashMap<>();
+      propertiesToUpdate.put("spring.main.web-application-type", "");
+      propertiesToUpdate.put("server.port", authPort.getText());
+
+      propertyWrite(propertiesToUpdate);
    }
 
    private void setWebApplicationType(String value) {
@@ -621,9 +626,29 @@ public class SettingsController {
       Properties properties = new Properties();
       try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
             FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
+
          properties.load(inputStream);
          properties.setProperty(key, value);
          properties.store(outputStream, null);
+
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+   private void propertyWrite(Map<String, String> propertiesToUpdate) {
+      Properties properties = new Properties();
+      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
+            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
+
+         properties.load(inputStream);
+
+         for (Map.Entry<String, String> entry : propertiesToUpdate.entrySet()) {
+            properties.setProperty(entry.getKey(), entry.getValue());
+         }
+
+         properties.store(outputStream, null);
+
       } catch (IOException e) {
          e.printStackTrace();
       }
