@@ -132,7 +132,6 @@ public class SettingsController {
 
    @FXML
    private Button reportBugButton;
-   private Button changePortButton;
 
    @FXML
    private Region bugIcon;
@@ -167,7 +166,7 @@ public class SettingsController {
    private TextField authName;
 
    @FXML
-   private TextField authPassword;
+   private PasswordField authPassword1;
 
    private ToggleGroup toggleGroup;
 
@@ -562,6 +561,9 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
       licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
+      licenseRows.add(new LicenseTableRow("mapstruct", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("jackson-databind", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("javax.xml.bind", Licenses.APACHEV2));
 
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
@@ -589,7 +591,7 @@ public class SettingsController {
 
    private void handleApiOn() {
       username = authName.getText();
-      password = authPassword.getText();
+      password = authPassword1.getText();
 
       createAndSaveUser(username, password);
 

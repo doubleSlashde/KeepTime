@@ -24,6 +24,7 @@
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -379,7 +380,6 @@
                         </Label>
                         <Label layoutX="24.0" layoutY="219.0" text="Password:" />
                         <TextField fx:id="authName" layoutX="97.0" layoutY="166.0" prefHeight="26.0" prefWidth="298.0" promptText="User" />
-                        <TextField fx:id="authPassword" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" promptText="1234" />
                         <Label layoutX="24.0" layoutY="70.0" text="Auth" />
                         <Label layoutX="26.0" layoutY="124.0" text="Port:" />
                         <TextField fx:id="authPort" layoutX="97.0" layoutY="120.0" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
@@ -389,6 +389,7 @@
                            </toggleGroup>
                         </RadioButton>
                         <RadioButton fx:id="radioApiOff" layoutX="219.0" layoutY="64.0" mnemonicParsing="false" text="OFF" toggleGroup="$authAPI" />
+                        <PasswordField fx:id="authPassword1" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" />
                      </children></AnchorPane>
                </content>
                <graphic>
