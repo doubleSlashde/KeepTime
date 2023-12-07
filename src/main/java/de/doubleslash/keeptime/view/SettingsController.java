@@ -17,6 +17,7 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -166,7 +167,7 @@ public class SettingsController {
    private TextField authName;
 
    @FXML
-   private PasswordField authPassword1;
+   private PasswordField authPassword;
 
    private ToggleGroup toggleGroup;
 
@@ -201,6 +202,17 @@ public class SettingsController {
 
    private String username;
    private String password;
+
+   @FXML
+   private Label labelPassword;
+
+   @FXML
+   private Label labelPort;
+
+   @FXML
+   private Label labelUsername;
+
+   User user = new User();
 
    @Autowired
    ViewController mainscreen;
@@ -245,6 +257,34 @@ public class SettingsController {
       toggleGroup = new ToggleGroup();
       radioApiOff.setToggleGroup(toggleGroup);
       radioApiOn.setToggleGroup(toggleGroup);
+
+      Properties properties = new Properties();
+      try (FileInputStream input = new FileInputStream(propertiesFilePath)) {
+         properties.load(input);
+         String apistatus = properties.getProperty("api");
+         if (apistatus != null) {
+            if (apistatus.equals("ON")) {
+               radioApiOn.setSelected(true);
+               radioApiOff.setSelected(false);
+               String port = properties.getProperty("server.port");
+//               String username = properties.getProperty(user.getUserName());
+//               System.err.println("'"+user.getUserName()+"'");
+               String username = properties.getProperty("authUsername");
+               if (port != null) {
+                  authPort.setText(port);
+               }
+               if (username != null) {
+                  authName.setText(username);
+               }
+            } else if (apistatus.equals("OFF")) {
+               radioApiOn.setSelected(false);
+               radioApiOff.setSelected(true);
+            }
+         }
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+
 
       LOG.debug("saveButton.setOnAction");
 
@@ -586,19 +626,23 @@ public class SettingsController {
    }
 
    private void handleApiOff() {
+      Map<String, String> propertiesToUpdate = new HashMap<>();
       setWebApplicationType("none");
+      propertiesToUpdate.put("api", "OFF");
+      propertyWrite(propertiesToUpdate);
    }
 
    private void handleApiOn() {
       username = authName.getText();
-      password = authPassword1.getText();
+      password = authPassword.getText();
 
       createAndSaveUser(username, password);
 
       Map<String, String> propertiesToUpdate = new HashMap<>();
       propertiesToUpdate.put("spring.main.web-application-type", "");
       propertiesToUpdate.put("server.port", authPort.getText());
-
+      propertiesToUpdate.put("api", "ON");
+      propertiesToUpdate.put("authUsername", username);
       propertyWrite(propertiesToUpdate);
    }
 
@@ -607,7 +651,6 @@ public class SettingsController {
    }
 
    private void createAndSaveUser(String username, String password) {
-      User user = new User();
       Authorities authorities = new Authorities();
 
       userRepository.deleteAll();
