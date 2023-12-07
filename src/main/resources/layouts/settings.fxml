@@ -372,16 +372,16 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
                      <children>
-                        <Label fx:id="labelUsername" layoutX="24.0" layoutY="169.0" text="Username:" />
+                        <Label layoutX="24.0" layoutY="169.0" text="Username:" />
                         <Label layoutX="14.0" layoutY="14.0" prefHeight="28.0" prefWidth="279.0" text="Rest API Authentication">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <Label fx:id="labelPassword" layoutX="24.0" layoutY="219.0" text="Password:" />
-                        <TextField fx:id="authName" layoutX="97.0" layoutY="166.0" prefHeight="26.0" prefWidth="298.0" />
+                        <Label layoutX="24.0" layoutY="219.0" text="Password:" />
+                        <TextField fx:id="authName" layoutX="97.0" layoutY="166.0" prefHeight="26.0" prefWidth="298.0" promptText="User" />
                         <Label layoutX="24.0" layoutY="70.0" text="Auth" />
-                        <Label fx:id="labelPort" layoutX="26.0" layoutY="124.0" text="Port:" />
+                        <Label layoutX="26.0" layoutY="124.0" text="Port:" />
                         <TextField fx:id="authPort" layoutX="97.0" layoutY="120.0" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
                         <RadioButton fx:id="radioApiOn" layoutX="88.0" layoutY="64.0" mnemonicParsing="false" text="ON">
                            <toggleGroup>
@@ -389,7 +389,7 @@
                            </toggleGroup>
                         </RadioButton>
                         <RadioButton fx:id="radioApiOff" layoutX="219.0" layoutY="64.0" mnemonicParsing="false" text="OFF" toggleGroup="$authAPI" />
-                        <PasswordField fx:id="authPassword" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" />
+                        <PasswordField fx:id="authPassword1" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" />
                      </children></AnchorPane>
                </content>
                <graphic>
