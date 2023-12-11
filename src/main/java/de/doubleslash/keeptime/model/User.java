@@ -31,6 +31,10 @@ public class User {
    }
 
    public String getUserName() {
-      return userName;
+      if (userName != null) {
+         return userName;
+      } else {
+         return "No username set";
+      }
    }
 }

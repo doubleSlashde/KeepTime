@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -62,6 +63,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
+import javax.print.attribute.standard.PrinterURI;
 
 @Component
 public class SettingsController {
@@ -212,17 +215,27 @@ public class SettingsController {
    @FXML
    private Label labelUsername;
 
-   User user = new User();
+   User user;
 
    @Autowired
    ViewController mainscreen;
 
    @Autowired
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties) {
+         ApplicationProperties applicationProperties, final UserRepository userRepository) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
+      this.userRepository = userRepository;
+      this.YYY();
+
+   }
+
+   private void YYY() {
+      final List<User> users = userRepository.findAll();
+      if (!users.isEmpty()) {
+         user = users.get(0);
+      }
    }
 
    @FXML
@@ -267,9 +280,7 @@ public class SettingsController {
                radioApiOn.setSelected(true);
                radioApiOff.setSelected(false);
                String port = properties.getProperty("server.port");
-//               String username = properties.getProperty(user.getUserName());
-//               System.err.println("'"+user.getUserName()+"'");
-               String username = properties.getProperty("authUsername");
+               authName.setText(user.getUserName());
                if (port != null) {
                   authPort.setText(port);
                }
@@ -284,7 +295,6 @@ public class SettingsController {
       } catch (IOException e) {
          e.printStackTrace();
       }
-
 
       LOG.debug("saveButton.setOnAction");
 
@@ -602,8 +612,16 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
       licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
       licenseRows.add(new LicenseTableRow("mapstruct", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("mapstruct-processor", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("jackson-databind", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("javax.xml.bind", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));//gleich
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));//gleich
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));//gleich
+      //      licenseRows.add(new LicenseTableRow("org.springframework.boot", Licenses.APACHEV2));
+      //      licenseRows.add(new LicenseTableRow("jaxb-api", Licenses.);//CDDL 1.1
+      licenseRows.add(new LicenseTableRow("jacoco-maven-plugin", Licenses.EPLV1));//EPL 2.0
+      licenseRows.add(new LicenseTableRow("maven-compiler-plugin", Licenses.APACHEV2));
 
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
