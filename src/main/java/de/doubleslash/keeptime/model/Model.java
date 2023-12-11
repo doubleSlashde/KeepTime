@@ -18,6 +18,7 @@ package de.doubleslash.keeptime.model;
 
 import java.util.Comparator;
 
+import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;

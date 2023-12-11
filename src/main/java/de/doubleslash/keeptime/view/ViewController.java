@@ -301,7 +301,6 @@ public class ViewController {
                   .bind(Bindings.createStringBinding(
                         () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
                         activeWorkSecondsProperty));
-
       // update ui each second
       new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
