@@ -615,12 +615,9 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("mapstruct-processor", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("jackson-databind", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("javax.xml.bind", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));//gleich
-      licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));//gleich
-      licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));//gleich
-      //      licenseRows.add(new LicenseTableRow("org.springframework.boot", Licenses.APACHEV2));
-      //      licenseRows.add(new LicenseTableRow("jaxb-api", Licenses.);//CDDL 1.1
-      licenseRows.add(new LicenseTableRow("jacoco-maven-plugin", Licenses.EPLV1));//EPL 2.0
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("maven-compiler-plugin", Licenses.APACHEV2));
 
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
