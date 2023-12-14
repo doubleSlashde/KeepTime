@@ -38,8 +38,4 @@ class WorkMapperTest {
 
       assertEquals(0, workDTO.getProject().getId());
    }
-
-   @Test
-   void workDTOToWork() {
-   }
 }
