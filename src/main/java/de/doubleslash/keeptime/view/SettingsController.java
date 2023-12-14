@@ -167,7 +167,6 @@ public class SettingsController {
    @Autowired
    ViewController mainscreen;
 
-   @Autowired
    public SettingsController(final Model model, final Controller controller,
          ApplicationProperties applicationProperties) {
       this.model = model;
@@ -183,7 +182,7 @@ public class SettingsController {
       LOG.debug("load substages");
       LOG.debug("set version label text");
 
-      if (OS.isLinux()) {
+      if (!OS.isWindows()) {
          LOG.info("Disabling unsupported settings for Linux.");
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
@@ -208,7 +207,7 @@ public class SettingsController {
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         if (OS.isLinux()) {
+         if (!OS.isWindows()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
                hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
                      (int) (hoverBackgroundColor.getValue().getGreen() * 255),
@@ -366,11 +365,13 @@ public class SettingsController {
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
             confirmationAlert.getDialogPane()
                              .setContent(new Label(
-                                   "Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n"
-                                         + "\n"
-                                         + "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n"
-                                         + "\n"
-                                         + "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
+                                   """
+                                   Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
+                                   
+                                   If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
+                                   
+                                   You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
+                                   """));
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -390,10 +391,14 @@ public class SettingsController {
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
-            // TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in
-            // the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
-            new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
-                  "-options", "FROM_1X");
+
+            if (file.getName().contains("H2-version-1")) {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
+                       "-options", "FROM_1X");
+               LOG.info("FROM_1X feature is used");
+            }else {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString());
+            }
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
 
@@ -403,8 +408,10 @@ public class SettingsController {
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
             informationDialog.getDialogPane()
-                             .setContent(new Label("KeepTime will now be CLOSED!\n"
-                                   + "You have to RESTART it again to see the changes"));
+                             .setContent(new Label("""
+                                   KeepTime will now be CLOSED!
+                                   You have to RESTART it again to see the changes\
+                                   """));
             informationDialog.showAndWait();
             Platform.exit();
 
@@ -433,7 +440,7 @@ public class SettingsController {
 
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(Paths.get(".").toFile());
-            fileChooser.setInitialFileName(String.format("KeepTime_database-export_H2-version-%s.sql", h2Version));
+            fileChooser.setInitialFileName("KeepTime_database-export_H2-version-%s.sql".formatted(h2Version));
             fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
             final File fileToSave = fileChooser.showSaveDialog(thisStage);
             if (fileToSave == null) {
@@ -522,9 +529,9 @@ public class SettingsController {
          final Alert alert = new Alert(AlertType.ERROR);
          alert.setTitle("Ooops");
          alert.setHeaderText("Could not find the license file");
-         alert.setContentText(String.format(
-               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
-               license.getPath(), license.getUrl()));
+         alert.setContentText(
+               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".".formatted(
+                     license.getPath(), license.getUrl()));
 
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 

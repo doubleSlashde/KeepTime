@@ -28,6 +28,6 @@ import de.doubleslash.keeptime.model.Work;
 @Repository
 public interface WorkRepository extends JpaRepository<Work, Long> {
 
-   @Query(value = "SELECT * FROM work WHERE CAST(start_time AS DATE) = ?1 ORDER BY start_time ASC", nativeQuery = true)
+   @Query(value = "SELECT w FROM Work w WHERE CAST(startTime AS DATE) = ?1 ORDER BY startTime ASC")
    List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
 }
