@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class ProjectReportTest {
+public class ProjectReportTest {
 
    /** The slf4j-logger for this class. */
    private static final Logger LOG = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -41,7 +41,7 @@ class ProjectReportTest {
    }
 
    @Test
-   void testAppendToWorkNotes_EmptyNoteAtStart() {
+   public void testAppendToWorkNotes_EmptyNoteAtStart() {
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       this.uut.appendToWorkNotes("note 1 ");
       this.uut.appendToWorkNotes("note 2 ");
@@ -50,7 +50,7 @@ class ProjectReportTest {
    }
 
    @Test
-   void testAppendToWorkNotes_EmptyNoteInTheMiddle() {
+   public void testAppendToWorkNotes_EmptyNoteInTheMiddle() {
       this.uut.appendToWorkNotes("note 1 ");
       this.uut.appendToWorkNotes(EMPTY_NOTE);
       this.uut.appendToWorkNotes("note 2 ");
@@ -59,7 +59,7 @@ class ProjectReportTest {
    }
 
    @Test
-   void testAppendToWorkNotes_NoEmptyNote() {
+   public void testAppendToWorkNotes_NoEmptyNote() {
       this.uut = new ProjectReport();
       this.uut.appendToWorkNotes("note 1");
       this.uut.appendToWorkNotes("note 2");
@@ -69,7 +69,7 @@ class ProjectReportTest {
    }
 
    @Test
-   void testAppendToWorkNotes_EmptyNotesAtTheEnd() {
+   public void testAppendToWorkNotes_EmptyNotesAtTheEnd() {
       this.uut = new ProjectReport();
       this.uut.appendToWorkNotes("note 1");
       this.uut.appendToWorkNotes("note 2");

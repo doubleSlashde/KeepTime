@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2023 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -14,24 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.persistenceconverter;
+package de.doubleslash.keeptime.REST_API.mapper;
 
-import javax.persistence.AttributeConverter;
+import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
+import de.doubleslash.keeptime.model.Work;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-import javafx.scene.paint.Color;
+@Mapper
+public interface WorkMapper {
+   WorkMapper INSTANCE = Mappers.getMapper(WorkMapper.class);
 
-public class ColorConverter implements AttributeConverter<Color, String> {
-   @Override
-   public Color convertToEntityAttribute(final String arg0) {
-      try {
-         return Color.valueOf(arg0);
-      } catch (final Exception e) {
-         return Color.BLACK;
-      }
-   }
+   WorkDTO workToWorkDTO(Work work);
 
-   @Override
-   public String convertToDatabaseColumn(final Color arg0) {
-      return arg0.toString();
-   }
+   Work workDTOToWork(WorkDTO workDTO);
 }
+
+

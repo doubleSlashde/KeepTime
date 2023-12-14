@@ -23,6 +23,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.model.Model;
@@ -61,6 +62,7 @@ public class ManageProjectController {
 
    private BooleanProperty formValidProperty = new SimpleBooleanProperty(false);
 
+   @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
    }

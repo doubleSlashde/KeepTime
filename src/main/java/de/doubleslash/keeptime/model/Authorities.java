@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2023 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -14,24 +14,33 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.persistenceconverter;
+package de.doubleslash.keeptime.model;
 
-import javax.persistence.AttributeConverter;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import javafx.scene.paint.Color;
+@Entity
+@Table(name = "AUTHORITIES")
+public class Authorities {
 
-public class ColorConverter implements AttributeConverter<Color, String> {
-   @Override
-   public Color convertToEntityAttribute(final String arg0) {
-      try {
-         return Color.valueOf(arg0);
-      } catch (final Exception e) {
-         return Color.BLACK;
-      }
+   @Id
+   @Column(name = "USERNAME")
+   private String userName;
+
+   @Column(name = "AUTHORITY")
+   private String authority;
+
+   public void setAuthority(final String authority) {
+      this.authority = authority;
    }
 
-   @Override
-   public String convertToDatabaseColumn(final Color arg0) {
-      return arg0.toString();
+   public void setUserName(final String userName) {
+      this.userName = userName;
+   }
+
+   public String getAuthority() {
+      return authority;
    }
 }

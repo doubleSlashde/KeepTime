@@ -16,6 +16,13 @@
 
 package de.doubleslash.keeptime.model;
 
+import java.util.Comparator;
+
+import de.doubleslash.keeptime.model.repos.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
+
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.SettingsRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
@@ -25,10 +32,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
-
-import java.util.Comparator;
 
 @Component
 public class Model {
@@ -36,6 +39,7 @@ public class Model {
    private WorkRepository workRepository;
    private SettingsRepository settingsRepository;
 
+   @Autowired
    public Model(final ProjectRepository projectRepository, final WorkRepository workRepository,
          final SettingsRepository settingsRepository) {
       super();

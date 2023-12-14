@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2023 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -14,24 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.persistenceconverter;
+package de.doubleslash.keeptime.model.repos;
 
-import javax.persistence.AttributeConverter;
+import de.doubleslash.keeptime.model.Authorities;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import javafx.scene.paint.Color;
-
-public class ColorConverter implements AttributeConverter<Color, String> {
-   @Override
-   public Color convertToEntityAttribute(final String arg0) {
-      try {
-         return Color.valueOf(arg0);
-      } catch (final Exception e) {
-         return Color.BLACK;
-      }
-   }
-
-   @Override
-   public String convertToDatabaseColumn(final Color arg0) {
-      return arg0.toString();
-   }
+@Repository
+public interface AuthoritiesRepository extends JpaRepository<Authorities, Long> {
+   Authorities findByUserName(String username);
 }

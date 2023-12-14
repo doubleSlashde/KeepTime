@@ -18,7 +18,15 @@ package de.doubleslash.keeptime.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Work")
@@ -28,9 +36,10 @@ public class Work {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
+   @NotNull
    private LocalDateTime startTime;
+   @NotNull
    private LocalDateTime endTime;
-
    @ManyToOne
    private Project project;
    @Lob
@@ -88,5 +97,4 @@ public class Work {
       return "Work [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", projectName="
             + project.getName() + ", notes=" + notes + "]";
    }
-
 }
