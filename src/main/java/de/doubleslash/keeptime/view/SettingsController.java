@@ -226,14 +226,20 @@ public class SettingsController {
       this.controller = controller;
       this.applicationProperties = applicationProperties;
       this.userRepository = userRepository;
-      this.YYY();
+      this.setDefaultUserAndPassword();
 
    }
 
-   private void YYY() {
+   private void setDefaultUserAndPassword() {
       final List<User> users = userRepository.findAll();
       if (!users.isEmpty()) {
          user = users.get(0);
+      } else {
+
+         user = new User();
+         user.setUserName("user");
+         user.setPassword("123");
+         user.setEnabled(true);
       }
    }
 
