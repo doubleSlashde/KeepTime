@@ -16,18 +16,11 @@
 
 package de.doubleslash.keeptime.model;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.Table;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PositiveOrZero;
+import jakarta.persistence.*;
 
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
 import javafx.scene.paint.Color;
 
 @Entity
@@ -45,7 +38,7 @@ public class Project {
    @Lob
    private String description;
 
-   @Convert(converter = ColorConverter.class, disableConversion = false)
+   @Convert(converter = ColorConverter.class)
    private Color color;
 
    private boolean isWork;
