@@ -286,8 +286,8 @@ public class SettingsController {
                radioApiOff.setSelected(false);
                String port = properties.getProperty("server.port");
 
-               if(user!=null){
-               authName.setText(user.getUserName());
+               if (user != null) {
+                  authName.setText(user.getUserName());
                }
                if (port != null) {
                   authPort.setText(port);
@@ -474,15 +474,13 @@ public class SettingsController {
 
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.getDialogPane()
-                             .setContent(new Label(
-                                   """
-                                   Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
-                                   
-                                   If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
-                                   
-                                   You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
-                                   """));
+            confirmationAlert.getDialogPane().setContent(new Label("""
+                  Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
+                                                     
+                  If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
+                                                     
+                  You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
+                  """));
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -504,11 +502,12 @@ public class SettingsController {
             final String password = applicationProperties.getSpringDataSourcePassword();
 
             if (file.getName().contains("H2-version-1")) {
-               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
-                       "-options", "FROM_1X");
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString(), "-options", "FROM_1X");
                LOG.info("FROM_1X feature is used");
-            }else {
-               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString());
+            } else {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString());
             }
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
@@ -518,11 +517,10 @@ public class SettingsController {
 
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.getDialogPane()
-                             .setContent(new Label("""
-                                   KeepTime will now be CLOSED!
-                                   You have to RESTART it again to see the changes\
-                                   """));
+            informationDialog.getDialogPane().setContent(new Label("""
+                  KeepTime will now be CLOSED!
+                  You have to RESTART it again to see the changes\
+                  """));
             informationDialog.showAndWait();
             Platform.exit();
 
@@ -629,13 +627,9 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
       licenseRows.add(new LicenseTableRow("mapstruct", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("mapstruct-processor", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("jackson-databind", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("javax.xml.bind", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));
       licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));
-      licenseRows.add(new LicenseTableRow("maven-compiler-plugin", Licenses.APACHEV2));
-
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
       return licenseRows;
