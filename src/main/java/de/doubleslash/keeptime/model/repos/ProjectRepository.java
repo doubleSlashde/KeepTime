@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+
 package de.doubleslash.keeptime.model.repos;
 
 import org.springframework.data.jpa.repository.JpaRepository;
