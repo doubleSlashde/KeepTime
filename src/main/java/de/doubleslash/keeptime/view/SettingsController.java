@@ -17,10 +17,22 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
+import de.doubleslash.keeptime.model.Authorities;
+import de.doubleslash.keeptime.model.User;
+import de.doubleslash.keeptime.model.repos.AuthoritiesRepository;
+import de.doubleslash.keeptime.model.repos.UserRepository;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -51,6 +63,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
+import javax.print.attribute.standard.PrinterURI;
 
 @Component
 public class SettingsController {
@@ -152,6 +166,31 @@ public class SettingsController {
    @FXML
    private Region licensesIcon;
 
+   @FXML
+   private TextField authName;
+
+   @FXML
+   private PasswordField authPassword;
+
+   private ToggleGroup toggleGroup;
+
+   @FXML
+   private RadioButton radioApiOff;
+
+   @FXML
+   private RadioButton radioApiOn;
+
+   @Autowired
+   private UserRepository userRepository;
+
+   @Autowired
+   private AuthoritiesRepository authoritiesRepository;
+
+   @FXML
+   private TextField authPort;
+
+   private String propertiesFilePath = "application.properties";
+
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
@@ -164,15 +203,44 @@ public class SettingsController {
 
    private Stage thisStage;
 
+   private String username;
+   private String password;
+
+   @FXML
+   private Label labelPassword;
+
+   @FXML
+   private Label labelPort;
+
+   @FXML
+   private Label labelUsername;
+
+   User user;
+
    @Autowired
    ViewController mainscreen;
 
-   @Autowired
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties) {
+         ApplicationProperties applicationProperties, final UserRepository userRepository) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
+      this.userRepository = userRepository;
+      this.setDefaultUserAndPassword();
+
+   }
+
+   private void setDefaultUserAndPassword() {
+      final List<User> users = userRepository.findAll();
+      if (!users.isEmpty()) {
+         user = users.get(0);
+      } else {
+
+         user = new User();
+         user.setUserName("user");
+         user.setPassword("123");
+         user.setEnabled(true);
+      }
    }
 
    @FXML
@@ -183,7 +251,7 @@ public class SettingsController {
       LOG.debug("load substages");
       LOG.debug("set version label text");
 
-      if (OS.isLinux()) {
+      if (!OS.isWindows()) {
          LOG.info("Disabling unsupported settings for Linux.");
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
@@ -204,11 +272,52 @@ public class SettingsController {
       initExportButton();
       initImportButton();
 
+      toggleGroup = new ToggleGroup();
+      radioApiOff.setToggleGroup(toggleGroup);
+      radioApiOn.setToggleGroup(toggleGroup);
+
+      Properties properties = new Properties();
+      try (FileInputStream input = new FileInputStream(propertiesFilePath)) {
+         properties.load(input);
+         String apistatus = properties.getProperty("api");
+         if (apistatus != null) {
+            if (apistatus.equals("ON")) {
+               radioApiOn.setSelected(true);
+               radioApiOff.setSelected(false);
+               String port = properties.getProperty("server.port");
+
+               if (user != null) {
+                  authName.setText(user.getUserName());
+               }
+               if (port != null) {
+                  authPort.setText(port);
+               }
+               if (username != null) {
+                  authName.setText(username);
+               }
+            } else if (apistatus.equals("OFF")) {
+               radioApiOn.setSelected(false);
+               radioApiOff.setSelected(true);
+            }
+         }
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+
       LOG.debug("saveButton.setOnAction");
+
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         if (OS.isLinux()) {
+         RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
+
+         if (selectedRadioButton == radioApiOff) {
+            handleApiOff();
+         } else if (selectedRadioButton == radioApiOn) {
+            handleApiOn();
+         }
+
+         if (!OS.isWindows()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
                hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
                      (int) (hoverBackgroundColor.getValue().getGreen() * 255),
@@ -275,6 +384,7 @@ public class SettingsController {
 
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
+
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
@@ -364,13 +474,13 @@ public class SettingsController {
 
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.getDialogPane()
-                             .setContent(new Label(
-                                   "Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n"
-                                         + "\n"
-                                         + "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n"
-                                         + "\n"
-                                         + "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
+            confirmationAlert.getDialogPane().setContent(new Label("""
+                  Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
+                                                     
+                  If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
+                                                     
+                  You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
+                  """));
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -390,10 +500,15 @@ public class SettingsController {
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
-            // TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in
-            // the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
-            new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
-                  "-options", "FROM_1X");
+
+            if (file.getName().contains("H2-version-1")) {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString(), "-options", "FROM_1X");
+               LOG.info("FROM_1X feature is used");
+            } else {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString());
+            }
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
 
@@ -402,9 +517,10 @@ public class SettingsController {
 
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.getDialogPane()
-                             .setContent(new Label("KeepTime will now be CLOSED!\n"
-                                   + "You have to RESTART it again to see the changes"));
+            informationDialog.getDialogPane().setContent(new Label("""
+                  KeepTime will now be CLOSED!
+                  You have to RESTART it again to see the changes\
+                  """));
             informationDialog.showAndWait();
             Platform.exit();
 
@@ -418,9 +534,7 @@ public class SettingsController {
 
             errorDialog.showAndWait();
          }
-
       });
-
    }
 
    private void initExportButton() {
@@ -433,7 +547,7 @@ public class SettingsController {
 
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(Paths.get(".").toFile());
-            fileChooser.setInitialFileName(String.format("KeepTime_database-export_H2-version-%s.sql", h2Version));
+            fileChooser.setInitialFileName("KeepTime_database-export_H2-version-%s.sql".formatted(h2Version));
             fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
             final File fileToSave = fileChooser.showSaveDialog(thisStage);
             if (fileToSave == null) {
@@ -511,7 +625,11 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
       licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
-
+      licenseRows.add(new LicenseTableRow("mapstruct", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("mapstruct-processor", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
       return licenseRows;
@@ -522,13 +640,87 @@ public class SettingsController {
          final Alert alert = new Alert(AlertType.ERROR);
          alert.setTitle("Ooops");
          alert.setHeaderText("Could not find the license file");
-         alert.setContentText(String.format(
-               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
-               license.getPath(), license.getUrl()));
+         alert.setContentText(
+               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".".formatted(
+                     license.getPath(), license.getUrl()));
 
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
          alert.show();
+      }
+   }
+
+   private void handleApiOff() {
+      Map<String, String> propertiesToUpdate = new HashMap<>();
+      setWebApplicationType("none");
+      propertiesToUpdate.put("api", "OFF");
+      propertyWrite(propertiesToUpdate);
+   }
+
+   private void handleApiOn() {
+      username = authName.getText();
+      password = authPassword.getText();
+
+      createAndSaveUser(username, password);
+
+      Map<String, String> propertiesToUpdate = new HashMap<>();
+      propertiesToUpdate.put("spring.main.web-application-type", "");
+      propertiesToUpdate.put("server.port", authPort.getText());
+      propertiesToUpdate.put("api", "ON");
+      propertiesToUpdate.put("authUsername", username);
+      propertyWrite(propertiesToUpdate);
+   }
+
+   private void setWebApplicationType(String value) {
+      propertyWrite("spring.main.web-application-type", value);
+   }
+
+   private void createAndSaveUser(String username, String password) {
+      Authorities authorities = new Authorities();
+
+      userRepository.deleteAll();
+      authoritiesRepository.deleteAll();
+
+      user.setUserName(username);
+      user.setPassword("{noop}" + password);
+      user.setEnabled(true);
+
+      authorities.setUserName(username);
+      authorities.setAuthority("ROLE_USER");
+
+      userRepository.save(user);
+      authoritiesRepository.save(authorities);
+   }
+
+   private void propertyWrite(String key, String value) {
+      Properties properties = new Properties();
+      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
+            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
+
+         properties.load(inputStream);
+         properties.setProperty(key, value);
+         properties.store(outputStream, null);
+
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+   }
+
+   private void propertyWrite(Map<String, String> propertiesToUpdate) {
+      Properties properties = new Properties();
+      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
+            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
+
+         properties.load(inputStream);
+
+         for (Map.Entry<String, String> entry : propertiesToUpdate.entrySet()) {
+            properties.setProperty(entry.getKey(), entry.getValue());
+         }
+
+         properties.store(outputStream, null);
+
+      } catch (IOException e) {
+         e.printStackTrace();
       }
    }
 }

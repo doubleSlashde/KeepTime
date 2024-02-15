@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
@@ -160,7 +159,6 @@ public class ViewController {
 
    private ProjectsListViewController projectsListViewController;
 
-   @Autowired
    public ViewController(final Model model, final Controller controller) {
       this.model = model;
       this.controller = controller;
@@ -257,9 +255,11 @@ public class ViewController {
          textAreaColorRunnable.run();
 
          model.activeWorkItem.addListener((a, b, c) -> {
-            updateProjectView();
-            textArea.setText("");
-            textArea.requestFocus();
+            Platform.runLater(() -> {
+               updateProjectView();
+               textArea.setText("");
+               textArea.requestFocus();
+            });
          });
 
          model.defaultBackgroundColor.addListener((a, b, c) -> updateMainBackgroundColor.run());
@@ -299,7 +299,6 @@ public class ViewController {
                   .bind(Bindings.createStringBinding(
                         () -> DateFormatter.secondsToHHMMSS(activeWorkSecondsProperty.get()),
                         activeWorkSecondsProperty));
-
       // update ui each second
       new Interval(1).registerCallBack(() -> {
          final LocalDateTime now = LocalDateTime.now();
@@ -495,7 +494,7 @@ public class ViewController {
       try {
          grid = loader.load();
       } catch (final IOException e) {
-         throw new FXMLLoaderException(String.format("Error while loading '%s'.", RESOURCE.FXML_MANAGE_PROJECT), e);
+         throw new FXMLLoaderException("Error while loading '%s'.".formatted(RESOURCE.FXML_MANAGE_PROJECT), e);
       }
 
       dialog.getDialogPane().setContent(grid);

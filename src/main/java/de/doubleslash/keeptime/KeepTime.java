@@ -16,8 +16,14 @@
 
 package de.doubleslash.keeptime;
 
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.stereotype.Component;
+
 import static javafx.application.Application.launch;
 
+@SpringBootApplication
+@ComponentScan(basePackages = "de.doubleslash.keeptime")
 public class KeepTime {
     public static void main(final String[] args) {
         launch(App.class, args);

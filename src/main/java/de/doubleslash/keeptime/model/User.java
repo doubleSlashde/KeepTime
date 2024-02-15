@@ -16,12 +16,38 @@
 
 package de.doubleslash.keeptime.model;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import jakarta.persistence.*;
 
-public class ScreenSettings {
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> proportionalX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> proportionalY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+@Table(name = "Users")
+@Entity
+public class User {
+
+   @Id
+   @Column(name = "USERNAME")
+   private String userName;
+
+   @Column(name = "PASSWORD")
+   private String password;
+   @Column(name = "ENABLED")
+   private boolean enabled;
+
+   public void setUserName(final String userName) {
+      this.userName = userName;
+   }
+
+   public void setPassword(final String password) {
+      this.password = password;
+   }
+
+   public void setEnabled(final boolean enabled) {
+      this.enabled = enabled;
+   }
+
+   public String getUserName() {
+      if (userName != null) {
+         return userName;
+      } else {
+         return "No username set";
+      }
+   }
 }

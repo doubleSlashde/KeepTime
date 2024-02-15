@@ -14,14 +14,43 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model;
+package de.doubleslash.keeptime.REST_API.DTO;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+public class ColorDTO {
+   private double red;
+   private double green;
+   private double blue;
+   private double opacity;
 
-public class ScreenSettings {
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> proportionalX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> proportionalY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+   public double getRed() {
+      return red;
+   }
+
+   public void setRed(double red) {
+      this.red = red;
+   }
+
+   public double getGreen() {
+      return green;
+   }
+
+   public void setGreen(double green) {
+      this.green = green;
+   }
+
+   public double getBlue() {
+      return blue;
+   }
+
+   public void setBlue(double blue) {
+      this.blue = blue;
+   }
+
+   public double getOpacity() {
+      return opacity;
+   }
+
+   public void setOpacity(double opacity) {
+      this.opacity = opacity;
+   }
 }

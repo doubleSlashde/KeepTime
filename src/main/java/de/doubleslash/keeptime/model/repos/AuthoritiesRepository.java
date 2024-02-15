@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2024 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -16,18 +16,11 @@
 
 package de.doubleslash.keeptime.model.repos;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import de.doubleslash.keeptime.model.Authorities;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import de.doubleslash.keeptime.model.Work;
-
 @Repository
-public interface WorkRepository extends JpaRepository<Work, Long> {
-
-   @Query(value = "SELECT w FROM Work w WHERE CAST(startTime AS DATE) = ?1 ORDER BY startTime ASC")
-   List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
+public interface AuthoritiesRepository extends JpaRepository<Authorities, Long> {
+   Authorities findByUserName(String username);
 }

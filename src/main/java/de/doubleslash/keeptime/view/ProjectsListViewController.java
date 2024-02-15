@@ -343,7 +343,7 @@ public class ProjectsListViewController {
       if (p.getDescription() == null || p.getDescription().isEmpty()) {
          return p.getName();
       } else {
-         return String.format("%s%n%s", p.getName(), p.getDescription());
+         return "%s%n%s".formatted(p.getName(), p.getDescription());
       }
    }
 

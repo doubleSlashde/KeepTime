@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2024 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -14,20 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.repos;
+package de.doubleslash.keeptime.model;
 
-import java.time.LocalDate;
-import java.util.List;
+import jakarta.persistence.*;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
-import de.doubleslash.keeptime.model.Work;
+@Entity
+@Table(name = "AUTHORITIES")
+public class Authorities {
 
-@Repository
-public interface WorkRepository extends JpaRepository<Work, Long> {
+   @Id
+   @Column(name = "USERNAME")
+   private String userName;
 
-   @Query(value = "SELECT w FROM Work w WHERE CAST(startTime AS DATE) = ?1 ORDER BY startTime ASC")
-   List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
+   @Column(name = "AUTHORITY")
+   private String authority;
+
+   public void setAuthority(final String authority) {
+      this.authority = authority;
+   }
+
+   public void setUserName(final String userName) {
+      this.userName = userName;
+   }
+
+   public String getAuthority() {
+      return authority;
+   }
 }

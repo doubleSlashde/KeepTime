@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2024 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -14,20 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.repos;
+package de.doubleslash.keeptime.REST_API.mapper;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
-
+import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
 import de.doubleslash.keeptime.model.Work;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Repository
-public interface WorkRepository extends JpaRepository<Work, Long> {
+@Mapper
+public interface WorkMapper {
+   WorkMapper INSTANCE = Mappers.getMapper(WorkMapper.class);
 
-   @Query(value = "SELECT w FROM Work w WHERE CAST(startTime AS DATE) = ?1 ORDER BY startTime ASC")
-   List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
+   WorkDTO workToWorkDTO(Work work);
+
+   Work workDTOToWork(WorkDTO workDTO);
 }
+
+
