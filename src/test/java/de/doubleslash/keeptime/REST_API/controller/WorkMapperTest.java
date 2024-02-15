@@ -1,15 +1,3 @@
-package de.doubleslash.keeptime.REST_API.controller;
-
-import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
-import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
-import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
-import javafx.scene.paint.Color;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 // Copyright 2024 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
@@ -25,6 +13,20 @@ import static org.junit.jupiter.api.Assertions.*;
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+package de.doubleslash.keeptime.REST_API.controller;
+
+import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
+import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
+import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
+import javafx.scene.paint.Color;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class WorkMapperTest {
