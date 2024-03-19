@@ -16,20 +16,11 @@
 
 package de.doubleslash.keeptime.view;
 
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.controller.report.Report;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
@@ -57,6 +48,14 @@ import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ReportController {
@@ -70,43 +69,29 @@ public class ReportController {
    private static final String FX_BACKGROUND_COLOR_WORKED = "-fx-background-color: #00a5e1;";
 
    private static final String EDIT_WORK_DIALOG_TITLE = "Edit work";
-
+   private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
+   private final Model model;
+   private final Controller controller;
+   private final TreeItem<TableRow> rootItem = new TreeItem<>();
    @FXML
    private BorderPane topBorderPane;
-
    @FXML
    private Label currentDayLabel;
    @FXML
    private Label currentDayWorkTimeLabel;
    @FXML
    private Label currentDayTimeLabel;
-
    @FXML
    private TreeTableView<TableRow> workTableTreeView;
-
    @FXML
    private AnchorPane reportRoot;
-
    @FXML
    private Canvas colorTimeLineCanvas;
-
    @FXML
    private Button expandCollapseButton;
-
-   private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
-
-   private final Model model;
-
-   private final Controller controller;
-
    private Stage stage;
-
    private ColorTimeLine colorTimeLine;
-
    private LocalDate currentReportDate;
-
-   private final TreeItem<TableRow> rootItem = new TreeItem<>();
-
    private boolean expanded = true;
 
    public ReportController(final Model model, final Controller controller) {
@@ -121,7 +106,7 @@ public class ReportController {
 
       colorTimeLine = new ColorTimeLine(colorTimeLineCanvas);
 
-      expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
+      expandCollapseButton.setOnMouseClicked(event -> toggleCollapseExpandReport());
       initTableView();
    }
 
@@ -211,74 +196,62 @@ public class ReportController {
       rootItem.setExpanded(true);
    }
 
-   private void toggleCollapseExpandReport(){
+   private void toggleCollapseExpandReport() {
 
-      if(expanded){
+      if (expanded) {
          expandAll(false);
          expandCollapseButton.setText("Expand");
 
-      }else {
+      } else {
          expandAll(true);
          expandCollapseButton.setText("Collapse");
       }
       expanded = !expanded;
    }
 
-   private void expandAll(boolean expand){
-      for (int i=0; i<rootItem.getChildren().size(); i++){
+   private void expandAll(boolean expand) {
+      for (int i = 0; i < rootItem.getChildren().size(); i++) {
          rootItem.getChildren().get(i).setExpanded(expand);
       }
    }
+
    private void updateReport(final LocalDate dateToShow) {
+      Report report = new Report(dateToShow, model, controller);
+
       this.currentReportDate = dateToShow;
       rootItem.getChildren().clear();
       reportRoot.requestFocus();
 
-      this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
-      final List<Work> currentWorkItems = model.getWorkRepository()
-                                               .findByStartDateOrderByStartTimeAsc(this.currentReportDate);
+      this.currentDayLabel.setText(report.getDateString());
 
-      colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
+      colorTimeLine.update(report.getWorkItems(), report.getWorkItemsSeconds());
 
-      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream()
-                                                                   .map(Work::getProject)
-                                                                   .collect(Collectors.toCollection(() -> new TreeSet<>(
-                                                                         Comparator.comparing(Project::getIndex))));
-
-      long currentWorkSeconds = 0;
-      long currentSeconds = 0;
-
-      for (final Project project : workedProjectsSet) {
-         final List<Work> onlyCurrentProjectWork = currentWorkItems.stream()
-                                                                   .filter(w -> w.getProject() == project)
-                                                                   .collect(Collectors.toList());
-
-         final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
-
-         currentSeconds += projectWorkSeconds;
-         if (project.isWork()) {
-            currentWorkSeconds += projectWorkSeconds;
-         }
+      for (Project project : report.getWorkedProjectsSet()) {
+         final List<Work> projectWorks = report.getWorkItems()
+                                               .stream()
+                                               .filter(w -> w.getProject().getId() == project.getId())
+                                               .toList();
 
          final HBox projectButtonBox = new HBox();
-         projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
-
+         projectButtonBox.getChildren().add(createCopyProjectButton(projectWorks));
          final TreeItem<TableRow> projectRow = new TreeItem<>(
-               new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
+               new ProjectTableRow(project, report.getProjectWorkSecondsMap().get(project.getId()), projectButtonBox));
 
-         for (final Work w : onlyCurrentProjectWork) {
+         for (final Work work : projectWorks) {
             final HBox workButtonBox = new HBox(5.0);
-            if(w.getId()==model.activeWorkItem.get().getId()){
+
+            if (work.getId() == model.activeWorkItem.get().getId() || work.getId() == 0) {
                Label label = new Label("Active Work");
-               label.setTooltip(new Tooltip("The active work item cannot be edited as it is currently active. To edit it you need to switch to another work first."));
+               label.setTooltip(new Tooltip(
+                     "The active work item cannot be edited as it is currently active. To edit it you need to switch to another work first."));
                label.setStyle("-fx-font-weight: bold");
                workButtonBox.getChildren().add(label);
-            }else {
-               workButtonBox.getChildren().add(createCopyWorkButton(w));
-               workButtonBox.getChildren().add(createEditWorkButton(w));
-               workButtonBox.getChildren().add(createDeleteWorkButton(w));
+            } else {
+               workButtonBox.getChildren().add(createCopyWorkButton(work));
+               workButtonBox.getChildren().add(createEditWorkButton(work));
+               workButtonBox.getChildren().add(createDeleteWorkButton(work));
             }
-            final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(w, workButtonBox));
+            final TreeItem<TableRow> workRow = new TreeItem<>(new WorkTableRow(work, workButtonBox));
             projectRow.getChildren().add(workRow);
          }
 
@@ -287,8 +260,8 @@ public class ReportController {
 
       }
 
-      this.currentDayTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentSeconds));
-      this.currentDayWorkTimeLabel.setText(DateFormatter.secondsToHHMMSS(currentWorkSeconds));
+      this.currentDayTimeLabel.setText(report.getPresentTimeString());
+      this.currentDayWorkTimeLabel.setText(report.getWorkTimeString());
 
       loadCalenderWidget();
 
