@@ -32,11 +32,10 @@ public class CalculateReportTest {
    private static Controller controller;
    private Model model;
    private DateProvider mockedDateProvider;
-   private WorkRepository mockedWorkRepository;
 
    @BeforeEach
    void beforeTest() {
-      mockedWorkRepository = Mockito.mock(WorkRepository.class);
+      WorkRepository mockedWorkRepository = Mockito.mock(WorkRepository.class);
       mockedDateProvider = Mockito.mock(DateProvider.class);
       model = new Model(Mockito.mock(ProjectRepository.class), mockedWorkRepository,
             Mockito.mock(SettingsRepository.class));
@@ -207,13 +206,7 @@ public class CalculateReportTest {
 
       LocalDate date = mockedDateProvider.dateTimeNow().toLocalDate();
 
-      LocalDateTime now = mockedDateProvider.dateTimeNow();
-      LocalDateTime startTime = mockedDateProvider.dateTimeNow().minusSeconds(120);
       LocalDateTime endTime = mockedDateProvider.dateTimeNow().minusSeconds(10);
-
-      List<Work> workList = new ArrayList<>();
-      Project presentProject = new Project("Idle", "description", Color.ORANGE, false, 0, true);
-      workList.add(new Work(startTime, endTime, presentProject, "notes"));
 
       Project newProject = new Project("project", "description", Color.WHITE, true, 1);
       Work unsavedWork = new Work(endTime, endTime, newProject, "");
