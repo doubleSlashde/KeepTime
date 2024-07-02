@@ -109,6 +109,4 @@ class WorkMapperTest {
       assertEquals(projectDTO.getId(), work.getProject().getId());
       assertEquals(notes, work.getNotes());
    }
-
-
 }

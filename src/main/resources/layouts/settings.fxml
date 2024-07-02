@@ -390,6 +390,12 @@
                 </RadioButton>
                 <RadioButton fx:id="radioApiOff" layoutX="219.0" layoutY="64.0" mnemonicParsing="false" text="OFF" toggleGroup="$authAPI" />
                 <PasswordField fx:id="authPassword" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" />
+                        <Label layoutX="24.0" layoutY="261.0" prefHeight="18.0" prefWidth="286.0" text="Warning this is a beta feature" textFill="#bf5d24">
+                           <font>
+                              <Font name="System Bold" size="12.0" />
+                           </font>
+                        </Label>
+                        <Label layoutX="26.0" layoutY="279.0" text="The change will not take effect until the next start " />
               </children></AnchorPane>
           </content>
           <graphic>
