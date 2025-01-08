@@ -64,7 +64,8 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 7. To see the changes just start the new KeepTime again
 
 ## Requirements
-
-* Windows 7, 10
-* Linux (tested on Ubuntu 18.04)
-* Java 11
+* Operating System
+  * Windows 7, 10, 11
+  * Linux (tested on Ubuntu 18.04)
+  * Mac (tested on MacBook M2 Pro (ARM based CPU))
+* Java 17

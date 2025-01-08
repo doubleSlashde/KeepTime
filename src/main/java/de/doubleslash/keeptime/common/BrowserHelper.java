@@ -35,7 +35,8 @@ public class BrowserHelper {
       } else if (OS.isLinux()) {
          openUrlLinux(rt, url);
       } else {
-         LOG.warn("OS is not supported");
+         // TODO implement for MAC
+         LOG.warn("OS '{}' is not supported", OS.getOSName());
       }
    }
 
@@ -45,7 +46,7 @@ public class BrowserHelper {
          LOG.debug("Executing command: {}", command);
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error("Could not open url '" + url + "' with command '" + command + "'.", e);
+         LOG.error("Could not open url '{}' with command '{}'.", url, command, e);
       }
    }
 
@@ -57,7 +58,7 @@ public class BrowserHelper {
          LOG.debug("Executing command: {}", Arrays.toString(command));
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error("Could not open url '" + url + "' with command '" + Arrays.toString(command) + "'.", e);
+         LOG.error("Could not open url '{}' with command '{}'.", url, Arrays.toString(command), e);
       }
    }
 }

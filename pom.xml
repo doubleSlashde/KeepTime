@@ -12,7 +12,7 @@
   </parent>
   <groupId>de.doubleslash</groupId>
   <artifactId>keeptime</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>${project.version}</version>
 
   <packaging>jar</packaging>
   <name>KeepTime</name>
@@ -33,6 +33,7 @@
   </licenses>
 
   <properties>
+    <project.version>2.0.0-SNAPSHOT</project.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>17</java.version>

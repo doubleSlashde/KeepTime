@@ -177,13 +177,13 @@ public class SettingsController {
    @FXML
    private void initialize() {
       LOG.debug("start init");
-      LOG.info("OS: {}", OS.getOSname());
+      LOG.info("OS: {}", OS.getOSName());
       LOG.debug("set versionLabel text");
       LOG.debug("load substages");
       LOG.debug("set version label text");
 
       if (!OS.isWindows()) {
-         LOG.info("Disabling unsupported settings for Linux.");
+         LOG.info("Disabling unsupported settings (hotkey) for non windows feature.");
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
@@ -217,7 +217,7 @@ public class SettingsController {
                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                alert.setHeaderText("Color setting not supported!");
                alert.setContentText(
-                     "The level of opacity on your hover background is to high for Linux. Resetting it.");
+                     "The level of opacity on your hover background is to low (<0.5) for non Windows system. Resetting it.");
 
                alert.showAndWait();
             }
@@ -230,7 +230,7 @@ public class SettingsController {
                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                alert.setHeaderText("Color settings not supported!");
                alert.setContentText(
-                     "The level of opacity on your hover background is to high for Linux. Resetting it.");
+                     "The level of opacity on your default background is to low (<0.5) for non Windows system. Resetting it.");
 
                alert.showAndWait();
             }

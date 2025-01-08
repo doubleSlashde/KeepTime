@@ -25,22 +25,14 @@ public class OS {
    }
 
    public static boolean isWindows() {
-      if (System.getProperty(OS_PROPERTY).toLowerCase().contains("windows")) {
-         return true;
-      }
-
-      return false;
+     return System.getProperty(OS_PROPERTY).toLowerCase().contains("windows");
    }
 
    public static boolean isLinux() {
-      if (System.getProperty(OS_PROPERTY).toLowerCase().contains("linux")) {
-         return true;
-      }
-
-      return false;
+     return System.getProperty(OS_PROPERTY).toLowerCase().contains("linux");
    }
 
-   public static String getOSname() {
+   public static String getOSName() {
       return System.getProperty(OS_PROPERTY);
    }
 

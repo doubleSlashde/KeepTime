@@ -32,18 +32,20 @@ public class FileOpenHelper {
       final File file = new File(filePath);
       final Runtime rt = Runtime.getRuntime();
 
-      if (file.exists() && file.isFile()) {
-         if (OS.isWindows()) {
-            openFileWindows(rt, file);
-         } else if (OS.isLinux()) {
-            openFileLinux(rt, filePath);
-         } else {
-            LOG.warn("OS is not supported");
-         }
-         return true;
-      } else {
+      if (!file.exists() || file.isFile()) {
+         LOG.warn("Filepath does not seem to exist or does not point to a file: '{}'.", filePath);
          return false;
       }
+
+      if (OS.isWindows()) {
+         openFileWindows(rt, file);
+      } else if (OS.isLinux()) {
+         openFileLinux(rt, filePath);
+      } else {
+         // TODO implement for MAC
+         LOG.warn("OS '{}' is not supported", OS.getOSName());
+      }
+      return true;
    }
 
    private static void openFileWindows(final Runtime rt, final File file) {
@@ -52,7 +54,7 @@ public class FileOpenHelper {
          LOG.debug("executing command: {}", command);
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error("Could not open file '" + file + "' with command '" + command + "'.", e);
+         LOG.error("Could not open file '{}' with command '{}'.", file, command, e);
       }
    }
 
@@ -64,7 +66,8 @@ public class FileOpenHelper {
          LOG.debug("executing command: {}", Arrays.toString(command));
          rt.exec(command);
       } catch (final Exception e) {
-         LOG.error("Could not open file '" + filePath + "' with command '" + Arrays.toString(command) + "'.", e);
+         LOG.error("Could not open file '{}' with command '{}'.", filePath, Arrays.toString(command),
+            e);
       }
    }
 }
