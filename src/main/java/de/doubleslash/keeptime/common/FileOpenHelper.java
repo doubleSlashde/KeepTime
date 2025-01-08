@@ -42,7 +42,6 @@ public class FileOpenHelper {
       } else if (OS.isLinux()) {
          openFileLinux(rt, filePath);
       } else {
-         // TODO implement for MAC
          LOG.warn("OS '{}' is not supported", OS.getOSName());
       }
       return true;
