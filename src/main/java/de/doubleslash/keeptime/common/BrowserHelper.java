@@ -34,14 +34,29 @@ public class BrowserHelper {
          openUrlWindows(rt, url);
       } else if (OS.isLinux()) {
          openUrlLinux(rt, url);
+      } else if (OS.isMacOS()) {
+         openUrlMac(rt, url);
       } else {
-         // TODO implement for MAC
          LOG.warn("OS '{}' is not supported", OS.getOSName());
       }
    }
 
    private static void openUrlWindows(final Runtime rt, final String url) {
       final String command = "rundll32 url.dll,FileProtocolHandler " + url;
+      executeCommand(rt, command, url);
+   }
+
+   private static void openUrlLinux(final Runtime rt, final String url) {
+      final String[] command = {"xdg-open", url};
+      executeCommand(rt, command, url); 
+   }
+
+   private static void openUrlMac(final Runtime rt, final String url) {
+      final String[] command = {"open", url};
+      executeCommand(rt, command, url);
+   }
+
+   private static void executeCommand(final Runtime rt, final String command, final String url) {
       try {
          LOG.debug("Executing command: {}", command);
          rt.exec(command);
@@ -50,13 +65,10 @@ public class BrowserHelper {
       }
    }
 
-   private static void openUrlLinux(final Runtime rt, final String url) {
-      final String[] command = {
-            "xdg-open", url
-      };
+   private static void executeCommand(final Runtime rt, final String[] command, final String url) {
       try {
          LOG.debug("Executing command: {}", Arrays.toString(command));
-         rt.exec(command);
+         rt.exec(command); 
       } catch (final Exception e) {
          LOG.error("Could not open url '{}' with command '{}'.", url, Arrays.toString(command), e);
       }

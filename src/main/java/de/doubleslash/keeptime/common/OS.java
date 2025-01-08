@@ -36,4 +36,8 @@ public class OS {
       return System.getProperty(OS_PROPERTY);
    }
 
+   public static boolean isMacOS() {
+       return getOSName().toLowerCase().contains("mac os x");
+   }
+
 }
