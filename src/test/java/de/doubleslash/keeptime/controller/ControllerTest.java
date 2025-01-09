@@ -31,9 +31,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -47,10 +45,9 @@ import de.doubleslash.keeptime.model.repos.SettingsRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
 import javafx.scene.paint.Color;
 
-public class ControllerTest {
+class ControllerTest {
 
    private static Controller testee;
-
    private  Model model;
    private  DateProvider mockedDateProvider;
 
@@ -66,7 +63,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void moveProjectFromEndToStart() {
+   void moveProjectFromEndToStart() {
 
       final List<Integer> expectedOrderAfter = Arrays.asList(1, 2, 3, 0);
 
@@ -94,7 +91,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void moveProjectFromStartToEnd() {
+   void moveProjectFromStartToEnd() {
 
       final List<Integer> expectedOrderAfter = Arrays.asList(3, 0, 1, 2);
 
@@ -121,7 +118,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void moveProjectForward() {
+   void moveProjectForward() {
 
       final List<Integer> expectedOrderAfter = Arrays.asList(0, 2, 1, 3);
 
@@ -148,7 +145,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void moveProjectBackward() {
+   void moveProjectBackward() {
 
       final List<Integer> expectedOrderAfter = Arrays.asList(0, 2, 1, 3);
 
@@ -174,7 +171,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void dontMoveProjectTest() {
+   void dontMoveProjectTest() {
 
       final List<Integer> expectedOrderAfter = Arrays.asList(0, 1, 2, 3);
 
@@ -199,7 +196,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void changeProjectSameDayTest() {
+   void changeProjectSameDayTest() {
       final LocalDateTime firstProjectDateTime = LocalDateTime.now();
       final LocalDateTime secondProjectDateTime = LocalDateTime.now();
 
@@ -230,7 +227,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void changeProjectOtherDayTest() {
+   void changeProjectOtherDayTest() {
       Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class))).thenAnswer(i -> i.getArguments()[0]);
       final LocalDateTime firstProjectDateTime = LocalDateTime.now();
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
@@ -262,8 +259,8 @@ public class ControllerTest {
    }
 
    @Test
-   public void changeProjectOtherDayWithTimeTest() {
-      final LocalDateTime firstProjectDateTime = LocalDateTime.of(2018, 02, 14, 14, 0);
+   void changeProjectOtherDayWithTimeTest() {
+      final LocalDateTime firstProjectDateTime = LocalDateTime.of(2018, 2, 14, 14, 0);
       final LocalDateTime secondProjectDateTime = firstProjectDateTime.plusDays(1); // project is create the next day
 
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(firstProjectDateTime);
@@ -299,7 +296,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void shouldCalculateSecondsCorrectlyWhenWorkItemsAreGiven() {
+   void shouldCalculateSecondsCorrectlyWhenWorkItemsAreGiven() {
       final Project workProject1 = new Project("workProject1", "Some description", Color.GREEN, true, 0);
       final Project workProject2 = new Project("workProject2", "A good description", Color.RED, true, 1);
       final Project nonworkProject1 = new Project("nonworkProject1", "An even better description", Color.RED, false, 2);
@@ -332,7 +329,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void shouldUpdateWorkItemPersistentlyWhenWorkItemIsEdited() {
+   void shouldUpdateWorkItemPersistentlyWhenWorkItemIsEdited() {
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
       Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class)))
             .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -364,7 +361,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void shouldNotUpdateOthersWhenWorkItemIsEdited() {
+   void shouldNotUpdateOthersWhenWorkItemIsEdited() {
       Mockito.when(mockedDateProvider.dateTimeNow()).thenReturn(LocalDateTime.now());
       Mockito.when(mockedWorkRepository.save(Mockito.any(Work.class)))
             .thenAnswer(invocation -> invocation.getArguments()[0]);
@@ -402,7 +399,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void shouldDeleteWorkPersistentlyWhenWorkIsDeleted() {
+   void shouldDeleteWorkPersistentlyWhenWorkIsDeleted() {
 
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);
@@ -422,7 +419,7 @@ public class ControllerTest {
    }
 
    @Test
-   public void shouldRemoveWorkFromPastWorkItemsWhenWorkIsDeleted() {
+   void shouldRemoveWorkFromPastWorkItemsWhenWorkIsDeleted() {
 
       final Project project1 = new Project("workProject1", "Some description", Color.RED, true, 0);
       model.getAllProjects().add(project1);

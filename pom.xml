@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.1.10</version>
+    <relativePath />
+    <!-- lookup parent from repository -->
+  </parent>
   <groupId>de.doubleslash</groupId>
   <artifactId>keeptime</artifactId>
   <version>${project.version}</version>
-  <packaging>jar</packaging>
 
+  <packaging>jar</packaging>
   <name>KeepTime</name>
+
   <description>Time tracker</description>
+
+  <organization>
+    <name>doubleSlash Net-Business GmbH</name>
+    <url>https://www.doubleslash.de/</url>
+  </organization>
 
   <licenses>
     <license>
@@ -19,26 +32,14 @@
     </license>
   </licenses>
 
-  <organization>
-    <name>doubleSlash Net-Business GmbH</name>
-    <url>https://www.doubleslash.de/</url>
-  </organization>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.5</version>
-    <relativePath /> <!-- lookup parent from repository -->
-  </parent>
-
   <properties>
-    <project.version>1.3.0-SNAPSHOT</project.version>
+    <project.version>2.0.0-SNAPSHOT</project.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <java.version>17</java.version>
+    <javafx.version>22</javafx.version>
 
-    <maven-dependency-check.version>8.0.2</maven-dependency-check.version>
+    <maven-dependency-check.version>9.1.0</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
@@ -50,33 +51,44 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>11.0.2</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
-      <version>11.0.2</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-swing</artifactId>
-      <version>11</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <version>11.0.2</version>
+      <version>${javafx.version}</version>
       <classifier>win</classifier>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <version>11.0.2</version>
+      <version>${javafx.version}</version>
       <classifier>linux</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>mac-aarch64</classifier>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -105,21 +117,110 @@
     <dependency>
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-assembly-plugin</artifactId>
-      <version>3.4.2</version>
+      <version>3.7.1</version>
       <type>maven-plugin</type>
     </dependency>
     <dependency>
       <groupId>org.sonarsource.scanner.maven</groupId>
       <artifactId>sonar-maven-plugin</artifactId>
-      <version>3.9.1.2184</version>
+      <version>3.11.0.3922</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-library</artifactId>
-      <version>2.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <finalName>keeptime-${project.version}</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+        <configuration>
+          <generateGitPropertiesFile>false</generateGitPropertiesFile>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-keeptime-zip</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>./assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- needed for mvn site - see https://stackoverflow.com/a/51099913 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.12.1</version>
+      </plugin>
+
+      <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (run with mvn dependency-check:check ) -->
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${maven-dependency-check.version}</version>
+        <configuration>
+          <format>${maven-dependency-check.format}</format>
+          <failOnError>${maven-dependency-check.failOnError}</failOnError>
+          <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
+          <outputDirectory>target/site</outputDirectory>
+          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <!-- generate site with mvn site (including dependency check) -->
+  <reporting>
+    <plugins>
+      <plugin>
+        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (redefinition to run also with site) -->
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>${maven-dependency-check.version}</version>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+        <configuration>
+          <format>${maven-dependency-check.format}</format>
+          <failOnError>${maven-dependency-check.failOnError}</failOnError>
+          <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
+          <outputDirectory>target/site</outputDirectory>
+          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
   <profiles>
     <profile>
       <id>coverage</id>
@@ -153,93 +254,4 @@
       </build>
     </profile>
   </profiles>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-        <configuration>
-          <generateGitPropertiesFile>false</generateGitPropertiesFile>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>create-keeptime-zip</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>./assembly.xml</descriptor>
-              </descriptors>
-              <finalName>keeptime-${project.version}</finalName>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- needed for mvn site - see https://stackoverflow.com/a/51099913 -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.12.1</version>
-      </plugin>
-
-      <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (run with mvn dependency-check:check ) -->
-      <plugin>
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>${maven-dependency-check.version}</version>
-        <configuration>
-          <format>${maven-dependency-check.format}</format>
-          <failOnError>${maven-dependency-check.failOnError}</failOnError>
-          <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
-          <outputDirectory>target/site</outputDirectory>
-          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
-        </configuration>
-        <executions>
-            <execution>
-                <goals>
-                    <goal>check</goal>
-                </goals>
-            </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <!-- generate site with mvn site (including dependency check) -->
-  <reporting>
-    <plugins>
-      <plugin>
-        <!-- https://mvnrepository.com/artifact/org.owasp/dependency-check-maven (redefinition to run also with site) -->
-        <groupId>org.owasp</groupId>
-        <artifactId>dependency-check-maven</artifactId>
-        <version>${maven-dependency-check.version}</version>
-        <reportSets>
-          <reportSet>
-            <reports>
-              <report>aggregate</report>
-            </reports>
-          </reportSet>
-        </reportSets>
-        <configuration>
-          <format>${maven-dependency-check.format}</format>
-          <failOnError>${maven-dependency-check.failOnError}</failOnError>
-          <failBuildOnCVSS>${maven-dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
-          <outputDirectory>target/site</outputDirectory>
-          <suppressionFile>dependency-check-report_suppressions.xml</suppressionFile>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>

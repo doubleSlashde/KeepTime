@@ -16,8 +16,7 @@
 
 package de.doubleslash.keeptime.model.persistenceconverter;
 
-import javax.persistence.AttributeConverter;
-
+import jakarta.persistence.AttributeConverter;
 import javafx.scene.paint.Color;
 
 public class ColorConverter implements AttributeConverter<Color, String> {

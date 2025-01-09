@@ -20,7 +20,6 @@ import java.awt.Point;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.ColorHelper;
@@ -60,7 +59,6 @@ public class ViewControllerPopup {
 
    private ProjectsListViewController projectsListViewController;
 
-   @Autowired
    public ViewControllerPopup(final Model model, final Controller controller) {
       this.model = model;
       this.controller = controller;

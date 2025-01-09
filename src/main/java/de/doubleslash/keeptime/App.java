@@ -95,6 +95,7 @@ public class App extends Application {
 
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      controller.enableAutoSave();
       model.setSpringContext(springContext);
    }
 
@@ -144,6 +145,7 @@ public class App extends Application {
       readSettings();
 
       final List<Work> todaysWorkItems = model.getWorkRepository().findByStartDateOrderByStartTimeAsc(LocalDate.now());
+
       LOG.info("Found {} past work items", todaysWorkItems.size());
       model.getPastWorkItems().addAll(todaysWorkItems);
 
@@ -184,6 +186,7 @@ public class App extends Application {
       final List<Settings> settingsList = model.getSettingsRepository().findAll();
       final Settings settings;
       if (settingsList.isEmpty()) {
+         LOG.info("Empty settings. Set default");
          settings = new Settings();
          settings.setTaskBarColor(model.taskBarColor.get());
 
@@ -197,6 +200,7 @@ public class App extends Application {
          settings.setHideProjectsOnMouseExit(false);
          model.getSettingsRepository().save(settings);
       } else {
+         LOG.info("Got settings from database");
          settings = settingsList.get(0);
       }
 
@@ -239,7 +243,7 @@ public class App extends Application {
       final ViewControllerPopup viewControllerPopupController = loader.getController();
       viewControllerPopupController.setStage(popupViewStage);
 
-      if (!OS.isLinux()) {
+      if (OS.isWindows()) {
          globalScreenListener = new GlobalScreenListener();
          globalScreenListener.register(model.useHotkey.get());
          globalScreenListener.setViewController(viewControllerPopupController);
