@@ -46,7 +46,6 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -173,21 +172,20 @@ public class SettingsController {
    @FXML
    private PasswordField authPassword;
 
-   private ToggleGroup toggleGroup;
+   @FXML
+   private CheckBox activateRestApiCheckBox;
 
    @FXML
-   private RadioButton radioApiOff;
-
-   @FXML
-   private RadioButton radioApiOn;
+   private Hyperlink swaggerHyperLink;
 
    @FXML
    private TextField authPort;
 
-   private String propertiesFilePath = "application.properties";
+   private final String propertiesFilePath = "application.properties";
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
+
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
    private final ApplicationProperties applicationProperties;
 
@@ -238,38 +236,32 @@ public class SettingsController {
       initExportButton();
       initImportButton();
 
-      toggleGroup = new ToggleGroup();
-      radioApiOff.setToggleGroup(toggleGroup);
-      radioApiOn.setToggleGroup(toggleGroup);
-
-      Properties properties = new Properties();
       try (FileInputStream input = new FileInputStream(propertiesFilePath)) {
+         Properties properties = new Properties();
          properties.load(input);
-         String apistatus = properties.getProperty("api");
-         if (apistatus != null) {
-            if (apistatus.equals("ON")) {
-               radioApiOn.setSelected(true);
-               radioApiOff.setSelected(false);
+         String apiStatus = properties.getProperty("api");
+         if (apiStatus != null) {
+            if (apiStatus.equals("ON")) {
+               activateRestApiCheckBox.setSelected(true);
                String port = properties.getProperty("server.port");
                String userName = properties.getProperty("spring.security.user.name");
                String userPassword = properties.getProperty("spring.security.user.password");
 
                if (port != null) {
                   authPort.setText(port);
-
                }
                if  (userName!= null) {
-                  authName.setText(LoginController.extractValue(userName));
-                  authPassword.setText(LoginController.extractValue(userPassword));
-
+                  authName.setText(userName);
+                  authPassword.setText(userPassword);
                }
-            } else if (apistatus.equals("OFF")) {
-               radioApiOn.setSelected(false);
-               radioApiOff.setSelected(true);
+            } else if (apiStatus.equals("OFF")) {
+               activateRestApiCheckBox.setSelected(false);
             }
          }
       } catch (IOException e) {
-        LOG.warn("There is currently no application.properties available");
+        LOG.debug(
+            "There is currently no additional '{}' file available. This is fine as it should only be present when rest-api is used.",
+            propertiesFilePath, e);
       }
 
       LOG.debug("saveButton.setOnAction");
@@ -277,12 +269,10 @@ public class SettingsController {
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         RadioButton selectedRadioButton = (RadioButton) toggleGroup.getSelectedToggle();
-
-         if (selectedRadioButton == radioApiOff) {
-            handleApiOff();
-         } else if (selectedRadioButton == radioApiOn) {
+         if (activateRestApiCheckBox.isSelected()) {
             handleApiOn();
+         } else {
+            handleApiOff();
          }
 
          if (!OS.isWindows()) {
@@ -334,9 +324,7 @@ public class SettingsController {
       });
 
       LOG.debug("cancelButton.setOnAction");
-      cancelButton.setOnAction(ae ->
-
-      {
+      cancelButton.setOnAction(ae -> {
          LOG.info("Cancel clicked");
          thisStage.close();
       });
@@ -356,7 +344,6 @@ public class SettingsController {
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
-
       region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource, 1.0, 1.0));
       region.setMinSize(requiredWidth, requiredHeight);
       region.setPrefSize(requiredWidth, requiredHeight);
@@ -418,16 +405,15 @@ public class SettingsController {
       licenseTableView.getColumns().add(nameColumn);
       licenseTableView.getColumns().add(licenseColumn);
 
-      LOG.debug("hyperlink setonaction");
       gitHubHyperlink.setOnAction(ae -> {
-         LOG.debug("hyperlink clicked");
          BrowserHelper.openURL(GITHUB_PAGE);
       });
-
-      LOG.debug("roportbugbutton setonaction");
       reportBugButton.setOnAction(ae -> {
-         LOG.info("Clicked reportBugButton");
          BrowserHelper.openURL(GITHUB_ISSUE_PAGE);
+      });
+      swaggerHyperLink.setOnAction(ae -> {
+         String port = authPort.getText().isEmpty() ? "8080" : authPort.getText();
+         BrowserHelper.openURL("http://localhost:" + port + "/api/swagger");
       });
    }
 
@@ -444,9 +430,9 @@ public class SettingsController {
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
             confirmationAlert.getDialogPane().setContent(new Label("""
                   Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
-                                                     
+                  
                   If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
-                                                     
+                  
                   You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
                   """));
             confirmationAlert.showAndWait();
@@ -578,10 +564,6 @@ public class SettingsController {
       this.thisStage = thisStage;
    }
 
-   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
-      return new FXMLLoader(Resources.getResource(fxmlLayout));
-   }
-
    public ObservableList<LicenseTableRow> loadLicenseRows() {
       final ObservableList<LicenseTableRow> licenseRows = FXCollections.observableArrayList();
       licenseRows.add(new LicenseTableRow("Open Sans", Licenses.APACHEV2));
@@ -620,7 +602,7 @@ public class SettingsController {
 
    private void handleApiOff() {
       Map<String, String> propertiesToUpdate = new HashMap<>();
-      setWebApplicationType("none");
+      propertiesToUpdate.put("spring.main.web-application-type", "none");
       propertiesToUpdate.put("api", "OFF");
       propertyWrite(propertiesToUpdate);
    }
@@ -629,53 +611,32 @@ public class SettingsController {
       String username = authName.getText();
       String password = authPassword.getText();
 
-      LoginController loginController = new LoginController(username, password);
-
-      loginController.createAndSaveUser();
-
       Map<String, String> propertiesToUpdate = new HashMap<>();
       propertiesToUpdate.put("spring.main.web-application-type", "");
       propertiesToUpdate.put("server.port", authPort.getText());
       propertiesToUpdate.put("api", "ON");
+      propertiesToUpdate.put("spring.security.user.name", username);
+      propertiesToUpdate.put("spring.security.user.password", password);
 
-      propertiesToUpdate.put("spring.security.user.name", "${BASIC_AUTH_USER:" + username + "}");
-      propertiesToUpdate.put("spring.security.user.password", "${BASIC_AUTH_PASSWORD:" + password + "}");
       propertyWrite(propertiesToUpdate);
-   }
-
-   private void setWebApplicationType(String value) {
-      propertyWrite("spring.main.web-application-type", value);
-   }
-
-   public void propertyWrite(String key, String value) {
-      Properties properties = new Properties();
-      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
-            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
-
-         properties.load(inputStream);
-         properties.setProperty(key, value);
-         properties.store(outputStream, null);
-
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
    }
 
    private void propertyWrite(Map<String, String> propertiesToUpdate) {
       Properties properties = new Properties();
-      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(propertiesFilePath);
-            FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
 
+      try (InputStream inputStream = new FileInputStream(propertiesFilePath)){
          properties.load(inputStream);
+      } catch (IOException e) {
+         LOG.debug("Could not open '{}' file. This is most likely fine as it was just not needed before and will be created next.", propertiesFilePath, e);
+      }
 
+     try(FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
          for (Map.Entry<String, String> entry : propertiesToUpdate.entrySet()) {
             properties.setProperty(entry.getKey(), entry.getValue());
          }
-
-         properties.store(outputStream, null);
-
+         properties.store(outputStream, "REST-API settings");
       } catch (IOException e) {
-         e.printStackTrace();
+         LOG.error("Error while persisting properties: '{}'.", propertiesToUpdate, e);
       }
    }
 

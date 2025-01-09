@@ -25,12 +25,10 @@
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -40,7 +38,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
   <children>
     <TabPane layoutX="-50.0" layoutY="3.0" prefHeight="383.0" prefWidth="608.0" rotateGraphic="true" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE">
       <tabs>
@@ -372,30 +370,85 @@
           <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
               <children>
-                <Label fx:id="labelUsername" layoutX="24.0" layoutY="169.0" text="Username:" />
-                <Label layoutX="14.0" layoutY="14.0" prefHeight="28.0" prefWidth="279.0" text="Rest API Authentication">
-                  <font>
-                    <Font name="System Bold" size="13.0" />
-                  </font>
-                </Label>
-                <Label fx:id="labelPassword" layoutX="24.0" layoutY="219.0" text="Password:" />
-                <TextField fx:id="authName" layoutX="97.0" layoutY="166.0" prefHeight="26.0" prefWidth="298.0" />
-                <Label layoutX="24.0" layoutY="70.0" text="Auth" />
-                <Label fx:id="labelPort" layoutX="26.0" layoutY="124.0" text="Port:" />
-                <TextField fx:id="authPort" layoutX="97.0" layoutY="120.0" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
-                <RadioButton fx:id="radioApiOn" layoutX="88.0" layoutY="64.0" mnemonicParsing="false" text="ON">
-                  <toggleGroup>
-                    <ToggleGroup fx:id="authAPI" />
-                  </toggleGroup>
-                </RadioButton>
-                <RadioButton fx:id="radioApiOff" layoutX="219.0" layoutY="64.0" mnemonicParsing="false" text="OFF" toggleGroup="$authAPI" />
-                <PasswordField fx:id="authPassword" layoutX="97.0" layoutY="215.0" prefHeight="26.0" prefWidth="298.0" />
-                        <Label layoutX="24.0" layoutY="261.0" prefHeight="18.0" prefWidth="286.0" text="Warning this is a beta feature" textFill="#bf5d24">
-                           <font>
-                              <Font name="System Bold" size="12.0" />
-                           </font>
-                        </Label>
-                        <Label layoutX="26.0" layoutY="279.0" text="The change will not take effect until the next start " />
+                        <VBox layoutX="14.0" layoutY="14.0" spacing="5.0">
+                           <children>
+                              <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                 <children>
+                            <Label prefHeight="28.0" prefWidth="279.0" text="REST API Settings">
+                              <font>
+                                <Font name="System Bold" size="13.0" />
+                              </font>
+                            </Label>
+                                 </children>
+                              </VBox>
+                              <Group>
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <Label prefHeight="18.0" prefWidth="286.0" text="Warning this is a beta feature" textFill="#bf5d24">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                          <Label text="Changes will not take effect until the next start of KeepTime" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                              <Group>
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <CheckBox fx:id="activateRestApiCheckBox" mnemonicParsing="false" text="Activate REST API">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font>
+                                          </CheckBox>
+                                          <HBox>
+                                             <children>
+                                        <Label fx:id="labelPort" prefWidth="75.0" text="Port" />
+                                        <TextField fx:id="authPort" prefHeight="26.0" prefWidth="298.0" promptText="8080" />
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                        <Label fx:id="labelUsername" prefWidth="75.0" text="Username" />
+                                        <TextField fx:id="authName" prefHeight="26.0" prefWidth="298.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                        <Label fx:id="labelPassword" prefWidth="75.0" text="Password" />
+                                        <PasswordField fx:id="authPassword" prefHeight="26.0" prefWidth="298.0" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                              <Group>
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT">
+                                             <children>
+                                                <Label text="Swagger UI" />
+                                                <Hyperlink fx:id="swaggerHyperLink" focusTraversable="false" text="http://localhost:&lt;PORT&gt;/api/swagger" underline="true">
+                                                   <font>
+                                                      <Font name="Open Sans Regular" size="14.0" />
+                                                   </font>
+                                                </Hyperlink>
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
               </children></AnchorPane>
           </content>
           <graphic>
