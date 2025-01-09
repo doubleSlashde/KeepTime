@@ -16,31 +16,27 @@
 
 package de.doubleslash.keeptime.REST_API.mapper;
 
-import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
+import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import javafx.scene.paint.Color;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface ColorMapper {
-   default ColorDTO colorToColorDTO(Color color) {
+
+   ColorConverter colorConverter = new ColorConverter();
+
+   default String colorToColorDTO(Color color) {
       if (color == null) {
          return null;
       }
-
-      ColorDTO colorDTO = new ColorDTO();
-      colorDTO.setRed(Color.RED.getRed());
-      colorDTO.setGreen(color.getGreen());
-      colorDTO.setBlue(color.getBlue());
-      colorDTO.setOpacity(color.getOpacity());
-
-      return colorDTO;
+      return colorConverter.convertToDatabaseColumn(color);
    }
 
-   default Color colorDTOToColor(ColorDTO colorDTO) {
+   default Color colorDTOToColor(String colorDTO) {
       if (colorDTO == null) {
          return null;
       }
 
-      return new Color(colorDTO.getRed(), colorDTO.getGreen(), colorDTO.getBlue(), colorDTO.getOpacity());
+      return colorConverter.convertToEntityAttribute(colorDTO);
    }
 }

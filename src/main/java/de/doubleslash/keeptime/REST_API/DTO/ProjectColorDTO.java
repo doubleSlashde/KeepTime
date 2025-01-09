@@ -20,14 +20,17 @@ public class ProjectColorDTO {
    private long id;
    private String name;
    private String description;
-   private ColorDTO color;
+   /**
+    * Color in format of 0xRRGGBBAA (R=Red, G=Green, B=Blue, A=Alpha). E.g. 0xff0000ff is fully opaque red.
+    */
+   private String color;
    private boolean isWork;
    private boolean isDefault;
    private boolean isEnabled;
    private int index;
 
 
-   public ProjectColorDTO( long id, String name, String description, ColorDTO color, boolean isWork, int index, boolean isDefault) {
+   public ProjectColorDTO( long id, String name, String description, String color, boolean isWork, int index, boolean isDefault) {
       this.id= id;
       this.name = name;
       this.description = description;
@@ -62,11 +65,11 @@ public class ProjectColorDTO {
       this.description = description;
    }
 
-   public ColorDTO getColor() {
+   public String getColor() {
       return color;
    }
 
-   public void setColor(ColorDTO color) {
+   public void setColor(String color) {
       this.color = color;
    }
 

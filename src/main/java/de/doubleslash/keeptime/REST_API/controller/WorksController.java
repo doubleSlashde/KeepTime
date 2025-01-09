@@ -44,12 +44,14 @@ import java.util.stream.Stream;
 
 public class WorksController {
 
-   private WorkRepository workRepository;
-   private Model model;
+   private final WorkRepository workRepository;
+   private final Model model;
+   private final WorkMapper workMapper;
 
-   public WorksController(final WorkRepository workRepository, final Controller controller, Model model) {
+   public WorksController(final WorkRepository workRepository, Model model, WorkMapper workMapper) {
       this.workRepository = workRepository;
       this.model = model;
+      this.workMapper = workMapper;
    }
 
    @GetMapping("")
@@ -61,12 +63,12 @@ public class WorksController {
       if (projectName != null) {
          workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
       }
-      return workStream.map(WorkMapper.INSTANCE::workToWorkDTO).collect(Collectors.toList());
+      return workStream.map(workMapper::workToWorkDTO).collect(Collectors.toList());
    }
 
    @PutMapping("/{id}")
    public ResponseEntity<WorkDTO> editWork(@PathVariable("id") Long workId, @RequestBody WorkDTO newValuedWorkDTO) {
-      Work newValuedWork = WorkMapper.INSTANCE.workDTOToWork(newValuedWorkDTO);
+      Work newValuedWork = workMapper.workDTOToWork(newValuedWorkDTO);
       Optional<Work> optionalWork = workRepository.findById(workId);
 
       if (optionalWork.isPresent()) {
@@ -79,7 +81,7 @@ public class WorksController {
 
          Work editedWork = workRepository.save(workToBeEdited);
 
-         return ResponseEntity.ok(WorkMapper.INSTANCE.workToWorkDTO(editedWork));
+         return ResponseEntity.ok(workMapper.workToWorkDTO(editedWork));
       } else {
          return ResponseEntity.notFound().build();
       }
@@ -103,7 +105,7 @@ public class WorksController {
       Work workProjects = model.activeWorkItem.get();
 
       if (workProjects != null) {
-         return ResponseEntity.ok(WorkMapper.INSTANCE.workToWorkDTO(workProjects));
+         return ResponseEntity.ok(workMapper.workToWorkDTO(workProjects));
       } else {
          return ResponseEntity.notFound().build();
       }

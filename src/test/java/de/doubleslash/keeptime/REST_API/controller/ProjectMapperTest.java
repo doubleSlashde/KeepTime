@@ -17,9 +17,9 @@
 
 package de.doubleslash.keeptime.REST_API.controller;
 
-import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
 import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
 import de.doubleslash.keeptime.REST_API.mapper.ProjectMapper;
+import de.doubleslash.keeptime.REST_API.mapper.ProjectMapperImpl;
 import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectMapperTest {
-   ProjectMapper projectMapper = ProjectMapper.INSTANCE;
+   ProjectMapper projectMapper = new ProjectMapperImpl();
 
    @Test
    void projectToProjectDTO() {
@@ -44,25 +44,20 @@ class ProjectMapperTest {
       //ACT
       final ProjectColorDTO projectColorDTO = projectMapper.projectToProjectDTO(project);
       //Assert
-      assertEquals(Color.BLUE.getBlue(), projectColorDTO.getColor().getBlue());
+      assertEquals("0x0000ffff", projectColorDTO.getColor());
 
    }
 
    @Test
    void projectDTOToProject() {
       // ARRANGE
-      ColorDTO colorDTO = new ColorDTO();
-      colorDTO.setRed(1.0);
-      colorDTO.setGreen(0.0);
-      colorDTO.setBlue(0.0);
-
-      ProjectColorDTO project = new ProjectColorDTO(1, "ProjectName", "ProjectDescription", colorDTO, false, 0, true);
+      ProjectColorDTO project = new ProjectColorDTO(1, "ProjectName", "ProjectDescription", "0xff0000ff", false, 0, true);
 
       // ACT
       final Project project1 = projectMapper.projectDTOToProject(project);
 
       // ASSERT
-      assertEquals(colorDTO.getBlue(), project1.getColor().getBlue());
+      assertEquals(Color.RED, project1.getColor());
       assertEquals("ProjectName", project1.getName());
       assertEquals("ProjectDescription", project1.getDescription());
    }

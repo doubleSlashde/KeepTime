@@ -40,17 +40,21 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/projects")
 public class ProjectController {
-   private ProjectRepository projectRepository;
-   private WorkRepository workRepository;
-   private Controller controller;
-   private Model model;
+   private final ProjectRepository projectRepository;
+   private final WorkRepository workRepository;
+   private final Controller controller;
+   private final Model model;
+   private final WorkMapper workMapper;
+   private final ProjectMapper projectMapper;
 
    public ProjectController(final ProjectRepository projectRepository, final WorkRepository workRepository,
-         final Controller controller, Model model) {
+         final Controller controller, Model model, WorkMapper workMapper, ProjectMapper projectMapper) {
       this.projectRepository = projectRepository;
       this.workRepository = workRepository;
       this.controller = controller;
       this.model = model;
+      this.workMapper = workMapper;
+      this.projectMapper = projectMapper;
    }
 
    @GetMapping("")
@@ -64,7 +68,7 @@ public class ProjectController {
          projects = projectRepository.findAll();
       }
       List<ProjectColorDTO> projectColorDTOs = projects.stream()
-                                                       .map(ProjectMapper.INSTANCE::projectToProjectDTO)
+                                                       .map(projectMapper::projectToProjectDTO)
                                                        .collect(Collectors.toList());
       return ResponseEntity.ok(projectColorDTOs);
    }
@@ -76,7 +80,7 @@ public class ProjectController {
       if (project.isEmpty()) {
          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project with id '" + id + "' not found");
       }
-      return ProjectMapper.INSTANCE.projectToProjectDTO(project.get());
+      return projectMapper.projectToProjectDTO(project.get());
    }
 
    @GetMapping("/{id}/works")
@@ -84,7 +88,7 @@ public class ProjectController {
       return workRepository.findAll().stream().filter(work -> {
          Project project = work.getProject();
          return project != null && project.getId() == id;
-      }).map(work -> WorkMapper.INSTANCE.workToWorkDTO(work)).collect(Collectors.toList());
+      }).map(workMapper::workToWorkDTO).collect(Collectors.toList());
    }
 
    @GetMapping("/{projectId}/works/{workId}")
@@ -96,7 +100,7 @@ public class ProjectController {
                               return project != null && project.getId() == projectId && work.getId() == workId;
                            })
                            .findFirst()
-                           .map(WorkMapper.INSTANCE::workToWorkDTO)
+                           .map(workMapper::workToWorkDTO)
                            .orElseThrow(() -> new ResourceNotFoundException(
                                  "Work with id '" + workId + "' related to project with id '" + projectId
                                        + "' not found"));
@@ -105,13 +109,13 @@ public class ProjectController {
    @PostMapping("")
    public ResponseEntity<ProjectColorDTO> createProject(@Valid @RequestBody final ProjectColorDTO newProjectDTO) {
       try {
-         Project newProject = ProjectMapper.INSTANCE.projectDTOToProject(newProjectDTO);
+         Project newProject = projectMapper.projectDTOToProject(newProjectDTO);
 
          controller.addNewProject(newProject);
 
          model.getProjectRepository().save(newProject);
 
-         ProjectColorDTO projectDTO = ProjectMapper.INSTANCE.projectToProjectDTO(newProject);
+         ProjectColorDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
 
          return ResponseEntity.status(HttpStatus.CREATED).body(projectDTO);
       } catch (Exception e) {
@@ -130,7 +134,7 @@ public class ProjectController {
          }
 
          Project existingProject = optionalProject.get();
-         Project newValuedProject = ProjectMapper.INSTANCE.projectDTOToProject(newValuedProjectDTO);
+         Project newValuedProject = projectMapper.projectDTOToProject(newValuedProjectDTO);
 
          existingProject.setName(newValuedProject.getName());
          existingProject.setDescription(newValuedProject.getDescription());
@@ -142,7 +146,7 @@ public class ProjectController {
 
          projectRepository.save(existingProject);
 
-         ProjectColorDTO updatedProjectDTO = ProjectMapper.INSTANCE.projectToProjectDTO(existingProject);
+         ProjectColorDTO updatedProjectDTO = projectMapper.projectToProjectDTO(existingProject);
 
          return ResponseEntity.ok(updatedProjectDTO);
       } catch (DataAccessException e) {
@@ -160,7 +164,7 @@ public class ProjectController {
          work.setProject(project);
          workRepository.save(work);
 
-         WorkDTO workDTO = WorkMapper.INSTANCE.workToWorkDTO(work);
+         WorkDTO workDTO = workMapper.workToWorkDTO(work);
 
          return ResponseEntity.status(HttpStatus.CREATED).body(workDTO);
       } else {
@@ -172,7 +176,7 @@ public class ProjectController {
    public ResponseEntity<String> deleteProject(@PathVariable final long id) {
       Optional<Project> projectOptional = projectRepository.findById(id);
 
-      if (!projectOptional.isPresent()) {
+      if (projectOptional.isEmpty()) {
          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project with the ID '" + id + "' not found");
       }
 
@@ -190,14 +194,14 @@ public class ProjectController {
    @GetMapping("/current")
    public ProjectColorDTO getWorkProjects() {
       Project project = model.activeWorkItem.get().getProject();
-      return ProjectMapper.INSTANCE.projectToProjectDTO(project);
+      return projectMapper.projectToProjectDTO(project);
    }
 
    @PutMapping("/current")
    public ResponseEntity<ProjectColorDTO> changeProject(@Valid @RequestBody Project newProject) {
       try {
          controller.changeProject(newProject);
-         ProjectColorDTO projectDTO = ProjectMapper.INSTANCE.projectToProjectDTO(newProject);
+         ProjectColorDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
          return ResponseEntity.ok(projectDTO);
       } catch (Exception e) {
          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

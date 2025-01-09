@@ -17,10 +17,10 @@
 
 package de.doubleslash.keeptime.REST_API.controller;
 
-import de.doubleslash.keeptime.REST_API.DTO.ColorDTO;
 import de.doubleslash.keeptime.REST_API.DTO.ProjectDTO;
 import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
 import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
+import de.doubleslash.keeptime.REST_API.mapper.WorkMapperImpl;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.scene.paint.Color;
@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WorkMapperTest {
 
-   WorkMapper workMapper = WorkMapper.INSTANCE;
+   WorkMapper workMapper = new WorkMapperImpl();
 
    @Test
    void workToWorkDTO() {
@@ -51,49 +51,19 @@ class WorkMapperTest {
       final WorkDTO workDTO = workMapper.workToWorkDTO(work);
 
       // ASSERT
+      assertEquals(work.getId() ,workDTO.getId());
+      assertEquals(from ,workDTO.getStartTime());
+      assertEquals(to ,workDTO.getEndTime());
       assertEquals("Did something", workDTO.getNotes());
-      assertEquals(5,workDTO.getId());
-      //... assert other fields
 
-      assertEquals(0, workDTO.getProject().getId());
+      assertEquals(project.getId(), workDTO.getProject().getId());
    }
 
-//   @Test
-//   void WorkDTOToWork() {
-//      // ARRANGE
-//      LocalDateTime startTime = LocalDateTime.of(2024, 4, 19, 9, 0);
-//      LocalDateTime endTime = LocalDateTime.of(2024, 4, 19, 17, 0);
-//
-//      // Erstellen eines ColorDTO-Objekts für das Projekt
-//      ColorDTO colorDTO = new ColorDTO();
-//      colorDTO.setRed(0.0);
-//      colorDTO.setGreen(0.0);
-//      colorDTO.setBlue(1.0);
-//
-//      // Erstellen eines ProjectDTO
-//      ProjectDTO projectDTO = new ProjectDTO(1);
-//      projectDTO.setId(1);
-//
-//
-//      // Erstellen einer WorkDTO
-//      WorkDTO workDTO = new WorkDTO(1, startTime, endTime, projectDTO, "Did something");
-//
-//      // ACT
-//      // Konvertieren der WorkDTO in ein Work-Objekt
-//      Work work = workMapper.workDTOToWork(workDTO);
-//
-//      // ASSERT
-//      // Überprüfen der notwendigen Felder des erstellten Work-Objekts
-//      assertEquals(1, work.getId());
-//
-//   }
-
-
    @Test
-   public void testWorkDTOToWork() {
+   public void workDTOToWork() {
       // Arrange
-      LocalDateTime startTime = LocalDateTime.of(2024, 4, 22, 9, 0); // Beispielzeit
-      LocalDateTime endTime = LocalDateTime.of(2024, 4, 22, 17, 0); // Beispielzeit
+      LocalDateTime startTime = LocalDateTime.of(2024, 4, 22, 9, 0);
+      LocalDateTime endTime = LocalDateTime.of(2024, 4, 22, 17, 0);
       ProjectDTO projectDTO = new ProjectDTO(0);
       String notes = "Test Notizen";
       WorkDTO workDTO = new WorkDTO(1,startTime, endTime, projectDTO, notes);

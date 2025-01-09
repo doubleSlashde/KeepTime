@@ -21,10 +21,8 @@ import de.doubleslash.keeptime.model.Project;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = ColorMapper.class)
+@Mapper(uses = ColorMapper.class, componentModel = "spring")
 public interface ProjectMapper {
-
-   ProjectMapper INSTANCE = Mappers.getMapper(ProjectMapper.class);
 
    ProjectColorDTO projectToProjectDTO(Project project);
 

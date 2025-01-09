@@ -21,9 +21,8 @@ import de.doubleslash.keeptime.model.Work;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface WorkMapper {
-   WorkMapper INSTANCE = Mappers.getMapper(WorkMapper.class);
 
    WorkDTO workToWorkDTO(Work work);
 
