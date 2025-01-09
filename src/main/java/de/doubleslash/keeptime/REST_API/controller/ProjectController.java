@@ -26,13 +26,14 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
+import javafx.application.Platform;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -102,8 +103,9 @@ public class ProjectController {
                            .findFirst()
                            .map(workMapper::workToWorkDTO)
                            .orElseThrow(() -> new ResourceNotFoundException(
-                                 "Work with id '" + workId + "' related to project with id '" + projectId
-                                       + "' not found"));
+                               "Work with id '" + workId + "' related to project with id '"
+                                   + projectId
+                                   + "' not found"));
    }
 
    @PostMapping("")
@@ -113,10 +115,7 @@ public class ProjectController {
 
          controller.addNewProject(newProject);
 
-         model.getProjectRepository().save(newProject);
-
          ProjectColorDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
-
          return ResponseEntity.status(HttpStatus.CREATED).body(projectDTO);
       } catch (Exception e) {
          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -136,15 +135,7 @@ public class ProjectController {
          Project existingProject = optionalProject.get();
          Project newValuedProject = projectMapper.projectDTOToProject(newValuedProjectDTO);
 
-         existingProject.setName(newValuedProject.getName());
-         existingProject.setDescription(newValuedProject.getDescription());
-         existingProject.setIndex(newValuedProject.getIndex());
-         existingProject.setWork(newValuedProject.isWork());
-         existingProject.setColor(newValuedProject.getColor());
-         existingProject.setDefault(newValuedProject.isDefault());
-         existingProject.setEnabled(newValuedProject.isEnabled());
-
-         projectRepository.save(existingProject);
+         controller.editProject(existingProject, newValuedProject);
 
          ProjectColorDTO updatedProjectDTO = projectMapper.projectToProjectDTO(existingProject);
 
@@ -159,17 +150,17 @@ public class ProjectController {
          @Valid @RequestBody final Work work) {
       Optional<Project> projectOptional = projectRepository.findById(id);
 
-      if (projectOptional.isPresent()) {
-         Project project = projectOptional.get();
-         work.setProject(project);
-         workRepository.save(work);
-
-         WorkDTO workDTO = workMapper.workToWorkDTO(work);
-
-         return ResponseEntity.status(HttpStatus.CREATED).body(workDTO);
-      } else {
+      if (projectOptional.isEmpty()) {
          return ResponseEntity.notFound().build();
       }
+
+      Project project = projectOptional.get();
+      work.setProject(project);
+      workRepository.save(work);
+
+      WorkDTO workDTO = workMapper.workToWorkDTO(work);
+
+      return ResponseEntity.status(HttpStatus.CREATED).body(workDTO);
    }
 
    @DeleteMapping("/{id}")
@@ -177,18 +168,18 @@ public class ProjectController {
       Optional<Project> projectOptional = projectRepository.findById(id);
 
       if (projectOptional.isEmpty()) {
-         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project with the ID '" + id + "' not found");
+         return ResponseEntity.notFound().build();
       }
 
       Project project = projectOptional.get();
 
       if (project.isDefault()) {
          return new ResponseEntity<>("Project cannot be deleted as it is the default", HttpStatus.BAD_REQUEST);
-      } else {
-         controller.deleteProject(project);
-         projectRepository.delete(project);
-         return new ResponseEntity<>("Project successfully deleted", HttpStatus.OK);
       }
+
+      controller.deleteProject(project);
+      projectRepository.delete(project);
+      return new ResponseEntity<>("Project successfully deleted", HttpStatus.OK);
    }
 
    @GetMapping("/current")
@@ -209,7 +200,7 @@ public class ProjectController {
    }
 
    @ResponseStatus(value = HttpStatus.NOT_FOUND)
-   public class ResourceNotFoundException extends RuntimeException {
+   public static class ResourceNotFoundException extends RuntimeException {
       public ResourceNotFoundException(String message) {
          super(message);
       }

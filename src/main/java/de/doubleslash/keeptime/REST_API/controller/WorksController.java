@@ -18,7 +18,6 @@ package de.doubleslash.keeptime.REST_API.controller;
 
 import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
 import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
-import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
@@ -32,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -70,33 +68,33 @@ public class WorksController {
       Work newValuedWork = workMapper.workDTOToWork(newValuedWorkDTO);
       Optional<Work> optionalWork = workRepository.findById(workId);
 
-      if (optionalWork.isPresent()) {
-         Work workToBeEdited = optionalWork.get();
-
-         workToBeEdited.setStartTime(newValuedWork.getStartTime());
-         workToBeEdited.setEndTime(newValuedWork.getEndTime());
-         workToBeEdited.setNotes(newValuedWork.getNotes());
-         workToBeEdited.setProject(newValuedWork.getProject());
-
-         Work editedWork = workRepository.save(workToBeEdited);
-
-         return ResponseEntity.ok(workMapper.workToWorkDTO(editedWork));
-      } else {
+      if (optionalWork.isEmpty()) {
          return ResponseEntity.notFound().build();
       }
+
+      Work workToBeEdited = optionalWork.get();
+
+      workToBeEdited.setStartTime(newValuedWork.getStartTime());
+      workToBeEdited.setEndTime(newValuedWork.getEndTime());
+      workToBeEdited.setNotes(newValuedWork.getNotes());
+      workToBeEdited.setProject(newValuedWork.getProject());
+
+      Work editedWork = workRepository.save(workToBeEdited);
+
+      return ResponseEntity.ok(workMapper.workToWorkDTO(editedWork));
    }
 
    @DeleteMapping("/{id}")
    public ResponseEntity<String> deleteWork(@PathVariable final long id) {
       Optional<Work> optionalWork = workRepository.findById(id);
 
-      if (optionalWork.isPresent()) {
-         Work workToBeDeleted = optionalWork.get();
-         workRepository.delete(workToBeDeleted);
-         return new ResponseEntity<>("Work successfully deleted", HttpStatus.OK);
-      } else {
-         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Work with the ID " + id + " not found");
+      if (optionalWork.isEmpty()) {
+         return ResponseEntity.notFound().build();
       }
+
+      Work workToBeDeleted = optionalWork.get();
+      workRepository.delete(workToBeDeleted);
+      return new ResponseEntity<>("Work successfully deleted", HttpStatus.OK);
    }
 
    @GetMapping("/current")
