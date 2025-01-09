@@ -40,8 +40,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping("/works")
-
+@RequestMapping("/api/works")
 public class WorksController {
 
    private final WorkRepository workRepository;
