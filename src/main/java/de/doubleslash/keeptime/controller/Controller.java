@@ -38,9 +38,11 @@ import javafx.collections.ObservableList;
 
 @Service
 public class Controller {
-   private final long QUICK_SAVE_INTERVAL = 60;
 
    private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
+
+   private final long AUTO_SAVE_INTERVAL_SECONDS = 60;
+   private Interval autoSaveInterval;
 
    private final Model model;
 
@@ -49,9 +51,15 @@ public class Controller {
    public Controller(final Model model, final DateProvider dateProvider) {
       this.model = model;
       this.dateProvider = dateProvider;
+   }
 
-      // initiate quicksaving
-      new Interval(QUICK_SAVE_INTERVAL).registerCallBack(() -> saveCurrentWork(dateProvider.dateTimeNow()));
+   public void enableAutoSave() {
+      LOG.info("Enabling auto save with interval '{}' seconds.", AUTO_SAVE_INTERVAL_SECONDS);
+      autoSaveInterval = new Interval(AUTO_SAVE_INTERVAL_SECONDS);
+      autoSaveInterval.registerCallBack(() -> {
+         LOG.debug("Auto saving current work.");
+         saveCurrentWork(dateProvider.dateTimeNow());
+      });
    }
 
    public void changeProject(final Project newProject) {
@@ -178,7 +186,7 @@ public class Controller {
          changeProject(model.getIdleProject());
       }
 
-      LOG.info("Disabeling project '{}'.", p);
+      LOG.info("Disabling project '{}'.", p);
 
       final int indexToRemove = p.getIndex();
       p.setEnabled(false); // we don't delete it because of the referenced work
@@ -311,7 +319,7 @@ public class Controller {
    }
 
    /**
-    * Calculate todays seconds counted as work
+    * Calculate today's seconds counted as work
     */
    public long calcTodaysWorkSeconds() {
       final List<Work> workItems = new ArrayList<>();
@@ -332,14 +340,10 @@ public class Controller {
    }
 
    /**
-    * Calculate todays present seconds (work+nonWork)
+    * Calculate today's present seconds (work+nonWork)
     */
    public long calcTodaysSeconds() {
       return calcSeconds(model.getPastWorkItems());
-   }
-
-   public ObservableList<Project> getAvailableProjects() {
-      return model.getAvailableProjects();
    }
 
    public long calcSeconds(final List<Work> workItems) {

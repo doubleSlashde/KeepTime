@@ -32,7 +32,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -45,10 +44,7 @@ import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.SettingsRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
 import javafx.scene.paint.Color;
-import org.testfx.framework.junit5.ApplicationExtension;
 
-
-@ExtendWith(ApplicationExtension.class)
 class ControllerTest {
 
    private static Controller testee;

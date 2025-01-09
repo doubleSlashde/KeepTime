@@ -95,6 +95,7 @@ public class App extends Application {
 
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      controller.enableAutoSave();
       model.setSpringContext(springContext);
    }
 
