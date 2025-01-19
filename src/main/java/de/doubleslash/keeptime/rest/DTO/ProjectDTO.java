@@ -14,10 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.DTO;
+package de.doubleslash.keeptime.rest.DTO;
 
-public class ProjectColorDTO {
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PositiveOrZero;
+
+public class ProjectDTO {
    private long id;
+   @NotEmpty(message = "Name must not be null or empty")
    private String name;
    private String description;
    /**
@@ -25,20 +29,18 @@ public class ProjectColorDTO {
     */
    private String color;
    private boolean isWork;
-   private boolean isDefault;
-   private boolean isEnabled;
+   @PositiveOrZero(message = "Index must not be negative")
    private int index;
+   private boolean isEnabled;
 
-
-   public ProjectColorDTO( long id, String name, String description, String color, boolean isWork, int index, boolean isDefault) {
+   public ProjectDTO( long id, String name, String description, String color, boolean isWork, int index, boolean isEnabled) {
       this.id= id;
       this.name = name;
       this.description = description;
       this.color = color;
       this.isWork = isWork;
       this.index = index;
-      this.isDefault = isDefault;
-      this.isEnabled = true;
+      this.isEnabled = isEnabled;
    }
 
    public long getId() {
@@ -81,22 +83,6 @@ public class ProjectColorDTO {
       this.isWork = isWork;
    }
 
-   public boolean isDefault() {
-      return isDefault;
-   }
-
-   public void setDefault(boolean isDefault) {
-      this.isDefault = isDefault;
-   }
-
-   public boolean isEnabled() {
-      return isEnabled;
-   }
-
-   public void setEnabled(boolean isEnabled) {
-      this.isEnabled = isEnabled;
-   }
-
    public int getIndex() {
       return index;
    }
@@ -105,5 +91,11 @@ public class ProjectColorDTO {
       this.index = index;
    }
 
+   public boolean isEnabled() {
+      return isEnabled;
+   }
 
+   public void setEnabled(final boolean enabled) {
+      isEnabled = enabled;
+   }
 }

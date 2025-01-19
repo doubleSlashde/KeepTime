@@ -14,17 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.mapper;
+package de.doubleslash.keeptime.rest.mapper;
 
-import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
-import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
+import javafx.scene.paint.Color;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = ColorMapper.class, componentModel = "spring")
-public interface ProjectMapper {
+@Mapper(componentModel = "spring")
+public interface ColorMapper {
 
-   ProjectColorDTO projectToProjectDTO(Project project);
+   ColorConverter colorConverter = new ColorConverter();
 
-   Project projectDTOToProject(ProjectColorDTO projectColorDTO);
+   default String colorToColorDTO(Color color) {
+      if (color == null) {
+         return null;
+      }
+      return colorConverter.convertToDatabaseColumn(color);
+   }
+
+   default Color colorDTOToColor(String colorDTO) {
+      if (colorDTO == null) {
+         return null;
+      }
+
+      return colorConverter.convertToEntityAttribute(colorDTO);
+   }
 }

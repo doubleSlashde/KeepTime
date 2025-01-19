@@ -14,19 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.mapper;
+package de.doubleslash.keeptime.rest.mapper;
 
-import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
-import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.rest.DTO.ProjectDTO;
+import de.doubleslash.keeptime.model.Project;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
-public interface WorkMapper {
+@Mapper(uses = ColorMapper.class, componentModel = "spring")
+public interface ProjectMapper {
 
-   WorkDTO workToWorkDTO(Work work);
+   ProjectDTO projectToProjectDTO(Project project);
 
-   Work workDTOToWork(WorkDTO workDTO);
+   Project projectDTOToProject(ProjectDTO projectDTO);
 }
-
-

@@ -14,12 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.rest.controller;
 
-import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
-import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
+import de.doubleslash.keeptime.rest.mapper.WorkMapper;
 import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
@@ -42,16 +43,18 @@ import java.util.stream.Stream;
 public class WorksController {
 
    private final WorkRepository workRepository;
+   private final ProjectRepository projectRepository;
    private final Model model;
    private final WorkMapper workMapper;
 
-   public WorksController(final WorkRepository workRepository, Model model, WorkMapper workMapper) {
+   public WorksController(final WorkRepository workRepository,final ProjectRepository projectRepository, Model model, WorkMapper workMapper) {
       this.workRepository = workRepository;
+      this.projectRepository=projectRepository;
       this.model = model;
       this.workMapper = workMapper;
    }
 
-   @GetMapping("")
+   @GetMapping
    public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) final String projectName) {
       List<Work> works = workRepository.findAll();
 
@@ -60,15 +63,21 @@ public class WorksController {
       if (projectName != null) {
          workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
       }
-      return workStream.map(workMapper::workToWorkDTO).collect(Collectors.toList());
+      return workStream.map(workMapper::workToWorkDTO).toList();
    }
 
    @PutMapping("/{id}")
    public ResponseEntity<WorkDTO> editWork(@PathVariable("id") Long workId, @RequestBody WorkDTO newValuedWorkDTO) {
+
+      if(workId != newValuedWorkDTO.getId() ){
+         return ResponseEntity.badRequest().build();
+      }
+
       Work newValuedWork = workMapper.workDTOToWork(newValuedWorkDTO);
       Optional<Work> optionalWork = workRepository.findById(workId);
+      Optional<Project> optionalProject = projectRepository.findById(newValuedWorkDTO.getProject().getId());
 
-      if (optionalWork.isEmpty()) {
+      if (optionalWork.isEmpty() || optionalProject.isEmpty()) {
          return ResponseEntity.notFound().build();
       }
 
@@ -77,7 +86,7 @@ public class WorksController {
       workToBeEdited.setStartTime(newValuedWork.getStartTime());
       workToBeEdited.setEndTime(newValuedWork.getEndTime());
       workToBeEdited.setNotes(newValuedWork.getNotes());
-      workToBeEdited.setProject(newValuedWork.getProject());
+      workToBeEdited.setProject(optionalProject.get());
 
       Work editedWork = workRepository.save(workToBeEdited);
 

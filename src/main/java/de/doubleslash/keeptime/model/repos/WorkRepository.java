@@ -30,4 +30,6 @@ public interface WorkRepository extends JpaRepository<Work, Long> {
 
    @Query(value = "SELECT w FROM Work w WHERE CAST(startTime AS DATE) = ?1 ORDER BY startTime ASC")
    List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
+
+   List<Work> findByProjectId(long id);
 }

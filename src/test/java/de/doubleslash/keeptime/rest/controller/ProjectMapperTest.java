@@ -15,19 +15,24 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.rest.controller;
 
-import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
-import de.doubleslash.keeptime.REST_API.mapper.ProjectMapper;
-import de.doubleslash.keeptime.REST_API.mapper.ProjectMapperImpl;
+import de.doubleslash.keeptime.rest.DTO.ProjectDTO;
+import de.doubleslash.keeptime.rest.mapper.ProjectMapper;
 import de.doubleslash.keeptime.model.Project;
 import javafx.scene.paint.Color;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+@SpringBootTest
 class ProjectMapperTest {
-   ProjectMapper projectMapper = new ProjectMapperImpl();
+
+   @Autowired
+   ProjectMapper projectMapper;
 
    @Test
    void projectToProjectDTO() {
@@ -42,16 +47,16 @@ class ProjectMapperTest {
       project.setWork(false);
 
       //ACT
-      final ProjectColorDTO projectColorDTO = projectMapper.projectToProjectDTO(project);
+      final ProjectDTO projectDTO = projectMapper.projectToProjectDTO(project);
       //Assert
-      assertEquals("0x0000ffff", projectColorDTO.getColor());
+      assertEquals("0x0000ffff", projectDTO.getColor());
 
    }
 
    @Test
    void projectDTOToProject() {
       // ARRANGE
-      ProjectColorDTO project = new ProjectColorDTO(1, "ProjectName", "ProjectDescription", "0xff0000ff", false, 0, true);
+      ProjectDTO project = new ProjectDTO(1, "ProjectName", "ProjectDescription", "0xff0000ff", false, 0, true);
 
       // ACT
       final Project project1 = projectMapper.projectDTOToProject(project);
@@ -60,5 +65,6 @@ class ProjectMapperTest {
       assertEquals(Color.RED, project1.getColor());
       assertEquals("ProjectName", project1.getName());
       assertEquals("ProjectDescription", project1.getDescription());
+      assertTrue(project1.isEnabled());
    }
 }

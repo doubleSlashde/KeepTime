@@ -14,18 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.DTO;
+package de.doubleslash.keeptime.rest.DTO;
+
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 public class WorkDTO {
    private long id;
+
+   @NotNull
    private LocalDateTime startTime;
+
+   @NotNull
    private LocalDateTime endTime;
-   private ProjectDTO project;
+
+   @NotNull
+   private ProjectIdentificationDTO project;
+
    private String notes;
 
-   public WorkDTO(long id, LocalDateTime startTime, LocalDateTime endTime, ProjectDTO project, String notes) {
+   public WorkDTO(long id, LocalDateTime startTime, LocalDateTime endTime, ProjectIdentificationDTO project, String notes) {
       this.id = id;
       this.startTime = startTime;
       this.endTime = endTime;
@@ -57,11 +66,11 @@ public class WorkDTO {
       this.endTime = endTime;
    }
 
-   public ProjectDTO getProject() {
+   public ProjectIdentificationDTO getProject() {
       return project;
    }
 
-   public void setProject(ProjectDTO project) {
+   public void setProject(ProjectIdentificationDTO project) {
       this.project = project;
    }
 

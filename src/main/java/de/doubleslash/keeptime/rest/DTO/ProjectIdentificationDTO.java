@@ -14,12 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.DTO;
+package de.doubleslash.keeptime.rest.DTO;
 
-public class ProjectDTO {
+public class ProjectIdentificationDTO {
    private long id;
-
-   public ProjectDTO(final long id) {
+   public ProjectIdentificationDTO(){}
+   public ProjectIdentificationDTO(final long id) {
       this.id = id;
    }
 

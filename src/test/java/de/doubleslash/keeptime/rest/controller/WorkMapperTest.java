@@ -15,12 +15,12 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.rest.controller;
 
-import de.doubleslash.keeptime.REST_API.DTO.ProjectDTO;
-import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
-import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
-import de.doubleslash.keeptime.REST_API.mapper.WorkMapperImpl;
+import de.doubleslash.keeptime.rest.DTO.ProjectIdentificationDTO;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
+import de.doubleslash.keeptime.rest.mapper.WorkMapper;
+import de.doubleslash.keeptime.rest.mapper.WorkMapperImpl;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import javafx.scene.paint.Color;
@@ -64,9 +64,9 @@ class WorkMapperTest {
       // Arrange
       LocalDateTime startTime = LocalDateTime.of(2024, 4, 22, 9, 0);
       LocalDateTime endTime = LocalDateTime.of(2024, 4, 22, 17, 0);
-      ProjectDTO projectDTO = new ProjectDTO(0);
+      ProjectIdentificationDTO projectIdentificationDTO = new ProjectIdentificationDTO(0);
       String notes = "Test Notizen";
-      WorkDTO workDTO = new WorkDTO(1,startTime, endTime, projectDTO, notes);
+      WorkDTO workDTO = new WorkDTO(1,startTime, endTime, projectIdentificationDTO, notes);
 
       // Act
       Work work = workMapper.workDTOToWork(workDTO);
@@ -76,7 +76,7 @@ class WorkMapperTest {
       assertEquals(startTime, work.getStartTime());
       assertEquals(endTime, work.getEndTime());
       assertNotNull(work.getProject());
-      assertEquals(projectDTO.getId(), work.getProject().getId());
+      assertEquals(projectIdentificationDTO.getId(), work.getProject().getId());
       assertEquals(notes, work.getNotes());
    }
 }

@@ -14,19 +14,19 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.REST_API.controller;
+package de.doubleslash.keeptime.rest.controller;
 
-import de.doubleslash.keeptime.REST_API.DTO.ProjectColorDTO;
-import de.doubleslash.keeptime.REST_API.DTO.WorkDTO;
-import de.doubleslash.keeptime.REST_API.mapper.ProjectMapper;
-import de.doubleslash.keeptime.REST_API.mapper.WorkMapper;
+import de.doubleslash.keeptime.rest.DTO.ProjectDTO;
+import de.doubleslash.keeptime.rest.DTO.ProjectIdentificationDTO;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
+import de.doubleslash.keeptime.rest.mapper.ProjectMapper;
+import de.doubleslash.keeptime.rest.mapper.WorkMapper;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
-import javafx.application.Platform;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +36,6 @@ import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -58,8 +57,8 @@ public class ProjectController {
       this.projectMapper = projectMapper;
    }
 
-   @GetMapping("")
-   public ResponseEntity<List<ProjectColorDTO>> getProjectColorDTOsByName(
+   @GetMapping
+   public ResponseEntity<List<ProjectDTO>> getProjectColorDTOsByName(
          @RequestParam(name = "name", required = false) final String name) {
       List<Project> projects;
 
@@ -68,14 +67,14 @@ public class ProjectController {
       } else {
          projects = projectRepository.findAll();
       }
-      List<ProjectColorDTO> projectColorDTOs = projects.stream()
-                                                       .map(projectMapper::projectToProjectDTO)
-                                                       .collect(Collectors.toList());
-      return ResponseEntity.ok(projectColorDTOs);
+      List<ProjectDTO> projectDTOS = projects.stream()
+                                             .map(projectMapper::projectToProjectDTO)
+                                             .toList();
+      return ResponseEntity.ok(projectDTOS);
    }
 
    @GetMapping("/{id}")
-   public @Valid ProjectColorDTO getProjectById(@PathVariable final long id) {
+   public @Valid ProjectDTO getProjectById(@PathVariable final long id) {
       final Optional<Project> project = projectRepository.findById(id);
 
       if (project.isEmpty()) {
@@ -86,36 +85,17 @@ public class ProjectController {
 
    @GetMapping("/{id}/works")
    public List<WorkDTO> getWorksFromProject(@PathVariable final long id) {
-      return workRepository.findAll().stream().filter(work -> {
-         Project project = work.getProject();
-         return project != null && project.getId() == id;
-      }).map(workMapper::workToWorkDTO).collect(Collectors.toList());
+      return workRepository.findByProjectId(id).stream().map(workMapper::workToWorkDTO).toList();
    }
 
-   @GetMapping("/{projectId}/works/{workId}")
-   public WorkDTO getWorkByIdFromProject(@PathVariable final long projectId, @PathVariable final long workId) {
-      return workRepository.findAll()
-                           .stream()
-                           .filter(work -> {
-                              Project project = work.getProject();
-                              return project != null && project.getId() == projectId && work.getId() == workId;
-                           })
-                           .findFirst()
-                           .map(workMapper::workToWorkDTO)
-                           .orElseThrow(() -> new ResourceNotFoundException(
-                               "Work with id '" + workId + "' related to project with id '"
-                                   + projectId
-                                   + "' not found"));
-   }
-
-   @PostMapping("")
-   public ResponseEntity<ProjectColorDTO> createProject(@Valid @RequestBody final ProjectColorDTO newProjectDTO) {
+   @PostMapping
+   public ResponseEntity<ProjectDTO> createProject(@Valid @RequestBody final ProjectDTO newProjectDTO) {
       try {
          Project newProject = projectMapper.projectDTOToProject(newProjectDTO);
 
-         controller.addNewProject(newProject);
+         FXUtils.runInFxThreadAndWait(()-> controller.addNewProject(newProject));
 
-         ProjectColorDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
+         ProjectDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
          return ResponseEntity.status(HttpStatus.CREATED).body(projectDTO);
       } catch (Exception e) {
          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -123,21 +103,27 @@ public class ProjectController {
    }
 
    @PutMapping("/{id}")
-   public ResponseEntity<ProjectColorDTO> updateProjectColorDTO(@PathVariable final long id,
-         @Valid @RequestBody final ProjectColorDTO newValuedProjectDTO) {
+   public ResponseEntity<ProjectDTO> updateProject(@PathVariable final long id,
+         @Valid @RequestBody final ProjectDTO newValuedProjectDTO) {
+
+      if(id != newValuedProjectDTO.getId()){
+         return ResponseEntity.badRequest().build();
+      }
+      Optional<Project> optionalProject = projectRepository.findById(id);
+
+      if (optionalProject.isEmpty()) {
+         return ResponseEntity.notFound().build();
+      }
+
+      Project existingProject = optionalProject.get();
+
       try {
-         Optional<Project> optionalProject = projectRepository.findById(id);
-
-         if (optionalProject.isEmpty()) {
-            return ResponseEntity.notFound().build();
-         }
-
-         Project existingProject = optionalProject.get();
          Project newValuedProject = projectMapper.projectDTOToProject(newValuedProjectDTO);
 
-         controller.editProject(existingProject, newValuedProject);
+         FXUtils.runInFxThreadAndWait(()->
+               controller.editProject(existingProject, newValuedProject));
 
-         ProjectColorDTO updatedProjectDTO = projectMapper.projectToProjectDTO(existingProject);
+         ProjectDTO updatedProjectDTO = projectMapper.projectToProjectDTO(existingProject);
 
          return ResponseEntity.ok(updatedProjectDTO);
       } catch (DataAccessException e) {
@@ -147,20 +133,27 @@ public class ProjectController {
 
    @PostMapping("/{id}/works")
    public ResponseEntity<WorkDTO> createWorkInProject(@PathVariable final long id,
-         @Valid @RequestBody final Work work) {
+         @Valid @RequestBody final WorkDTO workDTO) {
+
+      if(id != workDTO.getProject().getId()){
+         return ResponseEntity.badRequest().build();
+      }
+
       Optional<Project> projectOptional = projectRepository.findById(id);
 
       if (projectOptional.isEmpty()) {
          return ResponseEntity.notFound().build();
       }
 
+      final Work newWork = workMapper.workDTOToWork(workDTO);
       Project project = projectOptional.get();
-      work.setProject(project);
-      workRepository.save(work);
+      newWork.setProject(project);
 
-      WorkDTO workDTO = workMapper.workToWorkDTO(work);
+      workRepository.save(newWork);
 
-      return ResponseEntity.status(HttpStatus.CREATED).body(workDTO);
+      WorkDTO createdWorkDTO = workMapper.workToWorkDTO(newWork);
+
+      return ResponseEntity.status(HttpStatus.CREATED).body(createdWorkDTO);
    }
 
    @DeleteMapping("/{id}")
@@ -176,24 +169,31 @@ public class ProjectController {
       if (project.isDefault()) {
          return new ResponseEntity<>("Project cannot be deleted as it is the default", HttpStatus.BAD_REQUEST);
       }
+      FXUtils.runInFxThreadAndWait(()->
+            controller.deleteProject(project));
 
-      controller.deleteProject(project);
-      projectRepository.delete(project);
       return new ResponseEntity<>("Project successfully deleted", HttpStatus.OK);
    }
 
    @GetMapping("/current")
-   public ProjectColorDTO getWorkProjects() {
+   public ProjectDTO getWorkProjects() {
       Project project = model.activeWorkItem.get().getProject();
       return projectMapper.projectToProjectDTO(project);
    }
 
    @PutMapping("/current")
-   public ResponseEntity<ProjectColorDTO> changeProject(@Valid @RequestBody Project newProject) {
+   public ResponseEntity<ProjectIdentificationDTO> changeProject(@Valid @RequestBody ProjectIdentificationDTO newProject) {
+      Optional<Project> projectOptional = projectRepository.findById(newProject.getId());
+
+      if (projectOptional.isEmpty()) {
+         return ResponseEntity.notFound().build();
+      }
+
       try {
-         controller.changeProject(newProject);
-         ProjectColorDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
-         return ResponseEntity.ok(projectDTO);
+         FXUtils.runInFxThreadAndWait(()->
+               controller.changeProject(projectOptional.get()));
+
+         return ResponseEntity.ok(newProject);
       } catch (Exception e) {
          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
       }

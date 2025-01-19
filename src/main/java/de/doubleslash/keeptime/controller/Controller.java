@@ -84,10 +84,8 @@ public class Controller {
       // Start new work
       final Work newWork = new Work(workEnd, workEnd.plusSeconds(minusSeconds), newProject, "");
 
-      runInFXThread(() -> {
-         model.getPastWorkItems().add(newWork);
-         model.activeWorkItem.set(newWork);
-      });
+      model.getPastWorkItems().add(newWork);
+      model.activeWorkItem.set(newWork);
    }
 
    public Work saveCurrentWork(final LocalDateTime workEnd) {
@@ -111,10 +109,9 @@ public class Controller {
 
    public void addNewProject(final Project project) {
       LOG.info("Creating new project '{}'.", project);
-      runInFXThread(() -> {
-         model.getAllProjects().add(project);
-         model.getAvailableProjects().add(project);
-      });
+
+      model.getAllProjects().add(project);
+      model.getAvailableProjects().add(project);
 
       final List<Project> changedProjects = resortProjectIndexes(model.getAvailableProjects(), project,
             model.getAvailableProjects().size(), project.getIndex());
@@ -356,17 +353,5 @@ public class Controller {
       }
 
       return seconds;
-   }
-
-   /**
-    * Helper to make sure change is run in FX Thread. Needed when triggered via REST-API
-    * @param runnable
-    */
-   private void runInFXThread(Runnable runnable){
-      if(Platform.isFxApplicationThread()){
-         runnable.run();
-      }else{
-         Platform.runLater(runnable);
-      }
    }
 }

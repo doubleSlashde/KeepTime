@@ -19,8 +19,6 @@ package de.doubleslash.keeptime.model;
 import jakarta.persistence.*;
 
 import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.PositiveOrZero;
 import javafx.scene.paint.Color;
 
 @Entity
@@ -31,8 +29,6 @@ public class Project {
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
-
-   @NotEmpty(message = "Name must not be null or empty")
    private String name;
 
    @Lob
@@ -45,7 +41,6 @@ public class Project {
    private boolean isDefault;
    private boolean isEnabled;
 
-   @PositiveOrZero(message = "Index must not be negative")
    private int index;
 
    public Project() {
