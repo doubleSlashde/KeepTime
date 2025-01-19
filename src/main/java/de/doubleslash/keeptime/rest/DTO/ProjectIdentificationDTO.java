@@ -18,7 +18,9 @@ package de.doubleslash.keeptime.rest.DTO;
 
 public class ProjectIdentificationDTO {
    private long id;
-   public ProjectIdentificationDTO(){}
+
+   public ProjectIdentificationDTO() {}
+
    public ProjectIdentificationDTO(final long id) {
       this.id = id;
    }

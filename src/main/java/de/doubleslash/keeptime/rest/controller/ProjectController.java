@@ -16,26 +16,36 @@
 
 package de.doubleslash.keeptime.rest.controller;
 
-import de.doubleslash.keeptime.rest.DTO.ProjectDTO;
-import de.doubleslash.keeptime.rest.DTO.ProjectIdentificationDTO;
-import de.doubleslash.keeptime.rest.DTO.WorkDTO;
-import de.doubleslash.keeptime.rest.mapper.ProjectMapper;
-import de.doubleslash.keeptime.rest.mapper.WorkMapper;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
-import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-
+import de.doubleslash.keeptime.rest.DTO.ProjectDTO;
+import de.doubleslash.keeptime.rest.DTO.ProjectIdentificationDTO;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
+import de.doubleslash.keeptime.rest.mapper.ProjectMapper;
+import de.doubleslash.keeptime.rest.mapper.WorkMapper;
 import jakarta.validation.Valid;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/projects")
@@ -67,9 +77,7 @@ public class ProjectController {
       } else {
          projects = projectRepository.findAll();
       }
-      List<ProjectDTO> projectDTOS = projects.stream()
-                                             .map(projectMapper::projectToProjectDTO)
-                                             .toList();
+      List<ProjectDTO> projectDTOS = projects.stream().map(projectMapper::projectToProjectDTO).toList();
       return ResponseEntity.ok(projectDTOS);
    }
 
@@ -93,7 +101,7 @@ public class ProjectController {
       try {
          Project newProject = projectMapper.projectDTOToProject(newProjectDTO);
 
-         FXUtils.runInFxThreadAndWait(()-> controller.addNewProject(newProject));
+         FXUtils.runInFxThreadAndWait(() -> controller.addNewProject(newProject));
 
          ProjectDTO projectDTO = projectMapper.projectToProjectDTO(newProject);
          return ResponseEntity.status(HttpStatus.CREATED).body(projectDTO);
@@ -106,7 +114,7 @@ public class ProjectController {
    public ResponseEntity<ProjectDTO> updateProject(@PathVariable final long id,
          @Valid @RequestBody final ProjectDTO newValuedProjectDTO) {
 
-      if(id != newValuedProjectDTO.getId()){
+      if (id != newValuedProjectDTO.getId()) {
          return ResponseEntity.badRequest().build();
       }
       Optional<Project> optionalProject = projectRepository.findById(id);
@@ -120,8 +128,7 @@ public class ProjectController {
       try {
          Project newValuedProject = projectMapper.projectDTOToProject(newValuedProjectDTO);
 
-         FXUtils.runInFxThreadAndWait(()->
-               controller.editProject(existingProject, newValuedProject));
+         FXUtils.runInFxThreadAndWait(() -> controller.editProject(existingProject, newValuedProject));
 
          ProjectDTO updatedProjectDTO = projectMapper.projectToProjectDTO(existingProject);
 
@@ -135,7 +142,7 @@ public class ProjectController {
    public ResponseEntity<WorkDTO> createWorkInProject(@PathVariable final long id,
          @Valid @RequestBody final WorkDTO workDTO) {
 
-      if(id != workDTO.getProject().getId()){
+      if (id != workDTO.getProject().getId()) {
          return ResponseEntity.badRequest().build();
       }
 
@@ -169,8 +176,7 @@ public class ProjectController {
       if (project.isDefault()) {
          return new ResponseEntity<>("Project cannot be deleted as it is the default", HttpStatus.BAD_REQUEST);
       }
-      FXUtils.runInFxThreadAndWait(()->
-            controller.deleteProject(project));
+      FXUtils.runInFxThreadAndWait(() -> controller.deleteProject(project));
 
       return new ResponseEntity<>("Project successfully deleted", HttpStatus.OK);
    }
@@ -182,7 +188,8 @@ public class ProjectController {
    }
 
    @PutMapping("/current")
-   public ResponseEntity<ProjectIdentificationDTO> changeProject(@Valid @RequestBody ProjectIdentificationDTO newProject) {
+   public ResponseEntity<ProjectIdentificationDTO> changeProject(
+         @Valid @RequestBody ProjectIdentificationDTO newProject) {
       Optional<Project> projectOptional = projectRepository.findById(newProject.getId());
 
       if (projectOptional.isEmpty()) {
@@ -190,8 +197,7 @@ public class ProjectController {
       }
 
       try {
-         FXUtils.runInFxThreadAndWait(()->
-               controller.changeProject(projectOptional.get()));
+         FXUtils.runInFxThreadAndWait(() -> controller.changeProject(projectOptional.get()));
 
          return ResponseEntity.ok(newProject);
       } catch (Exception e) {

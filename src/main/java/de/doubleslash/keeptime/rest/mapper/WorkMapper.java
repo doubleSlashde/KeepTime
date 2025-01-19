@@ -16,9 +16,10 @@
 
 package de.doubleslash.keeptime.rest.mapper;
 
-import de.doubleslash.keeptime.rest.DTO.WorkDTO;
-import de.doubleslash.keeptime.model.Work;
 import org.mapstruct.Mapper;
+
+import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
 
 @Mapper(componentModel = "spring")
 public interface WorkMapper {
@@ -27,5 +28,3 @@ public interface WorkMapper {
 
    Work workDTOToWork(WorkDTO workDTO);
 }
-
-

@@ -16,13 +16,10 @@
 
 package de.doubleslash.keeptime.rest.controller;
 
-import de.doubleslash.keeptime.rest.DTO.WorkDTO;
-import de.doubleslash.keeptime.rest.mapper.WorkMapper;
-import de.doubleslash.keeptime.model.Model;
-import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
-import de.doubleslash.keeptime.model.repos.ProjectRepository;
-import de.doubleslash.keeptime.model.repos.WorkRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,9 +31,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+import de.doubleslash.keeptime.model.Model;
+import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.model.repos.ProjectRepository;
+import de.doubleslash.keeptime.model.repos.WorkRepository;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
+import de.doubleslash.keeptime.rest.mapper.WorkMapper;
 
 @RestController
 @RequestMapping("/api/works")
@@ -47,9 +48,10 @@ public class WorksController {
    private final Model model;
    private final WorkMapper workMapper;
 
-   public WorksController(final WorkRepository workRepository,final ProjectRepository projectRepository, Model model, WorkMapper workMapper) {
+   public WorksController(final WorkRepository workRepository, final ProjectRepository projectRepository, Model model,
+         WorkMapper workMapper) {
       this.workRepository = workRepository;
-      this.projectRepository=projectRepository;
+      this.projectRepository = projectRepository;
       this.model = model;
       this.workMapper = workMapper;
    }
@@ -69,7 +71,7 @@ public class WorksController {
    @PutMapping("/{id}")
    public ResponseEntity<WorkDTO> editWork(@PathVariable("id") Long workId, @RequestBody WorkDTO newValuedWorkDTO) {
 
-      if(workId != newValuedWorkDTO.getId() ){
+      if (workId != newValuedWorkDTO.getId()) {
          return ResponseEntity.badRequest().build();
       }
 

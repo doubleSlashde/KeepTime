@@ -33,8 +33,9 @@ public class ProjectDTO {
    private int index;
    private boolean isEnabled;
 
-   public ProjectDTO( long id, String name, String description, String color, boolean isWork, int index, boolean isEnabled) {
-      this.id= id;
+   public ProjectDTO(long id, String name, String description, String color, boolean isWork, int index,
+         boolean isEnabled) {
+      this.id = id;
       this.name = name;
       this.description = description;
       this.color = color;

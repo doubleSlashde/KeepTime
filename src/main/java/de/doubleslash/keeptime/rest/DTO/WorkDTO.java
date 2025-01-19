@@ -16,9 +16,9 @@
 
 package de.doubleslash.keeptime.rest.DTO;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
+
+import jakarta.validation.constraints.NotNull;
 
 public class WorkDTO {
    private long id;
@@ -34,7 +34,8 @@ public class WorkDTO {
 
    private String notes;
 
-   public WorkDTO(long id, LocalDateTime startTime, LocalDateTime endTime, ProjectIdentificationDTO project, String notes) {
+   public WorkDTO(long id, LocalDateTime startTime, LocalDateTime endTime, ProjectIdentificationDTO project,
+         String notes) {
       this.id = id;
       this.startTime = startTime;
       this.endTime = endTime;
