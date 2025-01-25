@@ -312,14 +312,14 @@ public class SettingsController {
             mainscreen.savePosition();
          }
 
-         controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+         /*controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
                saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
                emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected()));
-         thisStage.close();
+         */thisStage.close();
 
       });
 

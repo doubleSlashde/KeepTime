@@ -44,11 +44,13 @@ public class Controller {
    private Interval autoSaveInterval;
 
    private final Model model;
+   private final Settings settings;
 
    private final DateProvider dateProvider;
 
-   public Controller(final Model model, final DateProvider dateProvider) {
+   public Controller(final Model model, Settings settings, final DateProvider dateProvider) {
       this.model = model;
+      this.settings = settings;
       this.dateProvider = dateProvider;
    }
 
@@ -118,7 +120,6 @@ public class Controller {
    }
 
    public void updateSettings(final Settings newValuedSettings) {
-      Settings settings = model.getSettingsRepository().findAll().get(0);
 
       settings.setTaskBarColor(newValuedSettings.getTaskBarColor());
       settings.setDefaultBackgroundColor(newValuedSettings.getDefaultBackgroundColor());
@@ -135,8 +136,6 @@ public class Controller {
       settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
       settings.setRemindIfNotesAreEmptyOnlyForWorkEntry(newValuedSettings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
       settings.setConfirmClose(newValuedSettings.isConfirmClose());
-
-      settings = model.getSettingsRepository().save(settings);
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
@@ -163,14 +162,14 @@ public class Controller {
       changeProject(model.getIdleProject(), 0);
 
       LOG.info("Updating settings to persist local changes on shutdown.");
-      final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
+      /*final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
             model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
             model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
             model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
             model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
             model.remindIfNotesAreEmpty.get(), model.remindIfNotesAreEmptyOnlyForWorkEntry.get(),
             model.confirmClose.get());
-      updateSettings(newSettings);
+      updateSettings(newSettings);*/
    }
 
    public void deleteProject(final Project p) {

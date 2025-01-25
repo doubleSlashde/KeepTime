@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import de.doubleslash.keeptime.model.Settings;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
@@ -59,7 +60,7 @@ class ControllerTest {
       model = new Model(Mockito.mock(ProjectRepository.class), mockedWorkRepository,
             Mockito.mock(SettingsRepository.class));
       mockedDateProvider = Mockito.mock(DateProvider.class);
-      testee = new Controller(model, mockedDateProvider);
+      testee = new Controller(model, Mockito.mock(Settings.class), mockedDateProvider);
    }
 
    @Test

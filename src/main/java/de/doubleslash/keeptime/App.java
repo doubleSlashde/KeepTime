@@ -78,6 +78,7 @@ public class App extends Application {
    private ViewController viewController;
 
    private GlobalScreenListener globalScreenListener;
+   private Settings settings;
 
    @Override
    public void init() throws Exception {
@@ -95,6 +96,7 @@ public class App extends Application {
 
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      settings = springContext.getBean(Settings.class);
       controller.enableAutoSave();
       model.setSpringContext(springContext);
    }
@@ -183,11 +185,8 @@ public class App extends Application {
    private void readSettings() {
       LOG.debug("Reading configuration");
 
-      final List<Settings> settingsList = model.getSettingsRepository().findAll();
-      final Settings settings;
-      if (settingsList.isEmpty()) {
+      if (false) {
          LOG.info("Empty settings. Set default");
-         settings = new Settings();
          settings.setTaskBarColor(model.taskBarColor.get());
 
          settings.setDefaultBackgroundColor(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
@@ -198,10 +197,8 @@ public class App extends Application {
          settings.setUseHotkey(false);
          settings.setDisplayProjectsRight(false);
          settings.setHideProjectsOnMouseExit(false);
-         model.getSettingsRepository().save(settings);
       } else {
          LOG.info("Got settings from database");
-         settings = settingsList.get(0);
       }
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
