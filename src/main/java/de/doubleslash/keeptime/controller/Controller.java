@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class Controller {
    private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
    private final long AUTO_SAVE_INTERVAL_SECONDS = 60;
+   private final HeimatSettings heimatSettings;
    private Interval autoSaveInterval;
 
    private final Model model;
@@ -48,9 +50,10 @@ public class Controller {
 
    private final DateProvider dateProvider;
 
-   public Controller(final Model model, Settings settings, final DateProvider dateProvider) {
+   public Controller(final Model model, Settings settings, HeimatSettings heimatSettings, final DateProvider dateProvider) {
       this.model = model;
       this.settings = settings;
+      this.heimatSettings = heimatSettings;
       this.dateProvider = dateProvider;
    }
 
@@ -119,8 +122,14 @@ public class Controller {
       model.getProjectRepository().saveAll(changedProjects);
    }
 
+   public void updateHeimatSettings(final boolean active, String url, String pat){
+      heimatSettings.setHeimatActive(active);
+      heimatSettings.setHeimatUrl(url);
+      heimatSettings.setHeimatPat(pat);
+      heimatSettings.save();
+   }
+   
    public void updateSettings(final Settings newValuedSettings) {
-
       settings.setTaskBarColor(newValuedSettings.getTaskBarColor());
       settings.setDefaultBackgroundColor(newValuedSettings.getDefaultBackgroundColor());
       settings.setDefaultFontColor(newValuedSettings.getDefaultFontColor());

@@ -28,6 +28,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
+import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
+import de.doubleslash.keeptime.rest.integration.heimat.JwtDecoder;
+import javafx.beans.binding.Bindings;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -181,6 +185,28 @@ public class SettingsController {
    @FXML
    private TextField authPort;
 
+   @FXML
+   private CheckBox heimatActivationCheckbox;
+
+
+   @FXML
+   private TextField heimatUrlTextField;
+
+   @FXML
+   private Label heimatUrlPreviewLabel;
+
+   @FXML
+   private PasswordField heimatPatTextField;
+
+   @FXML
+   private Label heimatExpiresLabel;
+
+   @FXML
+   private Button heimatValidateConnectionButton;
+
+   @FXML
+   private Label heimatValidateConnectionLabel;
+
    private final String propertiesFilePath = "application.properties";
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
@@ -312,6 +338,7 @@ public class SettingsController {
             mainscreen.savePosition();
          }
 
+
          /*controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
                defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
                useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
@@ -319,8 +346,14 @@ public class SettingsController {
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
                saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
                emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected()));
-         */thisStage.close();
+         */
 
+         controller.updateHeimatSettings(
+                  heimatActivationCheckbox.isSelected(),
+                  heimatUrlTextField.getText(),
+                  heimatPatTextField.getText());
+
+         thisStage.close();
       });
 
       LOG.debug("cancelButton.setOnAction");
@@ -340,7 +373,45 @@ public class SettingsController {
 
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
+      initializeHeimat();
+   }
 
+   private void initializeHeimat() {
+      heimatValidateConnectionButton.disableProperty().bind(
+            Bindings.createBooleanBinding(
+                  () -> heimatUrlTextField.getText().trim().isEmpty() || heimatPatTextField.getText().trim().isEmpty(),
+                  heimatUrlTextField.textProperty(),
+                  heimatPatTextField.textProperty()
+            )
+      );
+      heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
+         try{
+            final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
+            heimatExpiresLabel.setText(jwt.expiration().toString());
+         } catch(Exception e){
+            heimatExpiresLabel.setText("Does not seem to be valid");
+         }
+      });
+      heimatValidateConnectionButton.setOnAction(ae -> {
+         final HeimatAPI heimatAPI = new HeimatAPI(heimatUrlTextField.getText() + "/heimat-core/api/v1/", heimatPatTextField.getText());
+         try {
+            heimatAPI.isLoginValid();
+            heimatValidateConnectionLabel.setText("Connection is valid");
+         }catch(Exception e){
+            LOG.error("Error while validating Heimat connection", e);
+            heimatValidateConnectionLabel.setText("Invalid connection: " + e.getMessage());
+         }
+      });
+
+      heimatUrlPreviewLabel.setText("<url>/heimat-core/api/v1/");
+      heimatUrlTextField.textProperty().addListener((observable, oldValue, newValue)->{
+         heimatUrlPreviewLabel.setText(newValue + "/heimat-core/api/v1/");
+      });
+
+      final HeimatSettings heimatSettings = model.getHeimatSettings();
+      heimatActivationCheckbox.setSelected(heimatSettings.isHeimatActive());
+      heimatUrlTextField.setText(heimatSettings.getHeimatUrl());
+      heimatPatTextField.setText(heimatSettings.getHeimatPat());
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {

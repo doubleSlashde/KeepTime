@@ -36,8 +36,10 @@ public class Settings {
       this.settingsRepository = settingsRepository;
    }
 
+   // TODO add default values
+
    public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
-      return getBoolean("remind_if_notes_are_empty_only_for_work_entry");
+      return getBoolean("remind_if_notes_are_empty_only_for_work_entry", false);
    }
 
    public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
@@ -45,7 +47,7 @@ public class Settings {
    }
 
    public boolean isConfirmClose() {
-      return getBoolean("confirm_close");
+      return getBoolean("confirm_close", false);
    }
 
    public void setConfirmClose(boolean confirmClose) {
@@ -93,7 +95,7 @@ public class Settings {
    }
 
    public boolean isUseHotkey() {
-      return getBoolean("use_hotkey");
+      return getBoolean("use_hotkey", false);
    }
 
    public void setUseHotkey(final boolean useHotkey) {
@@ -101,7 +103,7 @@ public class Settings {
    }
 
    public boolean isDisplayProjectsRight() {
-      return getBoolean("display_projects_right");
+      return getBoolean("display_projects_right", true);
    }
 
    public void setDisplayProjectsRight(final boolean displayProjectsRight) {
@@ -109,7 +111,7 @@ public class Settings {
    }
 
    public boolean isHideProjectsOnMouseExit() {
-      return getBoolean("hide_projects_on_mouse_exit");
+      return getBoolean("hide_projects_on_mouse_exit", true);
    }
 
    public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
@@ -141,7 +143,7 @@ public class Settings {
    }
 
    public boolean isSaveWindowPosition() {
-      return getBoolean("save_window_position");
+      return getBoolean("save_window_position", false);
    }
 
    public void setSaveWindowPosition(final boolean saveWindowPosition) {
@@ -149,19 +151,24 @@ public class Settings {
    }
 
    public boolean isRemindIfNotesAreEmpty() {
-      return getBoolean("remind_if_notes_are_empty");
+      return getBoolean("remind_if_notes_are_empty", false);
    }
 
    public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
       setBoolean("remind_if_notes_are_empty", emptyNoteReminder);
    }
 
-   private boolean getBoolean(String key) {
-      return Boolean.getBoolean(settingsRepository.findBySetting(key).getSettingValue());
+   private boolean getBoolean(String key, boolean orDefault) {
+      final Setting bySetting = settingsRepository.findBySetting(key);
+      if (bySetting == null)
+         return orDefault;
+      return Boolean.parseBoolean(bySetting.getSettingValue());
    }
 
    public void setBoolean(String key, boolean value) {
-      final Setting setting = settingsRepository.findBySetting(key);
+      Setting setting = settingsRepository.findBySetting(key);
+      if (setting == null)
+         setting = new Setting(key, "");
       setting.setSettingValue(String.valueOf(value));
       settingsRepository.save(setting);
    }
