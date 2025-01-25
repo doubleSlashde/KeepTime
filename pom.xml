@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.10</version>
+    <version>3.4.2</version>
     <relativePath />
     <!-- lookup parent from repository -->
   </parent>
@@ -39,7 +39,7 @@
     <java.version>17</java.version>
     <javafx.version>22</javafx.version>
 
-    <maven-dependency-check.version>9.1.0</maven-dependency-check.version>
+    <maven-dependency-check.version>12.0.1</maven-dependency-check.version>
     <!-- USING HTML,XML (comma-separated list) did not work with plugin version 5.1.0 -->
     <maven-dependency-check.format>ALL</maven-dependency-check.format>
     <maven-dependency-check.failOnError>true</maven-dependency-check.failOnError>
