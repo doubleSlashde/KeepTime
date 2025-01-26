@@ -473,7 +473,7 @@ public class ViewController {
       }
    }
 
-   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
+   public static FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
 

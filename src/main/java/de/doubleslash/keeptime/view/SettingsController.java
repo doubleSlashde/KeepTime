@@ -28,10 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.JwtDecoder;
 import javafx.beans.binding.Bindings;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Modality;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -61,6 +67,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
+import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
 
 @Component
 public class SettingsController {
@@ -206,6 +214,9 @@ public class SettingsController {
 
    @FXML
    private Label heimatValidateConnectionLabel;
+
+   @FXML
+   private Button heimatMapProjectsButton;
 
    private final String propertiesFilePath = "application.properties";
 
@@ -397,7 +408,7 @@ public class SettingsController {
          }
       });
       heimatValidateConnectionButton.setOnAction(ae -> {
-         final HeimatAPI heimatAPI = new HeimatAPI(heimatUrlTextField.getText() + "/heimat-core/api/v1/", heimatPatTextField.getText());
+         final HeimatAPI heimatAPI = new HeimatAPI(heimatUrlTextField.getText() , heimatPatTextField.getText());
          try {
             heimatAPI.isLoginValid();
             heimatValidateConnectionLabel.setText("Connection is valid");
@@ -416,6 +427,45 @@ public class SettingsController {
       heimatActivationCheckbox.setSelected(heimatSettings.isHeimatActive());
       heimatUrlTextField.setText(heimatSettings.getHeimatUrl());
       heimatPatTextField.setText(heimatSettings.getHeimatPat());
+
+      heimatMapProjectsButton.setOnAction((ae) -> {
+         try {
+            showMapProjectsStage();
+         } catch (IOException e) {
+            throw new RuntimeException(e);
+         }
+      });
+   }
+
+   private void showMapProjectsStage() throws IOException {
+      try{
+      // Settings stage
+      final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
+      fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
+      final Parent settingsRoot = fxmlLoader2.load();
+      MapExternalProjectsController settingsController = fxmlLoader2.getController();
+      Stage settingsStage = new Stage();
+      //settingsController.setStage(settingsStage);
+      settingsStage.initModality(Modality.APPLICATION_MODAL);
+      settingsStage.setTitle("External Project Mappings");
+      settingsStage.setResizable(false);
+      settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+      final Scene settingsScene = new Scene(settingsRoot);
+      settingsScene.setOnKeyPressed(ke -> {
+         if (ke.getCode() == KeyCode.ESCAPE) {
+            LOG.info("pressed ESCAPE");
+            settingsStage.close();
+         }
+      });
+
+      settingsStage.setScene(settingsScene);
+         settingsStage.showAndWait();
+      //settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
+   } catch (final IOException e) {
+      LOG.error("Error while loading sub stage");
+      throw new FXMLLoaderException(e);
+   }
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {

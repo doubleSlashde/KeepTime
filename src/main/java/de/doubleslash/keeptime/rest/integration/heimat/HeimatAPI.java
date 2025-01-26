@@ -17,9 +17,10 @@ public class HeimatAPI {
 
    public HeimatAPI(final String baseUrl, final String bearerToken) {
       restClient = RestClient.builder()
-                             .baseUrl(baseUrl)
+                             .baseUrl(baseUrl + "/heimat-core/api/v1/")
                              .defaultHeader("X-Client-Identifier", "KeepTime")
                              .defaultHeader("Authorization", "Bearer " + bearerToken)
+                             .defaultHeader("Accept", "application/json")
                              .build();
    }
 

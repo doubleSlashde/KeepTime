@@ -721,7 +721,7 @@
                                        <children>
                                           <HBox alignment="CENTER_LEFT">
                                              <children>
-                                                <Label text="Link your projects in &quot;Add new project&quot; or &quot;Edit project&quot;" />
+                                                <Button fx:id="heimatMapProjectsButton" mnemonicParsing="false" text="Map projects" />
                                              </children>
                                           </HBox>
                                        </children>

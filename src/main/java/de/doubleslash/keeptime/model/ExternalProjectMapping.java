@@ -102,4 +102,8 @@ public class ExternalProjectMapping {
    public void setProject(Project project) {
       this.project = project;
    }
+
+   public long getDatabaseId() {
+      return id;
+   }
 }

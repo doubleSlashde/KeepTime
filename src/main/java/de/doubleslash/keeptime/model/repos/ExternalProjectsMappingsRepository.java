@@ -18,11 +18,15 @@
 package de.doubleslash.keeptime.model.repos;
 
 import de.doubleslash.keeptime.model.ExternalProjectMapping;
+import de.doubleslash.keeptime.model.ExternalSystem;
 import de.doubleslash.keeptime.model.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ExternalProjectsMappingsRepository extends JpaRepository<ExternalProjectMapping, Long> {
 
+   List<ExternalProjectMapping> findByExternalSystemId(ExternalSystem externalSystem);
 }
