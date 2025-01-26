@@ -1,6 +1,6 @@
 CREATE TABLE new_settings(
-     setting        VARCHAR(255) NOT NULL,
-     setting_value      CLOB,
+     setting        VARCHAR NOT NULL,
+     setting_value  VARCHAR NOT NULL,
      PRIMARY KEY (setting)
 );
 

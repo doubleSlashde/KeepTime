@@ -16,9 +16,7 @@
 
 package de.doubleslash.keeptime.model;
 
-import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import jakarta.persistence.*;
-import javafx.scene.paint.Color;
 
 @Entity
 @Table(name = "ExternalProjectMapping")
@@ -29,10 +27,15 @@ public class ExternalProjectMapping {
    @Column(name = "id", updatable = false, nullable = false)
    private long id;
 
-   // TODO maybe add a externalSystem Identifier
+   @Enumerated(EnumType.STRING)
+   private ExternalSystem externalSystemId;
 
+   private String externalProjectName;
+
+   private long externalTaskId;
+   private String externalTaskName;
    @Lob
-   private String externalProjectData;
+   private String externalTaskMetadata;
 
    @ManyToOne
    private Project project;
@@ -41,24 +44,62 @@ public class ExternalProjectMapping {
       // Needed for jpa
    }
 
-   public ExternalProjectMapping(final String externalProjectData, final Project project) {
-      this.externalProjectData = externalProjectData;
+   public ExternalProjectMapping(ExternalSystem externalSystemId, String externalProjectName,
+       long externalTaskId, String externalTaskName, String externalTaskMetadata,
+       Project project) {
+      this.externalSystemId = externalSystemId;
+      this.externalProjectName = externalProjectName;
+      this.externalTaskId = externalTaskId;
+      this.externalTaskName = externalTaskName;
+      this.externalTaskMetadata = externalTaskMetadata;
       this.project = project;
    }
 
-   public String getExternalProjectData() {
-      return externalProjectData;
+   public ExternalSystem getExternalSystemId() {
+      return externalSystemId;
    }
 
-   public void setExternalProjectData(final String externalProjectData) {
-      this.externalProjectData = externalProjectData;
+   public void setExternalSystemId(ExternalSystem externalSystemId) {
+      this.externalSystemId = externalSystemId;
+   }
+
+   public String getExternalProjectName() {
+      return externalProjectName;
+   }
+
+   public void setExternalProjectName(String externalProjectName) {
+      this.externalProjectName = externalProjectName;
+   }
+
+   public long getExternalTaskId() {
+      return externalTaskId;
+   }
+
+   public void setExternalTaskId(long externalTaskId) {
+      this.externalTaskId = externalTaskId;
+   }
+
+   public String getExternalTaskName() {
+      return externalTaskName;
+   }
+
+   public void setExternalTaskName(String externalTaskName) {
+      this.externalTaskName = externalTaskName;
+   }
+
+   public String getExternalTaskMetadata() {
+      return externalTaskMetadata;
+   }
+
+   public void setExternalTaskMetadata(String externalTaskMetadata) {
+      this.externalTaskMetadata = externalTaskMetadata;
    }
 
    public Project getProject() {
       return project;
    }
 
-   public void setProject(final Project project) {
+   public void setProject(Project project) {
       this.project = project;
    }
 }

@@ -10,7 +10,6 @@ public class Setting {
    @Column(nullable = false, unique = true)
    private String setting;
 
-   @Lob
    private String settingValue;
 
    public Setting(){
