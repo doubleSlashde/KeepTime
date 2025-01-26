@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.doubleslash.keeptime.model.settings.HeimatSettings;
+import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -122,45 +123,58 @@ public class Controller {
       model.getProjectRepository().saveAll(changedProjects);
    }
 
-   public void updateHeimatSettings(final boolean active, String url, String pat){
-      heimatSettings.setHeimatActive(active);
-      heimatSettings.setHeimatUrl(url);
-      heimatSettings.setHeimatPat(pat);
-      heimatSettings.save();
-   }
-   
-   public void updateSettings(final Settings newValuedSettings) {
-      settings.setTaskBarColor(newValuedSettings.getTaskBarColor());
-      settings.setDefaultBackgroundColor(newValuedSettings.getDefaultBackgroundColor());
-      settings.setDefaultFontColor(newValuedSettings.getDefaultFontColor());
-      settings.setHoverBackgroundColor(newValuedSettings.getHoverBackgroundColor());
-      settings.setHoverFontColor(newValuedSettings.getHoverFontColor());
-      settings.setUseHotkey(newValuedSettings.isUseHotkey());
-      settings.setDisplayProjectsRight(newValuedSettings.isDisplayProjectsRight());
-      settings.setHideProjectsOnMouseExit(newValuedSettings.isHideProjectsOnMouseExit());
-      settings.setSaveWindowPosition(newValuedSettings.isSaveWindowPosition());
-      settings.setWindowXProportion(newValuedSettings.getWindowXProportion());
-      settings.setWindowYProportion(newValuedSettings.getWindowYProportion());
-      settings.setScreenHash(newValuedSettings.getScreenHash());
-      settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
-      settings.setRemindIfNotesAreEmptyOnlyForWorkEntry(newValuedSettings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
-      settings.setConfirmClose(newValuedSettings.isConfirmClose());
+
+   public void updateColorSettings(final Color hoverBackgroundColor,final Color hoverFontColor,final Color defaultBackgroundColor,final Color defaultFontColor,final Color taskBarColor) {
+      settings.setTaskBarColor(taskBarColor);
+      settings.setDefaultBackgroundColor(defaultBackgroundColor);
+      settings.setDefaultFontColor(defaultFontColor);
+      settings.setHoverBackgroundColor(hoverBackgroundColor);
+      settings.setHoverFontColor(hoverFontColor);
+      settings.save();
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
       model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
       model.hoverFontColor.set(settings.getHoverFontColor());
       model.taskBarColor.set(settings.getTaskBarColor());
-      model.useHotkey.set(settings.isUseHotkey());
+   }
+
+   public void updateLayoutSettings(final boolean displayProjectsRight,final boolean  hideProjectsOnMouseExit,final double proportionalX,final double proportionalY,final int screenHash,final boolean  saveWindowPosition) {
+      settings.setDisplayProjectsRight(displayProjectsRight);
+      settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
+      settings.setSaveWindowPosition(saveWindowPosition);
+      settings.setWindowXProportion(proportionalX);
+      settings.setWindowYProportion(proportionalY);
+      settings.setScreenHash(screenHash);
+      settings.save();
+
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.screenSettings.proportionalX.set(settings.getWindowXProportion());
       model.screenSettings.proportionalY.set(settings.getWindowYProportion());
       model.screenSettings.screenHash.set(settings.getScreenHash());
+   }
+
+   public void updateFeatureSettings(final boolean useHotkey,final boolean emptyNoteReminder,final boolean emptyNoteReminderOnlyForWorkEntry,final boolean confirmClose) {
+      settings.setUseHotkey(useHotkey);
+      settings.setRemindIfNotesAreEmpty(emptyNoteReminder);
+      settings.setRemindIfNotesAreEmptyOnlyForWorkEntry(emptyNoteReminderOnlyForWorkEntry);
+      settings.setConfirmClose(confirmClose);
+      settings.save();
+
+      model.useHotkey.set(settings.isUseHotkey());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
       model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
       model.confirmClose.set(settings.isConfirmClose());
+   }
+
+
+   public void updateHeimatSettings(final boolean active, final String url, final String pat){
+      heimatSettings.setHeimatActive(active);
+      heimatSettings.setHeimatUrl(url);
+      heimatSettings.setHeimatPat(pat);
+      heimatSettings.save();
    }
 
    @PreDestroy
@@ -171,14 +185,11 @@ public class Controller {
       changeProject(model.getIdleProject(), 0);
 
       LOG.info("Updating settings to persist local changes on shutdown.");
-      /*final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
-            model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
-            model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
-            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
-            model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
-            model.remindIfNotesAreEmpty.get(), model.remindIfNotesAreEmptyOnlyForWorkEntry.get(),
-            model.confirmClose.get());
-      updateSettings(newSettings);*/
+      // these are changed while dragging the windows - not via Settings-Dialog. Therefore, we need to save them separately.
+      settings.setScreenHash(model.screenSettings.screenHash.get());
+      settings.setWindowXProportion(model.screenSettings.proportionalX.get());
+      settings.setWindowYProportion(model.screenSettings.proportionalY.get());
+      settings.save();
    }
 
    public void deleteProject(final Project p) {
@@ -366,4 +377,6 @@ public class Controller {
 
       return seconds;
    }
+
+
 }

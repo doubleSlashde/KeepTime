@@ -1,7 +1,9 @@
 package de.doubleslash.keeptime.model.settings;
 
 import de.doubleslash.keeptime.model.Setting;
+import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
 import de.doubleslash.keeptime.model.repos.SettingsRepository;
+import javafx.scene.paint.Color;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class SettingsBase {
             Map.Entry::getValue).toList());
    }
 
-   boolean getBoolean(String key, boolean orDefault) {
+   public boolean getBoolean(String key, boolean orDefault) {
       final Setting bySetting = settingsMap.get(key);
       if (bySetting == null)
          return orDefault;
@@ -45,6 +47,7 @@ public class SettingsBase {
       if (setting == null)
          setting = new Setting(key, "");
       setting.setSettingValue(String.valueOf(value));
+      settingsMap.put(key, setting);
    }
 
    String getString(String key, String orDefault) {
@@ -59,5 +62,51 @@ public class SettingsBase {
       if (setting == null)
          setting = new Setting(key, "");
       setting.setSettingValue(value);
+      settingsMap.put(key, setting);
+   }
+
+   public Color getColor(String key, Color orDefault) {
+      Setting setting = settingsMap.get(key);
+      if (setting == null)
+         return orDefault;
+      return new ColorConverter().convertToEntityAttribute(setting.getSettingValue());
+   }
+
+   public void setColor(String key, Color value) {
+      Setting setting = settingsMap.get(key);
+      if (setting == null)
+         setting = new Setting(key, "");
+      setting.setSettingValue(new ColorConverter().convertToDatabaseColumn(value));
+      settingsMap.put(key, setting);
+   }
+
+   public double getDouble(String key, double orDefault) {
+      Setting setting = settingsMap.get(key);
+      if (setting == null)
+         return orDefault;
+      return Double.parseDouble(setting.getSettingValue());
+   }
+
+   public void setDouble(String key, double value) {
+      Setting setting = settingsMap.get(key);
+      if (setting == null)
+         setting = new Setting(key, "");
+      setting.setSettingValue(Double.toString(value));
+      settingsMap.put(key, setting);
+   }
+
+   public int getInt(String key, int orDefault) {
+      Setting setting = settingsMap.get(key);
+      if (setting == null)
+         return orDefault;
+      return Integer.parseInt(setting.getSettingValue());
+   }
+
+   public void setInt(String key, int value) {
+      Setting setting = settingsMap.get(key);
+      if (setting == null)
+         setting = new Setting(key, "");
+      setting.setSettingValue(Integer.toString(value));
+      settingsMap.put(key, setting);
    }
 }

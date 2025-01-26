@@ -16,9 +16,7 @@
 
 package de.doubleslash.keeptime.model;
 
-import de.doubleslash.keeptime.model.repos.SettingsRepository;
-
-import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
+import de.doubleslash.keeptime.model.settings.SettingsBase;
 import javafx.scene.paint.Color;
 import org.springframework.stereotype.Service;
 
@@ -30,176 +28,136 @@ import org.springframework.stereotype.Service;
 @Service
 public class Settings {
 
-   SettingsRepository settingsRepository;
+  SettingsBase settingsBase;
 
-   public Settings(SettingsRepository settingsRepository) {
-      this.settingsRepository = settingsRepository;
-   }
+  public Settings(SettingsBase settingsBase) {
+    this.settingsBase = settingsBase;
+  }
 
-   // TODO add default values
+  // TODO add default values
 
-   public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
-      return getBoolean("remind_if_notes_are_empty_only_for_work_entry", false);
-   }
+  public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
+    return settingsBase.getBoolean("remind_if_notes_are_empty_only_for_work_entry", false);
+  }
 
-   public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
-      setBoolean( "remind_if_notes_are_empty_only_for_work_entry", emptyNoteReminderCheckBoxIsWork);
-   }
+  public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
+    settingsBase.setBoolean("remind_if_notes_are_empty_only_for_work_entry",
+        emptyNoteReminderCheckBoxIsWork);
+  }
 
-   public boolean isConfirmClose() {
-      return getBoolean("confirm_close", false);
-   }
+  public boolean isConfirmClose() {
+    return settingsBase.getBoolean("confirm_close", false);
+  }
 
-   public void setConfirmClose(boolean confirmClose) {
-      setBoolean("confirm_close", confirmClose);
-   }
+  public void setConfirmClose(boolean confirmClose) {
+    settingsBase.setBoolean("confirm_close", confirmClose);
+  }
 
-   public Color getHoverBackgroundColor() {
-      return getColor("hover_background_color");
-   }
+  public Color getHoverBackgroundColor() {
+    return settingsBase.getColor("hover_background_color", Model.ORIGINAL_HOVER_BACKGROUND_COLOR);
+  }
 
-   public void setHoverBackgroundColor(final Color hoverBackgroundColor) {
-      setColor("hover_background_color", hoverBackgroundColor);
-   }
+  public void setHoverBackgroundColor(final Color hoverBackgroundColor) {
+    settingsBase.setColor("hover_background_color", hoverBackgroundColor);
+  }
 
-   public Color getHoverFontColor() {
-      return getColor("hover_font_color");
-   }
+  public Color getHoverFontColor() {
+    return settingsBase.getColor("hover_font_color", Model.ORIGINAL_HOVER_Font_COLOR);
+  }
 
-   public void setHoverFontColor(final Color hoverFontColor) {
-      setColor("hover_font_color", hoverFontColor);
-   }
+  public void setHoverFontColor(final Color hoverFontColor) {
+    settingsBase.setColor("hover_font_color", hoverFontColor);
+  }
 
-   public Color getDefaultBackgroundColor() {
-      return getColor("default_background_color");
-   }
+  public Color getDefaultBackgroundColor() {
+    return settingsBase.getColor("default_background_color",  Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
+  }
 
-   public void setDefaultBackgroundColor(final Color defaultBackgroundColor) {
-      setColor("default_background_color",defaultBackgroundColor);
-   }
+  public void setDefaultBackgroundColor(final Color defaultBackgroundColor) {
+    settingsBase.setColor("default_background_color", defaultBackgroundColor);
+  }
 
-   public Color getDefaultFontColor() {
-      return getColor("default_font_color");
-   }
+  public Color getDefaultFontColor() {
+    return settingsBase.getColor("default_font_color",  Model.ORIGINAL_DEFAULT_FONT_COLOR);
+  }
 
-   public void setDefaultFontColor(final Color defaultFontColor) {
-      setColor("default_font_color",defaultFontColor);
-   }
+  public void setDefaultFontColor(final Color defaultFontColor) {
+    settingsBase.setColor("default_font_color", defaultFontColor);
+  }
 
-   public Color getTaskBarColor() {
-      return getColor("task_bar_color");
-   }
+  public Color getTaskBarColor() {
+    return settingsBase.getColor("task_bar_color",  Model.ORIGINAL_TASK_BAR_FONT_COLOR);
+  }
 
-   public void setTaskBarColor(final Color taskBarColor) {
-      setColor("task_bar_color",taskBarColor);
-   }
+  public void setTaskBarColor(final Color taskBarColor) {
+    settingsBase.setColor("task_bar_color", taskBarColor);
+  }
 
-   public boolean isUseHotkey() {
-      return getBoolean("use_hotkey", false);
-   }
+  public boolean isUseHotkey() {
+    return settingsBase.getBoolean("use_hotkey", false);
+  }
 
-   public void setUseHotkey(final boolean useHotkey) {
-      setBoolean("use_hotkey", useHotkey);
-   }
+  public void setUseHotkey(final boolean useHotkey) {
+    settingsBase.setBoolean("use_hotkey", useHotkey);
+  }
 
-   public boolean isDisplayProjectsRight() {
-      return getBoolean("display_projects_right", true);
-   }
+  public boolean isDisplayProjectsRight() {
+    return settingsBase.getBoolean("display_projects_right", false);
+  }
 
-   public void setDisplayProjectsRight(final boolean displayProjectsRight) {
-      setBoolean("display_projects_right", displayProjectsRight);
-   }
+  public void setDisplayProjectsRight(final boolean displayProjectsRight) {
+    settingsBase.setBoolean("display_projects_right", displayProjectsRight);
+  }
 
-   public boolean isHideProjectsOnMouseExit() {
-      return getBoolean("hide_projects_on_mouse_exit", true);
-   }
+  public boolean isHideProjectsOnMouseExit() {
+    return settingsBase.getBoolean("hide_projects_on_mouse_exit", false);
+  }
 
-   public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
-      setBoolean("hide_projects_on_mouse_exit",hideProjectsOnMouseExit);
-   }
+  public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
+    settingsBase.setBoolean("hide_projects_on_mouse_exit", hideProjectsOnMouseExit);
+  }
 
-   public double getWindowXProportion() {
-      return getDouble("windowxproportion");
-   }
+  public double getWindowXProportion() {
+    return settingsBase.getDouble("windowxproportion", 0.5);
+  }
 
-   public void setWindowXProportion(final double windowPositionX) {
-      setDouble("windowxproportion", windowPositionX);
-   }
+  public void setWindowXProportion(final double windowPositionX) {
+    settingsBase.setDouble("windowxproportion", windowPositionX);
+  }
 
-   public double getWindowYProportion() {
-      return getDouble("windowyproportion");
-   }
+  public double getWindowYProportion() {
+    return settingsBase.getDouble("windowyproportion", 0.5);
+  }
 
-   public void setWindowYProportion(final double windowPositionY) {
-      setDouble("windowyproportion", windowPositionY);
-   }
+  public void setWindowYProportion(final double windowPositionY) {
+    settingsBase.setDouble("windowyproportion", windowPositionY);
+  }
 
-   public int getScreenHash() {
-      return getInt("window_screenhash");
-   }
+  public int getScreenHash() {
+    return settingsBase.getInt("window_screenhash", 0);
+  }
 
-   public void setScreenHash(final int screenHash) {
-      setInt("window_screenhash", screenHash);
-   }
+  public void setScreenHash(final int screenHash) {
+    settingsBase.setInt("window_screenhash", screenHash);
+  }
 
-   public boolean isSaveWindowPosition() {
-      return getBoolean("save_window_position", false);
-   }
+  public boolean isSaveWindowPosition() {
+    return settingsBase.getBoolean("save_window_position", false);
+  }
 
-   public void setSaveWindowPosition(final boolean saveWindowPosition) {
-      setBoolean("save_window_position", saveWindowPosition);
-   }
+  public void setSaveWindowPosition(final boolean saveWindowPosition) {
+    settingsBase.setBoolean("save_window_position", saveWindowPosition);
+  }
 
-   public boolean isRemindIfNotesAreEmpty() {
-      return getBoolean("remind_if_notes_are_empty", false);
-   }
+  public boolean isRemindIfNotesAreEmpty() {
+    return settingsBase.getBoolean("remind_if_notes_are_empty", false);
+  }
 
-   public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
-      setBoolean("remind_if_notes_are_empty", emptyNoteReminder);
-   }
+  public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
+    settingsBase.setBoolean("remind_if_notes_are_empty", emptyNoteReminder);
+  }
 
-   private boolean getBoolean(String key, boolean orDefault) {
-      final Setting bySetting = settingsRepository.findBySetting(key);
-      if (bySetting == null)
-         return orDefault;
-      return Boolean.parseBoolean(bySetting.getSettingValue());
-   }
-
-   public void setBoolean(String key, boolean value) {
-      Setting setting = settingsRepository.findBySetting(key);
-      if (setting == null)
-         setting = new Setting(key, "");
-      setting.setSettingValue(String.valueOf(value));
-      settingsRepository.save(setting);
-   }
-
-   private Color getColor(String key) {
-      return new ColorConverter().convertToEntityAttribute(settingsRepository.findBySetting(key).getSettingValue());
-   }
-
-   public void setColor(String key, Color value) {
-      final Setting setting = settingsRepository.findBySetting(key);
-      setting.setSettingValue(new ColorConverter().convertToDatabaseColumn(value));
-      settingsRepository.save(setting);
-   }
-
-   private double getDouble(String key) {
-      return Double.parseDouble(settingsRepository.findBySetting(key).getSettingValue());
-   }
-
-   public void setDouble(String key, double value) {
-      final Setting setting = settingsRepository.findBySetting(key);
-      setting.setSettingValue(Double.toString(value));
-      settingsRepository.save(setting);
-   }
-
-   private int getInt(String key) {
-      return Integer.parseInt(settingsRepository.findBySetting(key).getSettingValue());
-   }
-
-   public void setInt(String key, int value) {
-      final Setting setting = settingsRepository.findBySetting(key);
-      setting.setSettingValue(Integer.toString(value));
-      settingsRepository.save(setting);
-   }
+  public void save() {
+    settingsBase.saveAll();
+  }
 }

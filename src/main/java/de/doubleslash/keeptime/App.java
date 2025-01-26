@@ -185,22 +185,6 @@ public class App extends Application {
    private void readSettings() {
       LOG.debug("Reading configuration");
 
-      if (false) {
-         LOG.info("Empty settings. Set default");
-         settings.setTaskBarColor(model.taskBarColor.get());
-
-         settings.setDefaultBackgroundColor(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
-         settings.setDefaultFontColor(Model.ORIGINAL_DEFAULT_FONT_COLOR);
-
-         settings.setHoverBackgroundColor(Model.ORIGINAL_HOVER_BACKGROUND_COLOR);
-         settings.setHoverFontColor(Model.ORIGINAL_HOVER_Font_COLOR);
-         settings.setUseHotkey(false);
-         settings.setDisplayProjectsRight(false);
-         settings.setHideProjectsOnMouseExit(false);
-      } else {
-         LOG.info("Got settings from database");
-      }
-
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
       model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());

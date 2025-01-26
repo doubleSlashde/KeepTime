@@ -339,14 +339,18 @@ public class SettingsController {
          }
 
 
-         /*controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
-               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
-               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
+         controller.updateColorSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue());
+
+         controller.updateLayoutSettings(
+              displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
-               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
-               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected()));
-         */
+               saveWindowPositionCheckBox.isSelected());
+
+         controller.updateFeatureSettings(useHotkeyCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
+               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected());
+
 
          controller.updateHeimatSettings(
                   heimatActivationCheckbox.isSelected(),
