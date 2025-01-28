@@ -140,6 +140,7 @@ public class MapExternalProjectsController {
                      setGraphic(null);
                      setText(null);
                   } else {
+                     // TODO maybe show if the project was already mapped
                      setText(item.projectName() + " - " + item.name());
                   }
                }
@@ -190,6 +191,7 @@ public class MapExternalProjectsController {
 
          externalProjectsMappingsRepository.saveAll(list);
          // TODO remove mappings which were removed also from database
+         // TODO close
       });
 
       cancelButton.setOnAction(ae -> {

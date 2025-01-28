@@ -41,6 +41,7 @@ public class Resources {
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
       FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
       FXML_EXT_PROJECT_MAPPING("/layouts/externalProjectMapping.fxml"),
+      FXML_EXT_PROJECT_SYNC("/layouts/externalProjectSync.fxml"),
 
       SVG_CALENDAR_DAYS_ICON("/svgs/calendar-days.svg"),
 

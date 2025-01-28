@@ -21,6 +21,11 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Modality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -58,6 +63,8 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
+
 @Component
 public class ReportController {
 
@@ -93,6 +100,9 @@ public class ReportController {
    @FXML
    private Button expandCollapseButton;
 
+   @FXML
+   private Button heimatSyncButton;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private final Model model;
@@ -123,7 +133,51 @@ public class ReportController {
 
       expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
       initTableView();
+      initHeimatIntegration();
    }
+
+   private void initHeimatIntegration() {
+      // TODO if heimat active show or hide button
+      heimatSyncButton.setOnAction(ae-> {
+         try {
+            showSyncStage();
+         } catch (IOException e) {
+            throw new RuntimeException(e);
+         }
+      });
+   }
+
+   private void showSyncStage() throws IOException {
+      try{
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_SYNC);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
+         final Parent settingsRoot = fxmlLoader2.load();
+         ExternalProjectsSyncController settingsController = fxmlLoader2.getController();
+         Stage settingsStage = new Stage();
+         //settingsController.setStage(settingsStage);
+         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.setTitle("External Project Sync");
+         settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
+
+         settingsStage.setScene(settingsScene);
+         settingsStage.showAndWait();
+         //settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
+      } catch (final IOException e) {
+         LOG.error("Error while loading sub stage");
+         throw new FXMLLoaderException(e);
+      }
+   }
+
 
    private void initTableView() {
       final TreeTableColumn<TableRow, TableRow> noteColumn = new TreeTableColumn<>("Notes");

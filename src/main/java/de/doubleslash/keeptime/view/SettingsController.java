@@ -394,7 +394,8 @@ public class SettingsController {
    private void initializeHeimat() {
       heimatValidateConnectionButton.disableProperty().bind(
             Bindings.createBooleanBinding(
-                  () -> heimatUrlTextField.getText().trim().isEmpty() || heimatPatTextField.getText().trim().isEmpty(),
+                  () -> Boolean.valueOf(
+                        heimatUrlTextField.getText().trim().isEmpty() || heimatPatTextField.getText().trim().isEmpty()),
                   heimatUrlTextField.textProperty(),
                   heimatPatTextField.textProperty()
             )
@@ -439,33 +440,33 @@ public class SettingsController {
 
    private void showMapProjectsStage() throws IOException {
       try{
-      // Settings stage
-      final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
-      fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
-      final Parent settingsRoot = fxmlLoader2.load();
-      MapExternalProjectsController settingsController = fxmlLoader2.getController();
-      Stage settingsStage = new Stage();
-      //settingsController.setStage(settingsStage);
-      settingsStage.initModality(Modality.APPLICATION_MODAL);
-      settingsStage.setTitle("External Project Mappings");
-      settingsStage.setResizable(false);
-      settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
+         final Parent settingsRoot = fxmlLoader2.load();
+         MapExternalProjectsController settingsController = fxmlLoader2.getController();
+         Stage settingsStage = new Stage();
+         //settingsController.setStage(settingsStage);
+         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.setTitle("External Project Mappings");
+         settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-      final Scene settingsScene = new Scene(settingsRoot);
-      settingsScene.setOnKeyPressed(ke -> {
-         if (ke.getCode() == KeyCode.ESCAPE) {
-            LOG.info("pressed ESCAPE");
-            settingsStage.close();
-         }
-      });
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
 
-      settingsStage.setScene(settingsScene);
-         settingsStage.showAndWait();
-      //settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
-   } catch (final IOException e) {
-      LOG.error("Error while loading sub stage");
-      throw new FXMLLoaderException(e);
-   }
+         settingsStage.setScene(settingsScene);
+            settingsStage.showAndWait();
+         //settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
+      } catch (final IOException e) {
+         LOG.error("Error while loading sub stage");
+         throw new FXMLLoaderException(e);
+      }
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {

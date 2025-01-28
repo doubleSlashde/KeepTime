@@ -65,7 +65,7 @@ public class SvgNodeProvider {
       return svgPath;
    }
 
-   public static SVGPath getSvgNodeWithScale(Resources.RESOURCE resource, Double scaleX, Double scaleY) {
+   public static SVGPath getSvgNodeWithScale(Resources.RESOURCE resource, double scaleX, double scaleY) {
       SVGPath iconSvg = new SVGPath();
       iconSvg.setContent(getSvgPathWithXMl(resource));
       iconSvg.setScaleX(scaleX);

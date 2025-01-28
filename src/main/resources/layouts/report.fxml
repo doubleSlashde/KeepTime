@@ -91,6 +91,7 @@
             <HBox prefHeight="26.0" prefWidth="210.0">
                <children>
                   <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Collapse" />
+                  <Button fx:id="heimatSyncButton" mnemonicParsing="false" text="Sync2Heimat" />
                </children>
                <VBox.margin>
                   <Insets right="10.0" top="10.0" />
