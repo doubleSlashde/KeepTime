@@ -160,7 +160,7 @@ public class ReportController {
          //settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("External Project Sync");
-         settingsStage.setResizable(false);
+         settingsStage.setResizable(true);
          settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
          final Scene settingsScene = new Scene(settingsRoot);

@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Circle;
 import javafx.util.converter.LocalTimeStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,8 +123,8 @@ public class ExternalProjectsSyncController {
          if (!isMappedInHeimat) {
             canBeSynced = "Not mapped in Heimat";
          }
-         list.add(new TableRow(project, isMappedInHeimat, canBeSynced, heimatNotes, keeptimeNotes, keeptimeNotes, heimatTimeSeconds,
-               projectWorkSeconds, projectWorkSeconds));
+         list.add(new TableRow(project, isMappedInHeimat, canBeSynced, heimatNotes, keeptimeNotes, keeptimeNotes,
+               heimatTimeSeconds, projectWorkSeconds, projectWorkSeconds));
       }
       final ObservableList<TableRow> items = FXCollections.observableArrayList(list);
       mappingTableView.setItems(items);
@@ -148,10 +149,27 @@ public class ExternalProjectsSyncController {
       shouldSyncColumn.setEditable(true);
       shouldSyncColumn.setPrefWidth(50);
 
-      TableColumn<TableRow, String> projectColumn = new TableColumn<>("Project");
-      projectColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().project.getName()));
+      TableColumn<TableRow, Project> projectColumn = new TableColumn<>("Project");
+      projectColumn.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().project));
+      projectColumn.setCellFactory(column -> new TableCell<>() {
+         //private final Label label = new Label();
+
+         @Override
+         protected void updateItem(Project item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setGraphic(null);
+               setText(null);
+            } else {
+               //label.setText(item.getName());
+               setText(item.getName());
+               final Circle circle = new Circle(6, item.getColor());
+               this.setGraphic(circle);
+            }
+         }
+      });
       projectColumn.setPrefWidth(100);
-      // TODO set color
+
       TableColumn<TableRow, TableRow> timeColumn = new TableColumn<>("Time");
       timeColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
 
