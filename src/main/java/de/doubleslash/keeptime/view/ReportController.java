@@ -118,6 +118,7 @@ public class ReportController {
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
    private boolean expanded = true;
+   private List<Work> currentWorkItems;
 
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
@@ -154,6 +155,7 @@ public class ReportController {
          fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
          final Parent settingsRoot = fxmlLoader2.load();
          ExternalProjectsSyncController settingsController = fxmlLoader2.getController();
+         settingsController.initForDate(currentReportDate, currentWorkItems);
          Stage settingsStage = new Stage();
          //settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
@@ -289,7 +291,7 @@ public class ReportController {
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
-      final List<Work> currentWorkItems = model.getWorkRepository()
+      currentWorkItems = model.getWorkRepository()
                                                .findByStartDateOrderByStartTimeAsc(this.currentReportDate);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
