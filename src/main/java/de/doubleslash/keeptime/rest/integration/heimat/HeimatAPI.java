@@ -4,6 +4,7 @@ import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 
@@ -65,19 +66,34 @@ public class HeimatAPI {
 
    // POST /my/times
    public void addMyTime(final HeimatTime heimatTime) {
-      restClient.post()
-                .uri(uriBuilder -> {
-                   UriBuilder builder = uriBuilder.path("/my/times");
-                   return builder.build();
-                })
-                .header("Content-Type", "application/json")
-                .body(heimatTime)
-                .retrieve()
-                .onStatus(HttpStatus.UNAUTHORIZED::equals, (request, response) -> {
-                   throw new UnauthorizedException();
-                });
+      final ResponseEntity<String> responseEntity = restClient.post()
+                                                              .uri(uriBuilder -> {
+                                                                 UriBuilder builder = uriBuilder.path("/my/times");
+                                                                 return builder.build();
+                                                              })
+                                                              .header("Content-Type", "application/json")
+                                                              .body(heimatTime)
+                                                              .retrieve()
+                                                              .onStatus(HttpStatus.UNAUTHORIZED::equals,
+                                                                    (request, response) -> {
+                                                                       throw new UnauthorizedException();
+                                                                    })
+                                                              .toEntity(String.class);
+
+      System.out.println("Status Code: " + responseEntity.getStatusCode());
+      System.out.println("Response Body: " + responseEntity.getBody());
    }
 
    // DELETE /my/times/{id}
+   public void deleteMyTime(final long timeId) {
+      final ResponseEntity<String> responseEntity = restClient.delete().uri(uriBuilder -> {
+         UriBuilder builder = uriBuilder.path("/my/times/" + timeId);
+         return builder.build();
+      }).retrieve().onStatus(HttpStatus.UNAUTHORIZED::equals, (request, response) -> {
+         throw new UnauthorizedException();
+      }).toEntity(String.class);
 
+      System.out.println("Status Code: " + responseEntity.getStatusCode());
+      System.out.println("Response Body: " + responseEntity.getBody());
+   }
 }

@@ -157,8 +157,9 @@ public class ReportController {
          ExternalProjectsSyncController settingsController = fxmlLoader2.getController();
          settingsController.initForDate(currentReportDate, currentWorkItems);
          Stage settingsStage = new Stage();
-         //settingsController.setStage(settingsStage);
-         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsController.setStage(settingsStage);
+         settingsStage.initOwner(this.stage);
+         //settingsStage.initModality(Modality.WINDOW_MODAL);
          settingsStage.setTitle("External Project Sync");
          settingsStage.setResizable(true);
          settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));

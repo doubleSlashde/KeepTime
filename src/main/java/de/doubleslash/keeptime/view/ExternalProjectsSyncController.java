@@ -18,6 +18,7 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import javafx.util.converter.LocalTimeStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @Component
 public class ExternalProjectsSyncController {
 
-   private static final Logger LOG = LoggerFactory.getLogger(MapExternalProjectsController.class);
+   private static final Logger LOG = LoggerFactory.getLogger(ExternalProjectsSyncController.class);
 
    @FXML
    private TableView<TableRow> mappingTableView;
@@ -60,6 +61,10 @@ public class ExternalProjectsSyncController {
    private final ExternalProjectsMappingsRepository externalProjectsMappingsRepository;
 
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
+   private ObservableList<TableRow> items;
+   private final HeimatAPI heimatAPI;
+   private LocalDate currentReportDate;
+   private Stage thisStage;
 
    public ExternalProjectsSyncController(final Controller controller, final Model model, HeimatSettings heimatSettings,
          ExternalProjectsMappingsRepository externalProjectsMappingsRepository) {
@@ -67,14 +72,15 @@ public class ExternalProjectsSyncController {
       this.model = model;
       this.heimatSettings = heimatSettings;
       this.externalProjectsMappingsRepository = externalProjectsMappingsRepository;
+      heimatAPI = new HeimatAPI(heimatSettings.getHeimatUrl(), heimatSettings.getHeimatPat());
    }
 
    public void initForDate(LocalDate currentReportDate, List<Work> currentWorkItems) {
       dayOfSyncLabel.setText(currentReportDate.format(DateTimeFormatter.BASIC_ISO_DATE));
-
-      final HeimatAPI heimatAPI = new HeimatAPI(heimatSettings.getHeimatUrl(), heimatSettings.getHeimatPat());
+      this.currentReportDate = currentReportDate;
       // TODO check if external projects are available for the currentDay
       // final List<HeimatTask> heimatTasks = heimatAPI.getMyTasks(currentReportDate);
+      // TODO add a spinner while loading?
       final List<HeimatTime> heimatTimes = heimatAPI.getMyTimes(currentReportDate);
       final List<ExternalProjectMapping> mappedProjects = externalProjectsMappingsRepository.findByExternalSystemId(
             ExternalSystem.Heimat);
@@ -95,13 +101,13 @@ public class ExternalProjectsSyncController {
                                                                                                       .getId()
                                                                                             == project.getId())
                                                                                       .findAny();
+         Optional<HeimatTime> optionalAlreadyBookedTime = Optional.empty();
          if (optionalHeimatMapping.isPresent()) {
             isMappedInHeimat = true;
-            final Optional<HeimatTime> optionalAlreadyBookedTime = heimatTimes.stream()
-                                                                              .filter(heimatTime -> heimatTime.taskId()
-                                                                                    == optionalHeimatMapping.get()
-                                                                                                            .getExternalTaskId())
-                                                                              .findAny();
+            optionalAlreadyBookedTime = heimatTimes.stream()
+                                                   .filter(heimatTime -> heimatTime.taskId()
+                                                         == optionalHeimatMapping.get().getExternalTaskId())
+                                                   .findAny();
             if (optionalAlreadyBookedTime.isPresent()) {
                heimatNotes = optionalAlreadyBookedTime.get().note();
                heimatTimeSeconds = optionalAlreadyBookedTime.get().durationInMinutes() * 60L;
@@ -123,10 +129,11 @@ public class ExternalProjectsSyncController {
          if (!isMappedInHeimat) {
             canBeSynced = "Not mapped in Heimat";
          }
-         list.add(new TableRow(project, isMappedInHeimat, canBeSynced, heimatNotes, keeptimeNotes, keeptimeNotes,
-               heimatTimeSeconds, projectWorkSeconds, projectWorkSeconds));
+         list.add(new TableRow(project, isMappedInHeimat ? optionalHeimatMapping.get().getExternalTaskId() : -1,
+               optionalAlreadyBookedTime.orElse(null), isMappedInHeimat, canBeSynced, heimatNotes, keeptimeNotes,
+               keeptimeNotes, heimatTimeSeconds, projectWorkSeconds, projectWorkSeconds));
       }
-      final ObservableList<TableRow> items = FXCollections.observableArrayList(list);
+      items = FXCollections.observableArrayList(list);
       mappingTableView.setItems(items);
 
       ObservableList<TableRow> items2 = FXCollections.observableArrayList(
@@ -138,6 +145,8 @@ public class ExternalProjectsSyncController {
                                          .mapToLong(item -> item.userTimeSeconds.getValue())
                                          .sum())), items2);
       sumTimeLabel.textProperty().bind(Bindings.concat("Total Sum: ", totalSum));
+      // TODO add a label with current Heimat Time
+      // TODO add a label with current Keeptime time
    }
 
    @FXML
@@ -161,6 +170,7 @@ public class ExternalProjectsSyncController {
                setGraphic(null);
                setText(null);
             } else {
+               // TODO add a reference to the Heimat project which will be used
                //label.setText(item.getName());
                setText(item.getName());
                final Circle circle = new Circle(6, item.getColor());
@@ -222,6 +232,8 @@ public class ExternalProjectsSyncController {
             textArea.setPrefHeight(50);
             textArea.setPrefWidth(100);
             textArea.setWrapText(true);
+            // TODO mark textArea red when not content
+            // TODO make it possible to copy content of heimatNotesLabel
             hbox.getChildren().addAll(new Label("Heimat:"), heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox);
          }
@@ -235,7 +247,7 @@ public class ExternalProjectsSyncController {
                setGraphic(null);
             } else {
                textArea.setText(item.keeptimeNotes.get());
-               stringChangeListener = (obs, oldText, newText) -> item.keeptimeNotes.set(newText);
+               stringChangeListener = (obs, oldText, newText) -> item.userNotes.set(newText);
                textArea.textProperty().addListener(stringChangeListener);
                heimatNotesLabel.setText(item.heimatNotes.get());
                setGraphic(container);
@@ -251,12 +263,43 @@ public class ExternalProjectsSyncController {
 
       saveButton.setOnAction((ae) -> {
          LOG.debug("New mappings to be synced '{}'.", "TODO");
-         // TODO close
+
+         // TODO show progress
+         items.stream().filter(tr -> tr.shouldSyncCheckBox.get()).forEach(tr -> {
+            if (tr.userNotes.get().isEmpty()) {
+               LOG.warn("No notes were given. Skipping '{}'", tr.project.getName());
+               return;
+            }
+            final int durationInMinutes = Math.toIntExact(tr.userTimeSeconds.get() / 60);
+            if (durationInMinutes <= 0 || durationInMinutes % 15 != 0) {
+               LOG.warn("Duration '{}' is not valid for project '{}'.", durationInMinutes, tr.project.getName());
+               return;
+            }
+
+            final HeimatTime heimatTime = new HeimatTime(tr.heimatTaskId, currentReportDate, null, null,
+                  durationInMinutes, tr.userNotes.get(), 0L);
+
+            try {
+               if (tr.optionalExistingTime != null) {
+                  LOG.info("Removing existing booked time '{}'", tr.optionalExistingTime);
+                  heimatAPI.deleteMyTime(tr.optionalExistingTime.id());
+               }
+               LOG.info("Adding new time time '{}'", heimatTime);
+               heimatAPI.addMyTime(heimatTime);
+            } catch (Exception e) {
+               // TODO show errors to the user
+               LOG.error("Error while persisting time '{}'", heimatTime, e);
+            }
+         });
+
+         thisStage.close();
       });
 
       cancelButton.setOnAction(ae -> {
-         // TODO Close
+         thisStage.close();
       });
+
+      // TODO offer some way to book time to an additional project?
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
@@ -319,7 +362,13 @@ public class ExternalProjectsSyncController {
       return time.plusMinutes(increment).withSecond(0).withNano(0);
    }
 
+   public void setStage(final Stage thisStage) {
+      this.thisStage = thisStage;
+   }
+
    static class TableRow {
+      private final long heimatTaskId;
+      private final HeimatTime optionalExistingTime;
       public BooleanProperty shouldSyncCheckBox;
       public Project project;
 
@@ -333,10 +382,12 @@ public class ExternalProjectsSyncController {
 
       public StringProperty syncStatus;
 
-      public TableRow(final Project project, final boolean shouldSync, final String syncStatus,
-            final String heimatNotes, final String keeptimeNotes, String userNotes, final long heimatTimeSeconds,
-            final long keeptimeSeconds, final long userSeconds) {
+      public TableRow(final Project project, long heimatTaskId, HeimatTime optionalExistingTime,
+            final boolean shouldSync, final String syncStatus, final String heimatNotes, final String keeptimeNotes,
+            String userNotes, final long heimatTimeSeconds, final long keeptimeSeconds, final long userSeconds) {
          this.project = project;
+         this.heimatTaskId = heimatTaskId;
+         this.optionalExistingTime = optionalExistingTime;
          this.shouldSyncCheckBox = new SimpleBooleanProperty(shouldSync);
          this.syncStatus = new SimpleStringProperty(syncStatus);
          this.heimatNotes = new SimpleStringProperty(heimatNotes);

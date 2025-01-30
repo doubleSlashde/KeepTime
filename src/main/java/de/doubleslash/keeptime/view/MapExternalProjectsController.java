@@ -100,6 +100,7 @@ public class MapExternalProjectsController {
             value.setPredicate(null);
       }));
       filterOnlyWorkCheckBox.setSelected(true);
+      //value.add(new ProjectMapping(null, null)); // TODO somehow allow to create a new project for a task
       mappingTableView.setItems(value);
 
       // KeepTime Project column
