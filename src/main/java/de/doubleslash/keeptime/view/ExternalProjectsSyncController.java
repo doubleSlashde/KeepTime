@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Component
@@ -104,6 +105,8 @@ public class ExternalProjectsSyncController {
          Optional<HeimatTime> optionalAlreadyBookedTime = Optional.empty();
          if (optionalHeimatMapping.isPresent()) {
             isMappedInHeimat = true;
+            // TODO possibly there is more than one already booked time!
+            // TODO there might be more than one KeepTime project assigned to HEIMAT project
             optionalAlreadyBookedTime = heimatTimes.stream()
                                                    .filter(heimatTime -> heimatTime.taskId()
                                                          == optionalHeimatMapping.get().getExternalTaskId())
@@ -183,6 +186,15 @@ public class ExternalProjectsSyncController {
       TableColumn<TableRow, TableRow> timeColumn = new TableColumn<>("Time");
       timeColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
 
+      Consumer<Spinner<LocalTime>> spinnerValid = (Spinner<LocalTime> spinner) -> {
+         int seconds = spinner.getValue().toSecondOfDay();
+         int minutes = (seconds / 60);
+         if (seconds != 0 || minutes % 15 != 0 || minutes <= 0) {
+            spinner.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 4px;");
+         } else {
+            spinner.setStyle(""); // Reset to default style
+         }
+      };
       timeColumn.setCellFactory(column -> new TableCell<>() {
          private final Spinner<LocalTime> timeSpinner = new Spinner<>();
          private final Label keeptimeLabel = new Label();
@@ -210,7 +222,9 @@ public class ExternalProjectsSyncController {
                timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(item.userTimeSeconds.get()));
                localTimeChangeListener = (observable, oldValue, newValue) -> {
                   item.userTimeSeconds.set(newValue.toSecondOfDay());
+                  spinnerValid.accept(timeSpinner);
                };
+               spinnerValid.accept(timeSpinner);
                timeSpinner.valueProperty().addListener(localTimeChangeListener);
                setGraphic(container);
             }
@@ -221,6 +235,13 @@ public class ExternalProjectsSyncController {
       TableColumn<TableRow, TableRow> notesColumn = new TableColumn<>("Notes");
       notesColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
 
+      Consumer<TextArea> textAreaValid = (TextArea textArea) -> {
+         if (textArea.getText().isBlank()) {
+            textArea.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 4px;");
+         } else {
+            textArea.setStyle(""); // Reset to default style
+         }
+      };
       notesColumn.setCellFactory(column -> new TableCell<>() {
          private ChangeListener<String> stringChangeListener;
          private final TextArea textArea = new TextArea();
@@ -232,7 +253,6 @@ public class ExternalProjectsSyncController {
             textArea.setPrefHeight(50);
             textArea.setPrefWidth(100);
             textArea.setWrapText(true);
-            // TODO mark textArea red when not content
             // TODO make it possible to copy content of heimatNotesLabel
             hbox.getChildren().addAll(new Label("Heimat:"), heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox);
@@ -247,7 +267,11 @@ public class ExternalProjectsSyncController {
                setGraphic(null);
             } else {
                textArea.setText(item.keeptimeNotes.get());
-               stringChangeListener = (obs, oldText, newText) -> item.userNotes.set(newText);
+               stringChangeListener = (obs, oldText, newText) -> {
+                  item.userNotes.set(newText);
+                  textAreaValid.accept(textArea);
+               };
+               textAreaValid.accept(textArea);
                textArea.textProperty().addListener(stringChangeListener);
                heimatNotesLabel.setText(item.heimatNotes.get());
                setGraphic(container);
@@ -352,6 +376,8 @@ public class ExternalProjectsSyncController {
 
    public static LocalTime decrementToLastFullQuarter(LocalTime time) {
       int minutes = time.getMinute();
+      if (minutes == 0)
+         return time; // don't decrement below 0
       int decrement = (minutes % 15 == 0 && time.getSecond() == 0) ? 15 : minutes % 15;
       return time.minusMinutes(decrement).withSecond(0).withNano(0);
    }
