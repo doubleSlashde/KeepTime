@@ -286,7 +286,7 @@ public class App extends Application {
 
    @Override
    public void stop() throws Exception {
-      springContext.stop();
+      springContext.close();
    }
 
 }
