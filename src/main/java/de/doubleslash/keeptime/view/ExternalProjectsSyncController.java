@@ -1,24 +1,29 @@
 package de.doubleslash.keeptime.view;
 
-import de.doubleslash.keeptime.controller.Controller;
-import de.doubleslash.keeptime.model.*;
-import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
-import de.doubleslash.keeptime.model.settings.HeimatSettings;
-import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
-import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
+import de.doubleslash.keeptime.common.Resources;
+import de.doubleslash.keeptime.common.SvgNodeProvider;
+import de.doubleslash.keeptime.controller.HeimatController;
+import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.Work;
+import javafx.animation.RotateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.effect.GaussianBlur;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import javafx.util.converter.LocalTimeStringConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +34,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Component
 public class ExternalProjectsSyncController {
@@ -56,87 +61,42 @@ public class ExternalProjectsSyncController {
    @FXML
    private Hyperlink externalSystemLink;
 
-   private final Controller controller;
-   private final Model model;
-   private final HeimatSettings heimatSettings;
-   private final ExternalProjectsMappingsRepository externalProjectsMappingsRepository;
+   @FXML
+   private VBox loadingScreen;
+
+   @FXML
+   private AnchorPane pane;
 
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
    private ObservableList<TableRow> items;
-   private final HeimatAPI heimatAPI;
+
    private LocalDate currentReportDate;
    private Stage thisStage;
+   final private HeimatController heimatController;
 
-   public ExternalProjectsSyncController(final Controller controller, final Model model, HeimatSettings heimatSettings,
-         ExternalProjectsMappingsRepository externalProjectsMappingsRepository) {
-      this.controller = controller;
-      this.model = model;
-      this.heimatSettings = heimatSettings;
-      this.externalProjectsMappingsRepository = externalProjectsMappingsRepository;
-      heimatAPI = new HeimatAPI(heimatSettings.getHeimatUrl(), heimatSettings.getHeimatPat());
+   public ExternalProjectsSyncController(final HeimatController heimatController) {
+      this.heimatController = heimatController;
    }
 
    public void initForDate(LocalDate currentReportDate, List<Work> currentWorkItems) {
       dayOfSyncLabel.setText(currentReportDate.format(DateTimeFormatter.BASIC_ISO_DATE));
       this.currentReportDate = currentReportDate;
-      // TODO check if external projects are available for the currentDay
-      // final List<HeimatTask> heimatTasks = heimatAPI.getMyTasks(currentReportDate);
+
       // TODO add a spinner while loading?
-      final List<HeimatTime> heimatTimes = heimatAPI.getMyTimes(currentReportDate);
-      final List<ExternalProjectMapping> mappedProjects = externalProjectsMappingsRepository.findByExternalSystemId(
-            ExternalSystem.Heimat);
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(currentReportDate,
+            currentWorkItems);
 
-      final List<TableRow> list = new ArrayList<>();
-
-      final SortedSet<Project> workedProjectsSet = currentWorkItems.stream()
-                                                                   .map(Work::getProject)
-                                                                   .filter(Project::isWork)
-                                                                   .collect(Collectors.toCollection(() -> new TreeSet<>(
-                                                                         Comparator.comparing(Project::getIndex))));
-      for (final Project project : workedProjectsSet) {
-         String heimatNotes = "";
-         long heimatTimeSeconds = 0;
-         boolean isMappedInHeimat = false;
-         final Optional<ExternalProjectMapping> optionalHeimatMapping = mappedProjects.stream()
-                                                                                      .filter(mp -> mp.getProject()
-                                                                                                      .getId()
-                                                                                            == project.getId())
-                                                                                      .findAny();
-         Optional<HeimatTime> optionalAlreadyBookedTime = Optional.empty();
-         if (optionalHeimatMapping.isPresent()) {
-            isMappedInHeimat = true;
-            // TODO possibly there is more than one already booked time!
-            // TODO there might be more than one KeepTime project assigned to HEIMAT project
-            optionalAlreadyBookedTime = heimatTimes.stream()
-                                                   .filter(heimatTime -> heimatTime.taskId()
-                                                         == optionalHeimatMapping.get().getExternalTaskId())
-                                                   .findAny();
-            if (optionalAlreadyBookedTime.isPresent()) {
-               heimatNotes = optionalAlreadyBookedTime.get().note();
-               heimatTimeSeconds = optionalAlreadyBookedTime.get().durationInMinutes() * 60L;
-            }
+      items = FXCollections.observableArrayList(tableRows.stream().map(mapping -> {
+         String userNotes = mapping.keeptimeNotes();
+         long userSeconds = mapping.keeptimeSeconds();
+         // use info from heimat
+         if (mapping.heimatSeconds() != 0L) {
+            userNotes = mapping.heimatNotes();
+            userSeconds = mapping.heimatSeconds();
          }
-         final List<Work> onlyCurrentProjectWork = currentWorkItems.stream()
-                                                                   .filter(w -> w.getProject() == project)
-                                                                   .toList();
+         return new TableRow(mapping, userNotes, userSeconds);
+      }).toList());
 
-         final long projectWorkSeconds = controller.calcSeconds(onlyCurrentProjectWork);
-
-         final ProjectReport pr = new ProjectReport();
-         for (final Work work : onlyCurrentProjectWork) {
-            final String currentWorkNote = work.getNotes();
-            pr.appendToWorkNotes(currentWorkNote);
-         }
-         final String keeptimeNotes = pr.getNotes();
-         String canBeSynced = "Can be synced";
-         if (!isMappedInHeimat) {
-            canBeSynced = "Not mapped in Heimat";
-         }
-         list.add(new TableRow(project, isMappedInHeimat ? optionalHeimatMapping.get().getExternalTaskId() : -1,
-               optionalAlreadyBookedTime.orElse(null), isMappedInHeimat, canBeSynced, heimatNotes, keeptimeNotes,
-               keeptimeNotes, heimatTimeSeconds, projectWorkSeconds, projectWorkSeconds));
-      }
-      items = FXCollections.observableArrayList(list);
       mappingTableView.setItems(items);
 
       ObservableList<TableRow> items2 = FXCollections.observableArrayList(
@@ -154,31 +114,64 @@ public class ExternalProjectsSyncController {
 
    @FXML
    private void initialize() {
-      TableColumn<TableRow, Boolean> shouldSyncColumn = new TableColumn<>("Sync");
-      shouldSyncColumn.setCellValueFactory(data -> data.getValue().shouldSyncCheckBox);
-      shouldSyncColumn.setCellFactory(CheckBoxTableCell.forTableColumn(shouldSyncColumn));
+      initializeLoadingScreen();
+
+      TableColumn<TableRow, TableRow> shouldSyncColumn = new TableColumn<>("Sync");
+      shouldSyncColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
+      // Custom Cell Factory to disable CheckBoxes
+      shouldSyncColumn.setCellFactory(col -> new TableCell<TableRow, TableRow>() {
+         private final CheckBox checkBox = new CheckBox();
+         private ChangeListener<Boolean> boolChangeListener;
+
+         @Override
+         protected void updateItem(TableRow item, boolean empty) {
+            super.updateItem(item, empty);
+            if (boolChangeListener != null)
+               checkBox.selectedProperty().removeListener(boolChangeListener);
+
+            if (empty || item == null) {
+               setGraphic(null);
+            } else {
+               checkBox.setDisable(!item.mapping.canBeSynced());
+               checkBox.setSelected(item.shouldSyncCheckBox.get());
+               boolChangeListener = (obs, oldText, newBoolean) -> {
+                  item.shouldSyncCheckBox.set(newBoolean);
+               };
+               checkBox.selectedProperty().addListener(boolChangeListener);
+
+               setGraphic(checkBox);
+            }
+         }
+      });
       mappingTableView.setEditable(true);
       shouldSyncColumn.setEditable(true);
       shouldSyncColumn.setPrefWidth(50);
 
-      TableColumn<TableRow, Project> projectColumn = new TableColumn<>("Project");
-      projectColumn.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().project));
+      TableColumn<TableRow, List<Project>> projectColumn = new TableColumn<>("Project");
+      projectColumn.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().mapping.projects()));
       projectColumn.setCellFactory(column -> new TableCell<>() {
          //private final Label label = new Label();
 
          @Override
-         protected void updateItem(Project item, boolean empty) {
+         protected void updateItem(List<Project> item, boolean empty) {
             super.updateItem(item, empty);
             if (empty || item == null) {
                setGraphic(null);
                setText(null);
             } else {
-               // TODO add a reference to the Heimat project which will be used
-               //label.setText(item.getName());
-               setText(item.getName());
-               final Circle circle = new Circle(6, item.getColor());
-               this.setGraphic(circle);
+               VBox vbox = new VBox(5);
+               item.forEach(project -> {
+                  vbox.getChildren().add(createRow(project.getColor(), project.getName()));
+               });
+               setGraphic(vbox);
             }
+         }
+
+         private HBox createRow(Color color, String text) {
+            Circle circle = new Circle(6, color);
+            Label label = new Label(text);
+
+            return new HBox(5, circle, label);
          }
       });
       projectColumn.setPrefWidth(100);
@@ -189,7 +182,7 @@ public class ExternalProjectsSyncController {
       Consumer<Spinner<LocalTime>> spinnerValid = (Spinner<LocalTime> spinner) -> {
          int seconds = spinner.getValue().toSecondOfDay();
          int minutes = (seconds / 60);
-         if (seconds != 0 || minutes % 15 != 0 || minutes <= 0) {
+         if (seconds % 60 != 0 || minutes % 15 != 0 || minutes <= 0) {
             spinner.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 4px;");
          } else {
             spinner.setStyle(""); // Reset to default style
@@ -246,7 +239,9 @@ public class ExternalProjectsSyncController {
          private ChangeListener<String> stringChangeListener;
          private final TextArea textArea = new TextArea();
          private final Label heimatNotesLabel = new Label();
+         private final Label keepTimeNotesLabel = new Label();
          private final HBox hbox = new HBox(5);
+         private final HBox hbox2 = new HBox(5);
          private final VBox container = new VBox(5); // Space between TextArea and Label
 
          {
@@ -254,8 +249,9 @@ public class ExternalProjectsSyncController {
             textArea.setPrefWidth(100);
             textArea.setWrapText(true);
             // TODO make it possible to copy content of heimatNotesLabel
-            hbox.getChildren().addAll(new Label("Heimat:"), heimatNotesLabel);
-            container.getChildren().addAll(textArea, hbox);
+            hbox.getChildren().addAll(new Label("Keeptime:"), keepTimeNotesLabel);
+            hbox2.getChildren().addAll(new Label("Heimat:"), heimatNotesLabel);
+            container.getChildren().addAll(textArea, hbox, hbox2);
          }
 
          @Override
@@ -266,7 +262,7 @@ public class ExternalProjectsSyncController {
             if (empty || item == null) {
                setGraphic(null);
             } else {
-               textArea.setText(item.keeptimeNotes.get());
+               textArea.setText(item.userNotes.get());
                stringChangeListener = (obs, oldText, newText) -> {
                   item.userNotes.set(newText);
                   textAreaValid.accept(textArea);
@@ -274,49 +270,63 @@ public class ExternalProjectsSyncController {
                textAreaValid.accept(textArea);
                textArea.textProperty().addListener(stringChangeListener);
                heimatNotesLabel.setText(item.heimatNotes.get());
+               keepTimeNotesLabel.setText(item.keeptimeNotes.get());
                setGraphic(container);
             }
          }
       });
-      notesColumn.setPrefWidth(250);
+      notesColumn.setPrefWidth(350);
 
       TableColumn<TableRow, String> syncColumn = new TableColumn<>("Sync Status");
       syncColumn.setCellValueFactory(data -> data.getValue().syncStatus);
-      syncColumn.setPrefWidth(100);
+      syncColumn.setPrefWidth(250);
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
 
       saveButton.setOnAction((ae) -> {
          LOG.debug("New mappings to be synced '{}'.", "TODO");
+         showLoadingScreen(true);
 
-         // TODO show progress
-         items.stream().filter(tr -> tr.shouldSyncCheckBox.get()).forEach(tr -> {
-            if (tr.userNotes.get().isEmpty()) {
-               LOG.warn("No notes were given. Skipping '{}'", tr.project.getName());
-               return;
+         Task<List<HeimatController.HeimatErrors>> task = new Task<>() {
+            @Override
+            protected List<HeimatController.HeimatErrors> call() {
+               return heimatController.saveDay(items.stream()
+                                                    .map(item -> new HeimatController.Asdf(item.mapping,
+                                                          item.shouldSyncCheckBox.get(), item.userNotes.get(),
+                                                          (int) (item.userTimeSeconds.get() / 60)))
+                                                    .toList(), currentReportDate);
             }
-            final int durationInMinutes = Math.toIntExact(tr.userTimeSeconds.get() / 60);
-            if (durationInMinutes <= 0 || durationInMinutes % 15 != 0) {
-               LOG.warn("Duration '{}' is not valid for project '{}'.", durationInMinutes, tr.project.getName());
-               return;
+         };
+
+         task.setOnSucceeded(e -> {
+            LOG.error("Task successfull");
+            final List<HeimatController.HeimatErrors> errors = task.getValue();
+            if (!errors.isEmpty()) {
+               List<String> a = errors.stream().map(error -> {
+                  return error.mapping().getMapping().heimatTaskId() + ": " + error.errorMessage()
+                        + ". Wanted to store '" + error.mapping().getUserMinutes() + "' minutes with notes '"
+                        + error.mapping().getUserNotes() + "'";
+               }).toList();
+
+               showErrorDialog(a);
+            } else {
+               // show done
             }
 
-            final HeimatTime heimatTime = new HeimatTime(tr.heimatTaskId, currentReportDate, null, null,
-                  durationInMinutes, tr.userNotes.get(), 0L);
-
-            try {
-               if (tr.optionalExistingTime != null) {
-                  LOG.info("Removing existing booked time '{}'", tr.optionalExistingTime);
-                  heimatAPI.deleteMyTime(tr.optionalExistingTime.id());
-               }
-               LOG.info("Adding new time time '{}'", heimatTime);
-               heimatAPI.addMyTime(heimatTime);
-            } catch (Exception e) {
-               // TODO show errors to the user
-               LOG.error("Error while persisting time '{}'", heimatTime, e);
-            }
+            showLoadingScreen(false);
+            thisStage.close();
          });
 
-         thisStage.close();
+         task.setOnFailed(e -> {
+            final Throwable exception = task.getException();
+            LOG.error("Task failed", exception);
+
+            showErrorDialog(Collections.singletonList("ERROR" + exception.getMessage()));
+            showLoadingScreen(false);
+            thisStage.close();
+         });
+
+         // Start the task in a background thread
+         new Thread(task).start();
       });
 
       cancelButton.setOnAction(ae -> {
@@ -324,6 +334,47 @@ public class ExternalProjectsSyncController {
       });
 
       // TODO offer some way to book time to an additional project?
+   }
+
+   private void initializeLoadingScreen() {
+      SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.05, 0.05);
+      loadingScreen.getChildren().add(0, loadingSpinner);
+      RotateTransition rotateTransition = new RotateTransition(Duration.seconds(1), loadingSpinner);
+      rotateTransition.setByAngle(360);
+      rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
+      rotateTransition.play();
+   }
+
+   private void showLoadingScreen(final boolean show) {
+      pane.setDisable(show);
+      loadingScreen.setVisible(show);
+      pane.setEffect(show ? new GaussianBlur() : null);
+   }
+
+   private void showErrorDialog(List<String> errorMessages) {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("Error Details");
+      alert.setHeaderText("The following errors occurred. Please copy and manually book the times.");
+      alert.initOwner(thisStage);
+
+      String errorText = String.join("\n\n", errorMessages);
+
+      // Create a TextArea to allow copying
+      TextArea textArea = new TextArea(errorText);
+      textArea.setEditable(false); // Prevent editing
+      textArea.setWrapText(true);  // Wrap long lines
+      textArea.setMaxWidth(Double.MAX_VALUE);
+      textArea.setMaxHeight(Double.MAX_VALUE);
+
+      ScrollPane scrollPane = new ScrollPane(textArea);
+      scrollPane.setFitToWidth(true);
+      scrollPane.setFitToHeight(true);
+      scrollPane.setPrefHeight(150);
+
+      alert.getDialogPane().setContent(scrollPane);
+
+      alert.getButtonTypes().setAll(ButtonType.OK);
+      alert.showAndWait();
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
@@ -376,7 +427,7 @@ public class ExternalProjectsSyncController {
 
    public static LocalTime decrementToLastFullQuarter(LocalTime time) {
       int minutes = time.getMinute();
-      if (minutes == 0)
+      if (time.toSecondOfDay() == 0)
          return time; // don't decrement below 0
       int decrement = (minutes % 15 == 0 && time.getSecond() == 0) ? 15 : minutes % 15;
       return time.minusMinutes(decrement).withSecond(0).withNano(0);
@@ -392,36 +443,33 @@ public class ExternalProjectsSyncController {
       this.thisStage = thisStage;
    }
 
-   static class TableRow {
-      private final long heimatTaskId;
-      private final HeimatTime optionalExistingTime;
-      public BooleanProperty shouldSyncCheckBox;
-      public Project project;
+   public static class TableRow {
+      private final HeimatController.Mapping mapping;
 
-      public StringProperty keeptimeNotes;
-      public StringProperty userNotes;
-      public StringProperty heimatNotes;
+      public final BooleanProperty shouldSyncCheckBox;
+      public final StringProperty keeptimeNotes;
+      public final StringProperty userNotes;
+      public final StringProperty heimatNotes;
 
-      public LongProperty keeptimeTimeSeconds;
-      public LongProperty userTimeSeconds;
-      public LongProperty heimatTimeSeconds;
+      public final LongProperty keeptimeTimeSeconds;
+      public final LongProperty userTimeSeconds;
+      public final LongProperty heimatTimeSeconds;
 
-      public StringProperty syncStatus;
+      public final StringProperty syncStatus;
 
-      public TableRow(final Project project, long heimatTaskId, HeimatTime optionalExistingTime,
-            final boolean shouldSync, final String syncStatus, final String heimatNotes, final String keeptimeNotes,
-            String userNotes, final long heimatTimeSeconds, final long keeptimeSeconds, final long userSeconds) {
-         this.project = project;
-         this.heimatTaskId = heimatTaskId;
-         this.optionalExistingTime = optionalExistingTime;
-         this.shouldSyncCheckBox = new SimpleBooleanProperty(shouldSync);
-         this.syncStatus = new SimpleStringProperty(syncStatus);
-         this.heimatNotes = new SimpleStringProperty(heimatNotes);
-         this.keeptimeNotes = new SimpleStringProperty(keeptimeNotes);
+      public TableRow(HeimatController.Mapping mapping, String userNotes, final long userSeconds) {
+         this.mapping = mapping;
+         this.shouldSyncCheckBox = new SimpleBooleanProperty(mapping.canBeSynced());
+         this.syncStatus = new SimpleStringProperty(mapping.syncMessage());
+
+         this.keeptimeNotes = new SimpleStringProperty(mapping.keeptimeNotes());
+         this.keeptimeTimeSeconds = new SimpleLongProperty(mapping.keeptimeSeconds());
+
+         this.heimatNotes = new SimpleStringProperty(mapping.heimatNotes());
+         this.heimatTimeSeconds = new SimpleLongProperty(mapping.heimatSeconds());
+
          this.userNotes = new SimpleStringProperty(userNotes);
-         this.heimatTimeSeconds = new SimpleLongProperty(heimatTimeSeconds);
          this.userTimeSeconds = new SimpleLongProperty(userSeconds);
-         this.keeptimeTimeSeconds = new SimpleLongProperty(keeptimeSeconds);
       }
    }
 }

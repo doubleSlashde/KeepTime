@@ -444,6 +444,7 @@ public class SettingsController {
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
          fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
          final Parent settingsRoot = fxmlLoader2.load();
+         // TODO somehow the url is not available after saving - only when restarted
          MapExternalProjectsController settingsController = fxmlLoader2.getController();
          Stage settingsStage = new Stage();
          //settingsController.setStage(settingsStage);

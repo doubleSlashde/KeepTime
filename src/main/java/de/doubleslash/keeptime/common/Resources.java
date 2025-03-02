@@ -71,6 +71,8 @@ public class Resources {
 
       SVG_MULTIPLE_CLIPBOARD_ICON("/svgs/copy.svg"),
 
+      SVG_SPINNER_SOLID("/svgs/spinner-solid.svg"),
+
       ICON_MAIN("/icons/icon.png")
 
       ;

@@ -58,6 +58,11 @@ public class MapExternalProjectsController {
    @FXML
    private CheckBox filterOnlyWorkCheckBox;
 
+   // TODO maybe implement for edge case where user wants a different date than today
+   // but what happens with mapped projects not existing at that date? but actually not related to this feature alone
+   // @FXML
+   private DatePicker datePicker;
+
    public MapExternalProjectsController(final Model model, HeimatSettings heimatSettings,
          ExternalProjectsMappingsRepository externalProjectsMappingsRepository) {
       this.model = model;
