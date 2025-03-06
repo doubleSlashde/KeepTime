@@ -111,7 +111,7 @@ public class Controller {
       return model.getWorkRepository().save(currentWork);
    }
 
-   public void addNewProject(final Project project) {
+   public Project addNewProject(final Project project) {
       LOG.info("Creating new project '{}'.", project);
 
       model.getAllProjects().add(project);
@@ -121,6 +121,7 @@ public class Controller {
             model.getAvailableProjects().size(), project.getIndex());
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
+      return project;
    }
 
 

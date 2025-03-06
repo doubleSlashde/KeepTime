@@ -66,10 +66,10 @@ public class ManageProjectController {
    }
    @FXML
    private void initialize() {
-      final int availableProjectAmount = model.getAllProjects().size();
+      final int availableProjectAmount = model.getAvailableProjects().size();
       sortIndexSpinner
               .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
-      sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
+      sortIndexSpinner.getValueFactory().setValue(availableProjectAmount);
       formValidProperty.bind(Bindings.createBooleanBinding(() -> !nameTextField.getText().isBlank(),nameTextField.textProperty()));
       validateTextAlert.visibleProperty().bind(formValidProperty.not());
       

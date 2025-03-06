@@ -447,7 +447,7 @@ public class SettingsController {
          // TODO somehow the url is not available after saving - only when restarted
          MapExternalProjectsController settingsController = fxmlLoader2.getController();
          Stage settingsStage = new Stage();
-         //settingsController.setStage(settingsStage);
+         settingsController.setStage(settingsStage);
          settingsStage.initModality(Modality.APPLICATION_MODAL);
          settingsStage.setTitle("External Project Mappings");
          settingsStage.setResizable(false);

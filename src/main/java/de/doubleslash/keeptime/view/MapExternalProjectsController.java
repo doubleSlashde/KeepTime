@@ -16,6 +16,7 @@
 
 package de.doubleslash.keeptime.view;
 
+import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.ExternalProjectMapping;
 import de.doubleslash.keeptime.model.ExternalSystem;
 import de.doubleslash.keeptime.model.Model;
@@ -27,13 +28,17 @@ import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,8 +48,11 @@ public class MapExternalProjectsController {
    private static final Logger LOG = LoggerFactory.getLogger(MapExternalProjectsController.class);
 
    private final Model model;
+   private final Controller controller;
    private final HeimatSettings heimatSettings;
    private final ExternalProjectsMappingsRepository externalProjectsMappingsRepository;
+
+   private Stage thisStage;
 
    @FXML
    private TableView<ProjectMapping> mappingTableView;
@@ -58,23 +66,36 @@ public class MapExternalProjectsController {
    @FXML
    private CheckBox filterOnlyWorkCheckBox;
 
-   // TODO maybe implement for edge case where user wants a different date than today
-   // but what happens with mapped projects not existing at that date? but actually not related to this feature alone
-   // @FXML
-   private DatePicker datePicker;
+   @FXML
+   private ComboBox<HeimatTask> addNewProjectComboBox;
 
-   public MapExternalProjectsController(final Model model, HeimatSettings heimatSettings,
+   @FXML
+   private Button addNewProjectButton;
+
+   @FXML
+   private DatePicker tasksForDateDatePicker;
+
+   public MapExternalProjectsController(final Model model, Controller controller, HeimatSettings heimatSettings,
          ExternalProjectsMappingsRepository externalProjectsMappingsRepository) {
       this.model = model;
+      this.controller = controller;
       this.heimatSettings = heimatSettings;
       this.externalProjectsMappingsRepository = externalProjectsMappingsRepository;
    }
 
+   public void setStage(final Stage thisStage) {
+      this.thisStage = thisStage;
+   }
+
    @FXML
    private void initialize() {
+      tasksForDateDatePicker.setValue(LocalDate.now());
+      tasksForDateDatePicker.setDisable(true);
+      // TODO add listener on this thing
+      // but what happens with mapped projects not existing at that date? but actually not related to this feature alone
 
       final HeimatAPI heimatAPI = new HeimatAPI(heimatSettings.getHeimatUrl(), heimatSettings.getHeimatPat());
-      final List<HeimatTask> externalProjects = heimatAPI.getMyTasks();
+      final List<HeimatTask> externalProjects = heimatAPI.getMyTasks(tasksForDateDatePicker.getValue());
 
       final List<ExternalProjectMapping> alreadyMappedProjects = externalProjectsMappingsRepository.findByExternalSystemId(
             ExternalSystem.Heimat);
@@ -92,12 +113,14 @@ public class MapExternalProjectsController {
                                                           .findAny();
          if (any.isEmpty()) {
             LOG.warn("A mapping exists but task does not exist anymore in HEIMAT! {}.", mapping.get());
+            // TODO show this to the user somehow
             return new ProjectMapping(p, null);
          }
          return new ProjectMapping(p, any.get());
       }).toList();
 
-      final FilteredList<ProjectMapping> value = new FilteredList<>(FXCollections.observableArrayList(projectMappings));
+      final ObservableList<ProjectMapping> observableMappings = FXCollections.observableArrayList(projectMappings);
+      final FilteredList<ProjectMapping> value = new FilteredList<>(observableMappings);
       filterOnlyWorkCheckBox.selectedProperty().addListener(((observable, oldValue, newValue) -> {
          if (Boolean.TRUE.equals(newValue))
             value.setPredicate(pm -> pm.getProject().isWork());
@@ -105,7 +128,7 @@ public class MapExternalProjectsController {
             value.setPredicate(null);
       }));
       filterOnlyWorkCheckBox.setSelected(true);
-      //value.add(new ProjectMapping(null, null)); // TODO somehow allow to create a new project for a task
+
       mappingTableView.setItems(value);
 
       // KeepTime Project column
@@ -114,12 +137,14 @@ public class MapExternalProjectsController {
       keepTimeColumn.setPrefWidth(200);
 
       // External Project column with dropdown
+      externalProjects.add(0, null); // option to clear selection
+      final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(externalProjects);
       TableColumn<ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("Heimat Project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().heimatTask));
       externalColumn.setCellFactory(col -> new TableCell<>() {
          // TODO search in box would be nice
          private final ComboBox<HeimatTask> comboBox = new ComboBox<>(
-               FXCollections.observableArrayList(externalProjects));
+               externalProjectsObservableList );
 
          @Override
          protected void updateItem(HeimatTask item, boolean empty) {
@@ -170,38 +195,102 @@ public class MapExternalProjectsController {
 
       mappingTableView.getColumns().addAll(keepTimeColumn, externalColumn);
 
-      saveButton.setOnAction((ae) -> {
-         LOG.debug("New mappings to be saved '{}'.", projectMappings);
-         final List<ProjectMapping> newMappings = projectMappings.stream()
-                                                                 .filter(pm -> pm.getHeimatTask() != null)
-                                                                 .toList();
-
-         final List<ExternalProjectMapping> list = newMappings.stream().map(projectMapping -> {
-            final Optional<ExternalProjectMapping> any = alreadyMappedProjects.stream()
-                                                                              .filter(pm -> pm.getProject().getId()
-                                                                                    == projectMapping.project.getId())
-                                                                              .findAny();
-            final HeimatTask heimatTask = projectMapping.getHeimatTask();
-            if (any.isPresent()) {
-               final ExternalProjectMapping projectMapping1 = any.get();
-               projectMapping1.setExternalProjectName(heimatTask.projectName());
-               projectMapping1.setExternalTaskId(heimatTask.id());
-               projectMapping1.setExternalTaskName(heimatTask.name());
-               projectMapping1.setExternalTaskMetadata(heimatTask.toString()); // TODO to json
-               return projectMapping1;
+      addNewProjectComboBox.setCellFactory(param -> new ListCell<>() {
+         @Override
+         protected void updateItem(HeimatTask item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+               setGraphic(null);
+               setText(null);
+            } else {
+               // TODO maybe show if the project was already mapped
+               setText(item.projectName() + " - " + item.name());
             }
-            return new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask.projectName(), heimatTask.id(),
-                  heimatTask.name(), heimatTask.toString()// TODO to json
-                  , projectMapping.project);
-         }).toList();
+         }
+      });
+      addNewProjectComboBox.setButtonCell(new ListCell<>() {
+         @Override
+         protected void updateItem(HeimatTask item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setText(null);
+            } else {
+               setText(item.projectName() + " - " + item.name());
+            }
+         }
+      });
+      addNewProjectButton.disableProperty()
+                         .bind(addNewProjectComboBox.getSelectionModel().selectedItemProperty().isNull());
+      addNewProjectButton.setOnAction(ae -> {
+         final HeimatTask task = addNewProjectComboBox.getValue();
+         final int sortIndex = model.getAvailableProjects().size();
+         final Project project = controller.addNewProject(
+               new Project(task.projectName() + " - " + task.name(), task.bookingHint(), Color.BLACK, true, sortIndex));
+         observableMappings.add(new ProjectMapping(project, task));
+         addNewProjectComboBox.getSelectionModel().clearSelection();
+      });
+      addNewProjectComboBox.setItems(FXCollections.observableArrayList(externalProjects));
 
-         externalProjectsMappingsRepository.saveAll(list);
-         // TODO remove mappings which were removed also from database
-         // TODO close
+      saveButton.setOnAction((ae) -> {
+         LOG.debug("New mappings to be saved '{}'.", observableMappings);
+
+         final List<ExternalProjectMapping> mappingsToCreateOrUpdate = observableMappings.stream()
+                                                                                         .filter(
+                                                                                               pm -> pm.getHeimatTask()
+                                                                                                     != null)
+                                                                                         .map(projectMapping -> {
+                                                                                            final Optional<ExternalProjectMapping> any = alreadyMappedProjects.stream()
+                                                                                                                                                              .filter(
+                                                                                                                                                                    pm -> pm.getProject()
+                                                                                                                                                                            .getId()
+                                                                                                                                                                          == projectMapping.project.getId())
+                                                                                                                                                              .findAny();
+                                                                                            final HeimatTask heimatTask = projectMapping.getHeimatTask();
+                                                                                            if (any.isPresent()) {
+                                                                                               final ExternalProjectMapping projectMapping1 = any.get();
+                                                                                               projectMapping1.setExternalProjectName(
+                                                                                                     heimatTask.projectName());
+                                                                                               projectMapping1.setExternalTaskId(
+                                                                                                     heimatTask.id());
+                                                                                               projectMapping1.setExternalTaskName(
+                                                                                                     heimatTask.name());
+                                                                                               projectMapping1.setExternalTaskMetadata(
+                                                                                                     heimatTask.toString()); // TODO to json
+                                                                                               return projectMapping1;
+                                                                                            }
+                                                                                            return new ExternalProjectMapping(
+                                                                                                  ExternalSystem.Heimat,
+                                                                                                  heimatTask.projectName(),
+                                                                                                  heimatTask.id(),
+                                                                                                  heimatTask.name(),
+                                                                                                  heimatTask.toString()
+                                                                                                  // TODO to json
+                                                                                                  ,
+                                                                                                  projectMapping.project);
+                                                                                         })
+                                                                                         .toList();
+         // TODO the list also contains unchanged mappings
+         externalProjectsMappingsRepository.saveAll(mappingsToCreateOrUpdate);
+
+         // remove mappings which were removed also from database
+         final List<ExternalProjectMapping> mappingsToRemove = alreadyMappedProjects.stream()
+                                                                                    .filter(
+                                                                                          em -> observableMappings.stream()
+                                                                                                                  .anyMatch(
+                                                                                                                        wantedMapping ->
+                                                                                                                              wantedMapping.project.getId()
+                                                                                                                                    == em.getProject().getId()
+                                                                                                                                    &&
+                                                                                                                                    wantedMapping.heimatTask
+                                                                                                                                          == null))
+                                                                                    .toList();
+         externalProjectsMappingsRepository.deleteAll(mappingsToRemove);
+
+         thisStage.close();
       });
 
       cancelButton.setOnAction(ae -> {
-         // TODO Close
+         thisStage.close();
       });
    }
 
