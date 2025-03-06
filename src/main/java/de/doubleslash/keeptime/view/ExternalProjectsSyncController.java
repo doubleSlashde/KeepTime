@@ -5,7 +5,9 @@ import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
@@ -14,6 +16,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.AnchorPane;
@@ -67,12 +70,19 @@ public class ExternalProjectsSyncController {
    @FXML
    private AnchorPane pane;
 
+   @FXML
+   private Label loadingMessage;
+
+   private final SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.1, 0.1);
+   private final SVGPath loadingSuccess = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_THUMBS_UP_SOLID, 0.1, 0.1);
+   private final SVGPath loadingFailure = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_XMARK_SOLID, 0.1, 0.1);
+
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
    private ObservableList<TableRow> items;
 
    private LocalDate currentReportDate;
    private Stage thisStage;
-   final private HeimatController heimatController;
+   private final  HeimatController heimatController;
 
    public ExternalProjectsSyncController(final HeimatController heimatController) {
       this.heimatController = heimatController;
@@ -301,6 +311,7 @@ public class ExternalProjectsSyncController {
             LOG.error("Task successfull");
             final List<HeimatController.HeimatErrors> errors = task.getValue();
             if (!errors.isEmpty()) {
+               loadingScreenShowSyncing("Something did not work :(", loadingFailure);
                List<String> a = errors.stream().map(error -> {
                   return error.mapping().getMapping().heimatTaskId() + ": " + error.errorMessage()
                         + ". Wanted to store '" + error.mapping().getUserMinutes() + "' minutes with notes '"
@@ -309,24 +320,28 @@ public class ExternalProjectsSyncController {
 
                showErrorDialog(a);
             } else {
-               // show done
+               loadingScreenShowSyncing("Successfully synced!", loadingSuccess);
             }
 
-            showLoadingScreen(false);
-            thisStage.close();
+            PauseTransition delay = new PauseTransition(Duration.seconds(3));
+            delay.setOnFinished(event -> {
+               showLoadingScreen(false);
+               thisStage.close();
+            });
+            delay.play();
          });
 
          task.setOnFailed(e -> {
             final Throwable exception = task.getException();
             LOG.error("Task failed", exception);
+            loadingScreenShowSyncing("Something did not work :(", loadingFailure);
 
             showErrorDialog(Collections.singletonList("ERROR" + exception.getMessage()));
             showLoadingScreen(false);
             thisStage.close();
          });
-
-         // Start the task in a background thread
-         new Thread(task).start();
+         loadingScreenShowSyncing("Syncing...", loadingSpinner);
+         Platform.runLater(() -> new Thread(task).start());
       });
 
       cancelButton.setOnAction(ae -> {
@@ -337,12 +352,30 @@ public class ExternalProjectsSyncController {
    }
 
    private void initializeLoadingScreen() {
-      SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.05, 0.05);
       loadingScreen.getChildren().add(0, loadingSpinner);
+
+      loadingSuccess.setFill(Color.GREEN);
+      loadingSuccess.prefHeight(50);
+      loadingSuccess.prefWidth(50);
+
+      loadingFailure.setFill(Color.RED);
+      loadingFailure.prefHeight(50);
+      loadingFailure.prefWidth(50);
+
+      loadingSpinner.prefHeight(50);
+      loadingSpinner.prefWidth(50);
+
       RotateTransition rotateTransition = new RotateTransition(Duration.seconds(1), loadingSpinner);
       rotateTransition.setByAngle(360);
       rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
       rotateTransition.play();
+   }
+
+   private void loadingScreenShowSyncing(String statusMessage, SVGPath icon) {
+      final ObservableList<Node> children = loadingScreen.getChildren();
+      children.remove(0);
+      children.add(0, icon);
+      loadingMessage.setText(statusMessage);
    }
 
    private void showLoadingScreen(final boolean show) {
@@ -421,8 +454,6 @@ public class ExternalProjectsSyncController {
       });
 
       spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-
-      // TODO mark red if not a 15 minute slot
    }
 
    public static LocalTime decrementToLastFullQuarter(LocalTime time) {

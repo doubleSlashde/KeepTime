@@ -73,6 +73,10 @@ public class Resources {
 
       SVG_SPINNER_SOLID("/svgs/spinner-solid.svg"),
 
+      SVG_XMARK_SOLID("/svgs/xmark-solid.svg"),
+
+      SVG_THUMBS_UP_SOLID("/svgs/thumbs-up-solid.svg"),
+
       ICON_MAIN("/icons/icon.png")
 
       ;
