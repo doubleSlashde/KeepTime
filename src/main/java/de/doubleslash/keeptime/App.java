@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -110,36 +111,43 @@ public class App extends Application {
       } catch (final Exception e) {
          LOG.error("There was an error while initialising the UI", e);
 
-         final Alert alert = new Alert(AlertType.ERROR);
-         alert.setTitle("Error");
-         alert.setHeaderText("Could not start application");
-         alert.setContentText("Please send the error with your logs folder to a developer");
-
-         final StringWriter sw = new StringWriter();
-         final PrintWriter pw = new PrintWriter(sw);
-         e.printStackTrace(pw);
-         final String exceptionText = sw.toString();
-
-         final Label label = new Label("The exception stacktrace was:");
-
-         final TextArea textArea = new TextArea(exceptionText);
-         textArea.setEditable(false);
-         textArea.setWrapText(true);
-
-         textArea.setMaxWidth(Double.MAX_VALUE);
-         textArea.setMaxHeight(Double.MAX_VALUE);
-         GridPane.setVgrow(textArea, Priority.ALWAYS);
-         GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-         final GridPane expContent = new GridPane();
-         expContent.setMaxWidth(Double.MAX_VALUE);
-         expContent.add(label, 0, 0);
-         expContent.add(textArea, 0, 1);
-
-         alert.getDialogPane().setExpandableContent(expContent);
-         alert.showAndWait();
+         showErrorDialogAndWait("Error", "Could not start application",
+               "Please send the error with your logs folder to a developer", e, null);
          System.exit(1);
       }
+   }
+
+   public static void showErrorDialogAndWait(String title, String header, String content, final Exception e, Window window) {
+      final Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle(title);
+      alert.setHeaderText(header);
+      alert.setContentText(content);
+      if(window != null) {
+         alert.initOwner(window);
+      }
+      final StringWriter sw = new StringWriter();
+      final PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      final String exceptionText = sw.toString();
+
+      final Label label = new Label("The exception stacktrace was:");
+
+      final TextArea textArea = new TextArea(exceptionText);
+      textArea.setEditable(false);
+      textArea.setWrapText(true);
+
+      textArea.setMaxWidth(Double.MAX_VALUE);
+      textArea.setMaxHeight(Double.MAX_VALUE);
+      GridPane.setVgrow(textArea, Priority.ALWAYS);
+      GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+      final GridPane expContent = new GridPane();
+      expContent.setMaxWidth(Double.MAX_VALUE);
+      expContent.add(label, 0, 0);
+      expContent.add(textArea, 0, 1);
+
+      alert.getDialogPane().setExpandableContent(expContent);
+      alert.showAndWait();
    }
 
    private void initialiseApplication(final Stage primaryStage) throws Exception {

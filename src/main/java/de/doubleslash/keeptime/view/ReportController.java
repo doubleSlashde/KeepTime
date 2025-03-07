@@ -63,6 +63,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import static de.doubleslash.keeptime.App.showErrorDialogAndWait;
 import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
 
 @Component
@@ -138,17 +139,18 @@ public class ReportController {
    }
 
    private void initHeimatIntegration() {
-      // TODO if heimat active show or hide button
+      heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
       heimatSyncButton.setOnAction(ae-> {
          try {
             showSyncStage();
-         } catch (IOException e) {
-            throw new RuntimeException(e);
+         } catch (FXMLLoaderException e) {
+            LOG.error("Error while loading sync stage", e);
+            showErrorDialogAndWait("Error", "Could not load sync stage", "Please make sure your AccessToken is valid and you have internet.", e, this.stage);
          }
       });
    }
 
-   private void showSyncStage() throws IOException {
+   private void showSyncStage(){
       try{
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_SYNC);
@@ -159,7 +161,6 @@ public class ReportController {
          Stage settingsStage = new Stage();
          settingsController.setStage(settingsStage);
          settingsStage.initOwner(this.stage);
-         //settingsStage.initModality(Modality.WINDOW_MODAL);
          settingsStage.setTitle("External Project Sync");
          settingsStage.setResizable(true);
          settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
@@ -174,9 +175,7 @@ public class ReportController {
 
          settingsStage.setScene(settingsScene);
          settingsStage.showAndWait();
-         //settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
-      } catch (final IOException e) {
-         LOG.error("Error while loading sub stage");
+      } catch (final Exception e) {
          throw new FXMLLoaderException(e);
       }
    }

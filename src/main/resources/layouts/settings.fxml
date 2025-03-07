@@ -722,6 +722,7 @@
                                           <HBox alignment="CENTER_LEFT">
                                              <children>
                                                 <Button fx:id="heimatMapProjectsButton" mnemonicParsing="false" text="Map projects" />
+                                                <Label fx:id="mapProjectsButtonLabel" />
                                              </children>
                                           </HBox>
                                        </children>

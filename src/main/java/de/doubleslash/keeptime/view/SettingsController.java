@@ -43,6 +43,7 @@ import org.h2.tools.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.ApplicationProperties;
@@ -68,6 +69,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+import static de.doubleslash.keeptime.App.showErrorDialogAndWait;
 import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
 
 @Component
@@ -217,6 +219,9 @@ public class SettingsController {
 
    @FXML
    private Button heimatMapProjectsButton;
+
+   @FXML
+   private Label mapProjectsButtonLabel;
 
    private final String propertiesFilePath = "application.properties";
 
@@ -412,10 +417,11 @@ public class SettingsController {
          final HeimatAPI heimatAPI = new HeimatAPI(heimatUrlTextField.getText() , heimatPatTextField.getText());
          try {
             heimatAPI.isLoginValid();
-            heimatValidateConnectionLabel.setText("Connection is valid");
+            heimatValidateConnectionLabel.setText("Connection is valid.");
          }catch(Exception e){
             LOG.error("Error while validating Heimat connection", e);
             heimatValidateConnectionLabel.setText("Invalid connection: " + e.getMessage());
+            heimatValidateConnectionLabel.setTooltip(new Tooltip(e.getMessage()));
          }
       });
 
@@ -429,22 +435,25 @@ public class SettingsController {
       heimatUrlTextField.setText(heimatSettings.getHeimatUrl());
       heimatPatTextField.setText(heimatSettings.getHeimatPat());
 
+      mapProjectsButtonLabel.setText("Please save settings before mapping projects.");
+      heimatMapProjectsButton.disableProperty().bind(heimatActivationCheckbox.selectedProperty().not());
+
       heimatMapProjectsButton.setOnAction((ae) -> {
          try {
             showMapProjectsStage();
-         } catch (IOException e) {
-            throw new RuntimeException(e);
+         } catch (FXMLLoaderException e) {
+            LOG.error("Error while loading map stage", e);
+            showErrorDialogAndWait("Error", "Could not load mapping stage", "Try to save settings first. Make sure you have internet.", e, thisStage);
          }
       });
    }
 
-   private void showMapProjectsStage() throws IOException {
+   private void showMapProjectsStage() {
       try{
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
          fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
          final Parent settingsRoot = fxmlLoader2.load();
-         // TODO somehow the url is not available after saving - only when restarted
          MapExternalProjectsController settingsController = fxmlLoader2.getController();
          Stage settingsStage = new Stage();
          settingsController.setStage(settingsStage);
@@ -462,10 +471,8 @@ public class SettingsController {
          });
 
          settingsStage.setScene(settingsScene);
-            settingsStage.showAndWait();
-         //settingsStage.setOnHiding(e -> this.mainStage.setAlwaysOnTop(true));
-      } catch (final IOException e) {
-         LOG.error("Error while loading sub stage");
+         settingsStage.showAndWait();
+      } catch (final Exception e) {
          throw new FXMLLoaderException(e);
       }
    }
