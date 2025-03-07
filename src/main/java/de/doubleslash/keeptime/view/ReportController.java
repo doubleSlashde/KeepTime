@@ -487,10 +487,7 @@ public class ReportController {
             final String currentWorkNote = work.getNotes();
             pr.appendToWorkNotes(currentWorkNote);
          }
-         final Clipboard clipboard = Clipboard.getSystemClipboard();
-         final ClipboardContent content = new ClipboardContent();
-         content.putString(pr.getNotes());
-         clipboard.setContent(content);
+         copyToClipboard(pr.getNotes());
       };
 
       copyNotesButton.setOnAction(eventListener);
@@ -505,14 +502,18 @@ public class ReportController {
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
-         final Clipboard clipboard = Clipboard.getSystemClipboard();
-         final ClipboardContent content = new ClipboardContent();
-         content.putString(projectName);
-         clipboard.setContent(content);
+         copyToClipboard(projectName);
       };
 
       copyProjectNameButton.setOnAction(eventListener);
       return copyProjectNameButton;
+   }
+
+   public static void copyToClipboard(final String stringToCopy) {
+      final Clipboard clipboard = Clipboard.getSystemClipboard();
+      final ClipboardContent content = new ClipboardContent();
+      content.putString(stringToCopy);
+      clipboard.setContent(content);
    }
 
    private Node createCopyWorkButton(final Work w) {
@@ -523,10 +524,7 @@ public class ReportController {
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
-         final Clipboard clipboard = Clipboard.getSystemClipboard();
-         final ClipboardContent content = new ClipboardContent();
-         content.putString(w.getNotes());
-         clipboard.setContent(content);
+         copyToClipboard(w.getNotes());
       };
 
       copyButton.setOnAction(eventListener);

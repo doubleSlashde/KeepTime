@@ -16,7 +16,7 @@
       <Button fx:id="cancelButton" layoutX="500.0" layoutY="555.0" mnemonicParsing="false" text="Cancel" />
       <CheckBox fx:id="filterOnlyWorkCheckBox" layoutX="14.0" layoutY="21.0" mnemonicParsing="false" text="Only Work items" />
       <ComboBox fx:id="addNewProjectComboBox" layoutX="14.0" layoutY="555.0" prefHeight="25.0" prefWidth="210.0" />
-      <Button fx:id="addNewProjectButton" layoutX="234.0" layoutY="555.0" mnemonicParsing="false" text="+" />
+      <Button fx:id="addNewProjectButton" layoutX="234.0" layoutY="555.0" mnemonicParsing="false" text="Import project" />
       <DatePicker fx:id="tasksForDateDatePicker" layoutX="412.0" layoutY="17.0" />
    </children>
 </AnchorPane>

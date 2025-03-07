@@ -5,6 +5,7 @@ import de.doubleslash.keeptime.model.ExternalSystem;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
@@ -12,8 +13,10 @@ import javafx.scene.paint.Color;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 class HeimatControllerTest {
 
+   private static HeimatSettings mockedHeimatSettings;
    private static HeimatAPI mockedHeimatAPI;
    private static ExternalProjectsMappingsRepository mockedExternalMappingsRepository;
    private static HeimatController heimatController;
@@ -45,9 +49,10 @@ class HeimatControllerTest {
 
    @BeforeEach
    public void beforeEach() {
+      mockedHeimatSettings = Mockito.mock(HeimatSettings.class);
       mockedHeimatAPI = Mockito.mock(HeimatAPI.class);
       mockedExternalMappingsRepository = Mockito.mock(ExternalProjectsMappingsRepository.class);
-      heimatController = new HeimatController(mockedHeimatAPI, mockedExternalMappingsRepository,
+      heimatController = new HeimatController(mockedHeimatSettings,mockedHeimatAPI, mockedExternalMappingsRepository,
             new Controller(null, null, null, null));
 
       when(mockedExternalMappingsRepository.findByExternalSystemId(ExternalSystem.Heimat)).thenReturn(externalMappings);
@@ -60,10 +65,15 @@ class HeimatControllerTest {
 
    @Test
    void shouldMarkNonSyncableWhenNotMapped() {
+      // ARRANGE
       workItems.add(new Work(now.minusMinutes(13), now, workProject1, "Notes 1"));
 
+      // ACT
       final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+
+      // ASSERT
       assertFalse(tableRows.get(0).canBeSynced());
+      assertThat(tableRows.get(0).heimatTaskId(), Matchers.is(-1L));
    }
 
    @Test
@@ -78,7 +88,7 @@ class HeimatControllerTest {
 
       // ASSERT
       assertFalse(tableRows.get(0).canBeSynced());
-      assertThat(tableRows.get(0).syncMessage(), Matchers.containsString("no longer available"));
+      assertThat(tableRows.get(0).syncMessage(), Matchers.containsString("is not available"));
    }
 
    @Test
@@ -176,6 +186,13 @@ class HeimatControllerTest {
             () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
             //
       );
+   }
+
+   @Test
+   void shouldGenerateLinkForDay(){
+      when(mockedHeimatSettings.getHeimatUrl()).thenReturn("https://doubleslash.de");
+      final String urlForDay = heimatController.getUrlForDay(LocalDate.of(1999, 4, 2));
+      assertThat(urlForDay, Matchers.is("https://doubleslash.de/core/heimat/time/main/day/1999/4/2"));
    }
    // Save
    // shouldSaveTimes

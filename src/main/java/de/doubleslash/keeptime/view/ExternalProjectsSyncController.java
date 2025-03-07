@@ -1,5 +1,7 @@
 package de.doubleslash.keeptime.view;
 
+import de.doubleslash.keeptime.common.BrowserHelper;
+import de.doubleslash.keeptime.common.DateFormatter;
 import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
@@ -34,12 +36,13 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static de.doubleslash.keeptime.view.ReportController.copyToClipboard;
 
 @Component
 public class ExternalProjectsSyncController {
@@ -60,6 +63,10 @@ public class ExternalProjectsSyncController {
 
    @FXML
    private Label sumTimeLabel;
+   @FXML
+   private Label keepTimeTimeLabel;
+   @FXML
+   private Label heimatTimeLabel;
 
    @FXML
    private Hyperlink externalSystemLink;
@@ -73,23 +80,26 @@ public class ExternalProjectsSyncController {
    @FXML
    private Label loadingMessage;
 
-   private final SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.1, 0.1);
-   private final SVGPath loadingSuccess = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_THUMBS_UP_SOLID, 0.1, 0.1);
-   private final SVGPath loadingFailure = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_XMARK_SOLID, 0.1, 0.1);
+   private final SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.1,
+         0.1);
+   private final SVGPath loadingSuccess = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_THUMBS_UP_SOLID,
+         0.1, 0.1);
+   private final SVGPath loadingFailure = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_XMARK_SOLID, 0.1,
+         0.1);
 
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
    private ObservableList<TableRow> items;
 
    private LocalDate currentReportDate;
    private Stage thisStage;
-   private final  HeimatController heimatController;
+   private final HeimatController heimatController;
 
    public ExternalProjectsSyncController(final HeimatController heimatController) {
       this.heimatController = heimatController;
    }
 
    public void initForDate(LocalDate currentReportDate, List<Work> currentWorkItems) {
-      dayOfSyncLabel.setText(currentReportDate.format(DateTimeFormatter.BASIC_ISO_DATE));
+      dayOfSyncLabel.setText(DateFormatter.toDayDateString(currentReportDate));
       this.currentReportDate = currentReportDate;
 
       // TODO add a spinner while loading?
@@ -99,7 +109,7 @@ public class ExternalProjectsSyncController {
       items = FXCollections.observableArrayList(tableRows.stream().map(mapping -> {
          String userNotes = mapping.keeptimeNotes();
          long userSeconds = mapping.keeptimeSeconds();
-         // use info from heimat
+         // use info from heimat when already present
          if (mapping.heimatSeconds() != 0L) {
             userNotes = mapping.heimatNotes();
             userSeconds = mapping.heimatSeconds();
@@ -113,13 +123,17 @@ public class ExternalProjectsSyncController {
             item -> new javafx.beans.Observable[] { item.userTimeSeconds, item.shouldSyncCheckBox });
       items2.addAll(items);
       StringBinding totalSum = Bindings.createStringBinding(() -> localTimeStringConverter.toString(
-            LocalTime.ofSecondOfDay(items.stream()
-                                         .filter(item -> item.shouldSyncCheckBox.get())
-                                         .mapToLong(item -> item.userTimeSeconds.getValue())
-                                         .sum())), items2);
-      sumTimeLabel.textProperty().bind(Bindings.concat("Total Sum: ", totalSum));
-      // TODO add a label with current Heimat Time
-      // TODO add a label with current Keeptime time
+            LocalTime.ofSecondOfDay(
+                  items.stream().filter(item -> item.mapping.heimatTaskId() != -1L) // if its bookable in heimat
+                       .mapToLong(item -> item.userTimeSeconds.getValue()).sum())), items2);
+      sumTimeLabel.textProperty().bind(totalSum);
+
+      keepTimeTimeLabel.setText(localTimeStringConverter.toString(
+            LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::keeptimeSeconds).sum())));
+      heimatTimeLabel.setText(localTimeStringConverter.toString(
+            LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::heimatSeconds).sum())));
+
+      externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
    }
 
    @FXML
@@ -160,8 +174,6 @@ public class ExternalProjectsSyncController {
       TableColumn<TableRow, List<Project>> projectColumn = new TableColumn<>("Project");
       projectColumn.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().mapping.projects()));
       projectColumn.setCellFactory(column -> new TableCell<>() {
-         //private final Label label = new Label();
-
          @Override
          protected void updateItem(List<Project> item, boolean empty) {
             super.updateItem(item, empty);
@@ -222,13 +234,17 @@ public class ExternalProjectsSyncController {
                      LocalTime.ofSecondOfDay(item.keeptimeTimeSeconds.get())));
                heimatLabel.setText("Heimat: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.heimatTimeSeconds.get())));
-               timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(item.userTimeSeconds.get()));
-               localTimeChangeListener = (observable, oldValue, newValue) -> {
-                  item.userTimeSeconds.set(newValue.toSecondOfDay());
+               timeSpinner.setDisable(!item.mapping.canBeSynced());
+               timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(0));
+               if (item.mapping.canBeSynced()) {
+                  timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(item.userTimeSeconds.get()));
+                  localTimeChangeListener = (observable, oldValue, newValue) -> {
+                     item.userTimeSeconds.set(newValue.toSecondOfDay());
+                     spinnerValid.accept(timeSpinner);
+                  };
                   spinnerValid.accept(timeSpinner);
-               };
-               spinnerValid.accept(timeSpinner);
-               timeSpinner.valueProperty().addListener(localTimeChangeListener);
+                  timeSpinner.valueProperty().addListener(localTimeChangeListener);
+               }
                setGraphic(container);
             }
          }
@@ -258,9 +274,25 @@ public class ExternalProjectsSyncController {
             textArea.setPrefHeight(50);
             textArea.setPrefWidth(100);
             textArea.setWrapText(true);
-            // TODO make it possible to copy content of heimatNotesLabel
-            hbox.getChildren().addAll(new Label("Keeptime:"), keepTimeNotesLabel);
-            hbox2.getChildren().addAll(new Label("Heimat:"), heimatNotesLabel);
+
+            final Button copyKeepTimeNotes = new Button("",
+                  SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_CLIPBOARD_ICON, 0.03, 0.03));
+            copyKeepTimeNotes.setMaxSize(20, 18);
+            copyKeepTimeNotes.setMinSize(20, 18);
+            copyKeepTimeNotes.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            copyKeepTimeNotes.setTooltip(new Tooltip("Copy notes"));
+            copyKeepTimeNotes.setOnAction(me -> copyToClipboard(keepTimeNotesLabel.getText()));
+
+            final Button copyHeimatNotes = new Button("",
+                  SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_CLIPBOARD_ICON, 0.03, 0.03));
+            copyHeimatNotes.setMaxSize(20, 18);
+            copyHeimatNotes.setMinSize(20, 18);
+            copyHeimatNotes.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+            copyHeimatNotes.setTooltip(new Tooltip("Copy notes"));
+            copyHeimatNotes.setOnAction(me -> copyToClipboard(heimatNotesLabel.getText()));
+
+            hbox.getChildren().addAll(copyKeepTimeNotes, new Label("KeepTime:"), keepTimeNotesLabel);
+            hbox2.getChildren().addAll(copyHeimatNotes, new Label("Heimat:"), heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox, hbox2);
          }
 
@@ -272,13 +304,17 @@ public class ExternalProjectsSyncController {
             if (empty || item == null) {
                setGraphic(null);
             } else {
-               textArea.setText(item.userNotes.get());
-               stringChangeListener = (obs, oldText, newText) -> {
-                  item.userNotes.set(newText);
+               textArea.setDisable(!item.mapping.canBeSynced());
+               textArea.setText("");
+               if (item.mapping.canBeSynced()) {
+                  textArea.setText(item.userNotes.get());
+                  stringChangeListener = (obs, oldText, newText) -> {
+                     item.userNotes.set(newText);
+                     textAreaValid.accept(textArea);
+                  };
                   textAreaValid.accept(textArea);
-               };
-               textAreaValid.accept(textArea);
-               textArea.textProperty().addListener(stringChangeListener);
+                  textArea.textProperty().addListener(stringChangeListener);
+               }
                heimatNotesLabel.setText(item.heimatNotes.get());
                keepTimeNotesLabel.setText(item.keeptimeNotes.get());
                setGraphic(container);
@@ -291,6 +327,7 @@ public class ExternalProjectsSyncController {
       syncColumn.setCellValueFactory(data -> data.getValue().syncStatus);
       syncColumn.setPrefWidth(250);
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
+      mappingTableView.setSelectionModel(null);
 
       saveButton.setOnAction((ae) -> {
          LOG.debug("New mappings to be synced '{}'.", "TODO");
