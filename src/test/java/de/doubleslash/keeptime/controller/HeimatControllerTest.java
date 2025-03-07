@@ -148,12 +148,39 @@ class HeimatControllerTest {
             () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2)));
    }
 
-   // shouldShowHeimatTimeWhenProjectIsNotMappedInKeeptime? (to know absolute time for the day)
+   // shouldDisableShouldBeSyncedWhenAlreadyPresentInHeimat
 
+   @Test
+   void shouldShowHeimatTimeWhenProjectIsNotMappedInKeeptime() {
+      // ARRANGE
+      final HeimatTime existingTime1 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 60, "Existing note 1", 12);
+      when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime1));
+      // there could be more than 1 time for a task in heimat (e.g. when manually saved with start,end feature)
+      final HeimatTime existingTime2 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 30, "Existing note 2", 13);
+      when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime1, existingTime2));
+
+      // ACT
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // ASSERT
+      assertAll(() -> assertFalse(mapping.canBeSynced()),
+            () -> assertThat(mapping.syncMessage(), Matchers.containsString("Not mapped in KeepTime")),
+            () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
+            () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
+            () -> assertThat(mapping.projects().size(), Matchers.is(0)),
+            () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1. Existing note 2")),
+            () -> assertThat(mapping.heimatSeconds(), Matchers.is((60 + 30) * 60L)),
+            () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
+            //
+      );
+   }
    // Save
    // shouldSaveTimes
    // shouldDeleteExistingTimesBeforeSavingWhenTimesAlreadyExist
    // shouldContinueOnErrorAndReturnErrorsWhenErrorsOccurred
-   // shouldOnlyUpdateHeimatWhenSomethingHasChanged
+   // shouldOnlyUpdateHeimatWhenSomethingHasChanged (not needed - user should decide)
 
 }
