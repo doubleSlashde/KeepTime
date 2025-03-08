@@ -21,20 +21,10 @@
                   <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel" />
                </children>
             </HBox>
-            <HBox spacing="20.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+            <HBox spacing="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                <children>
-                  <HBox spacing="5.0">
-                     <children>
-                        <Label text="Syncing day" />
-                        <Label fx:id="dayOfSyncLabel" text="01.01.2025" />
-                     </children>
-                  </HBox>
-                  <HBox spacing="5.0">
-                     <children>
-                        <Label text="KeepTime work time:" />
-                        <Label fx:id="keepTimeTimeLabel" text="08:45" />
-                     </children>
-                  </HBox>
+                  <Label text="Syncing day" />
+                  <Label fx:id="dayOfSyncLabel" text="01.01.2025" />
                </children>
             </HBox>
             <HBox layoutX="37.0" layoutY="665.0" spacing="50.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
@@ -55,6 +45,12 @@
                         </HBox>
                      </children>
                   </VBox>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label text="KeepTime work time:" />
+                        <Label fx:id="keepTimeTimeLabel" text="08:45" />
+                     </children>
+                  </HBox>
                </children>
             </HBox>
             <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in HEIMAT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
