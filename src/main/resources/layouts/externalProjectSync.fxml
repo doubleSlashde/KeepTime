@@ -5,31 +5,59 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ExternalProjectsSyncController">
+<StackPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ExternalProjectsSyncController">
    <children>
       <AnchorPane fx:id="pane" prefHeight="600.0" prefWidth="1000.0">
          <children>
-            <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="603.0" prefWidth="1112.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" />
-            <Label text="Sync dialog">
-               <font>
-                  <Font name="System Bold" size="15.0" />
-               </font>
-            </Label>
-            <Button fx:id="saveButton" layoutX="987.0" layoutY="722.0" mnemonicParsing="false" text="Save" />
-            <Button fx:id="cancelButton" layoutX="1058.0" layoutY="722.0" mnemonicParsing="false" text="Cancel" />
-            <Label layoutX="14.0" layoutY="21.0" text="Syncing day" />
-            <Label fx:id="dayOfSyncLabel" layoutX="104.0" layoutY="21.0" text="01.01.2025" />
-            <Label layoutX="37.0" layoutY="665.0" text="New Heimat time:" />
-            <Label fx:id="sumTimeLabel" layoutX="189.0" layoutY="665.0" text="08:45" />
-            <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in HEIMAT" />
-            <Label layoutX="282.0" layoutY="665.0" text="KeepTime time:" />
-            <Label fx:id="keepTimeTimeLabel" layoutX="402.0" layoutY="665.0" text="08:45" />
-            <Label layoutX="38.0" layoutY="692.0" text="Current Heimat time:" />
-            <Label fx:id="heimatTimeLabel" layoutX="189.0" layoutY="692.0" text="08:45" />
+            <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="603.0" prefWidth="1112.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0" />
+            <HBox layoutX="987.0" layoutY="722.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
+               <children>
+                  <Button fx:id="saveButton" mnemonicParsing="false" text="Save" />
+                  <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel" />
+               </children>
+            </HBox>
+            <HBox spacing="20.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+               <children>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label text="Syncing day" />
+                        <Label fx:id="dayOfSyncLabel" text="01.01.2025" />
+                     </children>
+                  </HBox>
+                  <HBox spacing="5.0">
+                     <children>
+                        <Label text="KeepTime work time:" />
+                        <Label fx:id="keepTimeTimeLabel" text="08:45" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox layoutX="37.0" layoutY="665.0" spacing="50.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0">
+               <children>
+                  <VBox spacing="5.0">
+                     <children>
+                        <HBox spacing="5.0">
+                           <children>
+                              <Label text="New Heimat time:" />
+                              <Label fx:id="sumTimeLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" text="08:45" />
+                           </children>
+                        </HBox>
+                        <HBox spacing="5.0">
+                           <children>
+                              <Label text="Current Heimat time:" />
+                              <Label fx:id="heimatTimeLabel" text="08:45" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in HEIMAT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
          </children>
       </AnchorPane>
       <VBox fx:id="loadingScreen" alignment="CENTER" spacing="10.0" visible="false">

@@ -169,7 +169,6 @@ public class ExternalProjectsSyncController {
       });
       mappingTableView.setEditable(true);
       shouldSyncColumn.setEditable(true);
-      shouldSyncColumn.setPrefWidth(50);
 
       TableColumn<TableRow, List<Project>> projectColumn = new TableColumn<>("Project");
       projectColumn.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().mapping.projects()));
@@ -196,7 +195,6 @@ public class ExternalProjectsSyncController {
             return new HBox(5, circle, label);
          }
       });
-      projectColumn.setPrefWidth(100);
 
       TableColumn<TableRow, TableRow> timeColumn = new TableColumn<>("Time");
       timeColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
@@ -249,7 +247,6 @@ public class ExternalProjectsSyncController {
             }
          }
       });
-      timeColumn.setPrefWidth(125);
 
       TableColumn<TableRow, TableRow> notesColumn = new TableColumn<>("Notes");
       notesColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
@@ -321,13 +318,20 @@ public class ExternalProjectsSyncController {
             }
          }
       });
-      notesColumn.setPrefWidth(350);
 
       TableColumn<TableRow, String> syncColumn = new TableColumn<>("Sync Status");
       syncColumn.setCellValueFactory(data -> data.getValue().syncStatus);
+
+      shouldSyncColumn.setPrefWidth(50);
+      projectColumn.setPrefWidth(100);
+      timeColumn.setPrefWidth(125);
+      notesColumn.prefWidthProperty().bind(mappingTableView.widthProperty().subtract(525+17));
       syncColumn.setPrefWidth(250);
+
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
       mappingTableView.setSelectionModel(null);
+      mappingTableView.getColumns().forEach(column -> column.setSortable(false));
+
 
       saveButton.setOnAction((ae) -> {
          LOG.debug("New mappings to be synced '{}'.", "TODO");

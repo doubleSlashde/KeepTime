@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 
-<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.MapExternalProjectsController">
+<AnchorPane prefHeight="600.0" prefWidth="700.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.MapExternalProjectsController">
    <children>
-      <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="500.0" prefWidth="600.0" />
-      <Label text="Map projects" />
-      <Button fx:id="saveButton" layoutX="429.0" layoutY="555.0" mnemonicParsing="false" text="Save" />
-      <Button fx:id="cancelButton" layoutX="500.0" layoutY="555.0" mnemonicParsing="false" text="Cancel" />
-      <CheckBox fx:id="filterOnlyWorkCheckBox" layoutX="14.0" layoutY="21.0" mnemonicParsing="false" text="Only Work items" />
-      <ComboBox fx:id="addNewProjectComboBox" layoutX="14.0" layoutY="555.0" prefHeight="25.0" prefWidth="210.0" />
-      <Button fx:id="addNewProjectButton" layoutX="234.0" layoutY="555.0" mnemonicParsing="false" text="Import project" />
-      <DatePicker fx:id="tasksForDateDatePicker" layoutX="412.0" layoutY="17.0" />
+      <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="500.0" prefWidth="600.0" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="40.0" />
+      <HBox layoutX="429.0" layoutY="555.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0">
+         <children>
+            <Button fx:id="saveButton" mnemonicParsing="false" text="Save" />
+            <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel" />
+         </children>
+      </HBox>
+      <HBox layoutX="5.0" layoutY="564.0" spacing="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+         <children>
+            <ComboBox fx:id="addNewProjectComboBox" prefHeight="25.0" prefWidth="210.0" />
+            <Button fx:id="addNewProjectButton" mnemonicParsing="false" text="Import project" />
+         </children>
+      </HBox>
+      <DatePicker fx:id="tasksForDateDatePicker" layoutX="371.0" layoutY="16.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
    </children>
 </AnchorPane>

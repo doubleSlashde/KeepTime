@@ -64,9 +64,6 @@ public class MapExternalProjectsController {
    private Button cancelButton;
 
    @FXML
-   private CheckBox filterOnlyWorkCheckBox;
-
-   @FXML
    private ComboBox<HeimatTask> addNewProjectComboBox;
 
    @FXML
@@ -120,21 +117,12 @@ public class MapExternalProjectsController {
       }).toList();
 
       final ObservableList<ProjectMapping> observableMappings = FXCollections.observableArrayList(projectMappings);
-      final FilteredList<ProjectMapping> value = new FilteredList<>(observableMappings);
-      filterOnlyWorkCheckBox.selectedProperty().addListener(((observable, oldValue, newValue) -> {
-         if (Boolean.TRUE.equals(newValue))
-            value.setPredicate(pm -> pm.getProject().isWork());
-         else
-            value.setPredicate(null);
-      }));
-      filterOnlyWorkCheckBox.setSelected(true);
-
+      final FilteredList<ProjectMapping> value = new FilteredList<>(observableMappings, pm->pm.getProject().isWork());
       mappingTableView.setItems(value);
 
       // KeepTime Project column
       TableColumn<ProjectMapping, String> keepTimeColumn = new TableColumn<>("KeepTime Project");
       keepTimeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().project.getName()));
-      keepTimeColumn.setPrefWidth(200);
 
       // External Project column with dropdown
       externalProjects.add(0, null); // option to clear selection
@@ -191,7 +179,10 @@ public class MapExternalProjectsController {
             }
          }
       });
-      externalColumn.setPrefWidth(400);
+
+      double scrollbarWidth = 17; // Approximate width of a vertical scrollbar
+      keepTimeColumn.prefWidthProperty().bind(mappingTableView.widthProperty().subtract(scrollbarWidth).multiply(.4));
+      externalColumn.prefWidthProperty().bind(mappingTableView.widthProperty().subtract(scrollbarWidth).multiply(.6));
 
       mappingTableView.getColumns().addAll(keepTimeColumn, externalColumn);
 
