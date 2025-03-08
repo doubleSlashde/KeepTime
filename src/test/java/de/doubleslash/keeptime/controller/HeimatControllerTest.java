@@ -178,6 +178,7 @@ class HeimatControllerTest {
       // ASSERT
       assertAll(() -> assertFalse(mapping.canBeSynced()),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString("Not mapped in KeepTime")),
+            () -> assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
             () -> assertThat(mapping.projects().size(), Matchers.is(0)),

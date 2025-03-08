@@ -146,8 +146,13 @@ public class HeimatController {
          long heimatTimeSeconds = times.stream()
                                        .reduce(0L, (subtotal, element) -> subtotal + element.durationInMinutes() * 60L,
                                              Long::sum);
-         final Mapping mapping = new Mapping(id, false, "Not mapped in KeepTime", times, new ArrayList<>(0),
-               heimatNotes, "", heimatTimeSeconds, 0);
+         final HeimatTask heimatTask = heimatTasks.stream()
+                                                  .filter(t -> t.id() == times.get(0).taskId())
+                                                  .findAny()
+                                                  .get();
+         final Mapping mapping = new Mapping(id, false,
+               "Not mapped in KeepTime\n\n" + heimatTask.name() + "\n" + heimatTask.projectName(), times,
+               new ArrayList<>(0), heimatNotes, "", heimatTimeSeconds, 0);
          list.add(mapping);
       });
       return list;
