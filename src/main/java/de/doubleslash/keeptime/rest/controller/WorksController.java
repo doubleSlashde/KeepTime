@@ -16,21 +16,6 @@
 
 package de.doubleslash.keeptime.rest.controller;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
@@ -38,6 +23,13 @@ import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
 import de.doubleslash.keeptime.rest.DTO.WorkDTO;
 import de.doubleslash.keeptime.rest.mapper.WorkMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/works")
@@ -57,15 +49,11 @@ public class WorksController {
    }
 
    @GetMapping
-   public List<WorkDTO> getWorks(@RequestParam(name = "name", required = false) final String projectName) {
-      List<Work> works = workRepository.findAll();
-
-      Stream<Work> workStream = works.stream();
-
-      if (projectName != null) {
-         workStream = workStream.filter(work -> work.getProject().getName().equals(projectName));
-      }
-      return workStream.map(workMapper::workToWorkDTO).toList();
+   public List<WorkDTO> getWorks(@RequestParam(name = "id", required = false) final Long projectId,
+         @RequestParam(name = "fromDate", required = false) final LocalDate fromDate,
+         @RequestParam(name = "toDate", required = false) final LocalDate toDate) {
+      List<Work> works = workRepository.findWorkItems(projectId, fromDate, toDate);
+      return works.stream().map(workMapper::workToWorkDTO).toList();
    }
 
    @PutMapping("/{id}")
