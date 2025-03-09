@@ -17,6 +17,7 @@
 package de.doubleslash.keeptime.view;
 
 import de.doubleslash.keeptime.controller.Controller;
+import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.ExternalProjectMapping;
 import de.doubleslash.keeptime.model.ExternalSystem;
 import de.doubleslash.keeptime.model.Model;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,7 +55,7 @@ public class MapExternalProjectsController {
 
    private final Model model;
    private final Controller controller;
-   private final HeimatSettings heimatSettings;
+   private final HeimatController heimatController;
    private final ExternalProjectsMappingsRepository externalProjectsMappingsRepository;
 
    private Stage thisStage;
@@ -76,11 +78,11 @@ public class MapExternalProjectsController {
    @FXML
    private DatePicker tasksForDateDatePicker;
 
-   public MapExternalProjectsController(final Model model, Controller controller, HeimatSettings heimatSettings,
+   public MapExternalProjectsController(final Model model, Controller controller, HeimatController heimatController,
          ExternalProjectsMappingsRepository externalProjectsMappingsRepository) {
       this.model = model;
       this.controller = controller;
-      this.heimatSettings = heimatSettings;
+      this.heimatController = heimatController;
       this.externalProjectsMappingsRepository = externalProjectsMappingsRepository;
    }
 
@@ -95,8 +97,7 @@ public class MapExternalProjectsController {
       // TODO add listener on this thing
       // but what happens with mapped projects not existing at that date? but actually not related to this feature alone
 
-      final HeimatAPI heimatAPI = new HeimatAPI(heimatSettings.getHeimatUrl(), heimatSettings.getHeimatPat());
-      final List<HeimatTask> allExternalProjects = heimatAPI.getMyTasks(tasksForDateDatePicker.getValue());
+      final List<HeimatTask> allExternalProjects = heimatController.getTasks(tasksForDateDatePicker.getValue());
       final List<HeimatTask> externalProjects = allExternalProjects.stream()
                                                                    .filter(p -> !p.isStartAndEndTimeRequired())
                                                                    .collect(Collectors.toCollection(ArrayList::new));
@@ -249,6 +250,10 @@ public class MapExternalProjectsController {
                                                                                             final HeimatTask heimatTask = projectMapping.getHeimatTask();
                                                                                             if (any.isPresent()) {
                                                                                                final ExternalProjectMapping projectMapping1 = any.get();
+                                                                                               if(projectMapping1.getExternalTaskId() == heimatTask.id()){
+                                                                                                  // mapping did not change
+                                                                                                  return null;
+                                                                                               }
                                                                                                projectMapping1.setExternalProjectName(
                                                                                                      heimatTask.taskHolderName());
                                                                                                projectMapping1.setExternalTaskId(
@@ -257,6 +262,7 @@ public class MapExternalProjectsController {
                                                                                                      heimatTask.name());
                                                                                                projectMapping1.setExternalTaskMetadata(
                                                                                                      heimatTask.toString()); // TODO to json
+
                                                                                                return projectMapping1;
                                                                                             }
                                                                                             return new ExternalProjectMapping(
@@ -268,9 +274,8 @@ public class MapExternalProjectsController {
                                                                                                   // TODO to json
                                                                                                   ,
                                                                                                   projectMapping.project);
-                                                                                         })
+                                                                                         }).filter(Objects::nonNull)
                                                                                          .toList();
-         // TODO the list also contains unchanged mappings
          externalProjectsMappingsRepository.saveAll(mappingsToCreateOrUpdate);
 
          // remove mappings which were removed also from database

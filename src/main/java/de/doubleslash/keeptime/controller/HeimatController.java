@@ -196,6 +196,16 @@ public class HeimatController {
             DateTimeFormatter.ofPattern("yyyy/M/d"));
    }
 
+   public List<HeimatTask> getTasks(final LocalDate forDate) {
+      final List<HeimatTask> myTasks = heimatAPI.getMyTasks(forDate);
+      // TODO remove this when api returns tasks only once
+      Map<Long, HeimatTask> uniqueMap = new LinkedHashMap<>();
+      for (HeimatTask obj : myTasks) {
+         uniqueMap.putIfAbsent(obj.id(), obj);
+      }
+      return new ArrayList<>(uniqueMap.values());
+   }
+
    public static class Asdf {
       private final Mapping mapping;
       private boolean shouldSync;
