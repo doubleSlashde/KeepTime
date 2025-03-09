@@ -149,7 +149,7 @@ public class HeimatController {
          final HeimatTask heimatTask = heimatTasks.stream()
                                                   .filter(t -> t.id() == times.get(0).taskId())
                                                   .findAny()
-                                                  .get();
+                                                  .orElseThrow();
          final Mapping mapping = new Mapping(id, false,
                "Not mapped in KeepTime\n\n" + heimatTask.name() + "\n" + heimatTask.taskHolderName(), times,
                new ArrayList<>(0), heimatNotes, "", heimatTimeSeconds, 0);
@@ -158,7 +158,7 @@ public class HeimatController {
       return list;
    }
 
-   public List<HeimatErrors> saveDay(final List<Asdf> items, LocalDate date) {
+   public List<HeimatErrors> saveDay(final List<UserMapping> items, LocalDate date) {
       List<HeimatErrors> errors = new ArrayList<>();
 
       items.stream().filter(tr -> tr.shouldSync).forEach(item -> {
@@ -206,51 +206,11 @@ public class HeimatController {
       return new ArrayList<>(uniqueMap.values());
    }
 
-   public static class Asdf {
-      private final Mapping mapping;
-      private boolean shouldSync;
-      private String userNotes;
-      private int userMinutes;
-
-      public Asdf(Mapping mapping, boolean shouldSync, String userNotes, int userMinutes) {
-         this.mapping = mapping;
-         this.shouldSync = shouldSync;
-         this.userNotes = userNotes;
-         this.userMinutes = userMinutes;
-      }
-
-      public void setShouldSync(final boolean shouldSync) {
-         this.shouldSync = shouldSync;
-      }
-
-      public void setUserNotes(final String userNotes) {
-         this.userNotes = userNotes;
-      }
-
-      public void setUserMinutes(final int userMinutes) {
-         this.userMinutes = userMinutes;
-      }
-
-      public Mapping getMapping() {
-         return mapping;
-      }
-
-      public boolean isShouldSync() {
-         return shouldSync;
-      }
-
-      public String getUserNotes() {
-         return userNotes;
-      }
-
-      public int getUserMinutes() {
-         return userMinutes;
-      }
-   }
+   public record UserMapping(Mapping mapping, boolean shouldSync, String userNotes, int userMinutes){ }
 
    public record Mapping(long heimatTaskId, boolean canBeSynced, String syncMessage, List<HeimatTime> existingTimes,
                          List<Project> projects, String heimatNotes, String keeptimeNotes, long heimatSeconds,
                          long keeptimeSeconds) {}
 
-   public record HeimatErrors(Asdf mapping, String errorMessage) {}
+   public record HeimatErrors(UserMapping mapping, String errorMessage) {}
 }

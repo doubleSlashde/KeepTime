@@ -7,6 +7,7 @@ import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import javafx.animation.Animation;
 import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
@@ -143,7 +144,7 @@ public class ExternalProjectsSyncController {
       TableColumn<TableRow, TableRow> shouldSyncColumn = new TableColumn<>("Sync");
       shouldSyncColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
       // Custom Cell Factory to disable CheckBoxes
-      shouldSyncColumn.setCellFactory(col -> new TableCell<TableRow, TableRow>() {
+      shouldSyncColumn.setCellFactory(col -> new TableCell<>() {
          private final CheckBox checkBox = new CheckBox();
          private ChangeListener<Boolean> boolChangeListener;
 
@@ -158,9 +159,7 @@ public class ExternalProjectsSyncController {
             } else {
                checkBox.setDisable(!item.mapping.canBeSynced());
                checkBox.setSelected(item.shouldSyncCheckBox.get());
-               boolChangeListener = (obs, oldText, newBoolean) -> {
-                  item.shouldSyncCheckBox.set(newBoolean);
-               };
+               boolChangeListener = (obs, oldText, newBoolean) -> item.shouldSyncCheckBox.set(newBoolean);
                checkBox.selectedProperty().addListener(boolChangeListener);
 
                setGraphic(checkBox);
@@ -171,7 +170,7 @@ public class ExternalProjectsSyncController {
       shouldSyncColumn.setEditable(true);
 
       TableColumn<TableRow, List<Project>> projectColumn = new TableColumn<>("Project");
-      projectColumn.setCellValueFactory(data -> new SimpleObjectProperty(data.getValue().mapping.projects()));
+      projectColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().mapping.projects()));
       projectColumn.setCellFactory(column -> new TableCell<>() {
          @Override
          protected void updateItem(List<Project> item, boolean empty) {
@@ -181,9 +180,7 @@ public class ExternalProjectsSyncController {
                setText(null);
             } else {
                VBox vbox = new VBox(5);
-               item.forEach(project -> {
-                  vbox.getChildren().add(createRow(project.getColor(), project.getName()));
-               });
+               item.forEach(project -> vbox.getChildren().add(createRow(project.getColor(), project.getName())));
                setGraphic(vbox);
             }
          }
@@ -230,7 +227,7 @@ public class ExternalProjectsSyncController {
             } else {
                keeptimeLabel.setText("KeepTime: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.keeptimeTimeSeconds.get())));
-               heimatLabel.setText("Heimat: " + localTimeStringConverter.toString(
+               heimatLabel.setText("HEIMAT: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.heimatTimeSeconds.get())));
                timeSpinner.setDisable(!item.mapping.canBeSynced());
                timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(0));
@@ -289,7 +286,7 @@ public class ExternalProjectsSyncController {
             copyHeimatNotes.setOnAction(me -> copyToClipboard(heimatNotesLabel.getText()));
 
             hbox.getChildren().addAll(copyKeepTimeNotes, new Label("KeepTime:"), keepTimeNotesLabel);
-            hbox2.getChildren().addAll(copyHeimatNotes, new Label("Heimat:"), heimatNotesLabel);
+            hbox2.getChildren().addAll(copyHeimatNotes, new Label("HEIMAT:"), heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox, hbox2);
          }
 
@@ -325,23 +322,21 @@ public class ExternalProjectsSyncController {
       shouldSyncColumn.setPrefWidth(50);
       projectColumn.setPrefWidth(100);
       timeColumn.setPrefWidth(125);
-      notesColumn.prefWidthProperty().bind(mappingTableView.widthProperty().subtract(525+17));
+      notesColumn.prefWidthProperty().bind(mappingTableView.widthProperty().subtract(525 + 17));
       syncColumn.setPrefWidth(250);
 
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
       mappingTableView.setSelectionModel(null);
       mappingTableView.getColumns().forEach(column -> column.setSortable(false));
 
-
-      saveButton.setOnAction((ae) -> {
-         LOG.debug("New mappings to be synced '{}'.", "TODO");
+      saveButton.setOnAction(ae -> {
          showLoadingScreen(true);
 
          Task<List<HeimatController.HeimatErrors>> task = new Task<>() {
             @Override
             protected List<HeimatController.HeimatErrors> call() {
                return heimatController.saveDay(items.stream()
-                                                    .map(item -> new HeimatController.Asdf(item.mapping,
+                                                    .map(item -> new HeimatController.UserMapping(item.mapping,
                                                           item.shouldSyncCheckBox.get(), item.userNotes.get(),
                                                           (int) (item.userTimeSeconds.get() / 60)))
                                                     .toList(), currentReportDate);
@@ -353,11 +348,12 @@ public class ExternalProjectsSyncController {
             final List<HeimatController.HeimatErrors> errors = task.getValue();
             if (!errors.isEmpty()) {
                loadingScreenShowSyncing("Something did not work :(", loadingFailure);
-               List<String> a = errors.stream().map(error -> {
-                  return error.mapping().getMapping().heimatTaskId() + ": " + error.errorMessage()
-                        + ". Wanted to store '" + error.mapping().getUserMinutes() + "' minutes with notes '"
-                        + error.mapping().getUserNotes() + "'";
-               }).toList();
+               List<String> a = errors.stream()
+                                      .map(error -> error.mapping().mapping().heimatTaskId() + ": "
+                                            + error.errorMessage() + ". Wanted to store '" + error.mapping()
+                                                                                                  .userMinutes()
+                                            + "' minutes with notes '" + error.mapping().userNotes() + "'")
+                                      .toList();
 
                showErrorDialog(a);
             } else {
@@ -385,9 +381,7 @@ public class ExternalProjectsSyncController {
          Platform.runLater(() -> new Thread(task).start());
       });
 
-      cancelButton.setOnAction(ae -> {
-         thisStage.close();
-      });
+      cancelButton.setOnAction(ae -> thisStage.close());
 
       // TODO offer some way to book time to an additional project?
    }
@@ -408,7 +402,7 @@ public class ExternalProjectsSyncController {
 
       RotateTransition rotateTransition = new RotateTransition(Duration.seconds(1), loadingSpinner);
       rotateTransition.setByAngle(360);
-      rotateTransition.setCycleCount(RotateTransition.INDEFINITE);
+      rotateTransition.setCycleCount(Animation.INDEFINITE);
       rotateTransition.play();
    }
 
@@ -452,7 +446,7 @@ public class ExternalProjectsSyncController {
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
-      spinner.focusedProperty().addListener((e) -> {
+      spinner.focusedProperty().addListener(e -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = spinner.getEditor().textProperty();
          try {
@@ -464,7 +458,7 @@ public class ExternalProjectsSyncController {
          }
       });
 
-      spinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
+      spinner.setValueFactory(new SpinnerValueFactory<>() {
 
          @Override
          public void decrement(final int steps) {

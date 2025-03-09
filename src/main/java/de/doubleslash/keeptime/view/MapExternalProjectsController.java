@@ -23,8 +23,6 @@ import de.doubleslash.keeptime.model.ExternalSystem;
 import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
-import de.doubleslash.keeptime.model.settings.HeimatSettings;
-import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
@@ -138,7 +136,7 @@ public class MapExternalProjectsController {
       externalProjects.add(0, null); // option to clear selection
       final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(
             externalProjects);
-      TableColumn<ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("Heimat Project");
+      TableColumn<ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("HEIMAT Project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().heimatTask));
       externalColumn.setCellFactory(col -> new TableCell<>() {
          // TODO search in box would be nice
@@ -233,7 +231,7 @@ public class MapExternalProjectsController {
       });
       addNewProjectComboBox.setItems(FXCollections.observableArrayList(externalProjects));
 
-      saveButton.setOnAction((ae) -> {
+      saveButton.setOnAction(ae -> {
          LOG.debug("New mappings to be saved '{}'.", observableMappings);
 
          final List<ExternalProjectMapping> mappingsToCreateOrUpdate = observableMappings.stream()
@@ -250,7 +248,8 @@ public class MapExternalProjectsController {
                                                                                             final HeimatTask heimatTask = projectMapping.getHeimatTask();
                                                                                             if (any.isPresent()) {
                                                                                                final ExternalProjectMapping projectMapping1 = any.get();
-                                                                                               if(projectMapping1.getExternalTaskId() == heimatTask.id()){
+                                                                                               if (projectMapping1.getExternalTaskId()
+                                                                                                     == heimatTask.id()) {
                                                                                                   // mapping did not change
                                                                                                   return null;
                                                                                                }
@@ -274,7 +273,8 @@ public class MapExternalProjectsController {
                                                                                                   // TODO to json
                                                                                                   ,
                                                                                                   projectMapping.project);
-                                                                                         }).filter(Objects::nonNull)
+                                                                                         })
+                                                                                         .filter(Objects::nonNull)
                                                                                          .toList();
          externalProjectsMappingsRepository.saveAll(mappingsToCreateOrUpdate);
 
@@ -296,9 +296,7 @@ public class MapExternalProjectsController {
          thisStage.close();
       });
 
-      cancelButton.setOnAction(ae -> {
-         thisStage.close();
-      });
+      cancelButton.setOnAction(ae -> thisStage.close());
 
       final List<String> invalidMappingsAsString = invalidExternalMappings.stream()
                                                                           .map(em -> "Task no longer exists: "

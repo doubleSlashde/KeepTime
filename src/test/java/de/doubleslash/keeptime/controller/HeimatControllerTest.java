@@ -59,7 +59,7 @@ class HeimatControllerTest {
 
       availableTasks.add(
             new HeimatTask(project1To1Mapping.getExternalTaskId(), project1To1Mapping.getExternalTaskName(),
-                  project1To1Mapping.getExternalProjectName(), false, "", false, false));
+                  project1To1Mapping.getExternalProjectName(),"PROJECT", false, "", false, false));
       when(mockedHeimatAPI.getMyTasks(now.toLocalDate())).thenReturn(availableTasks);
    }
 
