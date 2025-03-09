@@ -181,6 +181,12 @@ public class SettingsController {
    private Region licensesIcon;
 
    @FXML
+   private Region restAPIIcon;
+
+   @FXML
+   private Region heimatIcon;
+
+   @FXML
    private TextField authName;
 
    @FXML
@@ -274,6 +280,8 @@ public class SettingsController {
       setRegionSvg(aboutIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ABOUT_ICON);
       setRegionSvg(importExportIcon, requiredWidth, requiredHeight, RESOURCE.SVG_IMPORT_EXPORT_ICON);
       setRegionSvg(licensesIcon, requiredWidth, requiredHeight, RESOURCE.SVG_LICENSES_ICON);
+      setRegionSvg(restAPIIcon, requiredWidth, requiredHeight, RESOURCE.SVG_GLOBE_ICON);
+      setRegionSvg(heimatIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ROTATE_ICON);
 
       initExportButton();
       initImportButton();

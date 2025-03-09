@@ -77,6 +77,10 @@ public class Resources {
 
       SVG_THUMBS_UP_SOLID("/svgs/thumbs-up-solid.svg"),
 
+      SVG_GLOBE_ICON("/svgs/globe-solid.svg"),
+
+      SVG_ROTATE_ICON("/svgs/rotate-solid.svg"),
+
       ICON_MAIN("/icons/icon.png")
 
       ;
