@@ -25,6 +25,7 @@ import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
 import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -32,6 +33,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -39,8 +41,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class MapExternalProjectsController {
@@ -92,11 +96,15 @@ public class MapExternalProjectsController {
       // but what happens with mapped projects not existing at that date? but actually not related to this feature alone
 
       final HeimatAPI heimatAPI = new HeimatAPI(heimatSettings.getHeimatUrl(), heimatSettings.getHeimatPat());
-      final List<HeimatTask> externalProjects = heimatAPI.getMyTasks(tasksForDateDatePicker.getValue());
+      final List<HeimatTask> allExternalProjects = heimatAPI.getMyTasks(tasksForDateDatePicker.getValue());
+      final List<HeimatTask> externalProjects = allExternalProjects.stream()
+                                                                   .filter(p -> !p.isStartAndEndTimeRequired())
+                                                                   .collect(Collectors.toCollection(ArrayList::new));
 
       final List<ExternalProjectMapping> alreadyMappedProjects = externalProjectsMappingsRepository.findByExternalSystemId(
             ExternalSystem.Heimat);
 
+      final List<ExternalProjectMapping> invalidExternalMappings = new ArrayList<>();
       final List<ProjectMapping> projectMappings = model.getSortedAvailableProjects().stream().map(p -> {
          final Optional<ExternalProjectMapping> mapping = alreadyMappedProjects.stream()
                                                                                .filter(mp -> mp.getProject().getId()
@@ -109,15 +117,16 @@ public class MapExternalProjectsController {
                                                           .filter(ep -> ep.id() == mapping.get().getExternalTaskId())
                                                           .findAny();
          if (any.isEmpty()) {
-            LOG.warn("A mapping exists but task does not exist anymore in HEIMAT! {}.", mapping.get());
-            // TODO show this to the user somehow
+            LOG.warn("A mapping exists but task does not exist anymore in HEIMAT! '{}'->'{}'.",
+                  mapping.get().getProject(), mapping.get().getExternalTaskId());
+            invalidExternalMappings.add(mapping.get());
             return new ProjectMapping(p, null);
          }
          return new ProjectMapping(p, any.get());
       }).toList();
 
       final ObservableList<ProjectMapping> observableMappings = FXCollections.observableArrayList(projectMappings);
-      final FilteredList<ProjectMapping> value = new FilteredList<>(observableMappings, pm->pm.getProject().isWork());
+      final FilteredList<ProjectMapping> value = new FilteredList<>(observableMappings, pm -> pm.getProject().isWork());
       mappingTableView.setItems(value);
 
       // KeepTime Project column
@@ -126,13 +135,13 @@ public class MapExternalProjectsController {
 
       // External Project column with dropdown
       externalProjects.add(0, null); // option to clear selection
-      final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(externalProjects);
+      final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(
+            externalProjects);
       TableColumn<ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("Heimat Project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().heimatTask));
       externalColumn.setCellFactory(col -> new TableCell<>() {
          // TODO search in box would be nice
-         private final ComboBox<HeimatTask> comboBox = new ComboBox<>(
-               externalProjectsObservableList );
+         private final ComboBox<HeimatTask> comboBox = new ComboBox<>(externalProjectsObservableList);
 
          @Override
          protected void updateItem(HeimatTask item, boolean empty) {
@@ -145,7 +154,7 @@ public class MapExternalProjectsController {
                   if (empty || item == null) {
                      setText(null);
                   } else {
-                     setText(item.projectName() + " - " + item.name());
+                     setText(item.taskHolderName() + " - " + item.name());
                   }
                }
             });
@@ -160,7 +169,7 @@ public class MapExternalProjectsController {
                      setText(null);
                   } else {
                      // TODO maybe show if the project was already mapped
-                     setText(item.projectName() + " - " + item.name());
+                     setText(item.taskHolderName() + " - " + item.name());
                   }
                }
             });
@@ -195,7 +204,7 @@ public class MapExternalProjectsController {
                setText(null);
             } else {
                // TODO maybe show if the project was already mapped
-               setText(item.projectName() + " - " + item.name());
+               setText(item.taskHolderName() + " - " + item.name());
             }
          }
       });
@@ -206,7 +215,7 @@ public class MapExternalProjectsController {
             if (empty || item == null) {
                setText(null);
             } else {
-               setText(item.projectName() + " - " + item.name());
+               setText(item.taskHolderName() + " - " + item.name());
             }
          }
       });
@@ -216,7 +225,8 @@ public class MapExternalProjectsController {
          final HeimatTask task = addNewProjectComboBox.getValue();
          final int sortIndex = model.getAvailableProjects().size();
          final Project project = controller.addNewProject(
-               new Project(task.projectName() + " - " + task.name(), task.bookingHint(), Color.BLACK, true, sortIndex));
+               new Project(task.taskHolderName() + " - " + task.name(), task.bookingHint(), Color.BLACK, true,
+                     sortIndex));
          observableMappings.add(new ProjectMapping(project, task));
          addNewProjectComboBox.getSelectionModel().clearSelection();
       });
@@ -240,7 +250,7 @@ public class MapExternalProjectsController {
                                                                                             if (any.isPresent()) {
                                                                                                final ExternalProjectMapping projectMapping1 = any.get();
                                                                                                projectMapping1.setExternalProjectName(
-                                                                                                     heimatTask.projectName());
+                                                                                                     heimatTask.taskHolderName());
                                                                                                projectMapping1.setExternalTaskId(
                                                                                                      heimatTask.id());
                                                                                                projectMapping1.setExternalTaskName(
@@ -251,7 +261,7 @@ public class MapExternalProjectsController {
                                                                                             }
                                                                                             return new ExternalProjectMapping(
                                                                                                   ExternalSystem.Heimat,
-                                                                                                  heimatTask.projectName(),
+                                                                                                  heimatTask.taskHolderName(),
                                                                                                   heimatTask.id(),
                                                                                                   heimatTask.name(),
                                                                                                   heimatTask.toString()
@@ -270,7 +280,8 @@ public class MapExternalProjectsController {
                                                                                                                   .anyMatch(
                                                                                                                         wantedMapping ->
                                                                                                                               wantedMapping.project.getId()
-                                                                                                                                    == em.getProject().getId()
+                                                                                                                                    == em.getProject()
+                                                                                                                                         .getId()
                                                                                                                                     &&
                                                                                                                                     wantedMapping.heimatTask
                                                                                                                                           == null))
@@ -283,6 +294,52 @@ public class MapExternalProjectsController {
       cancelButton.setOnAction(ae -> {
          thisStage.close();
       });
+
+      final List<String> invalidMappingsAsString = invalidExternalMappings.stream()
+                                                                          .map(em -> "Task no longer exists: "
+                                                                                + em.getExternalProjectName() + " - "
+                                                                                + em.getExternalTaskName()
+                                                                                + "'. Was mapped to '" + em.getProject()
+                                                                                                           .getName()
+                                                                                + "'.")
+                                                                          .toList();
+      List<String> notSupportedTasks = allExternalProjects.stream()
+                                                          .filter(HeimatTask::isStartAndEndTimeRequired)
+                                                          .map(p -> "Task " + p.taskHolderName() + " - " + p.name()
+                                                                + " requires start+end time which is not supported.")
+                                                          .toList();
+      List<String> warnings = new ArrayList<>(notSupportedTasks);
+      warnings.addAll(invalidMappingsAsString);
+      if (!warnings.isEmpty()) {
+         Platform.runLater(() -> showInvalidMappingsDialog(warnings));
+      }
+   }
+
+   private void showInvalidMappingsDialog(final List<String> warnings) {
+      Dialog<Void> dialog = new Dialog<>();
+      dialog.initOwner(this.thisStage);
+      dialog.setTitle("Invalid mappings");
+      dialog.setHeaderText("Please note to following issue:");
+
+      VBox warningBox = new VBox(10);
+      for (String warning : warnings) {
+         Label label = new Label(warning);
+         label.setWrapText(true);
+         warningBox.getChildren().add(label);
+      }
+
+      ScrollPane scrollPane = new ScrollPane(warningBox);
+      scrollPane.setFitToWidth(true);
+      scrollPane.setPrefHeight(Math.min(300, warnings.size() * 30 + 50)); // Adjust height dynamically
+
+      dialog.getDialogPane().setContent(scrollPane);
+      dialog.getDialogPane().setMinWidth(400);
+
+      // Add OK button
+      ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+      dialog.getDialogPane().getButtonTypes().add(okButton);
+
+      dialog.showAndWait();
    }
 
    public static class ProjectMapping {

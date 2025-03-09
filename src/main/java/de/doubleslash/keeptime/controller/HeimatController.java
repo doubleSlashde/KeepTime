@@ -151,7 +151,7 @@ public class HeimatController {
                                                   .findAny()
                                                   .get();
          final Mapping mapping = new Mapping(id, false,
-               "Not mapped in KeepTime\n\n" + heimatTask.name() + "\n" + heimatTask.projectName(), times,
+               "Not mapped in KeepTime\n\n" + heimatTask.name() + "\n" + heimatTask.taskHolderName(), times,
                new ArrayList<>(0), heimatNotes, "", heimatTimeSeconds, 0);
          list.add(mapping);
       });
