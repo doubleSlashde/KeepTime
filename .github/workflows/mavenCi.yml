@@ -15,7 +15,6 @@ on:
 jobs:
 
   build-analyze:
-    if: false
     runs-on: ubuntu-latest
 
     env:
