@@ -126,7 +126,12 @@ public class ExternalProjectsSyncController {
       StringBinding totalSum = Bindings.createStringBinding(() -> localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(
                   items.stream().filter(item -> item.mapping.heimatTaskId() != -1L) // if its bookable in heimat
-                       .mapToLong(item -> item.userTimeSeconds.getValue()).sum())), items2);
+                       .mapToLong(item -> {
+                          if (item.shouldSyncCheckBox.get())
+                             return item.userTimeSeconds.getValue();
+                          else
+                             return item.heimatTimeSeconds.get();
+                       }).sum())), items2);
       sumTimeLabel.textProperty().bind(totalSum);
 
       keepTimeTimeLabel.setText(localTimeStringConverter.toString(
