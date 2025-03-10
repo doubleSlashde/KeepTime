@@ -49,7 +49,7 @@ public class WorksController {
    }
 
    @GetMapping
-   public List<WorkDTO> getWorks(@RequestParam(name = "id", required = false) final Long projectId,
+   public List<WorkDTO> getWorks(@RequestParam(name = "projectId", required = false) final Long projectId,
          @RequestParam(name = "fromDate", required = false) final LocalDate fromDate,
          @RequestParam(name = "toDate", required = false) final LocalDate toDate) {
       List<Work> works = workRepository.findWorkItems(projectId, fromDate, toDate);
