@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
@@ -52,14 +51,14 @@ class HeimatControllerTest {
       mockedHeimatSettings = Mockito.mock(HeimatSettings.class);
       mockedHeimatAPI = Mockito.mock(HeimatAPI.class);
       mockedExternalMappingsRepository = Mockito.mock(ExternalProjectsMappingsRepository.class);
-      heimatController = new HeimatController(mockedHeimatSettings,mockedHeimatAPI, mockedExternalMappingsRepository,
+      heimatController = new HeimatController(mockedHeimatSettings, mockedHeimatAPI, mockedExternalMappingsRepository,
             new Controller(null, null, null, null));
 
       when(mockedExternalMappingsRepository.findByExternalSystemId(ExternalSystem.Heimat)).thenReturn(externalMappings);
 
       availableTasks.add(
             new HeimatTask(project1To1Mapping.getExternalTaskId(), project1To1Mapping.getExternalTaskName(),
-                  project1To1Mapping.getExternalProjectName(),"PROJECT", false, "", false, false));
+                  project1To1Mapping.getExternalProjectName(), "PROJECT", false, "", false, false));
       when(mockedHeimatAPI.getMyTasks(now.toLocalDate())).thenReturn(availableTasks);
    }
 
@@ -190,7 +189,39 @@ class HeimatControllerTest {
    }
 
    @Test
-   void shouldGenerateLinkForDay(){
+   void shouldShowHeimatTimeWhenProjectIsMappedInKeeptimeButNoWorkAtThatDay() {
+      // ARRANGE
+      final HeimatTime existingTime1 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 60, "Existing note 1", 12);
+      // there could be more than 1 time for a task in heimat (e.g. when manually saved with start,end feature)
+      final HeimatTime existingTime2 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 30, "Existing note 2", 13);
+      when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime1, existingTime2));
+      externalMappings.add(project1To1Mapping);
+      externalMappings.add(project2To1Mapping);
+
+      // ACT
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // ASSERT
+      assertAll(
+            () -> assertThat(tableRows.size(), Matchers.is(1)),
+            () -> assertTrue(mapping.canBeSynced()),
+            () -> assertThat(mapping.syncMessage(), Matchers.containsString("Present in HEIMAT but not KeepTime")),
+            () -> assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
+            () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
+            () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
+            () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2)),
+            () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1. Existing note 2")),
+            () -> assertThat(mapping.heimatSeconds(), Matchers.is((60 + 30) * 60L)),
+            () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
+            //
+      );
+   }
+
+   @Test
+   void shouldGenerateLinkForDay() {
       when(mockedHeimatSettings.getHeimatUrl()).thenReturn("https://doubleslash.de");
       final String urlForDay = heimatController.getUrlForDay(LocalDate.of(1999, 4, 2));
       assertThat(urlForDay, Matchers.is("https://doubleslash.de/core/heimat/time/main/day/1999/4/2"));
