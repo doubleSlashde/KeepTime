@@ -246,7 +246,8 @@ public class HeimatController {
       for (HeimatTask obj : myTasks) {
          uniqueMap.putIfAbsent(obj.id(), obj);
       }
-      return new ArrayList<>(uniqueMap.values());
+
+      return uniqueMap.values().stream().sorted(Comparator.comparing(HeimatTask::taskHolderName).thenComparing(HeimatTask::name)).toList();
    }
 
    public record UserMapping(Mapping mapping, boolean shouldSync, String userNotes, int userMinutes) {}
