@@ -353,19 +353,23 @@ public class ExternalProjectsSyncController {
             final List<HeimatController.HeimatErrors> errors = task.getValue();
             if (!errors.isEmpty()) {
                loadingScreenShowSyncing("Something did not work :(", loadingFailure);
-               List<String> a = errors.stream()
-                                      .map(error -> error.mapping().mapping().heimatTaskId() + ": "
-                                            + error.errorMessage() + ". Wanted to store '" + error.mapping()
+               List<String> a = errors.stream().map(error -> {
+                  final List<Project> projects = error.mapping().mapping().projects();
+                  // TODO would be nice to show heimat task name but we only have ID here
+                  final String projectName = !projects.isEmpty()
+                        ? projects.get(0).getName()
+                        : Long.toString(error.mapping().mapping().heimatTaskId());
+                  return projectName + ": " + error.errorMessage() + ". Wanted to store '" + error.mapping()
                                                                                                   .userMinutes()
-                                            + "' minutes with notes '" + error.mapping().userNotes() + "'")
-                                      .toList();
+                        + "' minutes with notes '" + error.mapping().userNotes() + "'";
+               }).toList();
 
                showErrorDialog(a);
             } else {
                loadingScreenShowSyncing("Successfully synced!", loadingSuccess);
             }
 
-            PauseTransition delay = new PauseTransition(Duration.seconds(3));
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
             delay.setOnFinished(event -> {
                showLoadingScreen(false);
                thisStage.close();
