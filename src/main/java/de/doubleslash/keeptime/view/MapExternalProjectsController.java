@@ -16,6 +16,7 @@
 
 package de.doubleslash.keeptime.view;
 
+import de.doubleslash.keeptime.common.ColorHelper;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Model;
@@ -194,7 +195,7 @@ public class MapExternalProjectsController {
          final HeimatTask task = addNewProjectComboBox.getValue();
          final int sortIndex = model.getAvailableProjects().size();
          final Project project = controller.addNewProject(
-               new Project(task.taskHolderName() + " - " + task.name(), task.bookingHint(), Color.BLACK, true,
+               new Project(task.taskHolderName() + " - " + task.name(), task.bookingHint(), ColorHelper.randomColor(), true,
                      sortIndex));
          newProjectMappings.add(new HeimatController.ProjectMapping(project, task));
          addNewProjectComboBox.getSelectionModel().clearSelection();
