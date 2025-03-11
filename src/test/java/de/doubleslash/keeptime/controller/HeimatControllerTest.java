@@ -53,6 +53,8 @@ class HeimatControllerTest {
          heimatTask1.taskHolderName(), heimatTask1.id(), heimatTask1.name(), "", workProject1);
    final ExternalProjectMapping project2To1Mapping = new ExternalProjectMapping(ExternalSystem.Heimat,
          heimatTask1.taskHolderName(), heimatTask1.id(), heimatTask1.name(), "", workProject2);
+   final ExternalProjectMapping deletedProjectTo1Mapping = new ExternalProjectMapping(ExternalSystem.Heimat,
+         heimatTask1.taskHolderName(), heimatTask1.id(), heimatTask1.name(), "", deletedProject);
 
    @BeforeEach
    public void beforeEach() {
@@ -64,7 +66,7 @@ class HeimatControllerTest {
       mockedHeimatAPI = Mockito.mock(HeimatAPI.class);
       mockedExternalMappingsRepository = Mockito.mock(ExternalProjectsMappingsRepository.class);
       heimatController = new HeimatController(mockedHeimatSettings, mockedHeimatAPI, mockedExternalMappingsRepository,
-            new Controller(null, null, null, null));
+            new Controller(null, null, null, null), null);
 
       when(mockedExternalMappingsRepository.findByExternalSystemId(ExternalSystem.Heimat)).thenReturn(externalMappings);
 
@@ -76,9 +78,9 @@ class HeimatControllerTest {
    @Test
    void shouldSaveNewMappingWhenMappingDidNotExistBefore() {
       // ARRANGE
-      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
-            new MapExternalProjectsController.ProjectMapping(workProject1, heimatTask1));
-      final List<ExternalProjectMapping> existingMappings = Arrays.asList();
+      final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(workProject1, heimatTask1));
+      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList();
 
       // ACT
       heimatController.updateMappings(newMappings, existingMappings);
@@ -97,11 +99,10 @@ class HeimatControllerTest {
    @Test
    void shouldNotSaveOrRemoveAnythingWhenMappingDidNotChange() {
       // ARRANGE
-      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
-            new MapExternalProjectsController.ProjectMapping(workProject1, heimatTask1));
-      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
-            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
-                  heimatTask1.name(), heimatTask1.toString(), workProject1));
+      final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(workProject1, heimatTask1));
+      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(new HeimatController.ProjectMapping(workProject1, heimatTask1));
+      externalMappings.add(project1To1Mapping);
 
       // ACT
       heimatController.updateMappings(newMappings, existingMappings);
@@ -122,11 +123,11 @@ class HeimatControllerTest {
    @Test
    void shouldUpdateMappingWhenExistedBeforeButChanged() {
       // ARRANGE
-      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
-            new MapExternalProjectsController.ProjectMapping(workProject1, heimatTask2));
-      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
-            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
-                  heimatTask1.name(), heimatTask1.toString(), workProject1));
+      final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(workProject1, heimatTask2));
+      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(workProject1, heimatTask1));
+      externalMappings.add(project1To1Mapping);
 
       // ACT
       heimatController.updateMappings(newMappings, existingMappings);
@@ -140,6 +141,7 @@ class HeimatControllerTest {
       List<ExternalProjectMapping> deletedMappings = deleteMappingsCaptor.getValue();
       assertAll(//
             () -> assertThat(savedMappings, Matchers.hasSize(1)) //
+            , () -> assertThat(savedMappings.get(0), Matchers.is(project1To1Mapping)) //
             , () -> assertThat(savedMappings.get(0).getProject(), Matchers.is(workProject1)) //
             , () -> assertThat(savedMappings.get(0).getExternalTaskId(), Matchers.is(heimatTask2.id())) //
             , () -> assertThat(deletedMappings, Matchers.empty()) //
@@ -149,11 +151,11 @@ class HeimatControllerTest {
    @Test
    void shouldRemoveMappingWhenMappingDoesNoLongerExist() {
       // ARRANGE
-      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
-            new MapExternalProjectsController.ProjectMapping(workProject1, null));
-      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
-            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
-                  heimatTask1.name(), heimatTask1.toString(), workProject1));
+      final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(workProject1, null));
+      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(workProject1, heimatTask1));
+      externalMappings.add(project1To1Mapping);
 
       // ACT
       heimatController.updateMappings(newMappings, existingMappings);
@@ -176,10 +178,10 @@ class HeimatControllerTest {
    @Test
    void shouldRemoveMappingWhenProjectWasDeleted() {
       // ARRANGE
-      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList();
-      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
-            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
-                  heimatTask1.name(), heimatTask1.toString(), deletedProject));
+      final List<HeimatController.ProjectMapping> newMappings = Arrays.asList();
+      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(
+            new HeimatController.ProjectMapping(deletedProject, heimatTask1));
+      externalMappings.add(deletedProjectTo1Mapping);
 
       // ACT
       heimatController.updateMappings(newMappings, existingMappings);

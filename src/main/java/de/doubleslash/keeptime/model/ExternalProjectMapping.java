@@ -103,7 +103,9 @@ public class ExternalProjectMapping {
       this.project = project;
    }
 
-   public long getDatabaseId() {
-      return id;
+   @Override
+   public String toString() {
+      return "ExternalProjectMapping{" + "id=" + id + ", project.name=" + project.getName() + ", externalTaskName='" + externalTaskName
+            + '\'' + '}';
    }
 }
