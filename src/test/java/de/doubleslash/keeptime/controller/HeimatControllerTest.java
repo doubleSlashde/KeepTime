@@ -9,10 +9,12 @@ import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
+import de.doubleslash.keeptime.view.MapExternalProjectsController;
 import javafx.scene.paint.Color;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
@@ -40,14 +42,24 @@ class HeimatControllerTest {
 
    final Project workProject1 = new Project("Project 1", "", Color.RED, true, 0);
    final Project workProject2 = new Project("Project 2", "", Color.RED, true, 1);
+   final Project deletedProject = new Project("Project 3", "", Color.RED, true, 1);
+
+   final HeimatTask heimatTask1 = new HeimatTask(10, "External task name 1", "External project name 1", "PROJECT",
+         false, "", false, false);
+   final HeimatTask heimatTask2 = new HeimatTask(20, "External task name 2", "External project name 2", "PROJECT",
+         false, "", false, false);
 
    final ExternalProjectMapping project1To1Mapping = new ExternalProjectMapping(ExternalSystem.Heimat,
-         "External Project 1", 1L, "External Task 1", "", workProject1);
+         heimatTask1.taskHolderName(), heimatTask1.id(), heimatTask1.name(), "", workProject1);
    final ExternalProjectMapping project2To1Mapping = new ExternalProjectMapping(ExternalSystem.Heimat,
-         "External Project 1", 1L, "External Task 1", "", workProject2);
+         heimatTask1.taskHolderName(), heimatTask1.id(), heimatTask1.name(), "", workProject2);
 
    @BeforeEach
    public void beforeEach() {
+      externalMappings.clear();
+      availableTasks.clear();
+      deletedProject.setEnabled(false);
+
       mockedHeimatSettings = Mockito.mock(HeimatSettings.class);
       mockedHeimatAPI = Mockito.mock(HeimatAPI.class);
       mockedExternalMappingsRepository = Mockito.mock(ExternalProjectsMappingsRepository.class);
@@ -56,12 +68,138 @@ class HeimatControllerTest {
 
       when(mockedExternalMappingsRepository.findByExternalSystemId(ExternalSystem.Heimat)).thenReturn(externalMappings);
 
-      availableTasks.add(
-            new HeimatTask(project1To1Mapping.getExternalTaskId(), project1To1Mapping.getExternalTaskName(),
-                  project1To1Mapping.getExternalProjectName(), "PROJECT", false, "", false, false));
+      availableTasks.add(heimatTask1);
       when(mockedHeimatAPI.getMyTasks(now.toLocalDate())).thenReturn(availableTasks);
    }
 
+   /* Map dialog */
+   @Test
+   void shouldSaveNewMappingWhenMappingDidNotExistBefore() {
+      // ARRANGE
+      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
+            new MapExternalProjectsController.ProjectMapping(workProject1, heimatTask1));
+      final List<ExternalProjectMapping> existingMappings = Arrays.asList();
+
+      // ACT
+      heimatController.updateMappings(newMappings, existingMappings);
+
+      // ASSERT
+      ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).saveAll(saveMappingsCaptor.capture());
+      List<ExternalProjectMapping> savedMappings = saveMappingsCaptor.getValue();
+      assertAll(//
+            () -> assertThat(savedMappings, Matchers.hasSize(1)) //
+            , () -> assertThat(savedMappings.get(0).getProject(), Matchers.is(workProject1)) //
+            , () -> assertThat(savedMappings.get(0).getExternalTaskId(), Matchers.is(heimatTask1.id())) //
+      );
+   }
+
+   @Test
+   void shouldNotSaveOrRemoveAnythingWhenMappingDidNotChange() {
+      // ARRANGE
+      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
+            new MapExternalProjectsController.ProjectMapping(workProject1, heimatTask1));
+      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
+            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
+                  heimatTask1.name(), heimatTask1.toString(), workProject1));
+
+      // ACT
+      heimatController.updateMappings(newMappings, existingMappings);
+
+      // ASSERT
+      ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).saveAll(saveMappingsCaptor.capture());
+      List<ExternalProjectMapping> savedMappings = saveMappingsCaptor.getValue();
+      ArgumentCaptor<List<ExternalProjectMapping>> deleteMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).deleteAll(deleteMappingsCaptor.capture());
+      List<ExternalProjectMapping> deletedMappings = deleteMappingsCaptor.getValue();
+      assertAll(//
+            () -> assertThat(savedMappings, Matchers.empty()), //
+            () -> assertThat(deletedMappings, Matchers.empty()) //
+      );
+   }
+
+   @Test
+   void shouldUpdateMappingWhenExistedBeforeButChanged() {
+      // ARRANGE
+      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
+            new MapExternalProjectsController.ProjectMapping(workProject1, heimatTask2));
+      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
+            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
+                  heimatTask1.name(), heimatTask1.toString(), workProject1));
+
+      // ACT
+      heimatController.updateMappings(newMappings, existingMappings);
+
+      // ASSERT
+      ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).saveAll(saveMappingsCaptor.capture());
+      List<ExternalProjectMapping> savedMappings = saveMappingsCaptor.getValue();
+      ArgumentCaptor<List<ExternalProjectMapping>> deleteMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).deleteAll(deleteMappingsCaptor.capture());
+      List<ExternalProjectMapping> deletedMappings = deleteMappingsCaptor.getValue();
+      assertAll(//
+            () -> assertThat(savedMappings, Matchers.hasSize(1)) //
+            , () -> assertThat(savedMappings.get(0).getProject(), Matchers.is(workProject1)) //
+            , () -> assertThat(savedMappings.get(0).getExternalTaskId(), Matchers.is(heimatTask2.id())) //
+            , () -> assertThat(deletedMappings, Matchers.empty()) //
+      );
+   }
+
+   @Test
+   void shouldRemoveMappingWhenMappingDoesNoLongerExist() {
+      // ARRANGE
+      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList(
+            new MapExternalProjectsController.ProjectMapping(workProject1, null));
+      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
+            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
+                  heimatTask1.name(), heimatTask1.toString(), workProject1));
+
+      // ACT
+      heimatController.updateMappings(newMappings, existingMappings);
+
+      // ASSERT
+      ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).saveAll(saveMappingsCaptor.capture());
+      List<ExternalProjectMapping> savedMappings = saveMappingsCaptor.getValue();
+      ArgumentCaptor<List<ExternalProjectMapping>> deleteMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).deleteAll(deleteMappingsCaptor.capture());
+      List<ExternalProjectMapping> deletedMappings = deleteMappingsCaptor.getValue();
+      assertAll(//
+            () -> assertThat(savedMappings, Matchers.empty()) //
+            , () -> assertThat(deletedMappings, Matchers.hasSize(1)) //
+            , () -> assertThat(deletedMappings.get(0).getProject(), Matchers.is(workProject1)) //
+            , () -> assertThat(deletedMappings.get(0).getExternalTaskId(), Matchers.is(heimatTask1.id())) //
+      );
+   }
+
+   @Test
+   void shouldRemoveMappingWhenProjectWasDeleted() {
+      // ARRANGE
+      final List<MapExternalProjectsController.ProjectMapping> newMappings = Arrays.asList();
+      final List<ExternalProjectMapping> existingMappings = Arrays.asList(
+            new ExternalProjectMapping(ExternalSystem.Heimat, heimatTask1.taskHolderName(), heimatTask1.id(),
+                  heimatTask1.name(), heimatTask1.toString(), deletedProject));
+
+      // ACT
+      heimatController.updateMappings(newMappings, existingMappings);
+
+      // ASSERT
+      ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).saveAll(saveMappingsCaptor.capture());
+      List<ExternalProjectMapping> savedMappings = saveMappingsCaptor.getValue();
+      ArgumentCaptor<List<ExternalProjectMapping>> deleteMappingsCaptor = ArgumentCaptor.forClass(List.class);
+      Mockito.verify(mockedExternalMappingsRepository).deleteAll(deleteMappingsCaptor.capture());
+      List<ExternalProjectMapping> deletedMappings = deleteMappingsCaptor.getValue();
+      assertAll(//
+            () -> assertThat(savedMappings, Matchers.empty()) //
+            , () -> assertThat(deletedMappings, Matchers.hasSize(1)) //
+            , () -> assertThat(deletedMappings.get(0).getProject(), Matchers.is(deletedProject)) //
+            , () -> assertThat(deletedMappings.get(0).getExternalTaskId(), Matchers.is(heimatTask1.id())) //
+      );
+   }
+
+   /* Sync dialog */
    @Test
    void shouldMarkNonSyncableWhenNotMapped() {
       // ARRANGE
@@ -191,11 +329,11 @@ class HeimatControllerTest {
    @Test
    void shouldShowHeimatTimeWhenProjectIsMappedInKeeptimeButNoWorkAtThatDay() {
       // ARRANGE
-      final HeimatTime existingTime1 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
-            null, 60, "Existing note 1", 12);
+      final HeimatTime existingTime1 = new HeimatTime(heimatTask1.id(), now.toLocalDate(), null, null, 60,
+            "Existing note 1", 12);
       // there could be more than 1 time for a task in heimat (e.g. when manually saved with start,end feature)
-      final HeimatTime existingTime2 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
-            null, 30, "Existing note 2", 13);
+      final HeimatTime existingTime2 = new HeimatTime(heimatTask1.id(), now.toLocalDate(), null, null, 30,
+            "Existing note 2", 13);
       when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime1, existingTime2));
       externalMappings.add(project1To1Mapping);
       externalMappings.add(project2To1Mapping);
@@ -205,9 +343,7 @@ class HeimatControllerTest {
       final HeimatController.Mapping mapping = tableRows.get(0);
 
       // ASSERT
-      assertAll(
-            () -> assertThat(tableRows.size(), Matchers.is(1)),
-            () -> assertTrue(mapping.canBeSynced()),
+      assertAll(() -> assertThat(tableRows.size(), Matchers.is(1)), () -> assertTrue(mapping.canBeSynced()),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString("Present in HEIMAT but not KeepTime")),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),

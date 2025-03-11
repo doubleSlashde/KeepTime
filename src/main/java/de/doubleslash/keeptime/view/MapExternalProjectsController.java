@@ -233,66 +233,7 @@ public class MapExternalProjectsController {
 
       saveButton.setOnAction(ae -> {
          LOG.debug("New mappings to be saved '{}'.", observableMappings);
-
-         final List<ExternalProjectMapping> mappingsToCreateOrUpdate = observableMappings.stream()
-                                                                                         .filter(
-                                                                                               pm -> pm.getHeimatTask()
-                                                                                                     != null)
-                                                                                         .map(projectMapping -> {
-                                                                                            final Optional<ExternalProjectMapping> any = alreadyMappedProjects.stream()
-                                                                                                                                                              .filter(
-                                                                                                                                                                    pm -> pm.getProject()
-                                                                                                                                                                            .getId()
-                                                                                                                                                                          == projectMapping.project.getId())
-                                                                                                                                                              .findAny();
-                                                                                            final HeimatTask heimatTask = projectMapping.getHeimatTask();
-                                                                                            if (any.isPresent()) {
-                                                                                               final ExternalProjectMapping projectMapping1 = any.get();
-                                                                                               if (projectMapping1.getExternalTaskId()
-                                                                                                     == heimatTask.id()) {
-                                                                                                  // mapping did not change
-                                                                                                  return null;
-                                                                                               }
-                                                                                               projectMapping1.setExternalProjectName(
-                                                                                                     heimatTask.taskHolderName());
-                                                                                               projectMapping1.setExternalTaskId(
-                                                                                                     heimatTask.id());
-                                                                                               projectMapping1.setExternalTaskName(
-                                                                                                     heimatTask.name());
-                                                                                               projectMapping1.setExternalTaskMetadata(
-                                                                                                     heimatTask.toString()); // TODO to json
-
-                                                                                               return projectMapping1;
-                                                                                            }
-                                                                                            return new ExternalProjectMapping(
-                                                                                                  ExternalSystem.Heimat,
-                                                                                                  heimatTask.taskHolderName(),
-                                                                                                  heimatTask.id(),
-                                                                                                  heimatTask.name(),
-                                                                                                  heimatTask.toString()
-                                                                                                  // TODO to json
-                                                                                                  ,
-                                                                                                  projectMapping.project);
-                                                                                         })
-                                                                                         .filter(Objects::nonNull)
-                                                                                         .toList();
-         externalProjectsMappingsRepository.saveAll(mappingsToCreateOrUpdate);
-
-         // remove mappings which were removed also from database
-         final List<ExternalProjectMapping> mappingsToRemove = alreadyMappedProjects.stream()
-                                                                                    .filter(
-                                                                                          em -> observableMappings.stream()
-                                                                                                                  .anyMatch(
-                                                                                                                        wantedMapping ->
-                                                                                                                              wantedMapping.project.getId()
-                                                                                                                                    == em.getProject()
-                                                                                                                                         .getId()
-                                                                                                                                    &&
-                                                                                                                                    wantedMapping.heimatTask
-                                                                                                                                          == null))
-                                                                                    .toList();
-         externalProjectsMappingsRepository.deleteAll(mappingsToRemove);
-
+         heimatController.updateMappings(observableMappings, alreadyMappedProjects);
          thisStage.close();
       });
 
@@ -346,8 +287,8 @@ public class MapExternalProjectsController {
    }
 
    public static class ProjectMapping {
-      Project project;
-      HeimatTask heimatTask;
+      private Project project;
+      private HeimatTask heimatTask;
 
       public ProjectMapping(final Project project, final HeimatTask heimatTask) {
          this.project = project;
