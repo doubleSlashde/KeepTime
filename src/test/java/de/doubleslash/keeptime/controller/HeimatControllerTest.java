@@ -9,7 +9,6 @@ import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
-import de.doubleslash.keeptime.view.MapExternalProjectsController;
 import javafx.scene.paint.Color;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,10 +79,9 @@ class HeimatControllerTest {
       // ARRANGE
       final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
             new HeimatController.ProjectMapping(workProject1, heimatTask1));
-      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList();
 
       // ACT
-      heimatController.updateMappings(newMappings, existingMappings);
+      heimatController.updateMappings(newMappings);
 
       // ASSERT
       ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
@@ -101,11 +99,10 @@ class HeimatControllerTest {
       // ARRANGE
       final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
             new HeimatController.ProjectMapping(workProject1, heimatTask1));
-      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(new HeimatController.ProjectMapping(workProject1, heimatTask1));
       externalMappings.add(project1To1Mapping);
 
       // ACT
-      heimatController.updateMappings(newMappings, existingMappings);
+      heimatController.updateMappings(newMappings);
 
       // ASSERT
       ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
@@ -125,12 +122,10 @@ class HeimatControllerTest {
       // ARRANGE
       final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
             new HeimatController.ProjectMapping(workProject1, heimatTask2));
-      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(
-            new HeimatController.ProjectMapping(workProject1, heimatTask1));
       externalMappings.add(project1To1Mapping);
 
       // ACT
-      heimatController.updateMappings(newMappings, existingMappings);
+      heimatController.updateMappings(newMappings);
 
       // ASSERT
       ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
@@ -153,12 +148,10 @@ class HeimatControllerTest {
       // ARRANGE
       final List<HeimatController.ProjectMapping> newMappings = Arrays.asList(
             new HeimatController.ProjectMapping(workProject1, null));
-      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(
-            new HeimatController.ProjectMapping(workProject1, heimatTask1));
       externalMappings.add(project1To1Mapping);
 
       // ACT
-      heimatController.updateMappings(newMappings, existingMappings);
+      heimatController.updateMappings(newMappings);
 
       // ASSERT
       ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
@@ -179,12 +172,10 @@ class HeimatControllerTest {
    void shouldRemoveMappingWhenProjectWasDeleted() {
       // ARRANGE
       final List<HeimatController.ProjectMapping> newMappings = Arrays.asList();
-      final List<HeimatController.ProjectMapping> existingMappings = Arrays.asList(
-            new HeimatController.ProjectMapping(deletedProject, heimatTask1));
       externalMappings.add(deletedProjectTo1Mapping);
 
       // ACT
-      heimatController.updateMappings(newMappings, existingMappings);
+      heimatController.updateMappings(newMappings);
 
       // ASSERT
       ArgumentCaptor<List<ExternalProjectMapping>> saveMappingsCaptor = ArgumentCaptor.forClass(List.class);
