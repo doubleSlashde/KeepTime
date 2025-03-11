@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
 import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
@@ -229,13 +230,14 @@ public class SettingsController {
    @FXML
    private Label mapProjectsButtonLabel;
 
-   private final String propertiesFilePath = "application.properties";
+   private static final String propertiesFilePath = "application.properties";
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
 
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
    private final ApplicationProperties applicationProperties;
+   private final HeimatController heimatController;
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
@@ -248,11 +250,12 @@ public class SettingsController {
    ViewController mainscreen;
 
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties) {
+         ApplicationProperties applicationProperties, HeimatController heimatController) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
 
+      this.heimatController = heimatController;
    }
 
    @FXML
@@ -375,12 +378,7 @@ public class SettingsController {
          controller.updateFeatureSettings(useHotkeyCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
                emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected());
 
-
-         controller.updateHeimatSettings(
-                  heimatActivationCheckbox.isSelected(),
-                  heimatUrlTextField.getText(),
-                  heimatPatTextField.getText());
-
+         updateHeimatSettings();
          thisStage.close();
       });
 
@@ -421,10 +419,11 @@ public class SettingsController {
             heimatExpiresLabel.setText("Does not seem to be valid");
          }
       });
+      heimatValidateConnectionLabel.setText("Not validated.");
       heimatValidateConnectionButton.setOnAction(ae -> {
-         final HeimatAPI heimatAPI = new HeimatAPI(heimatUrlTextField.getText() , heimatPatTextField.getText());
+         updateHeimatSettings();
          try {
-            heimatAPI.isLoginValid();
+            heimatController.tryLogin();
             heimatValidateConnectionLabel.setText("Connection is valid.");
          }catch(Exception e){
             LOG.error("Error while validating Heimat connection", e);
@@ -443,7 +442,6 @@ public class SettingsController {
       heimatUrlTextField.setText(heimatSettings.getHeimatUrl());
       heimatPatTextField.setText(heimatSettings.getHeimatPat());
 
-      mapProjectsButtonLabel.setText("Please save settings before mapping projects.");
       heimatMapProjectsButton.disableProperty().bind(heimatActivationCheckbox.selectedProperty().not());
 
       heimatMapProjectsButton.setOnAction((ae) -> {
@@ -454,6 +452,14 @@ public class SettingsController {
             showErrorDialogAndWait("Error", "Could not load mapping stage", "Try to save settings first. Make sure you have internet.", e, thisStage);
          }
       });
+   }
+
+   private void updateHeimatSettings() {
+      controller.updateHeimatSettings(
+            heimatActivationCheckbox.isSelected(),
+            heimatUrlTextField.getText(),
+            heimatPatTextField.getText());
+      heimatController.refreshConnection();
    }
 
    private void showMapProjectsStage() {
@@ -700,6 +706,8 @@ public class SettingsController {
                                                .bind(emptyNoteReminderCheckBox.selectedProperty().not());
       emptyNoteReminderOnlyForWorkEntryCheckBox.setSelected(model.remindIfNotesAreEmptyOnlyForWorkEntry.get());
       confirmCloseCheckBox.setSelected(model.confirmClose.get());
+
+      heimatValidateConnectionLabel.setText("Not validated.");
    }
 
    public void setStage(final Stage thisStage) {

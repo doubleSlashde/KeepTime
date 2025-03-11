@@ -524,10 +524,10 @@
                                  <children>
                                     <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <HBox alignment="CENTER_LEFT">
+                                          <HBox alignment="CENTER_LEFT" spacing="5.0">
                                              <children>
                                                 <Button fx:id="heimatValidateConnectionButton" mnemonicParsing="false" text="Validate connection" />
-                                                <Label fx:id="heimatValidateConnectionLabel" />
+                                                <Label fx:id="heimatValidateConnectionLabel" disable="true" />
                                              </children>
                                           </HBox>
                                        </children>
@@ -541,7 +541,7 @@
                                           <HBox alignment="CENTER_LEFT" spacing="5.0">
                                              <children>
                                                 <Button fx:id="heimatMapProjectsButton" mnemonicParsing="false" text="Map projects" />
-                                                <Label fx:id="mapProjectsButtonLabel" disable="true" />
+                                                <Label fx:id="mapProjectsButtonLabel" disable="true" text="Please validate connection before mapping projects." />
                                              </children>
                                           </HBox>
                                        </children>
