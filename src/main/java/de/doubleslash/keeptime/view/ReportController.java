@@ -532,6 +532,7 @@ public class ReportController {
    }
 
    public void update() {
+      heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
       updateReport(this.currentReportDate);
    }
 

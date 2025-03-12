@@ -288,7 +288,7 @@ class HeimatControllerTest {
             () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2)));
    }
 
-   // shouldDisableShouldBeSyncedWhenAlreadyPresentInHeimat
+   // shouldDisableShouldBeSyncedWhenAlreadyPresentInHeimat (nice 2 have)
 
    @Test
    void shouldShowHeimatTimeWhenProjectIsNotMappedInKeeptime() {
