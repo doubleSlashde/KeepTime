@@ -228,16 +228,7 @@ public class HeimatController {
       List<HeimatErrors> errors = new ArrayList<>();
 
       items.stream().filter(tr -> tr.shouldSync).forEach(item -> {
-         if (item.userNotes.isEmpty()) {
-            errors.add(new HeimatErrors(item, "No notes were given"));
-            return;
-         }
          final int durationInMinutes = item.userMinutes;
-         if (durationInMinutes <= 0 || durationInMinutes % 15 != 0) {
-            errors.add(new HeimatErrors(item, "Duration '" + durationInMinutes + "' is not valid for project"));
-            return;
-         }
-
          final HeimatTime heimatTime = new HeimatTime(item.mapping.heimatTaskId, date, null, null, durationInMinutes,
                item.userNotes, 0L);
 

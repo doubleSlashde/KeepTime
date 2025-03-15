@@ -14,6 +14,7 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class HeimatControllerTest {
 
@@ -355,10 +356,118 @@ class HeimatControllerTest {
       final String urlForDay = heimatController.getUrlForDay(LocalDate.of(1999, 4, 2));
       assertThat(urlForDay, Matchers.is("https://doubleslash.de/core/heimat/time/main/day/1999/4/2"));
    }
-   // Save
-   // shouldSaveTimes
-   // shouldDeleteExistingTimesBeforeSavingWhenTimesAlreadyExist
-   // shouldContinueOnErrorAndReturnErrorsWhenErrorsOccurred
+
+   /* Save */
+   @Test
+   void shouldSaveTimes() {
+      // ARRANGE
+      workItems.add(new Work(now.minusMinutes(13), now, workProject1, "Notes 1"));
+      externalMappings.add(project1To1Mapping);
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // ACT
+      final String userNote = "User entered note";
+      final int userMinutes = 15;
+      final List<HeimatController.HeimatErrors> errors = heimatController.saveDay(
+            List.of(new HeimatController.UserMapping(mapping, true, userNote, userMinutes)), now.toLocalDate());
+
+      // ASSERT
+      ArgumentCaptor<HeimatTime> saveMappingsCaptor = ArgumentCaptor.forClass(HeimatTime.class);
+      Mockito.verify(mockedHeimatAPI).addMyTime(saveMappingsCaptor.capture());
+      assertAll( //
+            () -> assertThat(errors, Matchers.empty()) //
+            , () -> assertThat(saveMappingsCaptor.getValue().taskId(),
+                  Matchers.is(project1To1Mapping.getExternalTaskId())) //
+            , () -> assertThat(saveMappingsCaptor.getValue().note(), Matchers.is(userNote)) //
+            , () -> assertThat(saveMappingsCaptor.getValue().durationInMinutes(), Matchers.is(userMinutes)) //
+      );
+   }
+
+   @Test
+   void shouldNotSaveTimeWhenUserDoesNotWantToSync() {
+      // ARRANGE
+      workItems.add(new Work(now.minusMinutes(13), now, workProject1, "Notes 1"));
+      externalMappings.add(project1To1Mapping);
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // ACT
+      final String userNote = "User entered note";
+      final int userMinutes = 15;
+      final boolean shouldSync = false;
+      heimatController.saveDay(List.of(new HeimatController.UserMapping(mapping, shouldSync, userNote, userMinutes)),
+            now.toLocalDate());
+
+      // ASSERT
+      Mockito.verify(mockedHeimatAPI, Mockito.never()).addMyTime(any(HeimatTime.class));
+   }
+
+   @Test
+   void shouldDeleteExistingTimesBeforeSavingWhenTimesAlreadyExist() {
+      // updating existing times is not supported. therefore, we delete existing and create new.
+      // ARRANGE
+      workItems.add(new Work(now.minusMinutes(13), now, workProject1, "Notes 1"));
+      externalMappings.add(project1To1Mapping);
+
+      final HeimatTime existingTime1 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 60, "Existing note 1", 12);
+      final HeimatTime existingTime2 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 30, "Existing note 2", 13);
+      when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime1, existingTime2));
+
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // ACT
+      final String userNote = "User entered note";
+      final int userMinutes = 15;
+      final List<HeimatController.HeimatErrors> errors = heimatController.saveDay(
+            List.of(new HeimatController.UserMapping(mapping, true, userNote, userMinutes)), now.toLocalDate());
+
+      // ASSERT
+      InOrder inOrder = inOrder(mockedHeimatAPI);
+      inOrder.verify(mockedHeimatAPI).deleteMyTime(existingTime1.id());
+      inOrder.verify(mockedHeimatAPI).deleteMyTime(existingTime2.id());
+
+      ArgumentCaptor<HeimatTime> saveMappingsCaptor = ArgumentCaptor.forClass(HeimatTime.class);
+      inOrder.verify(mockedHeimatAPI).addMyTime(saveMappingsCaptor.capture());
+      assertAll( //
+            () -> assertThat(errors, Matchers.empty()) //
+            , () -> assertThat(saveMappingsCaptor.getValue().taskId(),
+                  Matchers.is(project1To1Mapping.getExternalTaskId())) //
+            , () -> assertThat(saveMappingsCaptor.getValue().note(), Matchers.is(userNote)) //
+            , () -> assertThat(saveMappingsCaptor.getValue().durationInMinutes(), Matchers.is(userMinutes)) //
+      );
+   }
+
+   @Test
+   void shouldReturnErrorsWhenErrorsOccurred() {
+      // ARRANGE
+      workItems.add(new Work(now.minusMinutes(13), now, workProject1, "Notes 1"));
+      externalMappings.add(project1To1Mapping);
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+      final String exceptionMessage = "SomethingDidNotWork";
+      doThrow(new RuntimeException(exceptionMessage)).when(mockedHeimatAPI).addMyTime(any(HeimatTime.class));
+
+      // ACT
+      final String userNote = "User entered note";
+      final int userMinutes = 15;
+      final HeimatController.UserMapping userMapping = new HeimatController.UserMapping(mapping, true, userNote,
+            userMinutes);
+      final List<HeimatController.HeimatErrors> errors = heimatController.saveDay(List.of(userMapping),
+            now.toLocalDate());
+
+      // ASSERT
+      ArgumentCaptor<HeimatTime> saveMappingsCaptor = ArgumentCaptor.forClass(HeimatTime.class);
+      Mockito.verify(mockedHeimatAPI).addMyTime(saveMappingsCaptor.capture());
+      assertAll( //
+            () -> assertThat(errors, Matchers.hasSize(1)) //
+            , () -> assertThat(errors.get(0).errorMessage(), Matchers.containsString(exceptionMessage)) //
+            , () -> assertThat(errors.get(0).mapping(), Matchers.is(userMapping)) //
+      );
+   }
    // shouldOnlyUpdateHeimatWhenSomethingHasChanged (not needed - user should decide)
 
 }
