@@ -12,6 +12,7 @@ import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
@@ -121,7 +122,7 @@ public class ExternalProjectsSyncController {
       mappingTableView.setItems(items);
 
       ObservableList<TableRow> items2 = FXCollections.observableArrayList(
-            item -> new javafx.beans.Observable[] { item.userTimeSeconds, item.shouldSyncCheckBox });
+            item -> new javafx.beans.Observable[] { item.userTimeSeconds, item.shouldSyncCheckBox, item.userNotes });
       items2.addAll(items);
       StringBinding totalSum = Bindings.createStringBinding(() -> localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(
@@ -138,6 +139,15 @@ public class ExternalProjectsSyncController {
             LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::keeptimeSeconds).sum())));
       heimatTimeLabel.setText(localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::heimatSeconds).sum())));
+
+      BooleanBinding projectsValidProperty = Bindings.createBooleanBinding(() -> items.stream().anyMatch(item -> {
+         boolean shouldSync = item.shouldSyncCheckBox.get();
+         boolean hasNote = !item.userNotes.get().isBlank();
+         boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
+         return shouldSync && !(hasNote && hasTime);
+      }), items2);
+
+      saveButton.disableProperty().bind(projectsValidProperty);
 
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
    }
@@ -201,10 +211,9 @@ public class ExternalProjectsSyncController {
       TableColumn<TableRow, TableRow> timeColumn = new TableColumn<>("Time");
       timeColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
 
-      Consumer<Spinner<LocalTime>> spinnerValid = (Spinner<LocalTime> spinner) -> {
-         int seconds = spinner.getValue().toSecondOfDay();
-         int minutes = (seconds / 60);
-         if (seconds % 60 != 0 || minutes % 15 != 0 || minutes <= 0) {
+      Consumer<Spinner<LocalTime>> spinnerValidConsumer = (Spinner<LocalTime> spinner) -> {
+         final boolean isValid = areSecondsOfDayValid(spinner.getValue().toSecondOfDay());
+         if (!isValid) {
             spinner.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 4px;");
          } else {
             spinner.setStyle(""); // Reset to default style
@@ -240,9 +249,9 @@ public class ExternalProjectsSyncController {
                   timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(item.userTimeSeconds.get()));
                   localTimeChangeListener = (observable, oldValue, newValue) -> {
                      item.userTimeSeconds.set(newValue.toSecondOfDay());
-                     spinnerValid.accept(timeSpinner);
+                     spinnerValidConsumer.accept(timeSpinner);
                   };
-                  spinnerValid.accept(timeSpinner);
+                  spinnerValidConsumer.accept(timeSpinner);
                   timeSpinner.valueProperty().addListener(localTimeChangeListener);
                }
                setGraphic(container);
@@ -393,6 +402,12 @@ public class ExternalProjectsSyncController {
       cancelButton.setOnAction(ae -> thisStage.close());
 
       // TODO offer some way to book time to an additional project?
+   }
+
+   private static boolean areSecondsOfDayValid(final long seconds) {
+      long minutes = (seconds / 60);
+      final boolean isInvalid = seconds % 60 != 0 || minutes % 15 != 0 || minutes <= 0;
+      return !isInvalid;
    }
 
    private void initializeLoadingScreen() {
