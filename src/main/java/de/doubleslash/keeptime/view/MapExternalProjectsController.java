@@ -27,12 +27,12 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class MapExternalProjectsController {
@@ -60,9 +61,6 @@ public class MapExternalProjectsController {
 
    @FXML
    private Button cancelButton;
-
-   @FXML
-   private ComboBox<HeimatTask> addNewProjectComboBox;
 
    @FXML
    private Button addNewProjectButton;
@@ -165,42 +163,22 @@ public class MapExternalProjectsController {
 
       mappingTableView.getColumns().addAll(keepTimeColumn, externalColumn);
 
-      addNewProjectComboBox.setCellFactory(param -> new ListCell<>() {
-         @Override
-         protected void updateItem(HeimatTask item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item == null || empty) {
-               setGraphic(null);
-               setText(null);
-            } else {
-               // TODO maybe show if the project was already mapped
-               setText(item.taskHolderName() + " - " + item.name());
-            }
+      addNewProjectButton.setOnAction(e -> {
+         final List<HeimatTask> unmappedHeimatTasks = externalProjects.stream().filter(ht -> {
+            final boolean alreadyMapped = value.stream()
+                                               .anyMatch(mapping -> mapping.getHeimatTask() != null
+                                                     && mapping.getHeimatTask().id() == ht.id());
+            return !alreadyMapped;
+         }).toList();
+         List<HeimatTask> selectedItems = showMultiSelectDialog(externalProjectsObservableList, unmappedHeimatTasks);
+         for (HeimatTask toBeCreatedHeimatTask : selectedItems) {
+            final int sortIndex = model.getAvailableProjects().size();
+            final Project project = controller.addNewProject(
+                  new Project(toBeCreatedHeimatTask.name() + " - " + toBeCreatedHeimatTask.taskHolderName(),
+                        toBeCreatedHeimatTask.bookingHint(), ColorHelper.randomColor(), true, sortIndex));
+            newProjectMappings.add(new HeimatController.ProjectMapping(project, toBeCreatedHeimatTask));
          }
       });
-      addNewProjectComboBox.setButtonCell(new ListCell<>() {
-         @Override
-         protected void updateItem(HeimatTask item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-               setText(null);
-            } else {
-               setText(item.taskHolderName() + " - " + item.name());
-            }
-         }
-      });
-      addNewProjectButton.disableProperty()
-                         .bind(addNewProjectComboBox.getSelectionModel().selectedItemProperty().isNull());
-      addNewProjectButton.setOnAction(ae -> {
-         final HeimatTask task = addNewProjectComboBox.getValue();
-         final int sortIndex = model.getAvailableProjects().size();
-         final Project project = controller.addNewProject(
-               new Project(task.taskHolderName() + " - " + task.name(), task.bookingHint(), ColorHelper.randomColor(), true,
-                     sortIndex));
-         newProjectMappings.add(new HeimatController.ProjectMapping(project, task));
-         addNewProjectComboBox.getSelectionModel().clearSelection();
-      });
-      addNewProjectComboBox.setItems(externalProjectsObservableList);
 
       saveButton.setOnAction(ae -> {
          heimatController.updateMappings(newProjectMappings);
@@ -213,6 +191,70 @@ public class MapExternalProjectsController {
       if (!warnings.isEmpty()) {
          Platform.runLater(() -> showInvalidMappingsDialog(warnings));
       }
+   }
+
+   private List<HeimatTask> showMultiSelectDialog(final ObservableList<HeimatTask> externalProjectsObservableList,
+         List<HeimatTask> unmappedHeimatTasks) {
+      Dialog<List<HeimatTask>> dialog = new Dialog<>();
+      dialog.setTitle("Import HEIMAT projects");
+      dialog.setHeaderText("You can select mutliple items");
+      dialog.initOwner(this.thisStage);
+      dialog.setWidth(600);
+      dialog.setHeight(500);
+
+      // Buttons
+      ButtonType okButtonType = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
+      ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+      dialog.getDialogPane().getButtonTypes().addAll(okButtonType, cancelButtonType);
+
+      ListView<HeimatTask> listView = new ListView<>();
+      listView.setCellFactory(param -> new ListCell<>() {
+         @Override
+         protected void updateItem(HeimatTask item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+               setGraphic(null);
+               setText(null);
+            } else {
+               // TODO maybe show if the project was already mapped
+               setText(item.taskHolderName() + " - " + item.name());
+            }
+         }
+      });
+      listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+      listView.setItems(externalProjectsObservableList);
+
+      Button selectAllUnmappedButton = new Button("Select All Unmapped");
+      selectAllUnmappedButton.setOnAction(e -> {
+         listView.getSelectionModel().clearSelection();
+         for (HeimatTask ht : unmappedHeimatTasks) {
+            listView.getSelectionModel().select(ht);
+         }
+         listView.requestFocus();
+      });
+
+      VBox content = new VBox(10, selectAllUnmappedButton, listView);
+      dialog.getDialogPane().setContent(content);
+      final List<HeimatTask> emptyList = List.of();
+      // Handle result when OK is clicked
+      dialog.setResultConverter(dialogButton -> {
+         if (dialogButton == okButtonType) {
+            return listView.getSelectionModel().getSelectedItems().stream().toList();
+         }
+         return emptyList; // Cancel was clicked
+      });
+
+      Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
+      okButton.setText("Import (0)"); // Initial state
+
+      // Listen for selection changes and update button text
+      listView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<HeimatTask>) change -> {
+         int selectedCount = listView.getSelectionModel().getSelectedItems().size();
+         okButton.setText("Import (" + selectedCount + ")");
+      });
+
+      Optional<List<HeimatTask>> result = dialog.showAndWait();
+      return result.orElse(emptyList);
    }
 
    private void showInvalidMappingsDialog(final List<String> warnings) {
