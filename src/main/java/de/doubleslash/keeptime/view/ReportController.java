@@ -25,6 +25,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Modality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +57,6 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -140,6 +138,12 @@ public class ReportController {
 
    private void initHeimatIntegration() {
       heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
+      final SVGPath svgNodeWithScale = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_ROTATE_ICON, 0.03, 0.03);
+      heimatSyncButton.setMaxSize(25,25);
+      heimatSyncButton.setMinSize(25, 25);
+      heimatSyncButton.setGraphic(svgNodeWithScale);
+      heimatSyncButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      heimatSyncButton.setTooltip(new Tooltip("Synchronize to HEIMAT..."));
       heimatSyncButton.setOnAction(ae-> {
          try {
             showSyncStage();

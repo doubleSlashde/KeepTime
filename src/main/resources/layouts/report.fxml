@@ -82,21 +82,20 @@
                   </VBox>
                </left>
                <VBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
+            </BorderPane>
+            <BorderPane>
+               <left>
+                  <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Collapse" />
+               </left>
+               <right>
+                  <Button fx:id="heimatSyncButton" mnemonicParsing="false" text="Sync2Heimat" />
+               </right>
                <padding>
-                  <Insets bottom="10.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </BorderPane>
-            <HBox prefHeight="26.0" prefWidth="210.0">
-               <children>
-                  <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Collapse" />
-                  <Button fx:id="heimatSyncButton" mnemonicParsing="false" text="Sync2Heimat" />
-               </children>
-               <VBox.margin>
-                  <Insets right="10.0" top="10.0" />
-               </VBox.margin>
-            </HBox>
             <Canvas fx:id="colorTimeLineCanvas" height="7.0" width="499.0" />
             <TreeTableView fx:id="workTableTreeView" prefHeight="300.0" prefWidth="500.0" showRoot="false" stylesheets="@../css/dialog.css" />
          </children>
