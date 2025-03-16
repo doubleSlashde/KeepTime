@@ -1,5 +1,7 @@
 package de.doubleslash.keeptime.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.doubleslash.keeptime.model.*;
 import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
 import de.doubleslash.keeptime.model.settings.HeimatSettings;
@@ -25,6 +27,8 @@ public class HeimatController {
    private final Controller controller;
    private final HeimatSettings heimatSettings;
    private final ExternalProjectsMappingsRepository externalProjectsMappingsRepository;
+
+   private final ObjectMapper objectMapper = new ObjectMapper();
 
    private HeimatAPI heimatAPI;
    private final Model model;
@@ -297,7 +301,7 @@ public class HeimatController {
                                                                                      projectMapping1.setExternalTaskName(
                                                                                            heimatTask.name());
                                                                                      projectMapping1.setExternalTaskMetadata(
-                                                                                           heimatTask.toString()); // TODO to json
+                                                                                           getAsJson(heimatTask));
 
                                                                                      return projectMapping1;
                                                                                   }
@@ -305,9 +309,8 @@ public class HeimatController {
                                                                                         ExternalSystem.Heimat,
                                                                                         heimatTask.taskHolderName(),
                                                                                         heimatTask.id(),
-                                                                                        heimatTask.name(),
-                                                                                        heimatTask.toString()
-                                                                                        // TODO to json
+                                                                                        heimatTask.name(), getAsJson(
+                                                                                              heimatTask)
                                                                                         , projectMapping.getProject());
                                                                                })
                                                                                .filter(Objects::nonNull)
@@ -333,6 +336,14 @@ public class HeimatController {
       alreadyMappedProjects.stream().filter(em -> !em.getProject().isEnabled()).forEach(mappingsToRemove::add);
       LOG.info("Removing mappings '{}'", mappingsToRemove);
       externalProjectsMappingsRepository.deleteAll(mappingsToRemove);
+   }
+
+   private String getAsJson(final HeimatTask heimatTask){
+      try {
+         return objectMapper.writeValueAsString(heimatTask);
+      } catch (JsonProcessingException e) {
+         throw new RuntimeException(e);
+      }
    }
 
    public ExistingAndInvalidMappings getExistingProjectMappings(List<HeimatTask> externalProjects) {
