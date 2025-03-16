@@ -213,11 +213,7 @@ public class ExternalProjectsSyncController {
 
       Consumer<Spinner<LocalTime>> spinnerValidConsumer = (Spinner<LocalTime> spinner) -> {
          final boolean isValid = areSecondsOfDayValid(spinner.getValue().toSecondOfDay());
-         if (!isValid) {
-            spinner.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 4px;");
-         } else {
-            spinner.setStyle(""); // Reset to default style
-         }
+         markNodeValidOrNot(spinner, isValid);
       };
       timeColumn.setCellFactory(column -> new TableCell<>() {
          private final Spinner<LocalTime> timeSpinner = new Spinner<>();
@@ -263,11 +259,8 @@ public class ExternalProjectsSyncController {
       notesColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue())); // Placeholder property
 
       Consumer<TextArea> textAreaValid = (TextArea textArea) -> {
-         if (textArea.getText().isBlank()) {
-            textArea.setStyle("-fx-border-color: red; -fx-border-width: 2px; -fx-border-radius: 4px;");
-         } else {
-            textArea.setStyle(""); // Reset to default style
-         }
+         final boolean isValid = !textArea.getText().isBlank();
+         markNodeValidOrNot(textArea, isValid);
       };
       notesColumn.setCellFactory(column -> new TableCell<>() {
          private ChangeListener<String> stringChangeListener;
@@ -299,8 +292,12 @@ public class ExternalProjectsSyncController {
             copyHeimatNotes.setTooltip(new Tooltip("Copy notes"));
             copyHeimatNotes.setOnAction(me -> copyToClipboard(heimatNotesLabel.getText()));
 
-            hbox.getChildren().addAll(copyKeepTimeNotes, new Label("KeepTime:"), keepTimeNotesLabel);
-            hbox2.getChildren().addAll(copyHeimatNotes, new Label("HEIMAT:"), heimatNotesLabel);
+            final Label keeptimeLabel = new Label("KeepTime:");
+            keeptimeLabel.setMinWidth(60);
+            hbox.getChildren().addAll(copyKeepTimeNotes, keeptimeLabel, keepTimeNotesLabel);
+            final Label heimatLabel = new Label("HEIMAT:");
+            heimatLabel.setMinWidth(60);
+            hbox2.getChildren().addAll(copyHeimatNotes, heimatLabel, heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox, hbox2);
          }
 
@@ -402,6 +399,14 @@ public class ExternalProjectsSyncController {
       cancelButton.setOnAction(ae -> thisStage.close());
 
       // TODO offer some way to book time to an additional project?
+   }
+
+   private static void markNodeValidOrNot(final Node textArea, final boolean isValid) {
+      String borderColor = "lightgreen";
+      if (!isValid) {
+         borderColor = "lightcoral";
+      }
+      textArea.setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: 1px; -fx-border-radius: 4px;");
    }
 
    private static boolean areSecondsOfDayValid(final long seconds) {
