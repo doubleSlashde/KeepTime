@@ -7,6 +7,7 @@ import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import javafx.animation.Animation;
 import javafx.animation.PauseTransition;
 import javafx.animation.RotateTransition;
@@ -17,7 +18,9 @@ import javafx.beans.binding.StringBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -43,6 +46,7 @@ import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static de.doubleslash.keeptime.view.ReportController.copyToClipboard;
 
@@ -81,6 +85,11 @@ public class ExternalProjectsSyncController {
 
    @FXML
    private Label loadingMessage;
+
+   @FXML
+   private ComboBox<HeimatTask> heimatTaskComboBox;
+   @FXML
+   private Button addHeimatTaskButton;
 
    private final SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.1,
          0.1);
@@ -148,12 +157,54 @@ public class ExternalProjectsSyncController {
       }), items2);
 
       saveButton.disableProperty().bind(projectsValidProperty);
-
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
+
+      final List<HeimatTask> tasksForDay = heimatController.getTasks(currentReportDate);
+      final FilteredList<HeimatTask> tasksNotInList = new FilteredList<>(FXCollections.observableArrayList(tasksForDay),
+            (task) -> items.stream().noneMatch(tr -> task.id() == tr.mapping.heimatTaskId()));
+      items.addListener(
+            (ListChangeListener<? super TableRow>) c -> {
+               final Predicate<? super HeimatTask> predicate = tasksNotInList.getPredicate();
+               tasksNotInList.setPredicate(null);
+               tasksNotInList.setPredicate(predicate);
+            });
+      heimatTaskComboBox.setItems(tasksNotInList);
+      addHeimatTaskButton.disableProperty()
+                         .bind(heimatTaskComboBox.getSelectionModel().selectedItemProperty().isNull());
+      addHeimatTaskButton.setOnAction(ae -> {
+         final HeimatTask task = heimatTaskComboBox.getValue();
+         items.add(new TableRow(new HeimatController.Mapping(task.id(), true,
+               "Manually added\n\n" + task.name() + "\n(" + task.taskHolderName() + ")", List.of(), List.of(), "", "",
+               0, 0), "", 0));
+         heimatTaskComboBox.getSelectionModel().clearSelection();
+      });
+
    }
 
    @FXML
    private void initialize() {
+      heimatTaskComboBox.setCellFactory(param -> new ListCell<>() {
+         @Override
+         protected void updateItem(HeimatTask item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setText(null);
+            } else {
+               setText(item.taskHolderName() + " - " + item.name());
+            }
+         }
+      });
+      heimatTaskComboBox.setButtonCell(new ListCell<>() {
+         @Override
+         protected void updateItem(HeimatTask item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setText(null);
+            } else {
+               setText(item.name() + " - " + item.taskHolderName());
+            }
+         }
+      });
       initializeLoadingScreen();
 
       TableColumn<TableRow, TableRow> shouldSyncColumn = new TableColumn<>("Sync");
@@ -397,8 +448,6 @@ public class ExternalProjectsSyncController {
       });
 
       cancelButton.setOnAction(ae -> thisStage.close());
-
-      // TODO offer some way to book time to an additional project?
    }
 
    private static void markNodeValidOrNot(final Node textArea, final boolean isValid) {
