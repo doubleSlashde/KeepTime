@@ -17,6 +17,7 @@
 package de.doubleslash.keeptime.view;
 
 import de.doubleslash.keeptime.common.ColorHelper;
+import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Model;
@@ -170,7 +171,7 @@ public class MapExternalProjectsController {
                                                      && mapping.getHeimatTask().id() == ht.id());
             return !alreadyMapped;
          }).toList();
-         List<HeimatTask> selectedItems = showMultiSelectDialog(externalProjectsObservableList, unmappedHeimatTasks);
+         List<HeimatTask> selectedItems = showMultiSelectDialog(externalProjects, unmappedHeimatTasks);
          for (HeimatTask toBeCreatedHeimatTask : selectedItems) {
             final int sortIndex = model.getAvailableProjects().size();
             final Project project = controller.addNewProject(
@@ -193,7 +194,7 @@ public class MapExternalProjectsController {
       }
    }
 
-   private List<HeimatTask> showMultiSelectDialog(final ObservableList<HeimatTask> externalProjectsObservableList,
+   private List<HeimatTask> showMultiSelectDialog(final List<HeimatTask> externalProjects,
          List<HeimatTask> unmappedHeimatTasks) {
       Dialog<List<HeimatTask>> dialog = new Dialog<>();
       dialog.setTitle("Import HEIMAT projects");
@@ -222,9 +223,10 @@ public class MapExternalProjectsController {
          }
       });
       listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-      listView.setItems(externalProjectsObservableList);
+      listView.setItems(FXCollections.observableArrayList(externalProjects));
 
-      Button selectAllUnmappedButton = new Button("Select All Unmapped");
+      Button selectAllUnmappedButton = new Button("Select unmapped projects (" + unmappedHeimatTasks.size() + ")");
+      selectAllUnmappedButton.getStyleClass().add("secondary-button");
       selectAllUnmappedButton.setOnAction(e -> {
          listView.getSelectionModel().clearSelection();
          for (HeimatTask ht : unmappedHeimatTasks) {
@@ -236,18 +238,22 @@ public class MapExternalProjectsController {
       VBox content = new VBox(10, selectAllUnmappedButton, listView);
       dialog.getDialogPane().setContent(content);
       final List<HeimatTask> emptyList = List.of();
-      // Handle result when OK is clicked
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == okButtonType) {
             return listView.getSelectionModel().getSelectedItems().stream().toList();
          }
-         return emptyList; // Cancel was clicked
+         return emptyList; // cancel was clicked
       });
 
       Button okButton = (Button) dialog.getDialogPane().lookupButton(okButtonType);
-      okButton.setText("Import (0)"); // Initial state
+      okButton.setText("Import (0)");
+      okButton.setPrefWidth(100);
+      okButton.getStyleClass().add("primary-button");
+      Button dialogCancelButton = (Button) dialog.getDialogPane().lookupButton(cancelButtonType);
+      dialogCancelButton.getStyleClass().add("secondary-button");
+      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_BUTTONS).toExternalForm());
 
-      // Listen for selection changes and update button text
+
       listView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<HeimatTask>) change -> {
          int selectedCount = listView.getSelectionModel().getSelectedItems().size();
          okButton.setText("Import (" + selectedCount + ")");

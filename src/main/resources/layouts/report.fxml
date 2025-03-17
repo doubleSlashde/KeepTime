@@ -27,7 +27,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="reportRoot" focusTraversable="true" prefWidth="500.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ReportController">
+<AnchorPane fx:id="reportRoot" focusTraversable="true" prefWidth="500.0" style="-fx-background-color: white;" stylesheets="@../css/buttons.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ReportController">
    <children>
       <VBox>
          <children>
@@ -87,10 +87,10 @@
             </BorderPane>
             <BorderPane>
                <left>
-                  <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" text="Collapse" />
+                  <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Collapse" />
                </left>
                <right>
-                  <Button fx:id="heimatSyncButton" mnemonicParsing="false" text="Sync2Heimat" />
+                  <Button fx:id="heimatSyncButton" mnemonicParsing="false" styleClass="secondary-button" text="Sync2Heimat" />
                </right>
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

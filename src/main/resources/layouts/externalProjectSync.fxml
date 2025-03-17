@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ExternalProjectsSyncController">
+<StackPane style="-fx-background-color: white;" stylesheets="@../css/buttons.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ExternalProjectsSyncController">
    <children>
       <AnchorPane fx:id="pane" prefHeight="600.0" prefWidth="1000.0">
          <children>
@@ -54,13 +54,13 @@
                   <HBox spacing="5.0">
                      <children>
                         <ComboBox fx:id="heimatTaskComboBox" prefHeight="25.0" prefWidth="254.0" />
-                        <Button fx:id="addHeimatTaskButton" mnemonicParsing="false" prefHeight="25.0" text="Add" />
+                        <Button fx:id="addHeimatTaskButton" mnemonicParsing="false" prefHeight="25.0" styleClass="secondary-button" text="Add" />
                      </children>
                   </HBox>
                   <HBox alignment="TOP_RIGHT" spacing="5.0">
                      <children>
-                        <Button fx:id="saveButton" mnemonicParsing="false" text="Save" />
-                        <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" styleClass="primary-button" text="Save" />
+                        <Button fx:id="cancelButton" mnemonicParsing="false" styleClass="secondary-button" text="Cancel" />
                      </children>
                   </HBox>
                </children>

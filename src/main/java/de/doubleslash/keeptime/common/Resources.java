@@ -81,8 +81,10 @@ public class Resources {
 
       SVG_ROTATE_ICON("/svgs/rotate-solid.svg"),
 
-      ICON_MAIN("/icons/icon.png")
+      ICON_MAIN("/icons/icon.png"),
 
+      /** CSS **/
+      CSS_BUTTONS("/css/buttons.css")
       ;
 
       String resourceLocation;
