@@ -25,6 +25,7 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.rest.integration.heimat.model.ExistingAndInvalidMappings;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -33,6 +34,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -208,39 +211,51 @@ public class MapExternalProjectsController {
       ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
       dialog.getDialogPane().getButtonTypes().addAll(okButtonType, cancelButtonType);
 
-      ListView<HeimatTask> listView = new ListView<>();
-      listView.setCellFactory(param -> new ListCell<>() {
-         @Override
-         protected void updateItem(HeimatTask item, boolean empty) {
-            super.updateItem(item, empty);
-            if (item == null || empty) {
-               setGraphic(null);
-               setText(null);
-            } else {
-               // TODO maybe show if the project was already mapped
-               setText(item.taskHolderName() + " - " + item.name());
-            }
-         }
+      TableView<HeimatTask> tableView = new TableView<>();
+      TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("HEIMAT Project");
+      nameColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
+      nameColumn.setCellFactory(param -> new TableCell<>() {
+        @Override
+        protected void updateItem(HeimatTask item, boolean empty) {
+           super.updateItem(item, empty);
+           if (item == null || empty) {
+              setGraphic(null);
+              setText(null);
+           } else {
+              setText(item.taskHolderName() + " - " + item.name());
+           }
+        }
       });
-      listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-      listView.setItems(FXCollections.observableArrayList(externalProjects));
+
+      // Column for Mapped Status (Read-Only CheckBox)
+      TableColumn<HeimatTask, Boolean> mappedColumn = new TableColumn<>("Mapped");
+      mappedColumn.setCellValueFactory(cellData -> new SimpleBooleanProperty(!unmappedHeimatTasks.contains(cellData.getValue())));
+      mappedColumn.setCellFactory(CheckBoxTableCell.forTableColumn(mappedColumn));
+      mappedColumn.setEditable(false);
+
+      mappedColumn.setPrefWidth(75);
+      tableView.getColumns().addAll(mappedColumn, nameColumn);
+      tableView.setEditable(false);
+
+      tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+      tableView.setItems(FXCollections.observableArrayList(externalProjects));
 
       Button selectAllUnmappedButton = new Button("Select unmapped projects (" + unmappedHeimatTasks.size() + ")");
       selectAllUnmappedButton.getStyleClass().add("secondary-button");
       selectAllUnmappedButton.setOnAction(e -> {
-         listView.getSelectionModel().clearSelection();
+         tableView.getSelectionModel().clearSelection();
          for (HeimatTask ht : unmappedHeimatTasks) {
-            listView.getSelectionModel().select(ht);
+            tableView.getSelectionModel().select(ht);
          }
-         listView.requestFocus();
+         tableView.requestFocus();
       });
 
-      VBox content = new VBox(10, selectAllUnmappedButton, listView);
+      VBox content = new VBox(10, selectAllUnmappedButton, tableView);
       dialog.getDialogPane().setContent(content);
       final List<HeimatTask> emptyList = List.of();
       dialog.setResultConverter(dialogButton -> {
          if (dialogButton == okButtonType) {
-            return listView.getSelectionModel().getSelectedItems().stream().toList();
+            return tableView.getSelectionModel().getSelectedItems().stream().toList();
          }
          return emptyList; // cancel was clicked
       });
@@ -254,8 +269,8 @@ public class MapExternalProjectsController {
       dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
 
 
-      listView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<HeimatTask>) change -> {
-         int selectedCount = listView.getSelectionModel().getSelectedItems().size();
+      tableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<HeimatTask>) change -> {
+         int selectedCount = tableView.getSelectionModel().getSelectedItems().size();
          okButton.setText("Import (" + selectedCount + ")");
       });
 

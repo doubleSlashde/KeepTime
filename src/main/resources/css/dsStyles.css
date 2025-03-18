@@ -46,6 +46,10 @@
 .check-box:selected .mark {
     -fx-background-color: white;
 }
+.check-box:disabled .box {
+    -fx-background-color: #c6c6c6;
+    -fx-border-color: #c6c6c6;
+}
 
 /* TextArea */
 .text-area {
