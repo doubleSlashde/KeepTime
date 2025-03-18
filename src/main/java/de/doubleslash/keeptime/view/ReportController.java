@@ -139,6 +139,7 @@ public class ReportController {
    private void initHeimatIntegration() {
       heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
       final SVGPath svgNodeWithScale = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_ROTATE_ICON, 0.03, 0.03);
+      svgNodeWithScale.setStyle("-fx-fill: #00759e");
       heimatSyncButton.setMaxSize(25,25);
       heimatSyncButton.setMinSize(25, 25);
       heimatSyncButton.setGraphic(svgNodeWithScale);

@@ -59,7 +59,7 @@
                   </HBox>
                   <HBox alignment="TOP_RIGHT" spacing="5.0">
                      <children>
-                        <Button fx:id="saveButton" mnemonicParsing="false" styleClass="primary-button" text="Save" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" styleClass="primary-button" text="Sync" />
                         <Button fx:id="cancelButton" mnemonicParsing="false" styleClass="secondary-button" text="Cancel" />
                      </children>
                   </HBox>
