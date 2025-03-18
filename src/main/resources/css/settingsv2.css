@@ -36,17 +36,3 @@
 {
 	-fx-background-color: #eaeaea;
 }
-
-.button:hover{
-	-fx-border-color: grey;
-}
-.color-picker{
-	-fx-background-color: white;
-	-fx-border-color: lightgrey;
-	-fx-border-radius: 2 2 2 2;
-}
-.check-box .box{
-	-fx-background-color: white;
-	-fx-border-color: lightgrey;
-	-fx-border-radius: 2 2 2 2;
-}

@@ -251,7 +251,7 @@ public class MapExternalProjectsController {
       okButton.getStyleClass().add("primary-button");
       Button dialogCancelButton = (Button) dialog.getDialogPane().lookupButton(cancelButtonType);
       dialogCancelButton.getStyleClass().add("secondary-button");
-      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_BUTTONS).toExternalForm());
+      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
 
 
       listView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<HeimatTask>) change -> {

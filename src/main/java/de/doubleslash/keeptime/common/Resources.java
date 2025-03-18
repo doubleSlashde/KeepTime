@@ -84,7 +84,7 @@ public class Resources {
       ICON_MAIN("/icons/icon.png"),
 
       /** CSS **/
-      CSS_BUTTONS("/css/buttons.css")
+      CSS_DS_STYLE("/css/dsStyles.css")
       ;
 
       String resourceLocation;

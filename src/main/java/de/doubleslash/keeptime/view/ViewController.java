@@ -504,7 +504,7 @@ public class ViewController {
       dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
       dialog.getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("primary-button");
       dialog.getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("secondary-button");
-      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_BUTTONS).toExternalForm());
+      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
 
       dialogResultConverter(dialog, manageProjectController);
 

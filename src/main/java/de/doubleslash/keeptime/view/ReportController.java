@@ -379,7 +379,6 @@ public class ReportController {
          }
 
       };
-
       myDatePicker.setDayCellFactory(dayCellFactory);
       final Node popupContent = datePickerSkin.getPopupContent();
       this.topBorderPane.setRight(popupContent);

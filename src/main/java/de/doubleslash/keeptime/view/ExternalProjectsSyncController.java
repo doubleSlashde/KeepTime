@@ -451,11 +451,11 @@ public class ExternalProjectsSyncController {
    }
 
    private static void markNodeValidOrNot(final Node textArea, final boolean isValid) {
-      String borderColor = "lightgreen";
+      String borderColor = "#74a317";
       if (!isValid) {
-         borderColor = "lightcoral";
+         borderColor = "#c63329";
       }
-      textArea.setStyle("-fx-border-color: " + borderColor + "; -fx-border-width: 1px; -fx-border-radius: 4px;");
+      textArea.setStyle("-fx-border-color: " + borderColor + ";");
    }
 
    private static boolean areSecondsOfDayValid(final long seconds) {
