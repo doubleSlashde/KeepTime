@@ -111,3 +111,26 @@
 .hyperlink:hover {
     -fx-text-fill: #00A5E1;
 }
+
+/* ComboBox */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #00759e;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+.combo-box:hover {
+    -fx-border-color: #00A5E1;
+}
+.combo-box:focused {
+    -fx-border-color: #00A5E1;
+}
+.combo-box .list-view {
+    -fx-background-color: white;
+    -fx-border-color: #00759e;
+    -fx-border-radius: 5px;
+}
+.combo-box .list-cell:hover {
+    -fx-background-color: #00A5E1;
+}
