@@ -203,8 +203,10 @@ class HeimatControllerTest {
       final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
 
       // ASSERT
-      assertFalse(tableRows.get(0).canBeSynced());
-      assertThat(tableRows.get(0).heimatTaskId(), Matchers.is(-1L));
+      final HeimatController.Mapping mapping = tableRows.get(0);
+      assertFalse(mapping.canBeSynced());
+      assertFalse(mapping.shouldBeSynced());
+      assertThat(mapping.heimatTaskId(), Matchers.is(-1L));
    }
 
    @Test
@@ -218,8 +220,10 @@ class HeimatControllerTest {
       final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
 
       // ASSERT
-      assertFalse(tableRows.get(0).canBeSynced());
-      assertThat(tableRows.get(0).syncMessage(), Matchers.containsString("is not available"));
+      final HeimatController.Mapping mapping = tableRows.get(0);
+      assertFalse(mapping.canBeSynced());
+      assertFalse(mapping.shouldBeSynced());
+      assertThat(mapping.syncMessage(), Matchers.containsString("is not available"));
    }
 
    @Test
@@ -234,6 +238,7 @@ class HeimatControllerTest {
 
       // ASSERT
       assertTrue(mapping.canBeSynced());
+      assertTrue(mapping.shouldBeSynced());
       assertThat(mapping.keeptimeSeconds(), Matchers.is(13 * 60L));
       assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1"));
       assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName()));
@@ -258,12 +263,39 @@ class HeimatControllerTest {
 
       // ASSERT
       assertAll(() -> assertTrue(mapping.canBeSynced()),
+            () -> assertTrue(mapping.shouldBeSynced()),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(13 * 60L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1")),
             () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1)),
             () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1. Existing note 2")),
             () -> assertThat(mapping.heimatSeconds(), Matchers.is((60 + 30) * 60L)),
             () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
+            //
+      );
+   }
+   @Test
+   void shouldDisableShouldBeSyncedWhenAlreadyPresentInHeimat() {
+      // ARRANGE
+      final Work work1 = new Work(now.minusMinutes(55), now, workProject1, "Notes 1");
+      workItems.add(work1);
+      externalMappings.add(project1To1Mapping);
+      final HeimatTime existingTime1 = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 60, "Existing note 1", 12);
+      when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime1));
+
+      // ACT
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // ASSERT
+      assertAll(() -> assertTrue(mapping.canBeSynced()),
+            () -> assertFalse(mapping.shouldBeSynced()),
+            () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(55 * 60L)),
+            () -> assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1")),
+            () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1)),
+            () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1")),
+            () -> assertThat(mapping.heimatSeconds(), Matchers.is((60) * 60L)),
+            () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1))
             //
       );
    }
@@ -284,12 +316,11 @@ class HeimatControllerTest {
 
       // ASSERT
       assertAll(() -> assertTrue(mapping.canBeSynced()),
+            () -> assertTrue(mapping.shouldBeSynced()),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(2 * 13 * 60L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1. Notes 2")),
             () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2)));
    }
-
-   // shouldDisableShouldBeSyncedWhenAlreadyPresentInHeimat (nice 2 have)
 
    @Test
    void shouldShowHeimatTimeWhenProjectIsNotMappedInKeeptime() {
@@ -307,7 +338,8 @@ class HeimatControllerTest {
       final HeimatController.Mapping mapping = tableRows.get(0);
 
       // ASSERT
-      assertAll(() -> assertFalse(mapping.canBeSynced()),
+      assertAll(() -> assertTrue(mapping.canBeSynced()),
+            () -> assertFalse(mapping.shouldBeSynced()),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString("Not mapped in KeepTime")),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
@@ -338,6 +370,8 @@ class HeimatControllerTest {
 
       // ASSERT
       assertAll(() -> assertThat(tableRows.size(), Matchers.is(1)), () -> assertTrue(mapping.canBeSynced()),
+            () -> assertTrue(mapping.canBeSynced()),
+            () -> assertFalse(mapping.shouldBeSynced()),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString("Present in HEIMAT but not KeepTime")),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),

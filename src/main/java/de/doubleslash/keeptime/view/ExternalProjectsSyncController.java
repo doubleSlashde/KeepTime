@@ -173,7 +173,7 @@ public class ExternalProjectsSyncController {
                          .bind(heimatTaskComboBox.getSelectionModel().selectedItemProperty().isNull());
       addHeimatTaskButton.setOnAction(ae -> {
          final HeimatTask task = heimatTaskComboBox.getValue();
-         items.add(new TableRow(new HeimatController.Mapping(task.id(), true,
+         items.add(new TableRow(new HeimatController.Mapping(task.id(), true, true,
                "Manually added\n\n" + task.name() + "\n(" + task.taskHolderName() + ")", List.of(), List.of(), "", "",
                0, 0), "", 0));
          heimatTaskComboBox.getSelectionModel().clearSelection();
@@ -427,6 +427,7 @@ public class ExternalProjectsSyncController {
             }
 
             PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            // TODO maybe show countdown in UI with option to "Open day in HEIMAT"? could add 1 second again ;)
             delay.setOnFinished(event -> {
                showLoadingScreen(false);
                thisStage.close();
@@ -603,7 +604,7 @@ public class ExternalProjectsSyncController {
 
       public TableRow(HeimatController.Mapping mapping, String userNotes, final long userSeconds) {
          this.mapping = mapping;
-         this.shouldSyncCheckBox = new SimpleBooleanProperty(mapping.canBeSynced());
+         this.shouldSyncCheckBox = new SimpleBooleanProperty(mapping.shouldBeSynced());
          this.syncStatus = new SimpleStringProperty(mapping.syncMessage());
 
          this.keeptimeNotes = new SimpleStringProperty(mapping.keeptimeNotes());
