@@ -7,6 +7,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -69,12 +70,18 @@
       </AnchorPane>
       <VBox fx:id="loadingScreen" alignment="CENTER" spacing="10.0" visible="false">
          <children>
-            <Label fx:id="loadingMessage" text="Syncing...">
+            <Region fx:id="syncingIconRegion" maxHeight="50.0" maxWidth="50.0" minHeight="50.0" minWidth="50.0" prefHeight="50.0" prefWidth="50.0" />
+            <Label fx:id="loadingMessage" alignment="CENTER" contentDisplay="CENTER" text="Syncing..." textAlignment="CENTER">
                <font>
-                  <Font size="22.0" />
+                  <Font size="18.0" />
                </font>
             </Label>
-            <Button fx:id="loadingCancelButton" mnemonicParsing="false" text="Cancel" visible="false" />
+            <Hyperlink fx:id="externalSystemLinkLoadingScreen" text="Open day in HEIMAT" />
+            <Label fx:id="loadingClosingMessage" alignment="CENTER" contentDisplay="CENTER" layoutX="473.0" layoutY="307.0" text="Closing in..." textAlignment="CENTER">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
          </children>
       </VBox>
    </children>

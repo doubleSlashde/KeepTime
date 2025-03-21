@@ -9,8 +9,9 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import javafx.animation.Animation;
-import javafx.animation.PauseTransition;
+import javafx.animation.KeyFrame;
 import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -26,9 +27,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
@@ -45,6 +44,7 @@ import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -76,6 +76,8 @@ public class ExternalProjectsSyncController {
 
    @FXML
    private Hyperlink externalSystemLink;
+   @FXML
+   private Hyperlink externalSystemLinkLoadingScreen;
 
    @FXML
    private VBox loadingScreen;
@@ -85,6 +87,10 @@ public class ExternalProjectsSyncController {
 
    @FXML
    private Label loadingMessage;
+   @FXML
+   private Label loadingClosingMessage;
+   @FXML
+   private Region syncingIconRegion;
 
    @FXML
    private ComboBox<HeimatTask> heimatTaskComboBox;
@@ -97,6 +103,9 @@ public class ExternalProjectsSyncController {
          0.1, 0.1);
    private final SVGPath loadingFailure = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_XMARK_SOLID, 0.1,
          0.1);
+   private final Color colorLoadingSpinner = Color.valueOf("#00A5E1");
+   private final Color colorLoadingSuccess = Color.valueOf("#74a317");
+   private final Color colorLoadingFailure = Color.valueOf("#c63329");
 
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
    private ObservableList<TableRow> items;
@@ -104,6 +113,8 @@ public class ExternalProjectsSyncController {
    private LocalDate currentReportDate;
    private Stage thisStage;
    private final HeimatController heimatController;
+   private final RotateTransition loadingSpinnerAnimation = new RotateTransition(Duration.seconds(1),
+         syncingIconRegion);
 
    public ExternalProjectsSyncController(final HeimatController heimatController) {
       this.heimatController = heimatController;
@@ -158,16 +169,17 @@ public class ExternalProjectsSyncController {
 
       saveButton.disableProperty().bind(projectsValidProperty);
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
+      externalSystemLinkLoadingScreen.setOnAction(
+            ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
 
       final List<HeimatTask> tasksForDay = heimatController.getTasks(currentReportDate);
       final FilteredList<HeimatTask> tasksNotInList = new FilteredList<>(FXCollections.observableArrayList(tasksForDay),
             (task) -> items.stream().noneMatch(tr -> task.id() == tr.mapping.heimatTaskId()));
-      items.addListener(
-            (ListChangeListener<? super TableRow>) c -> {
-               final Predicate<? super HeimatTask> predicate = tasksNotInList.getPredicate();
-               tasksNotInList.setPredicate(null);
-               tasksNotInList.setPredicate(predicate);
-            });
+      items.addListener((ListChangeListener<? super TableRow>) c -> {
+         final Predicate<? super HeimatTask> predicate = tasksNotInList.getPredicate();
+         tasksNotInList.setPredicate(null);
+         tasksNotInList.setPredicate(predicate);
+      });
       heimatTaskComboBox.setItems(tasksNotInList);
       addHeimatTaskButton.disableProperty()
                          .bind(heimatTaskComboBox.getSelectionModel().selectedItemProperty().isNull());
@@ -408,7 +420,9 @@ public class ExternalProjectsSyncController {
          task.setOnSucceeded(e -> {
             LOG.error("Task successfull");
             final List<HeimatController.HeimatErrors> errors = task.getValue();
+            int closingSeconds = 5;
             if (!errors.isEmpty()) {
+               closingSeconds = 10;
                loadingScreenShowSyncing("Something did not work :(", loadingFailure);
                List<String> a = errors.stream().map(error -> {
                   final List<Project> projects = error.mapping().mapping().projects();
@@ -423,24 +437,33 @@ public class ExternalProjectsSyncController {
 
                showErrorDialog(a);
             } else {
-               loadingScreenShowSyncing("Successfully synced!", loadingSuccess);
+               loadingScreenShowSyncing(
+                     "Successfully synced!\nPlease always validate that everything worked like expected.",
+                     loadingSuccess);
             }
 
-            PauseTransition delay = new PauseTransition(Duration.seconds(2));
-            // TODO maybe show countdown in UI with option to "Open day in HEIMAT"? could add 1 second again ;)
-            delay.setOnFinished(event -> {
-               showLoadingScreen(false);
-               thisStage.close();
-            });
-            delay.play();
+            final AtomicInteger remainingSeconds = new AtomicInteger(closingSeconds);
+            loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
+            loadingClosingMessage.setVisible(true);
+            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+               remainingSeconds.getAndDecrement();
+               loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
+               if (remainingSeconds.get() <= 0) {
+                  showLoadingScreen(false);
+                  thisStage.close();
+                  loadingClosingMessage.setVisible(false);
+               }
+            }));
+            timeline.setCycleCount(remainingSeconds.get());
+            timeline.play();
          });
 
          task.setOnFailed(e -> {
             final Throwable exception = task.getException();
-            LOG.error("Task failed", exception);
-            loadingScreenShowSyncing("Something did not work :(", loadingFailure);
+            LOG.error("Task failed unexpectedly.", exception);
+            loadingScreenShowSyncing("Something very unexpected has happened :(", loadingFailure);
 
-            showErrorDialog(Collections.singletonList("ERROR" + exception.getMessage()));
+            showErrorDialog(Collections.singletonList("Error was:" + exception.getMessage()));
             showLoadingScreen(false);
             thisStage.close();
          });
@@ -448,7 +471,10 @@ public class ExternalProjectsSyncController {
          Platform.runLater(() -> new Thread(task).start());
       });
 
-      cancelButton.setOnAction(ae -> thisStage.close());
+      cancelButton.setOnAction(ae -> {
+         showLoadingScreen(false);
+         thisStage.close();
+      });
    }
 
    private static void markNodeValidOrNot(final Node textArea, final boolean isValid) {
@@ -466,33 +492,39 @@ public class ExternalProjectsSyncController {
    }
 
    private void initializeLoadingScreen() {
-      loadingScreen.getChildren().add(0, loadingSpinner);
-
-      loadingSuccess.setFill(Color.GREEN);
+      showLoadingScreen(false);
+      loadingSuccess.setFill(colorLoadingSuccess);
       loadingSuccess.prefHeight(50);
       loadingSuccess.prefWidth(50);
 
-      loadingFailure.setFill(Color.RED);
+      loadingFailure.setFill(colorLoadingFailure);
       loadingFailure.prefHeight(50);
       loadingFailure.prefWidth(50);
 
+      loadingSpinner.setFill(colorLoadingSpinner);
       loadingSpinner.prefHeight(50);
       loadingSpinner.prefWidth(50);
 
-      RotateTransition rotateTransition = new RotateTransition(Duration.seconds(1), loadingSpinner);
-      rotateTransition.setByAngle(360);
-      rotateTransition.setCycleCount(Animation.INDEFINITE);
-      rotateTransition.play();
+      loadingSpinnerAnimation.setNode(syncingIconRegion);
+      loadingSpinnerAnimation.setByAngle(360);
+      loadingSpinnerAnimation.setCycleCount(Animation.INDEFINITE);
    }
 
    private void loadingScreenShowSyncing(String statusMessage, SVGPath icon) {
-      final ObservableList<Node> children = loadingScreen.getChildren();
-      children.remove(0);
-      children.add(0, icon);
+      if (icon == loadingSpinner) {
+         loadingSpinnerAnimation.play();
+      } else {
+         loadingSpinnerAnimation.stop();
+      }
+      syncingIconRegion.setShape(icon);
+      syncingIconRegion.setBackground(new Background(new BackgroundFill(icon.getFill(), null, null)));
       loadingMessage.setText(statusMessage);
    }
 
    private void showLoadingScreen(final boolean show) {
+      if (!show)
+         loadingSpinnerAnimation.stop();
+      loadingClosingMessage.setVisible(false);
       pane.setDisable(show);
       loadingScreen.setVisible(show);
       pane.setEffect(show ? new GaussianBlur() : null);
