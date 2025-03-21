@@ -346,7 +346,7 @@ public class ExternalProjectsSyncController {
             copyKeepTimeNotes.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             copyKeepTimeNotes.setTooltip(new Tooltip("Copy notes"));
             copyKeepTimeNotes.setOnAction(me -> copyToClipboard(keepTimeNotesLabel.getText()));
-
+            copyKeepTimeNotes.getStyleClass().add("tertiary-button");
             final Button copyHeimatNotes = new Button("",
                   SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_CLIPBOARD_ICON, 0.03, 0.03));
             copyHeimatNotes.setMaxSize(20, 18);
@@ -354,6 +354,7 @@ public class ExternalProjectsSyncController {
             copyHeimatNotes.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             copyHeimatNotes.setTooltip(new Tooltip("Copy notes"));
             copyHeimatNotes.setOnAction(me -> copyToClipboard(heimatNotesLabel.getText()));
+            copyHeimatNotes.getStyleClass().add("tertiary-button");
 
             final Label keeptimeLabel = new Label("KeepTime:");
             keeptimeLabel.setMinWidth(60);

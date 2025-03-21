@@ -75,4 +75,4 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
   * Windows 7, 10, 11
   * Linux (tested on Ubuntu 18.04)
   * Mac (tested on MacBook M2 Pro (ARM based CPU))
-* Java 17
+* Java >= 17

@@ -97,7 +97,7 @@
                </padding>
             </BorderPane>
             <Canvas fx:id="colorTimeLineCanvas" height="7.0" width="499.0" />
-            <TreeTableView fx:id="workTableTreeView" prefHeight="300.0" prefWidth="500.0" showRoot="false" stylesheets="@../css/dialog.css" />
+            <TreeTableView fx:id="workTableTreeView" prefHeight="300.0" prefWidth="500.0" showRoot="false" />
          </children>
       </VBox>
    </children>

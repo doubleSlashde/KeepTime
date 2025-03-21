@@ -260,8 +260,8 @@ public class ReportController {
       this.workTableTreeView.getColumns().add(timeSumColumn);
 
       final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>("Controls");
-      buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, Button>("buttonBox"));
-      buttonColumn.setMinWidth(100);
+      buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("buttonBox"));
+      buttonColumn.setMinWidth(95);
       buttonColumn.setSortable(false);
       buttonColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(buttonColumn);
@@ -392,6 +392,7 @@ public class ReportController {
       deleteButton.setMaxSize(20, 18);
       deleteButton.setMinSize(20, 18);
       deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      deleteButton.getStyleClass().add("tertiary-button");
 
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
@@ -419,6 +420,7 @@ public class ReportController {
       editButton.setMaxSize(20, 18);
       editButton.setMinSize(20, 18);
       editButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      editButton.getStyleClass().add("tertiary-button");
 
       editButton.setOnAction(e -> {
          LOG.info("Edit work clicked.");
@@ -481,7 +483,7 @@ public class ReportController {
       copyNotesButton.setMinSize(20, 18);
       copyNotesButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
       copyNotesButton.setTooltip(new Tooltip("Copy Project Notes"));
-
+      copyNotesButton.getStyleClass().add("tertiary-button");
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
@@ -503,6 +505,7 @@ public class ReportController {
       copyProjectNameButton.setMinSize(20, 18);
       copyProjectNameButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
       copyProjectNameButton.setTooltip(new Tooltip("Copy Project Name"));
+      copyProjectNameButton.getStyleClass().add("tertiary-button");
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
@@ -525,6 +528,7 @@ public class ReportController {
       copyButton.setMaxSize(20, 18);
       copyButton.setMinSize(20, 18);
       copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      copyButton.getStyleClass().add("tertiary-button");
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
