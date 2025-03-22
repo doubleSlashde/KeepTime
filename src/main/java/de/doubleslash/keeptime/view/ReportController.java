@@ -243,10 +243,8 @@ public class ReportController {
                      this.setGraphic(null);
                      this.setText(null);
                   } else {
-                     Label workLabel = new Label(workItem.getTimeSum());
-                     workLabel.setUnderline(workItem.isUnderlined());
-                     this.setGraphic(workLabel);
-                     this.setText(null);
+                     this.setText(workItem.getTimeSum());
+                     this.setUnderline(workItem.isUnderlined());
                   }
                }
             };

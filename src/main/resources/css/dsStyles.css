@@ -185,6 +185,9 @@
     -fx-border-width: 0px 1px 1px 0;
     -fx-border-color: #C6C6C6;
 }
+.tree-table-row-cell:selected .tree-table-cell {
+    -fx-text-fill: black;
+}
 .tree-table-row-cell * {
 	-fx-alignment:center;
 	-fx-padding:0px;
