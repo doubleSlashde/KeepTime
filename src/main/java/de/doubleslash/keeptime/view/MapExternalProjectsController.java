@@ -35,7 +35,6 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -215,21 +214,22 @@ public class MapExternalProjectsController {
       TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("HEIMAT Project");
       nameColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
       nameColumn.setCellFactory(param -> new TableCell<>() {
-        @Override
-        protected void updateItem(HeimatTask item, boolean empty) {
-           super.updateItem(item, empty);
-           if (item == null || empty) {
-              setGraphic(null);
-              setText(null);
-           } else {
-              setText(item.taskHolderName() + " - " + item.name());
-           }
-        }
+         @Override
+         protected void updateItem(HeimatTask item, boolean empty) {
+            super.updateItem(item, empty);
+            if (item == null || empty) {
+               setGraphic(null);
+               setText(null);
+            } else {
+               setText(item.taskHolderName() + " - " + item.name());
+            }
+         }
       });
 
       // Column for Mapped Status (Read-Only CheckBox)
       TableColumn<HeimatTask, Boolean> mappedColumn = new TableColumn<>("Mapped");
-      mappedColumn.setCellValueFactory(cellData -> new SimpleBooleanProperty(!unmappedHeimatTasks.contains(cellData.getValue())));
+      mappedColumn.setCellValueFactory(
+            cellData -> new SimpleBooleanProperty(!unmappedHeimatTasks.contains(cellData.getValue())));
       mappedColumn.setCellFactory(CheckBoxTableCell.forTableColumn(mappedColumn));
       mappedColumn.setEditable(false);
 
@@ -266,8 +266,9 @@ public class MapExternalProjectsController {
       okButton.getStyleClass().add("primary-button");
       Button dialogCancelButton = (Button) dialog.getDialogPane().lookupButton(cancelButtonType);
       dialogCancelButton.getStyleClass().add("secondary-button");
-      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
-
+      dialog.getDialogPane()
+            .getStylesheets()
+            .add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
 
       tableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<HeimatTask>) change -> {
          int selectedCount = tableView.getSelectionModel().getSelectedItems().size();
