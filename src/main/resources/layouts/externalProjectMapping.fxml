@@ -20,6 +20,6 @@
             <Button fx:id="addNewProjectButton" mnemonicParsing="false" styleClass="secondary-button" text="Import project(s)..." />
          </children>
       </HBox>
-      <DatePicker fx:id="tasksForDateDatePicker" layoutX="371.0" layoutY="16.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+      <DatePicker fx:id="tasksForDateDatePicker" layoutX="371.0" layoutY="16.0" visible="false" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
    </children>
 </AnchorPane>

@@ -372,7 +372,7 @@ public class HeimatController {
          if (any.isEmpty()) {
             LOG.warn("A mapping exists but task does not exist anymore in HEIMAT! '{}'->'{}'.",
                   mapping.get().getProject(), mapping.get().getExternalTaskId());
-            //invalidExternalMappings.add(mapping.get());
+            invalidExternalMappings.add(mapping.get());
             return new ProjectMapping(p, null);
          }
          return new ProjectMapping(p, any.get());

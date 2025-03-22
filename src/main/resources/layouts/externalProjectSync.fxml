@@ -20,7 +20,7 @@
             <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in HEIMAT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
             <HBox spacing="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                <children>
-                  <Label text="Syncing day" />
+                  <Label text="Day to sync" />
                   <Label fx:id="dayOfSyncLabel" text="01.01.2025" />
                </children>
             </HBox>

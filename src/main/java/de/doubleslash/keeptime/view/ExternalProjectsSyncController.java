@@ -419,7 +419,6 @@ public class ExternalProjectsSyncController {
          };
 
          task.setOnSucceeded(e -> {
-            LOG.error("Task successfull");
             final List<HeimatController.HeimatErrors> errors = task.getValue();
             int closingSeconds = 5;
             if (!errors.isEmpty()) {
