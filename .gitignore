@@ -30,3 +30,4 @@ logs/
 
 config.xml
 /db/
+application.properties

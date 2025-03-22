@@ -18,7 +18,14 @@ package de.doubleslash.keeptime.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Work")
@@ -30,14 +37,12 @@ public class Work {
 
    private LocalDateTime startTime;
    private LocalDateTime endTime;
-
    @ManyToOne
    private Project project;
    @Lob
    private String notes;
 
-   public Work() {
-   }
+   public Work() {}
 
    public Work(final LocalDateTime startTime, final LocalDateTime endTime, final Project project, final String notes) {
       super();
@@ -88,5 +93,4 @@ public class Work {
       return "Work [id=" + id + ", startTime=" + startTime + ", endTime=" + endTime + ", projectName="
             + project.getName() + ", notes=" + notes + "]";
    }
-
 }

@@ -14,14 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model;
+package de.doubleslash.keeptime.rest.DTO;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+public class ProjectIdentificationDTO {
+   private long id;
 
-public class ScreenSettings {
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> proportionalX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> proportionalY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+   public ProjectIdentificationDTO() {}
+
+   public ProjectIdentificationDTO(final long id) {
+      this.id = id;
+   }
+
+   public long getId() {
+      return id;
+   }
+
+   public void setId(final long id) {
+      this.id = id;
+   }
 }

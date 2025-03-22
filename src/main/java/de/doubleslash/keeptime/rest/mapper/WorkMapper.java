@@ -14,14 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model;
+package de.doubleslash.keeptime.rest.mapper;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import org.mapstruct.Mapper;
 
-public class ScreenSettings {
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> proportionalX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> proportionalY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+import de.doubleslash.keeptime.model.Work;
+import de.doubleslash.keeptime.rest.DTO.WorkDTO;
+
+@Mapper(componentModel = "spring")
+public interface WorkMapper {
+
+   WorkDTO workToWorkDTO(Work work);
+
+   Work workDTOToWork(WorkDTO workDTO);
 }

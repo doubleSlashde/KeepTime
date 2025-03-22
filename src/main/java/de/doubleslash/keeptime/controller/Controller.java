@@ -34,7 +34,6 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
 import jakarta.annotation.PreDestroy;
-import javafx.collections.ObservableList;
 
 @Service
 public class Controller {
@@ -84,9 +83,7 @@ public class Controller {
       final Work newWork = new Work(workEnd, workEnd.plusSeconds(minusSeconds), newProject, "");
 
       model.getPastWorkItems().add(newWork);
-
       model.activeWorkItem.set(newWork);
-
    }
 
    public Work saveCurrentWork(final LocalDateTime workEnd) {
@@ -98,19 +95,19 @@ public class Controller {
 
       currentWork.setEndTime(workEnd);
 
-      final String time = DateFormatter
-            .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
+      final String time = DateFormatter.secondsToHHMMSS(
+            Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
 
       LOG.info("Saving Work from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
             currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
       // Save in db
       return model.getWorkRepository().save(currentWork);
-
    }
 
    public void addNewProject(final Project project) {
       LOG.info("Creating new project '{}'.", project);
+
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 
@@ -190,7 +187,7 @@ public class Controller {
 
       final int indexToRemove = p.getIndex();
       p.setEnabled(false); // we don't delete it because of the referenced work
-                           // items
+      // items
       p.setIndex(-1);
 
       model.getAvailableProjects().remove(p);
@@ -253,7 +250,7 @@ public class Controller {
 
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
-    * 
+    *
     * @param originalList
     *           list of all projects to adapt the indexes for
     * @param changedProject
@@ -296,7 +293,7 @@ public class Controller {
 
    /**
     * Decreases all indexes by one, after the removed index
-    * 
+    *
     * @param originalList
     *           list of all projects to adapt the indexes for
     * @param removedIndex
@@ -361,5 +358,4 @@ public class Controller {
 
       return seconds;
    }
-
 }

@@ -25,6 +25,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,7 @@ public class Model {
    private ProjectRepository projectRepository;
    private WorkRepository workRepository;
    private SettingsRepository settingsRepository;
-
+   @Autowired
    public Model(final ProjectRepository projectRepository, final WorkRepository workRepository,
          final SettingsRepository settingsRepository) {
       super();

@@ -14,14 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model;
+package de.doubleslash.keeptime.rest.mapper;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
+import javafx.scene.paint.Color;
+import org.mapstruct.Mapper;
 
-public class ScreenSettings {
-   public final ObjectProperty<Boolean> saveWindowPosition = new SimpleObjectProperty<>(false);
-   public final ObjectProperty<Double> proportionalX = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Double> proportionalY = new SimpleObjectProperty<>(0.5);
-   public final ObjectProperty<Integer> screenHash = new SimpleObjectProperty<>(0);
+@Mapper(componentModel = "spring")
+public interface ColorMapper {
+
+   ColorConverter colorConverter = new ColorConverter();
+
+   default String colorToColorDTO(Color color) {
+      if (color == null) {
+         return null;
+      }
+      return colorConverter.convertToDatabaseColumn(color);
+   }
+
+   default Color colorDTOToColor(String colorDTO) {
+      if (colorDTO == null) {
+         return null;
+      }
+
+      return colorConverter.convertToEntityAttribute(colorDTO);
+   }
 }

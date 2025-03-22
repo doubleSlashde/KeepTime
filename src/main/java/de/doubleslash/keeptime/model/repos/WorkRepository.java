@@ -16,18 +16,24 @@
 
 package de.doubleslash.keeptime.model.repos;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import de.doubleslash.keeptime.model.Work;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import de.doubleslash.keeptime.model.Work;
+import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface WorkRepository extends JpaRepository<Work, Long> {
 
    @Query(value = "SELECT w FROM Work w WHERE CAST(startTime AS DATE) = ?1 ORDER BY startTime ASC")
    List<Work> findByStartDateOrderByStartTimeAsc(LocalDate creationDate);
+
+   @Query("SELECT w FROM Work w WHERE " + "(:projectId IS NULL OR w.project.id = :projectId) "
+         + "AND (:minStartTime IS NULL OR CAST(w.startTime AS DATE) >= :minStartTime) "
+         + "AND (:maxStartTime IS NULL OR CAST(w.startTime AS DATE) <= :maxStartTime)")
+   List<Work> findWorkItems(@Param("projectId") Long projectId, @Param("minStartTime") LocalDate minStartTime,
+         @Param("maxStartTime") LocalDate maxStartTime);
 }
