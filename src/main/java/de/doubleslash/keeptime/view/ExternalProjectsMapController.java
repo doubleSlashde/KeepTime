@@ -46,9 +46,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-public class MapExternalProjectsController {
+public class ExternalProjectsMapController {
 
-   private static final Logger LOG = LoggerFactory.getLogger(MapExternalProjectsController.class);
+   private static final Logger LOG = LoggerFactory.getLogger(ExternalProjectsMapController.class);
 
    private final Model model;
    private final Controller controller;
@@ -71,7 +71,7 @@ public class MapExternalProjectsController {
    @FXML
    private DatePicker tasksForDateDatePicker;
 
-   public MapExternalProjectsController(final Model model, Controller controller, HeimatController heimatController) {
+   public ExternalProjectsMapController(final Model model, Controller controller, HeimatController heimatController) {
       this.model = model;
       this.controller = controller;
       this.heimatController = heimatController;
