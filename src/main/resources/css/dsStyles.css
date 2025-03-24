@@ -179,20 +179,30 @@
     -fx-border-width: 0 1px 1px 0;
     -fx-border-style: solid;
 }
-.tree-table-row-cell{
+.tree-table-row-cell {
     -fx-background-color: white;
     -fx-cell-size:20;
     -fx-border-width: 0px 1px 1px 0;
     -fx-border-color: #C6C6C6;
 }
+.tree-table-row-cell:hover {
+    -fx-background-color: #e9ecef;
+}
 .tree-table-row-cell:selected .tree-table-cell {
     -fx-text-fill: black;
 }
 .tree-table-row-cell * {
-	-fx-alignment:center;
-	-fx-padding:0px;
-	-fx-margin:0px
+	-fx-alignment: center;
+	-fx-padding: 0px;
+	-fx-margin: 0px
 }
 .tree-table-row-cell .arrow {
-	-fx-padding:4px;
+    -fx-padding: 4px;
+}
+.tree-disclosure-node > .arrow {
+    -fx-background-color: black;
+}
+.tree-table-row-cell:selected .tree-table-cell {
+    -fx-border-color: #C6C6C6;
+    -fx-border-width: 0 0.5px 0 0;
 }
