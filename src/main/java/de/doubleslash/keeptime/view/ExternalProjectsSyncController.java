@@ -531,6 +531,7 @@ public class ExternalProjectsSyncController {
          loadingSpinnerAnimation.play();
       } else {
          loadingSpinnerAnimation.stop();
+         syncingIconRegion.setRotate(0);
       }
       syncingIconRegion.setShape(icon);
       syncingIconRegion.setBackground(new Background(new BackgroundFill(icon.getFill(), null, null)));
