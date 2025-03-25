@@ -100,7 +100,7 @@ public class ExternalProjectsMapController {
       mappingTableView.setItems(value);
 
       // KeepTime Project column
-      TableColumn<HeimatController.ProjectMapping, String> keepTimeColumn = new TableColumn<>("KeepTime Project");
+      TableColumn<HeimatController.ProjectMapping, String> keepTimeColumn = new TableColumn<>("KeepTime project");
       keepTimeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProject().getName()));
 
       // External Project column with dropdown
@@ -108,7 +108,7 @@ public class ExternalProjectsMapController {
             externalProjects);
       externalProjectsObservableList.add(0, null); // option to clear selection
 
-      TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("HEIMAT Project");
+      TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("HEIMAT project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getHeimatTask()));
       externalColumn.setCellFactory(col -> new TableCell<>() {
          // TODO search in box would be nice
@@ -211,7 +211,7 @@ public class ExternalProjectsMapController {
       dialog.getDialogPane().getButtonTypes().addAll(okButtonType, cancelButtonType);
 
       TableView<HeimatTask> tableView = new TableView<>();
-      TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("HEIMAT Project");
+      TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("HEIMAT project");
       nameColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
       nameColumn.setCellFactory(param -> new TableCell<>() {
          @Override
