@@ -27,7 +27,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
-import javafx.stage.Modality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -539,6 +538,8 @@ public class ReportController {
 
    public void update() {
       heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
+      // TODO save work so it appears directly in report. Quick fixes #170. Use #176 for this instead.
+      controller.saveCurrentWork();
       updateReport(this.currentReportDate);
    }
 

@@ -63,7 +63,7 @@ public class Controller {
       autoSaveInterval = new Interval(AUTO_SAVE_INTERVAL_SECONDS);
       autoSaveInterval.registerCallBack(() -> {
          LOG.debug("Auto saving current work.");
-         saveCurrentWork(dateProvider.dateTimeNow());
+         saveCurrentWork();
       });
    }
 
@@ -92,7 +92,11 @@ public class Controller {
       model.activeWorkItem.set(newWork);
    }
 
-   public Work saveCurrentWork(final LocalDateTime workEnd) {
+   public void saveCurrentWork() {
+      saveCurrentWork(dateProvider.dateTimeNow());
+   }
+
+   private Work saveCurrentWork(final LocalDateTime workEnd) {
       final Work currentWork = model.activeWorkItem.get();
 
       if (currentWork == null) {
