@@ -159,26 +159,26 @@ public class ReportController {
          // Settings stage
          final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_SYNC);
          fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
-         final Parent settingsRoot = fxmlLoader2.load();
-         ExternalProjectsSyncController settingsController = fxmlLoader2.getController();
-         settingsController.initForDate(currentReportDate, currentWorkItems);
-         Stage settingsStage = new Stage();
-         settingsController.setStage(settingsStage);
-         settingsStage.initOwner(this.stage);
-         settingsStage.setTitle("External Project Sync");
-         settingsStage.setResizable(true);
-         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         final Parent syncRoot = fxmlLoader2.load();
+         ExternalProjectsSyncController syncController = fxmlLoader2.getController();
+         syncController.initForDate(currentReportDate, currentWorkItems);
+         Stage syncStage = new Stage();
+         syncController.setStage(syncStage);
+         syncStage.initOwner(this.stage);
+         syncStage.setTitle("External Project Sync");
+         syncStage.setResizable(true);
+         syncStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-         final Scene settingsScene = new Scene(settingsRoot);
+         final Scene settingsScene = new Scene(syncRoot);
          settingsScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                LOG.info("pressed ESCAPE");
-               settingsStage.close();
+               syncStage.close();
             }
          });
 
-         settingsStage.setScene(settingsScene);
-         settingsStage.showAndWait();
+         syncStage.setScene(settingsScene);
+         syncStage.showAndWait();
       } catch (final Exception e) {
          throw new FXMLLoaderException(e);
       }
