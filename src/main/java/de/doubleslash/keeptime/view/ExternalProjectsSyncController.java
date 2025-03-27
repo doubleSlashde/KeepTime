@@ -40,6 +40,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.GaussianBlur;
@@ -257,7 +258,7 @@ public class ExternalProjectsSyncController {
                checkBox.setSelected(item.shouldSyncCheckBox.get());
                boolChangeListener = (obs, oldText, newBoolean) -> item.shouldSyncCheckBox.set(newBoolean);
                checkBox.selectedProperty().addListener(boolChangeListener);
-
+               setAlignment(Pos.TOP_CENTER);
                setGraphic(checkBox);
             }
          }
