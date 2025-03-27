@@ -201,9 +201,11 @@ public class ExternalProjectsSyncController {
                          .bind(heimatTaskComboBox.getSelectionModel().selectedItemProperty().isNull());
       addHeimatTaskButton.setOnAction(ae -> {
          final HeimatTask task = heimatTaskComboBox.getValue();
-         items.add(new TableRow(new HeimatController.Mapping(task.id(), true, true,
+         final TableRow addedRow = new TableRow(new HeimatController.Mapping(task.id(), true, true,
                "Manually added\n\n" + task.name() + "\n(" + task.taskHolderName() + ")", List.of(), List.of(), "", "",
-               0, 0), "", 0));
+               0, 0), "", 0);
+         items.add(addedRow);
+         items2.add(addedRow); // add new row also to items2 - as it is not added automatically :(
          heimatTaskComboBox.getSelectionModel().clearSelection();
       });
 
