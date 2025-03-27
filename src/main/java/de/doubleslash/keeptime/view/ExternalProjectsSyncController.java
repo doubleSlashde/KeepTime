@@ -482,7 +482,7 @@ public class ExternalProjectsSyncController {
             LOG.error("Task failed unexpectedly.", exception);
             loadingScreenShowSyncing("Something very unexpected has happened :(", loadingFailure);
 
-            showErrorDialog(Collections.singletonList("Error was:" + exception.getMessage()));
+            showErrorDialog(Collections.singletonList("Please report this to a developer. The error was:" + exception.getMessage()));
             showLoadingScreen(false);
             thisStage.close();
          });
