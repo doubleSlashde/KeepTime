@@ -163,14 +163,17 @@ public class HeimatController {
             projects.add(project);
             final long keepTimeSeconds = existingMapping.keeptimeSeconds() + projectWorkSeconds;
             final long heimatSeconds = existingMapping.heimatSeconds();
-            final boolean shouldBeSynced = isMappedInHeimat && differenceGreaterOrEqual15Minutes(heimatSeconds, keepTimeSeconds);
+            final boolean shouldBeSynced =
+                  isMappedInHeimat && differenceGreaterOrEqual15Minutes(heimatSeconds, keepTimeSeconds);
             final Mapping mapping = new Mapping(isMappedInHeimat ? optHeimatMapping.get().getExternalTaskId() : -1,
                   isMappedInHeimat, shouldBeSynced, canBeSyncedMessage, existingMapping.existingTimes(), projects,
-                  existingMapping.heimatNotes(), existingMapping.keeptimeNotes() + ". " + keeptimeNotes, heimatSeconds, keepTimeSeconds);
+                  existingMapping.heimatNotes(), existingMapping.keeptimeNotes() + ". " + keeptimeNotes, heimatSeconds,
+                  keepTimeSeconds);
             list.remove(existingMapping);
             list.add(mapping);
          } else {
-            final boolean shouldBeSynced = isMappedInHeimat && differenceGreaterOrEqual15Minutes(heimatTimeSeconds, projectWorkSeconds);
+            final boolean shouldBeSynced =
+                  isMappedInHeimat && differenceGreaterOrEqual15Minutes(heimatTimeSeconds, projectWorkSeconds);
             final List<Project> projects = Collections.singletonList(project);
             final Mapping mapping = new Mapping(isMappedInHeimat ? optHeimatMapping.get().getExternalTaskId() : -1,
                   isMappedInHeimat, shouldBeSynced, canBeSyncedMessage, optionalAlreadyBookedTimes, projects,
@@ -219,21 +222,22 @@ public class HeimatController {
          long heimatTimeSeconds = addHeimatTimes(times);
 
          final Mapping mapping2 = new Mapping(id, true, false,
-               "Present in HEIMAT but not KeepTime\n\n" + externalProjectMapping.getExternalTaskName() + "\n"
-                     + externalProjectMapping.getExternalProjectName(), times, mappedProjects.stream()
-                                                                                             .filter(
-                                                                                                   mp -> mp.getExternalTaskId()
-                                                                                                         == id)
-                                                                                             .map(ExternalProjectMapping::getProject)
-                                                                                             .toList(), heimatNotes, "",
-               heimatTimeSeconds, 0);
+               "Present in HEIMAT but not KeepTime\n\nSync to " + externalProjectMapping.getExternalTaskName() + "\n("
+                     + externalProjectMapping.getExternalProjectName() + ")", times, mappedProjects.stream()
+                                                                                                   .filter(
+                                                                                                         mp -> mp.getExternalTaskId()
+                                                                                                               == id)
+                                                                                                   .map(ExternalProjectMapping::getProject)
+                                                                                                   .toList(),
+               heimatNotes, "", heimatTimeSeconds, 0);
          list.add(mapping2);
       });
 
       return list;
    }
 
-   private static boolean differenceGreaterOrEqual15Minutes(final long heimatTimeSeconds, final long projectWorkSeconds) {
+   private static boolean differenceGreaterOrEqual15Minutes(final long heimatTimeSeconds,
+         final long projectWorkSeconds) {
       return heimatTimeSeconds == 0L || Math.abs(heimatTimeSeconds - projectWorkSeconds) >= 15 * 60L;
    }
 

@@ -203,11 +203,12 @@ public class ExternalProjectsSyncController {
       addHeimatTaskButton.setOnAction(ae -> {
          final HeimatTask task = heimatTaskComboBox.getValue();
          final TableRow addedRow = new TableRow(new HeimatController.Mapping(task.id(), true, true,
-               "Manually added\n\n" + task.name() + "\n(" + task.taskHolderName() + ")", List.of(), List.of(), "", "",
-               0, 0), "", 0);
+               "Manually added\n\nSync to " + task.name() + "\n(" + task.taskHolderName() + ")", List.of(), List.of(),
+               "", "", 0, 0), "", 0);
          items.add(addedRow);
          items2.add(addedRow); // add new row also to items2 - as it is not added automatically :(
          heimatTaskComboBox.getSelectionModel().clearSelection();
+         mappingTableView.scrollTo(items.size() - 1); // scroll to newly added row
       });
 
    }
@@ -482,7 +483,8 @@ public class ExternalProjectsSyncController {
             LOG.error("Task failed unexpectedly.", exception);
             loadingScreenShowSyncing("Something very unexpected has happened :(", loadingFailure);
 
-            showErrorDialog(Collections.singletonList("Please report this to a developer. The error was:" + exception.getMessage()));
+            showErrorDialog(Collections.singletonList(
+                  "Please report this to a developer. The error was:" + exception.getMessage()));
             showLoadingScreen(false);
             thisStage.close();
          });
