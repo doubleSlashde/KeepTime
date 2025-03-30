@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -78,6 +79,7 @@ public class App extends Application {
    private ViewController viewController;
 
    private GlobalScreenListener globalScreenListener;
+   private Settings settings;
 
    @Override
    public void init() throws Exception {
@@ -95,6 +97,7 @@ public class App extends Application {
 
       model = springContext.getBean(Model.class);
       controller = springContext.getBean(Controller.class);
+      settings = springContext.getBean(Settings.class);
       controller.enableAutoSave();
       model.setSpringContext(springContext);
    }
@@ -108,36 +111,43 @@ public class App extends Application {
       } catch (final Exception e) {
          LOG.error("There was an error while initialising the UI", e);
 
-         final Alert alert = new Alert(AlertType.ERROR);
-         alert.setTitle("Error");
-         alert.setHeaderText("Could not start application");
-         alert.setContentText("Please send the error with your logs folder to a developer");
-
-         final StringWriter sw = new StringWriter();
-         final PrintWriter pw = new PrintWriter(sw);
-         e.printStackTrace(pw);
-         final String exceptionText = sw.toString();
-
-         final Label label = new Label("The exception stacktrace was:");
-
-         final TextArea textArea = new TextArea(exceptionText);
-         textArea.setEditable(false);
-         textArea.setWrapText(true);
-
-         textArea.setMaxWidth(Double.MAX_VALUE);
-         textArea.setMaxHeight(Double.MAX_VALUE);
-         GridPane.setVgrow(textArea, Priority.ALWAYS);
-         GridPane.setHgrow(textArea, Priority.ALWAYS);
-
-         final GridPane expContent = new GridPane();
-         expContent.setMaxWidth(Double.MAX_VALUE);
-         expContent.add(label, 0, 0);
-         expContent.add(textArea, 0, 1);
-
-         alert.getDialogPane().setExpandableContent(expContent);
-         alert.showAndWait();
+         showErrorDialogAndWait("Error", "Could not start application",
+               "Please send the error with your logs folder to a developer", e, null);
          System.exit(1);
       }
+   }
+
+   public static void showErrorDialogAndWait(String title, String header, String content, final Exception e, Window window) {
+      final Alert alert = new Alert(AlertType.ERROR);
+      alert.setTitle(title);
+      alert.setHeaderText(header);
+      alert.setContentText(content);
+      if(window != null) {
+         alert.initOwner(window);
+      }
+      final StringWriter sw = new StringWriter();
+      final PrintWriter pw = new PrintWriter(sw);
+      e.printStackTrace(pw);
+      final String exceptionText = sw.toString();
+
+      final Label label = new Label("The exception stacktrace was:");
+
+      final TextArea textArea = new TextArea(exceptionText);
+      textArea.setEditable(false);
+      textArea.setWrapText(true);
+
+      textArea.setMaxWidth(Double.MAX_VALUE);
+      textArea.setMaxHeight(Double.MAX_VALUE);
+      GridPane.setVgrow(textArea, Priority.ALWAYS);
+      GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+      final GridPane expContent = new GridPane();
+      expContent.setMaxWidth(Double.MAX_VALUE);
+      expContent.add(label, 0, 0);
+      expContent.add(textArea, 0, 1);
+
+      alert.getDialogPane().setExpandableContent(expContent);
+      alert.showAndWait();
    }
 
    private void initialiseApplication(final Stage primaryStage) throws Exception {
@@ -182,27 +192,6 @@ public class App extends Application {
 
    private void readSettings() {
       LOG.debug("Reading configuration");
-
-      final List<Settings> settingsList = model.getSettingsRepository().findAll();
-      final Settings settings;
-      if (settingsList.isEmpty()) {
-         LOG.info("Empty settings. Set default");
-         settings = new Settings();
-         settings.setTaskBarColor(model.taskBarColor.get());
-
-         settings.setDefaultBackgroundColor(Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
-         settings.setDefaultFontColor(Model.ORIGINAL_DEFAULT_FONT_COLOR);
-
-         settings.setHoverBackgroundColor(Model.ORIGINAL_HOVER_BACKGROUND_COLOR);
-         settings.setHoverFontColor(Model.ORIGINAL_HOVER_Font_COLOR);
-         settings.setUseHotkey(false);
-         settings.setDisplayProjectsRight(false);
-         settings.setHideProjectsOnMouseExit(false);
-         model.getSettingsRepository().save(settings);
-      } else {
-         LOG.info("Got settings from database");
-         settings = settingsList.get(0);
-      }
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());

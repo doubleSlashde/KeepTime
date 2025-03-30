@@ -35,7 +35,7 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 
 ## Install
 
-* Download keeptime-<version>.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
+* Download keeptime-\<version\>.zip (see [releases](https://github.com/doubleSlashde/KeepTime/releases))
 * Extract the downloaded .zip
 * Try starting the application by executing the *keeptime.bat* file. The start may take up to one minute.
 
@@ -45,7 +45,24 @@ It is recommended to run the application at computer start, so you do not forget
 
 You should put the .jar in an extra folder as a *logs* and a *db* folder will be created next to it.\
 
-### Migrate from older version than v1.2.0
+## Update KeepTime
+1. Start your current version of KeepTime
+1. Open `Settings` -> `Import/Export` -> `Export` to export your data to an .sql file (Backup data)
+1. Stop KeepTime
+1. Download new version of KeepTime and extract it
+1. Start new version of KeepTime
+1. If your projects are available you are already done. But most likely your projects are missing. In this case follow the [Migrate](#Migrate) chapter
+     - Missing data is expected behavior with most updates as updates often include database version update which require an import of data
+
+### Migrate data
+1. Notice that your old data is not available after an update 
+1. Open the new version of KeepTime
+1. Open `Settings` -> `Import/Export` -> `Import` and import the previously exported .sql file 
+1. After the import KeepTime closes automatically
+1. Start KeepTime
+1. Your data is restored in the new version now
+
+### Migrate from version older than v1.2.0
 
 1. Download new version and replace the .jar file.
 2. Start new version of KeepTime. Notice that your old data is not available.
@@ -53,19 +70,9 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 4. Copy the files (not directories) of directory `db` (next to the .jar file) into `db/1.4.197/` (path now includes the database version).
 5. Start KeepTime again. Notice that your data is available again.
 
-### Migrate from KeepTime v1.2.0
-
-1. Start your current version of KeepTime (v1.2.0)
-2. Go to the settings and export your KeepTime data 
-3. Download new version and replace the .jar file. 
-4. Start new version of KeepTime. Notice that your old data is not available. 
-5. Open the new version and import the exported sql script 
-6. After the import KeepTime closes automatically
-7. To see the changes just start the new KeepTime again
-
 ## Requirements
 * Operating System
   * Windows 7, 10, 11
   * Linux (tested on Ubuntu 18.04)
   * Mac (tested on MacBook M2 Pro (ARM based CPU))
-* Java 17
+* Java >= 17

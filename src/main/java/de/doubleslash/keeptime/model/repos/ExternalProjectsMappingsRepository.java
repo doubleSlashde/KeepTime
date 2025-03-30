@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2025 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -16,11 +16,14 @@
 
 package de.doubleslash.keeptime.model.repos;
 
-import de.doubleslash.keeptime.model.Setting;
+import de.doubleslash.keeptime.model.ExternalProjectMapping;
+import de.doubleslash.keeptime.model.ExternalSystem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface SettingsRepository extends JpaRepository<Setting, String> {
-   Setting findBySetting(String key);
+public interface ExternalProjectsMappingsRepository extends JpaRepository<ExternalProjectMapping, Long> {
+   List<ExternalProjectMapping> findByExternalSystemId(ExternalSystem externalSystem);
 }

@@ -28,6 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import de.doubleslash.keeptime.controller.HeimatController;
+import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
+import de.doubleslash.keeptime.rest.integration.heimat.JwtDecoder;
+import javafx.beans.binding.Bindings;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Modality;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -40,7 +50,6 @@ import de.doubleslash.keeptime.common.*;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
-import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.view.license.LicenseTableRow;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -57,6 +66,9 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
+import static de.doubleslash.keeptime.App.showErrorDialogAndWait;
+import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
 
 @Component
 public class SettingsController {
@@ -167,6 +179,12 @@ public class SettingsController {
    private Region licensesIcon;
 
    @FXML
+   private Region restAPIIcon;
+
+   @FXML
+   private Region heimatIcon;
+
+   @FXML
    private TextField authName;
 
    @FXML
@@ -181,13 +199,42 @@ public class SettingsController {
    @FXML
    private TextField authPort;
 
-   private final String propertiesFilePath = "application.properties";
+   @FXML
+   private CheckBox heimatActivationCheckbox;
+
+
+   @FXML
+   private TextField heimatUrlTextField;
+
+   @FXML
+   private Label heimatUrlPreviewLabel;
+
+   @FXML
+   private PasswordField heimatPatTextField;
+
+   @FXML
+   private Label heimatExpiresLabel;
+
+   @FXML
+   private Button heimatValidateConnectionButton;
+
+   @FXML
+   private Label heimatValidateConnectionLabel;
+
+   @FXML
+   private Button heimatMapProjectsButton;
+
+   @FXML
+   private Label mapProjectsButtonLabel;
+
+   private static final String propertiesFilePath = "application.properties";
 
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
 
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
    private final ApplicationProperties applicationProperties;
+   private final HeimatController heimatController;
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
@@ -200,11 +247,12 @@ public class SettingsController {
    ViewController mainscreen;
 
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties) {
+         ApplicationProperties applicationProperties, HeimatController heimatController) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
 
+      this.heimatController = heimatController;
    }
 
    @FXML
@@ -232,6 +280,8 @@ public class SettingsController {
       setRegionSvg(aboutIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ABOUT_ICON);
       setRegionSvg(importExportIcon, requiredWidth, requiredHeight, RESOURCE.SVG_IMPORT_EXPORT_ICON);
       setRegionSvg(licensesIcon, requiredWidth, requiredHeight, RESOURCE.SVG_LICENSES_ICON);
+      setRegionSvg(restAPIIcon, requiredWidth, requiredHeight, RESOURCE.SVG_GLOBE_ICON);
+      setRegionSvg(heimatIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ROTATE_ICON);
 
       initExportButton();
       initImportButton();
@@ -312,15 +362,21 @@ public class SettingsController {
             mainscreen.savePosition();
          }
 
-         controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
-               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
-               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
+
+         controller.updateColorSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue());
+
+         controller.updateLayoutSettings(
+              displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
-               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
-               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected()));
-         thisStage.close();
+               saveWindowPositionCheckBox.isSelected());
 
+         controller.updateFeatureSettings(useHotkeyCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
+               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected());
+
+         updateHeimatSettings();
+         thisStage.close();
       });
 
       LOG.debug("cancelButton.setOnAction");
@@ -340,7 +396,96 @@ public class SettingsController {
 
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
+      initializeHeimat();
+   }
 
+   private void initializeHeimat() {
+      heimatValidateConnectionButton.disableProperty().bind(
+            Bindings.createBooleanBinding(
+                  () -> Boolean.valueOf(
+                        heimatUrlTextField.getText().trim().isEmpty() || heimatPatTextField.getText().trim().isEmpty()),
+                  heimatUrlTextField.textProperty(),
+                  heimatPatTextField.textProperty()
+            )
+      );
+      heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
+         try{
+            final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
+            heimatExpiresLabel.setText(jwt.expiration().toString());
+         } catch(Exception e){
+            heimatExpiresLabel.setText("Does not seem to be valid");
+         }
+      });
+      heimatValidateConnectionLabel.setText("Not validated.");
+      heimatValidateConnectionButton.setOnAction(ae -> {
+         updateHeimatSettings();
+         try {
+            heimatController.tryLogin();
+            heimatValidateConnectionLabel.setText("Connection is valid.");
+         }catch(Exception e){
+            LOG.error("Error while validating Heimat connection", e);
+            heimatValidateConnectionLabel.setText("Invalid connection: " + e.getMessage());
+            heimatValidateConnectionLabel.setTooltip(new Tooltip(e.getMessage()));
+         }
+      });
+
+      heimatUrlPreviewLabel.setText("<url>/heimat-core/api/v1/");
+      heimatUrlTextField.textProperty().addListener((observable, oldValue, newValue)->{
+         heimatUrlPreviewLabel.setText(newValue + "/heimat-core/api/v1/");
+      });
+
+      final HeimatSettings heimatSettings = model.getHeimatSettings();
+      heimatActivationCheckbox.setSelected(heimatSettings.isHeimatActive());
+      heimatUrlTextField.setText(heimatSettings.getHeimatUrl());
+      heimatPatTextField.setText(heimatSettings.getHeimatPat());
+
+      heimatMapProjectsButton.disableProperty().bind(heimatActivationCheckbox.selectedProperty().not());
+
+      heimatMapProjectsButton.setOnAction((ae) -> {
+         try {
+            showMapProjectsStage();
+         } catch (FXMLLoaderException e) {
+            LOG.error("Error while loading map stage", e);
+            showErrorDialogAndWait("Error", "Could not load mapping stage", "Try to save settings first. Make sure you have internet.", e, thisStage);
+         }
+      });
+   }
+
+   private void updateHeimatSettings() {
+      controller.updateHeimatSettings(
+            heimatActivationCheckbox.isSelected(),
+            heimatUrlTextField.getText(),
+            heimatPatTextField.getText());
+      heimatController.refreshConnection();
+   }
+
+   private void showMapProjectsStage() {
+      try{
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
+         final Parent settingsRoot = fxmlLoader2.load();
+         ExternalProjectsMapController settingsController = fxmlLoader2.getController();
+         Stage settingsStage = new Stage();
+         settingsController.setStage(settingsStage);
+         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.setTitle("External Project Mappings");
+         settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
+
+         settingsStage.setScene(settingsScene);
+         settingsStage.showAndWait();
+      } catch (final Exception e) {
+         throw new FXMLLoaderException(e);
+      }
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
@@ -558,6 +703,8 @@ public class SettingsController {
                                                .bind(emptyNoteReminderCheckBox.selectedProperty().not());
       emptyNoteReminderOnlyForWorkEntryCheckBox.setSelected(model.remindIfNotesAreEmptyOnlyForWorkEntry.get());
       confirmCloseCheckBox.setSelected(model.confirmClose.get());
+
+      heimatValidateConnectionLabel.setText("Not validated.");
    }
 
    public void setStage(final Stage thisStage) {

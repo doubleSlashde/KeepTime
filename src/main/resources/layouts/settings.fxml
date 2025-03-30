@@ -38,7 +38,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" stylesheets="@../css/dsStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
   <children>
     <TabPane layoutX="-50.0" layoutY="3.0" prefHeight="383.0" prefWidth="608.0" rotateGraphic="true" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE">
       <tabs>
@@ -61,7 +61,7 @@
                               <children>
                                 <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Background" />
                                 <ColorPicker fx:id="defaultBackgroundColor" />
-                                <Button fx:id="resetDefaultBackgroundButton" mnemonicParsing="false" text="Reset">
+                                <Button fx:id="resetDefaultBackgroundButton" mnemonicParsing="false" styleClass="secondary-button" text="Reset">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -72,7 +72,7 @@
                               <children>
                                 <Label alignment="TOP_LEFT" contentDisplay="TOP" prefWidth="100.0" text="Font" />
                                 <ColorPicker fx:id="defaultFontColor" />
-                                <Button fx:id="resetDefaultFontButton" mnemonicParsing="false" text="Reset">
+                                <Button fx:id="resetDefaultFontButton" mnemonicParsing="false" styleClass="secondary-button" text="Reset">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -100,7 +100,7 @@
                                   </font>
                                 </Label>
                                 <ColorPicker fx:id="hoverBackgroundColor" />
-                                <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" text="Reset">
+                                <Button fx:id="resetHoverBackgroundButton" mnemonicParsing="false" styleClass="secondary-button" text="Reset">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -115,7 +115,7 @@
                                   </font>
                                 </Label>
                                 <ColorPicker fx:id="hoverFontColor" />
-                                <Button fx:id="resetHoverFontButton" mnemonicParsing="false" text="Reset">
+                                <Button fx:id="resetHoverFontButton" mnemonicParsing="false" styleClass="secondary-button" text="Reset">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -143,7 +143,7 @@
                                   </font>
                                 </Label>
                                 <ColorPicker fx:id="taskBarColor" />
-                                <Button fx:id="resetTaskBarFontButton" mnemonicParsing="false" text="Reset">
+                                <Button fx:id="resetTaskBarFontButton" mnemonicParsing="false" styleClass="secondary-button" text="Reset">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -391,6 +391,7 @@
                                              </font>
                                           </Label>
                                           <Label text="Changes will not take effect until the next start of KeepTime" />
+                                          <Label layoutX="11.0" layoutY="34.0" prefHeight="42.0" prefWidth="393.0" text="When the port is in use KeepTime will fail to start. Adapt the port in application.properties if this is the case." wrapText="true" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -452,9 +453,114 @@
               </children></AnchorPane>
           </content>
           <graphic>
-            <Region fx:id="generalIcon1" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
+            <Region fx:id="restAPIIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
           </graphic>
         </Tab>
+            <Tab text="HEIMAT">
+               <content>
+                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
+                     <children>
+                        <VBox layoutX="14.0" layoutY="14.0" spacing="5.0">
+                           <children>
+                              <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                 <children>
+                                    <Label prefHeight="28.0" prefWidth="279.0" text="HEIMAT Integration">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                              <Group>
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <Label prefHeight="18.0" prefWidth="286.0" text="Warning this is a beta feature" textFill="#bf5d24">
+                                             <font>
+                                                <Font name="System Bold" size="12.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                              <Group>
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <CheckBox fx:id="heimatActivationCheckbox" mnemonicParsing="false" text="Use HEIMAT">
+                                             <font>
+                                                <Font name="Open Sans Regular" size="12.0" />
+                                             </font>
+                                          </CheckBox>
+                                          <HBox />
+                                          <HBox>
+                                             <children>
+                                                <Label fx:id="labelUsername1" prefWidth="75.0" text="URL" />
+                                                <TextField fx:id="heimatUrlTextField" prefHeight="26.0" prefWidth="298.0" promptText="https://your-heimat-domain.com" />
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label fx:id="heimatUrlPreviewLabel" disable="true" prefHeight="21.0" prefWidth="375.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label fx:id="labelPassword1" prefWidth="125.0" text="AccessToken" />
+                                                <PasswordField fx:id="heimatPatTextField" prefHeight="26.0" prefWidth="250.0" promptText="Personal Access Token" />
+                                             </children>
+                                          </HBox>
+                                          <HBox layoutX="11.0" layoutY="75.0">
+                                             <children>
+                                                <Label fx:id="labelPassword11" disable="true" prefWidth="125.0" text="Expires:" />
+                                                <Label fx:id="heimatExpiresLabel" disable="true" layoutX="10.0" layoutY="10.0" prefWidth="250.0" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                              <Group>
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                             <children>
+                                                <Button fx:id="heimatValidateConnectionButton" mnemonicParsing="false" styleClass="secondary-button" text="Validate connection" />
+                                                <Label fx:id="heimatValidateConnectionLabel" disable="true" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                              <Group layoutX="15.0" layoutY="192.0">
+                                 <children>
+                                    <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
+                                       <children>
+                                          <HBox alignment="CENTER_LEFT" spacing="5.0">
+                                             <children>
+                                                <Button fx:id="heimatMapProjectsButton" mnemonicParsing="false" styleClass="secondary-button" text="Map projects" />
+                                                <Label fx:id="mapProjectsButtonLabel" disable="true" text="Please validate connection before mapping projects." />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </Group>
+                           </children>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+               </content>
+               <graphic>
+                  <Region fx:id="heimatIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
+               </graphic>
+            </Tab>
         <Tab text="Import/Export">
           <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="489.0" prefWidth="452.0">
@@ -480,7 +586,7 @@
                             </HBox>
                             <HBox alignment="BOTTOM_RIGHT" prefHeight="31.0" prefWidth="368.0">
                               <children>
-                                <Button fx:id="importButton" alignment="TOP_LEFT" mnemonicParsing="false" text="Import">
+                                <Button fx:id="importButton" alignment="TOP_LEFT" mnemonicParsing="false" styleClass="secondary-button" text="Import">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -510,7 +616,7 @@
                             </HBox>
                             <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" prefWidth="367.0">
                               <children>
-                                <Button fx:id="exportButton" mnemonicParsing="false" text="Export">
+                                <Button fx:id="exportButton" mnemonicParsing="false" styleClass="secondary-button" text="Export">
                                   <font>
                                     <Font name="Open Sans Regular" size="12.0" />
                                   </font>
@@ -600,7 +706,7 @@
                     <Pane layoutX="212.0" layoutY="227.0" maxHeight="50.0" maxWidth="135.0" minHeight="50.0" minWidth="50.0" prefHeight="50.0" prefWidth="117.0">
                       <children>
                         <Region fx:id="bugIcon" layoutX="4.0" layoutY="16.0" prefHeight="15.0" prefWidth="15.0" />
-                        <Button fx:id="reportBugButton" focusTraversable="false" layoutX="28.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" text="Report">
+                        <Button fx:id="reportBugButton" focusTraversable="false" layoutX="28.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="80" styleClass="secondary-button" text="Report">
                           <font>
                             <Font size="14.0" />
                           </font>
@@ -645,17 +751,20 @@
     </TabPane>
     <HBox alignment="BOTTOM_RIGHT" layoutX="4.0" layoutY="524.0" prefHeight="26.0" prefWidth="598.0" spacing="10.0" styleClass="saveCancelHboxBorder" stylesheets="@../css/settingsv2.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <children>
-        <Button fx:id="saveButton" mnemonicParsing="false" text="Save">
+        <Button fx:id="saveButton" mnemonicParsing="false" styleClass="primary-button" text="Save">
           <font>
             <Font name="Open Sans Regular" size="12.0" />
           </font>
         </Button>
-        <Button fx:id="cancelButton" mnemonicParsing="false" text="Cancel">
+        <Button fx:id="cancelButton" mnemonicParsing="false" styleClass="secondary-button" text="Cancel">
           <font>
             <Font name="Open Sans Regular" size="12.0" />
           </font>
         </Button>
       </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
     </HBox>
   </children>
 </AnchorPane>

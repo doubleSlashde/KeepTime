@@ -380,6 +380,10 @@ public class ProjectsListViewController {
          return null;
       });
 
+      dialog.getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("primary-button");
+      dialog.getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("secondary-button");
+      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
+
       return grid;
    }
 

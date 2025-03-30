@@ -18,14 +18,21 @@ package de.doubleslash.keeptime.common;
 
 import javafx.scene.paint.Color;
 
+import java.util.Random;
+
 public class ColorHelper {
+
+   private static final Random random = new Random();
 
    private ColorHelper() {
       throw new IllegalStateException("Utility class: ColorHelper");
    }
 
    public static Color randomColor() {
-      return Color.BLACK;
+      double hue = random.nextDouble() * 360;
+      double saturation = 0.7 + random.nextDouble() * 0.3; // High saturation
+      double brightness = 0.8 + random.nextDouble() * 0.2; // High brightness
+      return Color.hsb(hue, saturation, brightness);
    }
 
    public static String colorToCssRgba(final Color color) {

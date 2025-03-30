@@ -473,7 +473,7 @@ public class ViewController {
       }
    }
 
-   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
+   public static FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
       return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
 
@@ -502,6 +502,9 @@ public class ViewController {
       final ManageProjectController manageProjectController = loader.getController();
 
       dialog.getDialogPane().lookupButton(ButtonType.OK).disableProperty().bind(manageProjectController.formValidProperty().not());
+      dialog.getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("primary-button");
+      dialog.getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("secondary-button");
+      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
 
       dialogResultConverter(dialog, manageProjectController);
 

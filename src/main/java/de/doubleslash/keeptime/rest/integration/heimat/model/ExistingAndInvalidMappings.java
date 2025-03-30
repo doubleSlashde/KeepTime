@@ -1,4 +1,4 @@
-// Copyright 2019 doubleSlash Net Business GmbH
+// Copyright 2025 doubleSlash Net Business GmbH
 //
 // This file is part of KeepTime.
 // KeepTime is free software: you can redistribute it and/or modify
@@ -14,13 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-package de.doubleslash.keeptime.model.repos;
+package de.doubleslash.keeptime.rest.integration.heimat.model;
 
-import de.doubleslash.keeptime.model.Setting;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import de.doubleslash.keeptime.controller.HeimatController;
 
-@Repository
-public interface SettingsRepository extends JpaRepository<Setting, String> {
-   Setting findBySetting(String key);
-}
+import java.util.List;
+
+public record ExistingAndInvalidMappings(List<HeimatController.ProjectMapping> validMappings,
+                                         List<String> invalidMappingsAsString) {}
