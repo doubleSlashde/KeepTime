@@ -17,10 +17,27 @@
 package de.doubleslash.keeptime.view;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
+import de.doubleslash.keeptime.controller.HeimatController;
+import de.doubleslash.keeptime.exceptions.FXMLLoaderException;
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
+import de.doubleslash.keeptime.rest.integration.heimat.JwtDecoder;
+import javafx.beans.binding.Bindings;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Modality;
 import org.h2.tools.RunScript;
 import org.h2.tools.Script;
 import org.slf4j.Logger;
@@ -33,13 +50,11 @@ import de.doubleslash.keeptime.common.*;
 import de.doubleslash.keeptime.common.Resources.RESOURCE;
 import de.doubleslash.keeptime.controller.Controller;
 import de.doubleslash.keeptime.model.Model;
-import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.view.license.LicenseTableRow;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -52,16 +67,20 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
+import static de.doubleslash.keeptime.App.showErrorDialogAndWait;
+import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
+
 @Component
 public class SettingsController {
-
    @FXML
    private ColorPicker hoverBackgroundColor;
+
    @FXML
    private ColorPicker hoverFontColor;
 
    @FXML
    private ColorPicker defaultBackgroundColor;
+
    @FXML
    private ColorPicker defaultFontColor;
 
@@ -70,21 +89,28 @@ public class SettingsController {
 
    @FXML
    private Button resetHoverBackgroundButton;
+
    @FXML
    private Button resetHoverFontButton;
+
    @FXML
    private Button resetDefaultBackgroundButton;
+
    @FXML
    private Button resetDefaultFontButton;
+
    @FXML
    private Button resetTaskBarFontButton;
 
    @FXML
    private CheckBox useHotkeyCheckBox;
+
    @FXML
    private CheckBox displayProjectsRightCheckBox;
+
    @FXML
    private CheckBox hideProjectsOnMouseExitCheckBox;
+
    @FXML
    private CheckBox saveWindowPositionCheckBox;
 
@@ -152,10 +178,63 @@ public class SettingsController {
    @FXML
    private Region licensesIcon;
 
+   @FXML
+   private Region restAPIIcon;
+
+   @FXML
+   private Region heimatIcon;
+
+   @FXML
+   private TextField authName;
+
+   @FXML
+   private PasswordField authPassword;
+
+   @FXML
+   private CheckBox activateRestApiCheckBox;
+
+   @FXML
+   private Hyperlink swaggerHyperLink;
+
+   @FXML
+   private TextField authPort;
+
+   @FXML
+   private CheckBox heimatActivationCheckbox;
+
+
+   @FXML
+   private TextField heimatUrlTextField;
+
+   @FXML
+   private Label heimatUrlPreviewLabel;
+
+   @FXML
+   private PasswordField heimatPatTextField;
+
+   @FXML
+   private Label heimatExpiresLabel;
+
+   @FXML
+   private Button heimatValidateConnectionButton;
+
+   @FXML
+   private Label heimatValidateConnectionLabel;
+
+   @FXML
+   private Button heimatMapProjectsButton;
+
+   @FXML
+   private Label mapProjectsButtonLabel;
+
+   private static final String propertiesFilePath = "application.properties";
+
    private static final String GITHUB_PAGE = "https://www.github.com/doubleSlashde/KeepTime";
    private static final String GITHUB_ISSUE_PAGE = GITHUB_PAGE + "/issues";
+
    private static final Color HYPERLINK_COLOR = Color.rgb(0, 115, 170);
    private final ApplicationProperties applicationProperties;
+   private final HeimatController heimatController;
 
    private static final Logger LOG = LoggerFactory.getLogger(SettingsController.class);
 
@@ -167,24 +246,25 @@ public class SettingsController {
    @Autowired
    ViewController mainscreen;
 
-   @Autowired
    public SettingsController(final Model model, final Controller controller,
-         ApplicationProperties applicationProperties) {
+         ApplicationProperties applicationProperties, HeimatController heimatController) {
       this.model = model;
       this.controller = controller;
       this.applicationProperties = applicationProperties;
+
+      this.heimatController = heimatController;
    }
 
    @FXML
    private void initialize() {
       LOG.debug("start init");
-      LOG.info("OS: {}", OS.getOSname());
+      LOG.info("OS: {}", OS.getOSName());
       LOG.debug("set versionLabel text");
       LOG.debug("load substages");
       LOG.debug("set version label text");
 
-      if (OS.isLinux()) {
-         LOG.info("Disabling unsupported settings for Linux.");
+      if (!OS.isWindows()) {
+         LOG.info("Disabling unsupported settings (hotkey) for non windows feature.");
          useHotkeyCheckBox.setDisable(true);
          hotkeyLabel.setDisable(true);
          globalKeyloggerLabel.setDisable(true);
@@ -200,15 +280,52 @@ public class SettingsController {
       setRegionSvg(aboutIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ABOUT_ICON);
       setRegionSvg(importExportIcon, requiredWidth, requiredHeight, RESOURCE.SVG_IMPORT_EXPORT_ICON);
       setRegionSvg(licensesIcon, requiredWidth, requiredHeight, RESOURCE.SVG_LICENSES_ICON);
+      setRegionSvg(restAPIIcon, requiredWidth, requiredHeight, RESOURCE.SVG_GLOBE_ICON);
+      setRegionSvg(heimatIcon, requiredWidth, requiredHeight, RESOURCE.SVG_ROTATE_ICON);
 
       initExportButton();
       initImportButton();
 
+      try (FileInputStream input = new FileInputStream(propertiesFilePath)) {
+         Properties properties = new Properties();
+         properties.load(input);
+         String apiStatus = properties.getProperty("api");
+         if (apiStatus != null) {
+            if (apiStatus.equals("ON")) {
+               activateRestApiCheckBox.setSelected(true);
+               String port = properties.getProperty("server.port");
+               String userName = properties.getProperty("spring.security.user.name");
+               String userPassword = properties.getProperty("spring.security.user.password");
+
+               if (port != null) {
+                  authPort.setText(port);
+               }
+               if  (userName!= null) {
+                  authName.setText(userName);
+                  authPassword.setText(userPassword);
+               }
+            } else if (apiStatus.equals("OFF")) {
+               activateRestApiCheckBox.setSelected(false);
+            }
+         }
+      } catch (IOException e) {
+        LOG.debug(
+            "There is currently no additional '{}' file available. This is fine as it should only be present when rest-api is used.",
+            propertiesFilePath, e);
+      }
+
       LOG.debug("saveButton.setOnAction");
+
       saveButton.setOnAction(ae -> {
          LOG.info("Save clicked");
 
-         if (OS.isLinux()) {
+         if (activateRestApiCheckBox.isSelected()) {
+            handleApiOn();
+         } else {
+            handleApiOff();
+         }
+
+         if (!OS.isWindows()) {
             if (hoverBackgroundColor.getValue().getOpacity() < 0.5) {
                hoverBackgroundColor.setValue(Color.rgb((int) (hoverBackgroundColor.getValue().getRed() * 255),
                      (int) (hoverBackgroundColor.getValue().getGreen() * 255),
@@ -218,7 +335,7 @@ public class SettingsController {
                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                alert.setHeaderText("Color setting not supported!");
                alert.setContentText(
-                     "The level of opacity on your hover background is to high for Linux. Resetting it.");
+                     "The level of opacity on your hover background is to low (<0.5) for non Windows system. Resetting it.");
 
                alert.showAndWait();
             }
@@ -231,7 +348,7 @@ public class SettingsController {
                alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
                alert.setHeaderText("Color settings not supported!");
                alert.setContentText(
-                     "The level of opacity on your hover background is to high for Linux. Resetting it.");
+                     "The level of opacity on your default background is to low (<0.5) for non Windows system. Resetting it.");
 
                alert.showAndWait();
             }
@@ -245,21 +362,25 @@ public class SettingsController {
             mainscreen.savePosition();
          }
 
-         controller.updateSettings(new Settings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
-               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue(),
-               useHotkeyCheckBox.isSelected(), displayProjectsRightCheckBox.isSelected(),
+
+         controller.updateColorSettings(hoverBackgroundColor.getValue(), hoverFontColor.getValue(),
+               defaultBackgroundColor.getValue(), defaultFontColor.getValue(), taskBarColor.getValue());
+
+         controller.updateLayoutSettings(
+              displayProjectsRightCheckBox.isSelected(),
                hideProjectsOnMouseExitCheckBox.isSelected(), model.screenSettings.proportionalX.get(),
                model.screenSettings.proportionalY.get(), model.screenSettings.screenHash.get(),
-               saveWindowPositionCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
-               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected()));
-         thisStage.close();
+               saveWindowPositionCheckBox.isSelected());
 
+         controller.updateFeatureSettings(useHotkeyCheckBox.isSelected(), emptyNoteReminderCheckBox.isSelected(),
+               emptyNoteReminderOnlyForWorkEntryCheckBox.isSelected(), confirmCloseCheckBox.isSelected());
+
+         updateHeimatSettings();
+         thisStage.close();
       });
 
       LOG.debug("cancelButton.setOnAction");
-      cancelButton.setOnAction(ae ->
-
-      {
+      cancelButton.setOnAction(ae -> {
          LOG.info("Cancel clicked");
          thisStage.close();
       });
@@ -275,10 +396,99 @@ public class SettingsController {
 
       LOG.debug("aboutButton.setOnAction");
       initializeAbout();
+      initializeHeimat();
+   }
+
+   private void initializeHeimat() {
+      heimatValidateConnectionButton.disableProperty().bind(
+            Bindings.createBooleanBinding(
+                  () -> Boolean.valueOf(
+                        heimatUrlTextField.getText().trim().isEmpty() || heimatPatTextField.getText().trim().isEmpty()),
+                  heimatUrlTextField.textProperty(),
+                  heimatPatTextField.textProperty()
+            )
+      );
+      heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
+         try{
+            final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
+            heimatExpiresLabel.setText(jwt.expiration().toString());
+         } catch(Exception e){
+            heimatExpiresLabel.setText("Does not seem to be valid");
+         }
+      });
+      heimatValidateConnectionLabel.setText("Not validated.");
+      heimatValidateConnectionButton.setOnAction(ae -> {
+         updateHeimatSettings();
+         try {
+            heimatController.tryLogin();
+            heimatValidateConnectionLabel.setText("Connection is valid.");
+         }catch(Exception e){
+            LOG.error("Error while validating Heimat connection", e);
+            heimatValidateConnectionLabel.setText("Invalid connection: " + e.getMessage());
+            heimatValidateConnectionLabel.setTooltip(new Tooltip(e.getMessage()));
+         }
+      });
+
+      heimatUrlPreviewLabel.setText("<url>/heimat-core/api/v1/");
+      heimatUrlTextField.textProperty().addListener((observable, oldValue, newValue)->{
+         heimatUrlPreviewLabel.setText(newValue + "/heimat-core/api/v1/");
+      });
+
+      final HeimatSettings heimatSettings = model.getHeimatSettings();
+      heimatActivationCheckbox.setSelected(heimatSettings.isHeimatActive());
+      heimatUrlTextField.setText(heimatSettings.getHeimatUrl());
+      heimatPatTextField.setText(heimatSettings.getHeimatPat());
+
+      heimatMapProjectsButton.disableProperty().bind(heimatActivationCheckbox.selectedProperty().not());
+
+      heimatMapProjectsButton.setOnAction((ae) -> {
+         try {
+            showMapProjectsStage();
+         } catch (FXMLLoaderException e) {
+            LOG.error("Error while loading map stage", e);
+            showErrorDialogAndWait("Error", "Could not load mapping stage", "Try to save settings first. Make sure you have internet.", e, thisStage);
+         }
+      });
+   }
+
+   private void updateHeimatSettings() {
+      controller.updateHeimatSettings(
+            heimatActivationCheckbox.isSelected(),
+            heimatUrlTextField.getText(),
+            heimatPatTextField.getText());
+      heimatController.refreshConnection();
+   }
+
+   private void showMapProjectsStage() {
+      try{
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
+         final Parent settingsRoot = fxmlLoader2.load();
+         ExternalProjectsMapController settingsController = fxmlLoader2.getController();
+         Stage settingsStage = new Stage();
+         settingsController.setStage(settingsStage);
+         settingsStage.initModality(Modality.APPLICATION_MODAL);
+         settingsStage.setTitle("External Project Mappings");
+         settingsStage.setResizable(false);
+         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+         final Scene settingsScene = new Scene(settingsRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               settingsStage.close();
+            }
+         });
+
+         settingsStage.setScene(settingsScene);
+         settingsStage.showAndWait();
+      } catch (final Exception e) {
+         throw new FXMLLoaderException(e);
+      }
    }
 
    private static void setRegionSvg(Region region, double requiredWidth, double requiredHeight, RESOURCE resource) {
-
       region.setShape(SvgNodeProvider.getSvgNodeWithScale(resource, 1.0, 1.0));
       region.setMinSize(requiredWidth, requiredHeight);
       region.setPrefSize(requiredWidth, requiredHeight);
@@ -340,16 +550,15 @@ public class SettingsController {
       licenseTableView.getColumns().add(nameColumn);
       licenseTableView.getColumns().add(licenseColumn);
 
-      LOG.debug("hyperlink setonaction");
       gitHubHyperlink.setOnAction(ae -> {
-         LOG.debug("hyperlink clicked");
          BrowserHelper.openURL(GITHUB_PAGE);
       });
-
-      LOG.debug("roportbugbutton setonaction");
       reportBugButton.setOnAction(ae -> {
-         LOG.info("Clicked reportBugButton");
          BrowserHelper.openURL(GITHUB_ISSUE_PAGE);
+      });
+      swaggerHyperLink.setOnAction(ae -> {
+         String port = authPort.getText().isEmpty() ? "8080" : authPort.getText();
+         BrowserHelper.openURL("http://localhost:" + port + "/api/swagger");
       });
    }
 
@@ -364,13 +573,13 @@ public class SettingsController {
 
             confirmationAlert.setTitle("Import");
             confirmationAlert.setHeaderText("Do you want to Override current Data ?");
-            confirmationAlert.getDialogPane()
-                             .setContent(new Label(
-                                   "Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!\n"
-                                         + "\n"
-                                         + "If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press \"Export\".\n"
-                                         + "\n"
-                                         + "You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file."));
+            confirmationAlert.getDialogPane().setContent(new Label("""
+                  Import previously exported .sql file. This will overwrite the currently used database contents - all current data will be lost!
+                  
+                  If you do not have a .sql file yet you need to open the previous version of KeepTime and in the settings dialog press "Export".
+                  
+                  You will need to restart the application after this action. If you proceed you need to select the previous exported .sql file.\
+                  """));
             confirmationAlert.showAndWait();
 
             if (confirmationAlert.getResult() == ButtonType.NO) {
@@ -390,10 +599,15 @@ public class SettingsController {
             final String url = applicationProperties.getSpringDataSourceUrl();
             final String username = applicationProperties.getSpringDataSourceUserName();
             final String password = applicationProperties.getSpringDataSourcePassword();
-            // TODO: add an option at the next release to make the "FROM_1X flag" configurable. E.g. if we upgrade (in
-            // the release after) from H2 version 2.x to 2.x we must not set the "FROM_1X flag".
-            new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script", file.toString(),
-                  "-options", "FROM_1X");
+
+            if (file.getName().contains("H2-version-1")) {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString(), "-options", "FROM_1X");
+               LOG.info("FROM_1X feature is used");
+            } else {
+               new RunScript().runTool("-url", url, "-user", username, "-password", password, "-script",
+                     file.toString());
+            }
 
             Alert informationDialog = new Alert(AlertType.INFORMATION);
 
@@ -402,9 +616,10 @@ public class SettingsController {
 
             informationDialog.setTitle("Import done");
             informationDialog.setHeaderText("The data was imported.");
-            informationDialog.getDialogPane()
-                             .setContent(new Label("KeepTime will now be CLOSED!\n"
-                                   + "You have to RESTART it again to see the changes"));
+            informationDialog.getDialogPane().setContent(new Label("""
+                  KeepTime will now be CLOSED!
+                  You have to RESTART it again to see the changes\
+                  """));
             informationDialog.showAndWait();
             Platform.exit();
 
@@ -418,9 +633,7 @@ public class SettingsController {
 
             errorDialog.showAndWait();
          }
-
       });
-
    }
 
    private void initExportButton() {
@@ -433,7 +646,7 @@ public class SettingsController {
 
             final FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(Paths.get(".").toFile());
-            fileChooser.setInitialFileName(String.format("KeepTime_database-export_H2-version-%s.sql", h2Version));
+            fileChooser.setInitialFileName("KeepTime_database-export_H2-version-%s.sql".formatted(h2Version));
             fileChooser.getExtensionFilters().add(new ExtensionFilter("SQL script files.", "*.sql"));
             final File fileToSave = fileChooser.showSaveDialog(thisStage);
             if (fileToSave == null) {
@@ -490,14 +703,12 @@ public class SettingsController {
                                                .bind(emptyNoteReminderCheckBox.selectedProperty().not());
       emptyNoteReminderOnlyForWorkEntryCheckBox.setSelected(model.remindIfNotesAreEmptyOnlyForWorkEntry.get());
       confirmCloseCheckBox.setSelected(model.confirmClose.get());
+
+      heimatValidateConnectionLabel.setText("Not validated.");
    }
 
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
-   }
-
-   private FXMLLoader createFXMLLoader(final RESOURCE fxmlLayout) {
-      return new FXMLLoader(Resources.getResource(fxmlLayout));
    }
 
    public ObservableList<LicenseTableRow> loadLicenseRows() {
@@ -511,7 +722,11 @@ public class SettingsController {
       licenseRows.add(new LicenseTableRow("mockito-core", Licenses.MIT));
       licenseRows.add(new LicenseTableRow("h2", Licenses.EPLV1));
       licenseRows.add(new LicenseTableRow("Font Awesome Icons", Licenses.CC_4_0));
-
+      licenseRows.add(new LicenseTableRow("mapstruct", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("mapstruct-processor", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-web", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-validation", Licenses.APACHEV2));
+      licenseRows.add(new LicenseTableRow("spring-boot-starter-security", Licenses.APACHEV2));
       licenseRows.sort(Comparator.comparing(LicenseTableRow::getName));
 
       return licenseRows;
@@ -522,13 +737,54 @@ public class SettingsController {
          final Alert alert = new Alert(AlertType.ERROR);
          alert.setTitle("Ooops");
          alert.setHeaderText("Could not find the license file");
-         alert.setContentText(String.format(
-               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".",
-               license.getPath(), license.getUrl()));
+         alert.setContentText(
+               "We could not find the license file at \"%s\". Did you remove it?%nPlease redownload or visit \"%s\".".formatted(
+                     license.getPath(), license.getUrl()));
 
          alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 
          alert.show();
       }
    }
+
+   private void handleApiOff() {
+      Map<String, String> propertiesToUpdate = new HashMap<>();
+      propertiesToUpdate.put("spring.main.web-application-type", "none");
+      propertiesToUpdate.put("api", "OFF");
+      propertyWrite(propertiesToUpdate);
+   }
+
+   private void handleApiOn() {
+      String username = authName.getText();
+      String password = authPassword.getText();
+
+      Map<String, String> propertiesToUpdate = new HashMap<>();
+      propertiesToUpdate.put("spring.main.web-application-type", "");
+      propertiesToUpdate.put("server.port", authPort.getText());
+      propertiesToUpdate.put("api", "ON");
+      propertiesToUpdate.put("spring.security.user.name", username);
+      propertiesToUpdate.put("spring.security.user.password", password);
+
+      propertyWrite(propertiesToUpdate);
+   }
+
+   private void propertyWrite(Map<String, String> propertiesToUpdate) {
+      Properties properties = new Properties();
+
+      try (InputStream inputStream = new FileInputStream(propertiesFilePath)){
+         properties.load(inputStream);
+      } catch (IOException e) {
+         LOG.debug("Could not open '{}' file. This is most likely fine as it was just not needed before and will be created next.", propertiesFilePath, e);
+      }
+
+     try(FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
+         for (Map.Entry<String, String> entry : propertiesToUpdate.entrySet()) {
+            properties.setProperty(entry.getKey(), entry.getValue());
+         }
+         properties.store(outputStream, "REST-API settings");
+      } catch (IOException e) {
+         LOG.error("Error while persisting properties: '{}'.", propertiesToUpdate, e);
+      }
+   }
+
 }

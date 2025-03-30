@@ -16,35 +16,39 @@
 
 package de.doubleslash.keeptime.model;
 
-import java.util.Comparator;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.stereotype.Component;
-
 import de.doubleslash.keeptime.model.repos.ProjectRepository;
 import de.doubleslash.keeptime.model.repos.SettingsRepository;
 import de.doubleslash.keeptime.model.repos.WorkRepository;
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.stereotype.Component;
+
+import java.util.Comparator;
 
 @Component
 public class Model {
    private ProjectRepository projectRepository;
    private WorkRepository workRepository;
-   private SettingsRepository settingsRepository;
 
+   public HeimatSettings getHeimatSettings() {
+      return heimatSettings;
+   }
+
+   private HeimatSettings heimatSettings;
    @Autowired
    public Model(final ProjectRepository projectRepository, final WorkRepository workRepository,
-         final SettingsRepository settingsRepository) {
+         final HeimatSettings heimatSettings) {
       super();
       this.projectRepository = projectRepository;
       this.workRepository = workRepository;
-      this.settingsRepository = settingsRepository;
+      this.heimatSettings = heimatSettings;
    }
 
    public static final Color ORIGINAL_HOVER_BACKGROUND_COLOR = new Color(54 / 255., 143 / 255., 179 / 255., .7);
@@ -98,10 +102,6 @@ public class Model {
       this.projectRepository = projectRepository;
    }
 
-   public void setSettingsRepository(final SettingsRepository settingsRepository) {
-      this.settingsRepository = settingsRepository;
-   }
-
    public void setIdleProject(final Project idleProject) {
       this.idleProject = idleProject;
    }
@@ -120,10 +120,6 @@ public class Model {
 
    public ProjectRepository getProjectRepository() {
       return projectRepository;
-   }
-
-   public SettingsRepository getSettingsRepository() {
-      return settingsRepository;
    }
 
    public ObservableList<Work> getPastWorkItems() {

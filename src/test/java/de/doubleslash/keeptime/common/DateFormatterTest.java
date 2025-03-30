@@ -25,10 +25,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled
-public class DateFormatterTest {
+class DateFormatterTest {
 
    @Test
-   public void zeroSecondsBetweenTest() {
+   void zeroSecondsBetweenTest() {
       final LocalDateTime startDate = LocalDateTime.now();
       final LocalDateTime endDate = startDate.plusNanos(10000);
 

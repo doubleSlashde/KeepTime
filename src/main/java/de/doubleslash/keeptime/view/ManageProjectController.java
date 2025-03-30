@@ -16,6 +16,7 @@
 
 package de.doubleslash.keeptime.view;
 
+import de.doubleslash.keeptime.common.ColorHelper;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -23,7 +24,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.model.Model;
@@ -52,6 +52,9 @@ public class ManageProjectController {
    private ColorPicker textFillColorPicker;
 
    @FXML
+   private Button randomColorButton;
+
+   @FXML
    private CheckBox isWorkCheckBox;
 
    @FXML
@@ -60,21 +63,22 @@ public class ManageProjectController {
    @FXML
    private Label validateTextAlert;
 
-   private BooleanProperty formValidProperty = new SimpleBooleanProperty(false);
+   private final BooleanProperty formValidProperty = new SimpleBooleanProperty(false);
 
-   @Autowired
    public ManageProjectController(final Model model) {
       this.model = model;
    }
    @FXML
    private void initialize() {
-      final int availableProjectAmount = model.getAllProjects().size();
+      final int availableProjectAmount = model.getAvailableProjects().size();
       sortIndexSpinner
               .setValueFactory(new IntegerSpinnerValueFactory(0, availableProjectAmount, availableProjectAmount));
-      sortIndexSpinner.getValueFactory().setValue(model.getAvailableProjects().size());
+      sortIndexSpinner.getValueFactory().setValue(availableProjectAmount);
       formValidProperty.bind(Bindings.createBooleanBinding(() -> !nameTextField.getText().isBlank(),nameTextField.textProperty()));
       validateTextAlert.visibleProperty().bind(formValidProperty.not());
-      
+
+      randomColorButton.setOnAction(ae -> textFillColorPicker.setValue(ColorHelper.randomColor()));
+
       Platform.runLater(() ->{
             nameTextField.requestFocus();
             nameTextField.end();

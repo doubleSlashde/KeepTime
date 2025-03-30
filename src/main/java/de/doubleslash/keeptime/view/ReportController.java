@@ -21,9 +21,14 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.common.DateFormatter;
@@ -51,13 +56,12 @@ import javafx.scene.control.cell.TreeItemPropertyValueFactory;
 import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
+import static de.doubleslash.keeptime.App.showErrorDialogAndWait;
+import static de.doubleslash.keeptime.view.ViewController.createFXMLLoader;
 
 @Component
 public class ReportController {
@@ -94,6 +98,9 @@ public class ReportController {
    @FXML
    private Button expandCollapseButton;
 
+   @FXML
+   private Button heimatSyncButton;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private final Model model;
@@ -109,8 +116,8 @@ public class ReportController {
    private final TreeItem<TableRow> rootItem = new TreeItem<>();
 
    private boolean expanded = true;
+   private List<Work> currentWorkItems;
 
-   @Autowired
    public ReportController(final Model model, final Controller controller) {
       this.model = model;
       this.controller = controller;
@@ -125,7 +132,58 @@ public class ReportController {
 
       expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
       initTableView();
+      initHeimatIntegration();
    }
+
+   private void initHeimatIntegration() {
+      heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
+      final SVGPath svgNodeWithScale = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_ROTATE_ICON, 0.03, 0.03);
+      svgNodeWithScale.setStyle("-fx-fill: #00759e");
+      heimatSyncButton.setMaxSize(25,25);
+      heimatSyncButton.setMinSize(25, 25);
+      heimatSyncButton.setGraphic(svgNodeWithScale);
+      heimatSyncButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      heimatSyncButton.setTooltip(new Tooltip("Synchronize to HEIMAT..."));
+      heimatSyncButton.setOnAction(ae-> {
+         try {
+            showSyncStage();
+         } catch (FXMLLoaderException e) {
+            LOG.error("Error while loading sync stage", e);
+            showErrorDialogAndWait("Error", "Could not load sync stage", "Please make sure your AccessToken is valid and you have internet.", e, this.stage);
+         }
+      });
+   }
+
+   private void showSyncStage(){
+      try{
+         // Settings stage
+         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_SYNC);
+         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
+         final Parent syncRoot = fxmlLoader2.load();
+         ExternalProjectsSyncController syncController = fxmlLoader2.getController();
+         syncController.initForDate(currentReportDate, currentWorkItems);
+         Stage syncStage = new Stage();
+         syncController.setStage(syncStage);
+         syncStage.initOwner(this.stage);
+         syncStage.setTitle("External Project Sync");
+         syncStage.setResizable(true);
+         syncStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+
+         final Scene settingsScene = new Scene(syncRoot);
+         settingsScene.setOnKeyPressed(ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+               LOG.info("pressed ESCAPE");
+               syncStage.close();
+            }
+         });
+
+         syncStage.setScene(settingsScene);
+         syncStage.showAndWait();
+      } catch (final Exception e) {
+         throw new FXMLLoaderException(e);
+      }
+   }
+
 
    private void initTableView() {
       final TreeTableColumn<TableRow, TableRow> noteColumn = new TreeTableColumn<>("Notes");
@@ -184,10 +242,8 @@ public class ReportController {
                      this.setGraphic(null);
                      this.setText(null);
                   } else {
-                     Label workLabel = new Label(workItem.getTimeSum());
-                     workLabel.setUnderline(workItem.isUnderlined());
-                     this.setGraphic(workLabel);
-                     this.setText(null);
+                     this.setText(workItem.getTimeSum());
+                     this.setUnderline(workItem.isUnderlined());
                   }
                }
             };
@@ -201,8 +257,8 @@ public class ReportController {
       this.workTableTreeView.getColumns().add(timeSumColumn);
 
       final TreeTableColumn<TableRow, Button> buttonColumn = new TreeTableColumn<>("Controls");
-      buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<TableRow, Button>("buttonBox"));
-      buttonColumn.setMinWidth(100);
+      buttonColumn.setCellValueFactory(new TreeItemPropertyValueFactory<>("buttonBox"));
+      buttonColumn.setMinWidth(95);
       buttonColumn.setSortable(false);
       buttonColumn.setReorderable(false);
       this.workTableTreeView.getColumns().add(buttonColumn);
@@ -237,7 +293,7 @@ public class ReportController {
       reportRoot.requestFocus();
 
       this.currentDayLabel.setText(DateFormatter.toDayDateString(this.currentReportDate));
-      final List<Work> currentWorkItems = model.getWorkRepository()
+      currentWorkItems = model.getWorkRepository()
                                                .findByStartDateOrderByStartTimeAsc(this.currentReportDate);
 
       colorTimeLine.update(currentWorkItems, controller.calcSeconds(currentWorkItems));
@@ -263,7 +319,8 @@ public class ReportController {
          }
 
          final HBox projectButtonBox = new HBox();
-         projectButtonBox.getChildren().add(createCopyProjectButton(onlyCurrentProjectWork));
+         projectButtonBox.getChildren().add(createCopyProjectNameButton(project.getName()));
+         projectButtonBox.getChildren().add(createCopyProjectNotesButton(onlyCurrentProjectWork));
 
          final TreeItem<TableRow> projectRow = new TreeItem<>(
                new ProjectTableRow(project, projectWorkSeconds, projectButtonBox));
@@ -320,7 +377,6 @@ public class ReportController {
          }
 
       };
-
       myDatePicker.setDayCellFactory(dayCellFactory);
       final Node popupContent = datePickerSkin.getPopupContent();
       this.topBorderPane.setRight(popupContent);
@@ -333,6 +389,7 @@ public class ReportController {
       deleteButton.setMaxSize(20, 18);
       deleteButton.setMinSize(20, 18);
       deleteButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      deleteButton.getStyleClass().add("tertiary-button");
 
       deleteButton.setOnAction(e -> {
          LOG.info("Delete work clicked.");
@@ -360,6 +417,7 @@ public class ReportController {
       editButton.setMaxSize(20, 18);
       editButton.setMinSize(20, 18);
       editButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      editButton.getStyleClass().add("tertiary-button");
 
       editButton.setOnAction(e -> {
          LOG.info("Edit work clicked.");
@@ -416,11 +474,13 @@ public class ReportController {
       return grid;
    }
 
-   private Button createCopyProjectButton(final List<Work> projectWork) {
-      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
-      copyButton.setMaxSize(20, 18);
-      copyButton.setMinSize(20, 18);
-      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+   private Button createCopyProjectNotesButton(final List<Work> projectWork) {
+      final Button copyNotesButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_MULTIPLE_CLIPBOARD_ICON, 0.03, 0.03));
+      copyNotesButton.setMaxSize(20, 18);
+      copyNotesButton.setMinSize(20, 18);
+      copyNotesButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      copyNotesButton.setTooltip(new Tooltip("Copy Project Notes"));
+      copyNotesButton.getStyleClass().add("tertiary-button");
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
@@ -430,28 +490,46 @@ public class ReportController {
             final String currentWorkNote = work.getNotes();
             pr.appendToWorkNotes(currentWorkNote);
          }
-         final Clipboard clipboard = Clipboard.getSystemClipboard();
-         final ClipboardContent content = new ClipboardContent();
-         content.putString(pr.getNotes());
-         clipboard.setContent(content);
+         copyToClipboard(pr.getNotes());
       };
 
-      copyButton.setOnAction(eventListener);
-      return copyButton;
+      copyNotesButton.setOnAction(eventListener);
+      return copyNotesButton;
    }
-
-   private Node createCopyWorkButton(final Work w) {
-      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD, 0.03, 0.03));
-      copyButton.setMaxSize(20, 18);
-      copyButton.setMinSize(20, 18);
-      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+   private Button createCopyProjectNameButton(String projectName) {
+      final Button copyProjectNameButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD_ICON, 0.03, 0.03));
+      copyProjectNameButton.setMaxSize(20, 18);
+      copyProjectNameButton.setMinSize(20, 18);
+      copyProjectNameButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      copyProjectNameButton.setTooltip(new Tooltip("Copy Project Name"));
+      copyProjectNameButton.getStyleClass().add("tertiary-button");
 
       final EventHandler<ActionEvent> eventListener = actionEvent -> {
          LOG.debug("Copy to Clipboard clicked.");
-         final Clipboard clipboard = Clipboard.getSystemClipboard();
-         final ClipboardContent content = new ClipboardContent();
-         content.putString(w.getNotes());
-         clipboard.setContent(content);
+         copyToClipboard(projectName);
+      };
+
+      copyProjectNameButton.setOnAction(eventListener);
+      return copyProjectNameButton;
+   }
+
+   public static void copyToClipboard(final String stringToCopy) {
+      final Clipboard clipboard = Clipboard.getSystemClipboard();
+      final ClipboardContent content = new ClipboardContent();
+      content.putString(stringToCopy);
+      clipboard.setContent(content);
+   }
+
+   private Node createCopyWorkButton(final Work w) {
+      final Button copyButton = new Button("", SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_CLIPBOARD_ICON, 0.03, 0.03));
+      copyButton.setMaxSize(20, 18);
+      copyButton.setMinSize(20, 18);
+      copyButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      copyButton.getStyleClass().add("tertiary-button");
+
+      final EventHandler<ActionEvent> eventListener = actionEvent -> {
+         LOG.debug("Copy to Clipboard clicked.");
+         copyToClipboard(w.getNotes());
       };
 
       copyButton.setOnAction(eventListener);
@@ -459,6 +537,9 @@ public class ReportController {
    }
 
    public void update() {
+      heimatSyncButton.setVisible(model.getHeimatSettings().isHeimatActive());
+      // TODO save work so it appears directly in report. Quick fixes #170. Use #176 for this instead.
+      controller.saveCurrentWork();
       updateReport(this.currentReportDate);
    }
 

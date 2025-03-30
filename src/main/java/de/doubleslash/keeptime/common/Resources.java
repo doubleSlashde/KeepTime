@@ -40,6 +40,8 @@ public class Resources {
 
       FXML_MANAGE_PROJECT("/layouts/manage-project.fxml"),
       FXML_MANAGE_WORK("/layouts/manage-work.fxml"),
+      FXML_EXT_PROJECT_MAPPING("/layouts/externalProjectMapping.fxml"),
+      FXML_EXT_PROJECT_SYNC("/layouts/externalProjectSync.fxml"),
 
       SVG_CALENDAR_DAYS_ICON("/svgs/calendar-days.svg"),
 
@@ -53,7 +55,7 @@ public class Resources {
 
       SVG_PENCIL_ICON("/svgs/pencil.svg"),
 
-      SVG_CLIPBOARD("/svgs/clipboard.svg"),
+      SVG_CLIPBOARD_ICON("/svgs/clipboard.svg"),
 
       SVG_BUG_ICON("/svgs/bug.svg"),
 
@@ -67,8 +69,22 @@ public class Resources {
 
       SVG_LICENSES_ICON("/svgs/closed-captioning.svg"),
 
-      ICON_MAIN("/icons/icon.png")
+      SVG_MULTIPLE_CLIPBOARD_ICON("/svgs/copy.svg"),
 
+      SVG_SPINNER_SOLID("/svgs/spinner-solid.svg"),
+
+      SVG_XMARK_SOLID("/svgs/xmark-solid.svg"),
+
+      SVG_THUMBS_UP_SOLID("/svgs/thumbs-up-solid.svg"),
+
+      SVG_GLOBE_ICON("/svgs/globe-solid.svg"),
+
+      SVG_ROTATE_ICON("/svgs/rotate-solid.svg"),
+
+      ICON_MAIN("/icons/icon.png"),
+
+      /** CSS **/
+      CSS_DS_STYLE("/css/dsStyles.css")
       ;
 
       String resourceLocation;

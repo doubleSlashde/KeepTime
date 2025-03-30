@@ -343,7 +343,7 @@ public class ProjectsListViewController {
       if (p.getDescription() == null || p.getDescription().isEmpty()) {
          return p.getName();
       } else {
-         return String.format("%s%n%s", p.getName(), p.getDescription());
+         return "%s%n%s".formatted(p.getName(), p.getDescription());
       }
    }
 
@@ -379,6 +379,10 @@ public class ProjectsListViewController {
          }
          return null;
       });
+
+      dialog.getDialogPane().lookupButton(ButtonType.OK).getStyleClass().add("primary-button");
+      dialog.getDialogPane().lookupButton(ButtonType.CANCEL).getStyleClass().add("secondary-button");
+      dialog.getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
 
       return grid;
    }

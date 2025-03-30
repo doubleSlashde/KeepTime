@@ -16,6 +16,7 @@
 
 package de.doubleslash.keeptime.view;
 
+import de.doubleslash.keeptime.common.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,10 @@ public class ChangeWithTimeDialog extends Dialog<Integer> {
       okButton.setDefaultButton(true);
       final Button cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
       cancelButton.setDefaultButton(false);
+      okButton.getStyleClass().add("primary-button");
+      cancelButton.getStyleClass().add("secondary-button");
+      getDialogPane().getStylesheets().add(Resources.getResource(Resources.RESOURCE.CSS_DS_STYLE).toExternalForm());
+
 
       final VBox vBox = new VBox();
       final Label description = new Label(

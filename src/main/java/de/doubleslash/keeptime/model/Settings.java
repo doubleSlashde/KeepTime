@@ -16,211 +16,148 @@
 
 package de.doubleslash.keeptime.model;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import de.doubleslash.keeptime.model.persistenceconverter.ColorConverter;
+import de.doubleslash.keeptime.model.settings.SettingsBase;
 import javafx.scene.paint.Color;
+import org.springframework.stereotype.Service;
 
 /**
  * Object holding settings
- * 
+ *
  * @author nmutter
  */
-@Entity
-@Table(name = "Settings")
+@Service
 public class Settings {
 
-   @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
-   @Column(name = "id", updatable = false, nullable = false)
-   private long id;
+  SettingsBase settingsBase;
 
-   @Convert(converter = ColorConverter.class, disableConversion = false)
-   private Color hoverBackgroundColor;
-   @Convert(converter = ColorConverter.class, disableConversion = false)
-   private Color hoverFontColor;
-   @Convert(converter = ColorConverter.class, disableConversion = false)
-   private Color defaultBackgroundColor;
-   @Convert(converter = ColorConverter.class, disableConversion = false)
-   private Color defaultFontColor;
+  public Settings(SettingsBase settingsBase) {
+    this.settingsBase = settingsBase;
+  }
 
-   @Convert(converter = ColorConverter.class, disableConversion = false)
-   private Color taskBarColor;
+  // TODO add default values
 
-   private boolean useHotkey;
+  public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
+    return settingsBase.getBoolean("remind_if_notes_are_empty_only_for_work_entry", false);
+  }
 
-   private boolean displayProjectsRight;
+  public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
+    settingsBase.setBoolean("remind_if_notes_are_empty_only_for_work_entry",
+        emptyNoteReminderCheckBoxIsWork);
+  }
 
-   private boolean hideProjectsOnMouseExit;
+  public boolean isConfirmClose() {
+    return settingsBase.getBoolean("confirm_close", false);
+  }
 
-   private double windowXProportion;
+  public void setConfirmClose(boolean confirmClose) {
+    settingsBase.setBoolean("confirm_close", confirmClose);
+  }
 
-   private double windowYProportion;
+  public Color getHoverBackgroundColor() {
+    return settingsBase.getColor("hover_background_color", Model.ORIGINAL_HOVER_BACKGROUND_COLOR);
+  }
 
-   private int windowScreenhash;
+  public void setHoverBackgroundColor(final Color hoverBackgroundColor) {
+    settingsBase.setColor("hover_background_color", hoverBackgroundColor);
+  }
 
-   private boolean saveWindowPosition;
+  public Color getHoverFontColor() {
+    return settingsBase.getColor("hover_font_color", Model.ORIGINAL_HOVER_Font_COLOR);
+  }
 
-   private boolean remindIfNotesAreEmpty;
+  public void setHoverFontColor(final Color hoverFontColor) {
+    settingsBase.setColor("hover_font_color", hoverFontColor);
+  }
 
-   private boolean remindIfNotesAreEmptyOnlyForWorkEntry;
+  public Color getDefaultBackgroundColor() {
+    return settingsBase.getColor("default_background_color",  Model.ORIGINAL_DEFAULT_BACKGROUND_COLOR);
+  }
 
-   private boolean confirmClose;
+  public void setDefaultBackgroundColor(final Color defaultBackgroundColor) {
+    settingsBase.setColor("default_background_color", defaultBackgroundColor);
+  }
 
-   public Settings() {}
+  public Color getDefaultFontColor() {
+    return settingsBase.getColor("default_font_color",  Model.ORIGINAL_DEFAULT_FONT_COLOR);
+  }
 
-   public Settings(final Color hoverBackgroundColor, final Color hoverFontColor, final Color defaultBackgroundColor,
-         final Color defaultFontColor, final Color taskBarColor, final boolean useHotkey,
-         final boolean displayProjectsRight, final boolean hideProjectsOnMouseExit, final double windowPositionX,
-         final double windowPositionY, final int screenHash, final boolean saveWindowPosition,
-         final boolean remindIfNotesAreEmpty, final boolean remindIfNotesAreEmptyOnlyForWorkEntry,
-         final boolean confirmClose) {
-      this.hoverBackgroundColor = hoverBackgroundColor;
-      this.hoverFontColor = hoverFontColor;
-      this.defaultBackgroundColor = defaultBackgroundColor;
-      this.defaultFontColor = defaultFontColor;
-      this.taskBarColor = taskBarColor;
-      this.useHotkey = useHotkey;
-      this.displayProjectsRight = displayProjectsRight;
-      this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
-      this.windowXProportion = windowPositionX;
-      this.windowYProportion = windowPositionY;
-      this.windowScreenhash = screenHash;
-      this.saveWindowPosition = saveWindowPosition;
-      this.remindIfNotesAreEmpty = remindIfNotesAreEmpty;
-      this.remindIfNotesAreEmptyOnlyForWorkEntry = remindIfNotesAreEmptyOnlyForWorkEntry;
-      this.confirmClose = confirmClose;
+  public void setDefaultFontColor(final Color defaultFontColor) {
+    settingsBase.setColor("default_font_color", defaultFontColor);
+  }
 
-   }
+  public Color getTaskBarColor() {
+    return settingsBase.getColor("task_bar_color",  Model.ORIGINAL_TASK_BAR_FONT_COLOR);
+  }
 
-   public boolean isRemindIfNotesAreEmptyOnlyForWorkEntry() {
-      return remindIfNotesAreEmptyOnlyForWorkEntry;
-   }
+  public void setTaskBarColor(final Color taskBarColor) {
+    settingsBase.setColor("task_bar_color", taskBarColor);
+  }
 
-   public void setRemindIfNotesAreEmptyOnlyForWorkEntry(boolean emptyNoteReminderCheckBoxIsWork) {
-      this.remindIfNotesAreEmptyOnlyForWorkEntry = emptyNoteReminderCheckBoxIsWork;
-   }
+  public boolean isUseHotkey() {
+    return settingsBase.getBoolean("use_hotkey", false);
+  }
 
-   public boolean isConfirmClose() {
-      return confirmClose;
-   }
+  public void setUseHotkey(final boolean useHotkey) {
+    settingsBase.setBoolean("use_hotkey", useHotkey);
+  }
 
-   public void setConfirmClose(boolean confirmClose) {
-      this.confirmClose = confirmClose;
-   }
+  public boolean isDisplayProjectsRight() {
+    return settingsBase.getBoolean("display_projects_right", false);
+  }
 
-   public long getId() {
-      return id;
-   }
+  public void setDisplayProjectsRight(final boolean displayProjectsRight) {
+    settingsBase.setBoolean("display_projects_right", displayProjectsRight);
+  }
 
-   public Color getHoverBackgroundColor() {
-      return hoverBackgroundColor;
-   }
+  public boolean isHideProjectsOnMouseExit() {
+    return settingsBase.getBoolean("hide_projects_on_mouse_exit", false);
+  }
 
-   public void setHoverBackgroundColor(final Color hoverBackgroundColor) {
-      this.hoverBackgroundColor = hoverBackgroundColor;
-   }
+  public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
+    settingsBase.setBoolean("hide_projects_on_mouse_exit", hideProjectsOnMouseExit);
+  }
 
-   public Color getHoverFontColor() {
-      return hoverFontColor;
-   }
+  public double getWindowXProportion() {
+    return settingsBase.getDouble("windowxproportion", 0.5);
+  }
 
-   public void setHoverFontColor(final Color hoverFontColor) {
-      this.hoverFontColor = hoverFontColor;
-   }
+  public void setWindowXProportion(final double windowPositionX) {
+    settingsBase.setDouble("windowxproportion", windowPositionX);
+  }
 
-   public Color getDefaultBackgroundColor() {
-      return defaultBackgroundColor;
-   }
+  public double getWindowYProportion() {
+    return settingsBase.getDouble("windowyproportion", 0.5);
+  }
 
-   public void setDefaultBackgroundColor(final Color defaultBackgroundColor) {
-      this.defaultBackgroundColor = defaultBackgroundColor;
-   }
+  public void setWindowYProportion(final double windowPositionY) {
+    settingsBase.setDouble("windowyproportion", windowPositionY);
+  }
 
-   public Color getDefaultFontColor() {
-      return defaultFontColor;
-   }
+  public int getScreenHash() {
+    return settingsBase.getInt("window_screenhash", 0);
+  }
 
-   public void setDefaultFontColor(final Color defaultFontColor) {
-      this.defaultFontColor = defaultFontColor;
-   }
+  public void setScreenHash(final int screenHash) {
+    settingsBase.setInt("window_screenhash", screenHash);
+  }
 
-   public Color getTaskBarColor() {
-      return taskBarColor;
-   }
+  public boolean isSaveWindowPosition() {
+    return settingsBase.getBoolean("save_window_position", false);
+  }
 
-   public void setTaskBarColor(final Color taskBarColor) {
-      this.taskBarColor = taskBarColor;
-   }
+  public void setSaveWindowPosition(final boolean saveWindowPosition) {
+    settingsBase.setBoolean("save_window_position", saveWindowPosition);
+  }
 
-   public boolean isUseHotkey() {
-      return useHotkey;
-   }
+  public boolean isRemindIfNotesAreEmpty() {
+    return settingsBase.getBoolean("remind_if_notes_are_empty", false);
+  }
 
-   public void setUseHotkey(final boolean useHotkey) {
-      this.useHotkey = useHotkey;
-   }
+  public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
+    settingsBase.setBoolean("remind_if_notes_are_empty", emptyNoteReminder);
+  }
 
-   public boolean isDisplayProjectsRight() {
-      return displayProjectsRight;
-   }
-
-   public void setDisplayProjectsRight(final boolean displayProjectsRight) {
-      this.displayProjectsRight = displayProjectsRight;
-   }
-
-   public boolean isHideProjectsOnMouseExit() {
-      return hideProjectsOnMouseExit;
-   }
-
-   public void setHideProjectsOnMouseExit(final boolean hideProjectsOnMouseExit) {
-      this.hideProjectsOnMouseExit = hideProjectsOnMouseExit;
-   }
-
-   public double getWindowXProportion() {
-      return windowXProportion;
-   }
-
-   public void setWindowXProportion(final double windowPositionX) {
-      this.windowXProportion = windowPositionX;
-   }
-
-   public double getWindowYProportion() {
-      return windowYProportion;
-   }
-
-   public void setWindowYProportion(final double windowPositionY) {
-      this.windowYProportion = windowPositionY;
-   }
-
-   public int getScreenHash() {
-      return windowScreenhash;
-   }
-
-   public void setScreenHash(final int screenHash) {
-      this.windowScreenhash = screenHash;
-   }
-
-   public boolean isSaveWindowPosition() {
-      return saveWindowPosition;
-   }
-
-   public void setSaveWindowPosition(final boolean saveWindowPosition) {
-      this.saveWindowPosition = saveWindowPosition;
-   }
-
-   public boolean isRemindIfNotesAreEmpty() {
-      return remindIfNotesAreEmpty;
-   }
-
-   public void setRemindIfNotesAreEmpty(final boolean emptyNoteReminder) {
-      this.remindIfNotesAreEmpty = emptyNoteReminder;
-   }
-
+  public void save() {
+    settingsBase.saveAll();
+  }
 }

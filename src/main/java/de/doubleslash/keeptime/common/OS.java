@@ -19,29 +19,26 @@ package de.doubleslash.keeptime.common;
 public class OS {
 
    private static final String OS_PROPERTY = "os.name";
+   private static final String OS_NAME = System.getProperty(OS_PROPERTY).toLowerCase();
 
    private OS() {
       // prevent instance creation
    }
 
    public static boolean isWindows() {
-      if (System.getProperty(OS_PROPERTY).toLowerCase().contains("windows")) {
-         return true;
-      }
-
-      return false;
+     return OS_NAME.contains("windows");
    }
 
    public static boolean isLinux() {
-      if (System.getProperty(OS_PROPERTY).toLowerCase().contains("linux")) {
-         return true;
-      }
-
-      return false;
+     return OS_NAME.contains("linux");
    }
 
-   public static String getOSname() {
-      return System.getProperty(OS_PROPERTY);
+   public static String getOSName() {
+      return OS_NAME;
+   }
+
+   public static boolean isMacOS() {
+       return OS_NAME.contains("mac os x");
    }
 
 }

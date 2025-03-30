@@ -22,11 +22,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PreDestroy;
-
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
+import javafx.scene.paint.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.doubleslash.keeptime.common.DateFormatter;
@@ -36,25 +35,36 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.Settings;
 import de.doubleslash.keeptime.model.Work;
-import javafx.collections.ObservableList;
+import jakarta.annotation.PreDestroy;
 
 @Service
 public class Controller {
-   private final long QUICK_SAVE_INTERVAL = 60;
 
    private static final Logger LOG = LoggerFactory.getLogger(Controller.class);
 
+   private final long AUTO_SAVE_INTERVAL_SECONDS = 60;
+   private final HeimatSettings heimatSettings;
+   private Interval autoSaveInterval;
+
    private final Model model;
+   private final Settings settings;
 
    private final DateProvider dateProvider;
 
-   @Autowired
-   public Controller(final Model model, final DateProvider dateProvider) {
+   public Controller(final Model model, Settings settings, HeimatSettings heimatSettings, final DateProvider dateProvider) {
       this.model = model;
+      this.settings = settings;
+      this.heimatSettings = heimatSettings;
       this.dateProvider = dateProvider;
+   }
 
-      // initiate quicksaving
-      new Interval(QUICK_SAVE_INTERVAL).registerCallBack(() -> saveCurrentWork(dateProvider.dateTimeNow()));
+   public void enableAutoSave() {
+      LOG.info("Enabling auto save with interval '{}' seconds.", AUTO_SAVE_INTERVAL_SECONDS);
+      autoSaveInterval = new Interval(AUTO_SAVE_INTERVAL_SECONDS);
+      autoSaveInterval.registerCallBack(() -> {
+         LOG.debug("Auto saving current work.");
+         saveCurrentWork();
+      });
    }
 
    public void changeProject(final Project newProject) {
@@ -79,12 +89,14 @@ public class Controller {
       final Work newWork = new Work(workEnd, workEnd.plusSeconds(minusSeconds), newProject, "");
 
       model.getPastWorkItems().add(newWork);
-
       model.activeWorkItem.set(newWork);
-
    }
 
-   public Work saveCurrentWork(final LocalDateTime workEnd) {
+   public void saveCurrentWork() {
+      saveCurrentWork(dateProvider.dateTimeNow());
+   }
+
+   private Work saveCurrentWork(final LocalDateTime workEnd) {
       final Work currentWork = model.activeWorkItem.get();
 
       if (currentWork == null) {
@@ -93,19 +105,19 @@ public class Controller {
 
       currentWork.setEndTime(workEnd);
 
-      final String time = DateFormatter
-            .secondsToHHMMSS(Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
+      final String time = DateFormatter.secondsToHHMMSS(
+            Duration.between(currentWork.getStartTime(), currentWork.getEndTime()).getSeconds());
 
       LOG.info("Saving Work from '{}' to '{}' ({}) on project '{}' with notes '{}'", currentWork.getStartTime(),
             currentWork.getEndTime(), time, currentWork.getProject().getName(), currentWork.getNotes());
 
       // Save in db
       return model.getWorkRepository().save(currentWork);
-
    }
 
-   public void addNewProject(final Project project) {
+   public Project addNewProject(final Project project) {
       LOG.info("Creating new project '{}'.", project);
+
       model.getAllProjects().add(project);
       model.getAvailableProjects().add(project);
 
@@ -113,44 +125,61 @@ public class Controller {
             model.getAvailableProjects().size(), project.getIndex());
       changedProjects.add(project);
       model.getProjectRepository().saveAll(changedProjects);
+      return project;
    }
 
-   public void updateSettings(final Settings newValuedSettings) {
-      Settings settings = model.getSettingsRepository().findAll().get(0);
 
-      settings.setTaskBarColor(newValuedSettings.getTaskBarColor());
-      settings.setDefaultBackgroundColor(newValuedSettings.getDefaultBackgroundColor());
-      settings.setDefaultFontColor(newValuedSettings.getDefaultFontColor());
-      settings.setHoverBackgroundColor(newValuedSettings.getHoverBackgroundColor());
-      settings.setHoverFontColor(newValuedSettings.getHoverFontColor());
-      settings.setUseHotkey(newValuedSettings.isUseHotkey());
-      settings.setDisplayProjectsRight(newValuedSettings.isDisplayProjectsRight());
-      settings.setHideProjectsOnMouseExit(newValuedSettings.isHideProjectsOnMouseExit());
-      settings.setSaveWindowPosition(newValuedSettings.isSaveWindowPosition());
-      settings.setWindowXProportion(newValuedSettings.getWindowXProportion());
-      settings.setWindowYProportion(newValuedSettings.getWindowYProportion());
-      settings.setScreenHash(newValuedSettings.getScreenHash());
-      settings.setRemindIfNotesAreEmpty(newValuedSettings.isRemindIfNotesAreEmpty());
-      settings.setRemindIfNotesAreEmptyOnlyForWorkEntry(newValuedSettings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
-      settings.setConfirmClose(newValuedSettings.isConfirmClose());
-
-      settings = model.getSettingsRepository().save(settings);
+   public void updateColorSettings(final Color hoverBackgroundColor,final Color hoverFontColor,final Color defaultBackgroundColor,final Color defaultFontColor,final Color taskBarColor) {
+      settings.setTaskBarColor(taskBarColor);
+      settings.setDefaultBackgroundColor(defaultBackgroundColor);
+      settings.setDefaultFontColor(defaultFontColor);
+      settings.setHoverBackgroundColor(hoverBackgroundColor);
+      settings.setHoverFontColor(hoverFontColor);
+      settings.save();
 
       model.defaultBackgroundColor.set(settings.getDefaultBackgroundColor());
       model.defaultFontColor.set(settings.getDefaultFontColor());
       model.hoverBackgroundColor.set(settings.getHoverBackgroundColor());
       model.hoverFontColor.set(settings.getHoverFontColor());
       model.taskBarColor.set(settings.getTaskBarColor());
-      model.useHotkey.set(settings.isUseHotkey());
+   }
+
+   public void updateLayoutSettings(final boolean displayProjectsRight,final boolean  hideProjectsOnMouseExit,final double proportionalX,final double proportionalY,final int screenHash,final boolean  saveWindowPosition) {
+      settings.setDisplayProjectsRight(displayProjectsRight);
+      settings.setHideProjectsOnMouseExit(hideProjectsOnMouseExit);
+      settings.setSaveWindowPosition(saveWindowPosition);
+      settings.setWindowXProportion(proportionalX);
+      settings.setWindowYProportion(proportionalY);
+      settings.setScreenHash(screenHash);
+      settings.save();
+
       model.displayProjectsRight.set(settings.isDisplayProjectsRight());
       model.hideProjectsOnMouseExit.set(settings.isHideProjectsOnMouseExit());
       model.screenSettings.saveWindowPosition.set(settings.isSaveWindowPosition());
       model.screenSettings.proportionalX.set(settings.getWindowXProportion());
       model.screenSettings.proportionalY.set(settings.getWindowYProportion());
       model.screenSettings.screenHash.set(settings.getScreenHash());
+   }
+
+   public void updateFeatureSettings(final boolean useHotkey,final boolean emptyNoteReminder,final boolean emptyNoteReminderOnlyForWorkEntry,final boolean confirmClose) {
+      settings.setUseHotkey(useHotkey);
+      settings.setRemindIfNotesAreEmpty(emptyNoteReminder);
+      settings.setRemindIfNotesAreEmptyOnlyForWorkEntry(emptyNoteReminderOnlyForWorkEntry);
+      settings.setConfirmClose(confirmClose);
+      settings.save();
+
+      model.useHotkey.set(settings.isUseHotkey());
       model.remindIfNotesAreEmpty.set(settings.isRemindIfNotesAreEmpty());
       model.remindIfNotesAreEmptyOnlyForWorkEntry.set(settings.isRemindIfNotesAreEmptyOnlyForWorkEntry());
       model.confirmClose.set(settings.isConfirmClose());
+   }
+
+
+   public void updateHeimatSettings(final boolean active, final String url, final String pat){
+      heimatSettings.setHeimatActive(active);
+      heimatSettings.setHeimatUrl(url);
+      heimatSettings.setHeimatPat(pat);
+      heimatSettings.save();
    }
 
    @PreDestroy
@@ -161,14 +190,11 @@ public class Controller {
       changeProject(model.getIdleProject(), 0);
 
       LOG.info("Updating settings to persist local changes on shutdown.");
-      final Settings newSettings = new Settings(model.hoverBackgroundColor.get(), model.hoverFontColor.get(),
-            model.defaultBackgroundColor.get(), model.defaultFontColor.get(), model.taskBarColor.get(),
-            model.useHotkey.get(), model.displayProjectsRight.get(), model.hideProjectsOnMouseExit.get(),
-            model.screenSettings.proportionalX.get(), model.screenSettings.proportionalY.get(),
-            model.screenSettings.screenHash.get(), model.screenSettings.saveWindowPosition.get(),
-            model.remindIfNotesAreEmpty.get(), model.remindIfNotesAreEmptyOnlyForWorkEntry.get(),
-            model.confirmClose.get());
-      updateSettings(newSettings);
+      // these are changed while dragging the windows - not via Settings-Dialog. Therefore, we need to save them separately.
+      settings.setScreenHash(model.screenSettings.screenHash.get());
+      settings.setWindowXProportion(model.screenSettings.proportionalX.get());
+      settings.setWindowYProportion(model.screenSettings.proportionalY.get());
+      settings.save();
    }
 
    public void deleteProject(final Project p) {
@@ -181,11 +207,11 @@ public class Controller {
          changeProject(model.getIdleProject());
       }
 
-      LOG.info("Disabeling project '{}'.", p);
+      LOG.info("Disabling project '{}'.", p);
 
       final int indexToRemove = p.getIndex();
       p.setEnabled(false); // we don't delete it because of the referenced work
-                           // items
+      // items
       p.setIndex(-1);
 
       model.getAvailableProjects().remove(p);
@@ -248,7 +274,7 @@ public class Controller {
 
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
-    * 
+    *
     * @param originalList
     *           list of all projects to adapt the indexes for
     * @param changedProject
@@ -291,7 +317,7 @@ public class Controller {
 
    /**
     * Decreases all indexes by one, after the removed index
-    * 
+    *
     * @param originalList
     *           list of all projects to adapt the indexes for
     * @param removedIndex
@@ -320,7 +346,7 @@ public class Controller {
    }
 
    /**
-    * Calculate todays seconds counted as work
+    * Calculate today's seconds counted as work
     */
    public long calcTodaysWorkSeconds() {
       final List<Work> workItems = new ArrayList<>();
@@ -341,14 +367,10 @@ public class Controller {
    }
 
    /**
-    * Calculate todays present seconds (work+nonWork)
+    * Calculate today's present seconds (work+nonWork)
     */
    public long calcTodaysSeconds() {
       return calcSeconds(model.getPastWorkItems());
-   }
-
-   public ObservableList<Project> getAvailableProjects() {
-      return model.getAvailableProjects();
    }
 
    public long calcSeconds(final List<Work> workItems) {
@@ -360,5 +382,6 @@ public class Controller {
 
       return seconds;
    }
+
 
 }
