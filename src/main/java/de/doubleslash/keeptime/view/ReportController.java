@@ -355,6 +355,7 @@ public class ReportController {
 
    private void loadCalenderWidget() {
       final DatePicker myDatePicker = new DatePicker(this.currentReportDate);
+      DateFormatter.applySystemLocaleOnDate(myDatePicker);
       myDatePicker.valueProperty().addListener((observable, oldvalue, newvalue) -> {
          LOG.info("Datepicker selected value changed to {}", newvalue);
          updateReport(newvalue);

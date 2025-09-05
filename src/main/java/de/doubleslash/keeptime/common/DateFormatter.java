@@ -16,14 +16,22 @@
 
 package de.doubleslash.keeptime.common;
 
+import javafx.scene.control.DatePicker;
+import javafx.util.StringConverter;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public class DateFormatter {
    private static DateTimeFormatter dayDateFormatter = DateTimeFormatter.ofPattern("eeee dd.MM.yyyy");
    private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+   private static Locale systemLocale = Locale.GERMAN;
 
    private DateFormatter() {
       throw new IllegalStateException("Utility class: DateFormatter");
@@ -55,4 +63,33 @@ public class DateFormatter {
       return localDateTime.format(timeFormatter);
    }
 
+   public static void setSystemLocale(Locale locale) {
+      systemLocale = locale;
+   }
+
+   public static Locale getSystemLocale() {
+      return systemLocale;
+   }
+
+   public static void applySystemLocaleOnDate(DatePicker datePicker) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(systemLocale);
+
+      datePicker.setConverter(new StringConverter<>() {
+         @Override
+         public String toString(LocalDate date) {
+            return (date != null) ? formatter.format(date) : "";
+         }
+
+         @Override
+         public LocalDate fromString(String s) {
+            try {
+               return (s != null && !s.isEmpty()) ? LocalDate.parse(s, formatter) : null;
+            } catch (DateTimeParseException e) {
+               return null;
+            }
+         }
+      });
+
+      datePicker.setPromptText(formatter.format(LocalDate.now()));
+   }
 }

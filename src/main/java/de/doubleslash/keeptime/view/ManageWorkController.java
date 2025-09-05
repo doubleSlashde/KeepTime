@@ -21,6 +21,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 
+import de.doubleslash.keeptime.common.DateFormatter;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +121,9 @@ public class ManageWorkController {
 
    private void setUpTimeRestriction() {
 
+      DateFormatter.applySystemLocaleOnDate(startDatePicker);
+      DateFormatter.applySystemLocaleOnDate(endDatePicker);
+
       BooleanBinding isValidBinding = Bindings.createBooleanBinding(() -> {
          if (startTimeSpinner.getValue() == null || endTimeSpinner.getValue() == null
                || startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
@@ -150,8 +154,11 @@ public class ManageWorkController {
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
+      final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(
+            FormatStyle.MEDIUM,
+            DateFormatter.getSystemLocale()
+            );
       spinner.focusedProperty().addListener((e) -> {
-         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = spinner.getEditor().textProperty();
          try {
             stringConverter.fromString(text.get());
@@ -188,7 +195,7 @@ public class ManageWorkController {
 
       });
 
-      spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
+      spinner.getValueFactory().setConverter(stringConverter);
 
    }
 

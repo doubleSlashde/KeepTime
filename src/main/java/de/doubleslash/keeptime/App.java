@@ -21,9 +21,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import de.doubleslash.keeptime.common.DateFormatter;
 import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +86,8 @@ public class App extends Application {
    @Override
    public void init() throws Exception {
       LOG.info("Starting KeepTime.");
+      DateFormatter.setSystemLocale(Locale.getDefault());
+      Locale.setDefault(Locale.ENGLISH);
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
