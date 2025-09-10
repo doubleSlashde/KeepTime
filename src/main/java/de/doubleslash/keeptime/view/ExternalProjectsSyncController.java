@@ -236,9 +236,8 @@ public class ExternalProjectsSyncController {
          mappingTableView.scrollTo(items.size() - 1);
       });
 
-      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getTextField());
-      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getSuggestionsButton());
-      heimatTaskSearchContainer.setSpacing(3);
+      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getComboBox());
+      HBox.setHgrow(heimatTaskSearchPopup.getComboBox(), Priority.ALWAYS);
    }
 
    @FXML

@@ -26,6 +26,7 @@ public class SearchPopup<T> {
    private ObservableList<T> allItems = FXCollections.observableArrayList();
    private Consumer<T> selectionHandler;
    private Function<T, String> displayTextFunction = Object::toString;
+   private final HBox comboBox;
 
    private ObservableList<T> observedItemsForListener = null;
    private final ListChangeListener<T> listChangeListener = c -> filterList(searchField.getText());
@@ -33,6 +34,8 @@ public class SearchPopup<T> {
    public SearchPopup() {
       popup.setAutoHide(true);
       popup.getContent().add(suggestionList);
+
+      comboBox = new HBox(searchField, showSuggestionsButton);
 
       setupStyle();
 
@@ -116,10 +119,10 @@ public class SearchPopup<T> {
    }
 
    private void setupStyle() {
-      HBox.setHgrow(searchField, Priority.ALWAYS);
       searchField.setPromptText("Select project…");
-      searchField.getStyleClass().add("combo-box");
-
+      searchField.getStyleClass().add("search-popup");
+      HBox.setHgrow(searchField, Priority.ALWAYS);
+      searchField.setMaxWidth(Double.MAX_VALUE); // Allow growing
       suggestionList.getStyleClass().add("scroll-pane");
       suggestionList.setMaxHeight(200);
 
@@ -147,7 +150,10 @@ public class SearchPopup<T> {
          }
       });
 
-      showSuggestionsButton.getStyleClass().add("secondary-button");
+      showSuggestionsButton.getStyleClass().add("search-popup-button");
+
+      comboBox.getStyleClass().add("search-popup-container");
+      comboBox.setAlignment(Pos.CENTER_LEFT);
    }
 
 
@@ -171,12 +177,8 @@ public class SearchPopup<T> {
       filterList(searchField.getText());
    }
 
-   public TextField getTextField() {
-      return searchField;
-   }
-
-   public Button getSuggestionsButton() {
-      return showSuggestionsButton;
+   public HBox getComboBox() {
+      return comboBox;
    }
 
    public void show(Node owner) {
