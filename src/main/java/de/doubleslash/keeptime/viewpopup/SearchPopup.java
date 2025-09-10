@@ -5,12 +5,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Popup;
 
 import java.util.function.Consumer;
@@ -32,7 +33,6 @@ public class SearchPopup<T> {
    public SearchPopup() {
       popup.setAutoHide(true);
       popup.getContent().add(suggestionList);
-      suggestionList.setMaxHeight(150);
 
       setupStyle();
 
@@ -74,8 +74,13 @@ public class SearchPopup<T> {
          } else if (ev.getCode() == KeyCode.UP &&
                suggestionList.getSelectionModel().getSelectedIndex() == 0) {
             searchField.requestFocus();
+         } else if (ev.getCode() == KeyCode.ESCAPE) {
+            hide();
+            searchField.getParent().requestFocus();
          }
       });
+
+      // Mouse events
       suggestionList.setOnMouseClicked(ev -> {
          T selected = suggestionList.getSelectionModel().getSelectedItem();
          if (selected != null) {
@@ -84,14 +89,7 @@ public class SearchPopup<T> {
 
       });
 
-      // Custom string for suggestions
-      suggestionList.setCellFactory(listView -> new ListCell<>() {
-         @Override
-         protected void updateItem(T item, boolean empty) {
-            super.updateItem(item, empty);
-            setText((empty || item == null) ? null : displayTextFunction.apply(item));
-         }
-      });
+      searchField.setOnMouseClicked(ev -> show(searchField));
    }
 
    private void filterList(String input) {
@@ -113,10 +111,42 @@ public class SearchPopup<T> {
       if (selectionHandler != null) selectionHandler.accept(selected);
       popup.hide();
       searchField.clear();
+      searchField.setPromptText("Select project…");
+      searchField.getParent().requestFocus();
    }
 
    private void setupStyle() {
-      searchField.getStyleClass().add("text-field");
+      HBox.setHgrow(searchField, Priority.ALWAYS);
+      searchField.setPromptText("Select project…");
+      searchField.getStyleClass().add("combo-box");
+
+      suggestionList.getStyleClass().add("scroll-pane");
+      suggestionList.setMaxHeight(200);
+
+      suggestionList.setCellFactory(listView -> new ListCell<>() {
+         private final Label label = new Label();
+         private final StackPane pane = new StackPane(label);
+
+         {
+            label.setWrapText(true);
+            label.setStyle("-fx-padding: 5;");
+            pane.setAlignment(Pos.CENTER_LEFT);
+            pane.setMinWidth(0);
+            pane.setPrefWidth(1);
+         }
+
+         @Override
+         protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setGraphic(null);
+            } else {
+               label.setText(displayTextFunction.apply(item));
+               setGraphic(pane);
+            }
+         }
+      });
+
       showSuggestionsButton.getStyleClass().add("secondary-button");
    }
 
@@ -152,6 +182,7 @@ public class SearchPopup<T> {
    public void show(Node owner) {
       if (owner == null) return;
       Bounds bounds = owner.localToScreen(owner.getBoundsInLocal());
+      suggestionList.setPrefWidth(searchField.getWidth());
       popup.show(owner, bounds.getMinX(), bounds.getMaxY());
    }
 

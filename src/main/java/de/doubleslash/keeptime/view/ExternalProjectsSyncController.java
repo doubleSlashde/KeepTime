@@ -290,7 +290,7 @@ public class ExternalProjectsSyncController {
                   vbox.getChildren().add(row);
 
                   // Set tooltip for the label
-                  Label label = (Label) row.getChildren().get(1); // Assuming label is second in HBox
+                  Label label = (Label) row.getChildren().get(1);
                   Tooltip tooltip = new Tooltip(label.getText());
                   label.setTooltip(tooltip);
                }
@@ -302,8 +302,8 @@ public class ExternalProjectsSyncController {
             Circle circle = new Circle(6, color);
             Label label = new Label(text);
 
-            label.setMaxWidth(Double.MAX_VALUE); // Allow layout to constrain width
-            HBox.setHgrow(label, Priority.ALWAYS); // Let label grow within HBox
+            label.setMaxWidth(Double.MAX_VALUE);
+            HBox.setHgrow(label, Priority.ALWAYS);
 
             return new HBox(5, circle, label);
          }
@@ -452,9 +452,14 @@ public class ExternalProjectsSyncController {
                                       .map(n -> ((Text) n).getText())
                                       .collect(Collectors.joining());
 
+
+
             if (!item.bookingHint.isEmpty().get()) {
+               statusFlow = new TextFlow(statusFlow);
                tooltip.setText(status + "\n" + item.bookingHint.get());
-               setStyle("-fx-background-color: #EFEFEF");
+               Text icon = new Text("ⓘ ");
+               icon.setStyle("-fx-text-fill: #1c2070; -fx-font-size: 14px;");
+               statusFlow.getChildren().add(0, icon);
             }
             else {
                tooltip.setText(status);
@@ -463,6 +468,7 @@ public class ExternalProjectsSyncController {
             // Fix Cell height not aligning with Textflow
             // https://stackoverflow.com/questions/42855724/textflow-inside-tablecell-not-correct-cell-height
             statusFlow.maxWidthProperty().bind(column.widthProperty());
+
             setGraphic(new Group(statusFlow));
 
             setTooltip(tooltip);
@@ -721,6 +727,9 @@ public class ExternalProjectsSyncController {
    }
 
    public static LocalTime decrementToNextHour(LocalTime time) {
+      if (time.getHour() == 0)
+         return LocalTime.MIDNIGHT;
+
       return time.minusHours(1).withMinute(0).withSecond(0).withNano(0);
    }
 
