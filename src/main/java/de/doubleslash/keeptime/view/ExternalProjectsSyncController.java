@@ -207,12 +207,12 @@ public class ExternalProjectsSyncController {
          tasksNotInList.setPredicate(predicate);
       });
 
-      heimatTaskSearchPopup = new SearchPopup<>();
-      heimatTaskSearchPopup.setItems(tasksNotInList);
+      heimatTaskSearchPopup = new SearchPopup<>(tasksNotInList);
       heimatTaskSearchPopup.setDisplayTextFunction(
             task -> task.taskHolderName() + " - " + task.name()
       );
-      heimatTaskSearchPopup.setOnItemSelected(selectedTask -> {
+
+      heimatTaskSearchPopup.setOnItemSelected((selectedTask, popup) -> {
          if (selectedTask == null) return;
          boolean alreadyExists = items.stream()
                                       .anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
@@ -235,6 +235,7 @@ public class ExternalProjectsSyncController {
          itemsForBindings.add(addedRow);
          mappingTableView.scrollTo(items.size() - 1);
       });
+      heimatTaskSearchPopup.setClearFieldAfterSelection(true);
 
       heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getComboBox());
       HBox.setHgrow(heimatTaskSearchPopup.getComboBox(), Priority.ALWAYS);
