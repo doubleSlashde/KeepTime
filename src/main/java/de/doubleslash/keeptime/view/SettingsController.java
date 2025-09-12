@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -214,6 +215,9 @@ public class SettingsController {
 
    @FXML
    private Label heimatExpiresLabel;
+
+   @FXML
+   private Label expirationDateLabel;
 
    @FXML
    private Button heimatValidateConnectionButton;
@@ -411,9 +415,21 @@ public class SettingsController {
       heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
          try{
             final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
-            heimatExpiresLabel.setText(jwt.expiration().toString());
+            if (!JwtDecoder.isExpired(jwt, LocalDateTime.now())) {
+               heimatExpiresLabel.setText("Expired:");
+               heimatExpiresLabel.setTextFill(Color.RED);
+               expirationDateLabel.setTextFill(Color.RED);
+            } else {
+               heimatExpiresLabel.setText("Expires:");
+               heimatExpiresLabel.setTextFill(Color.BLACK);
+               expirationDateLabel.setTextFill(Color.BLACK);
+            }
+
+            expirationDateLabel.setText(jwt.expiration().toString());
+
          } catch(Exception e){
-            heimatExpiresLabel.setText("Does not seem to be valid");
+            heimatExpiresLabel.setText("");
+            expirationDateLabel.setText("Does not seem to be valid");
          }
       });
       heimatValidateConnectionLabel.setText("Not validated.");

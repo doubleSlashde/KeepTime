@@ -30,7 +30,7 @@ public class JwtDecoder {
          String header,
          String payload,
          LocalDateTime expiration
-   ) {}
+   ) { }
 
 
    public static JWTTokenAttributes parse(String bearerToken) {
@@ -55,6 +55,10 @@ public class JwtDecoder {
       final LocalDateTime expiration = LocalDateTime.parse((String) claims.get("expiration"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
       return new JWTTokenAttributes(header, payload, expiration);
+   }
+
+   public static boolean isExpired(JWTTokenAttributes token, LocalDateTime localDateTimeNow) {
+      return token.expiration.isAfter(localDateTimeNow);
    }
 
    private static String removeBearerPrefix(String token) {

@@ -137,6 +137,7 @@ public class ExternalProjectsSyncController {
 
    private LocalDate currentReportDate;
    private Stage thisStage;
+   private Timeline closingTimeline;
    private final HeimatController heimatController;
    private final RotateTransition loadingSpinnerAnimation = new RotateTransition(Duration.seconds(1),
          syncingIconRegion);
@@ -236,7 +237,8 @@ public class ExternalProjectsSyncController {
          mappingTableView.scrollTo(items.size() - 1);
       });
       heimatTaskSearchPopup.setClearFieldAfterSelection(true);
-
+      heimatTaskSearchPopup.setMaxSuggestionHeight(220);
+      heimatTaskSearchPopup.setPromptText("Select Project...");
       heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getComboBox());
       HBox.setHgrow(heimatTaskSearchPopup.getComboBox(), Priority.ALWAYS);
    }
@@ -523,10 +525,14 @@ public class ExternalProjectsSyncController {
                      loadingSuccess);
             }
 
+            if (closingTimeline != null) {
+               closingTimeline.stop();
+            }
+
             final AtomicInteger remainingSeconds = new AtomicInteger(closingSeconds);
             loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
             loadingClosingMessage.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            closingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
                remainingSeconds.getAndDecrement();
                loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
                if (remainingSeconds.get() <= 0) {
@@ -535,8 +541,8 @@ public class ExternalProjectsSyncController {
                   loadingClosingMessage.setVisible(false);
                }
             }));
-            timeline.setCycleCount(remainingSeconds.get());
-            timeline.play();
+            closingTimeline.setCycleCount(remainingSeconds.get());
+            closingTimeline.play();
          });
 
          task.setOnFailed(e -> {
@@ -735,6 +741,13 @@ public class ExternalProjectsSyncController {
 
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
+
+      thisStage.setOnCloseRequest(e -> {
+         if (closingTimeline != null) {
+            closingTimeline.stop();
+            closingTimeline = null;
+         }
+      });
    }
 
    public static class TableRow {

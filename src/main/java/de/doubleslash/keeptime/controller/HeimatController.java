@@ -162,31 +162,76 @@ public class HeimatController {
                   new Text("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
          }
 
-         final String bookingHint = heimatTasks.stream()
-                                               .filter(ht -> ht.id() == optHeimatMapping.get().getExternalTaskId())
-                                               .map(HeimatTask::bookingHint)
-                                               .findAny()
-                                               .orElseGet(String::new);
+         final String bookingHint = optHeimatMapping.map(externalProjectMapping -> heimatTasks.stream()
+                                                                                              .filter(ht -> ht.id()
+                                                                                                    == externalProjectMapping.getExternalTaskId())
+                                                                                              .map(HeimatTask::bookingHint)
+                                                                                              .findAny()
+                                                                                              .orElseGet(String::new)).orElse("");
 
 
          if (optionalExistingMapping.isPresent()) {
             final Mapping existingMapping = optionalExistingMapping.get();
+
+            // Ensure we merge projects robustly: include any projects mapped to the same Heimat task
             final ArrayList<Project> projects = new ArrayList<>(existingMapping.projects());
-            projects.add(project);
+            if (optHeimatMapping.isPresent()) {
+               final long mappedTaskId = optHeimatMapping.get().getExternalTaskId();
+               final List<Project> allMappedForTask = mappedProjects.stream()
+                                                                    .filter(mp -> mp.getExternalTaskId() == mappedTaskId)
+                                                                    .map(ExternalProjectMapping::getProject)
+                                                                    .toList();
+               for (Project p : allMappedForTask) {
+                  boolean alreadyContains = projects.stream().anyMatch(pp -> pp.getId() == p.getId());
+                  if (!alreadyContains) {
+                     projects.add(p);
+                  }
+               }
+            } else {
+               // fallback: ensure current project is present
+               boolean alreadyContains = projects.stream().anyMatch(p -> p.getId() == project.getId());
+               if (!alreadyContains) {
+                  projects.add(project);
+               }
+            }
+
             final long keepTimeSeconds = existingMapping.keeptimeSeconds() + projectWorkSeconds;
             final long heimatSeconds = existingMapping.heimatSeconds();
             final boolean shouldBeSynced =
                   isMappedInHeimat && differenceGreaterOrEqual15Minutes(heimatSeconds, keepTimeSeconds);
+
+            final String mergedKeeptimeNotes;
+            if (existingMapping.keeptimeNotes() == null || existingMapping.keeptimeNotes().isEmpty()) {
+               mergedKeeptimeNotes = keeptimeNotes;
+            } else if (keeptimeNotes == null || keeptimeNotes.isEmpty()) {
+               mergedKeeptimeNotes = existingMapping.keeptimeNotes();
+            } else {
+               mergedKeeptimeNotes = existingMapping.keeptimeNotes() + ". " + keeptimeNotes;
+            }
+
             final Mapping mapping = new Mapping(isMappedInHeimat ? optHeimatMapping.get().getExternalTaskId() : -1,
                   isMappedInHeimat, shouldBeSynced, canBeSyncedMessage, bookingHint, existingMapping.existingTimes(), projects,
-                  existingMapping.heimatNotes(), existingMapping.keeptimeNotes() + ". " + keeptimeNotes, heimatSeconds,
+                  existingMapping.heimatNotes(), mergedKeeptimeNotes, heimatSeconds,
                   keepTimeSeconds);
             list.remove(existingMapping);
             list.add(mapping);
          } else {
+            // FIX: when creating a new mapping row for a project that is mapped to a Heimat task,
+            // include ALL Projects that are mapped to the same Heimat task so that projects without
+            // KeepTime entries (no worked time) are also shown in the same row (case 4).
+            final List<Project> projects;
+            if (optHeimatMapping.isPresent()) {
+               final long mappedTaskId = optHeimatMapping.get().getExternalTaskId();
+               projects = mappedProjects.stream()
+                                        .filter(mp -> mp.getExternalTaskId() == mappedTaskId)
+                                        .map(ExternalProjectMapping::getProject)
+                                        .collect(Collectors.toList());
+            } else {
+               projects = Collections.singletonList(project);
+            }
+
             final boolean shouldBeSynced =
                   isMappedInHeimat && differenceGreaterOrEqual15Minutes(heimatTimeSeconds, projectWorkSeconds);
-            final List<Project> projects = Collections.singletonList(project);
             final Mapping mapping = new Mapping(isMappedInHeimat ? optHeimatMapping.get().getExternalTaskId() : -1,
                   isMappedInHeimat, shouldBeSynced, canBeSyncedMessage, bookingHint, optionalAlreadyBookedTimes, projects,
                   heimatNotes, keeptimeNotes, heimatTimeSeconds, projectWorkSeconds);
@@ -216,37 +261,56 @@ public class HeimatController {
       });
 
       taskIdToHeimatTimesMap.forEach((id, times) -> {
-         final Optional<ExternalProjectMapping> mapping = mappedProjects.stream()
-                                                                        .filter(mp -> mp.getExternalTaskId() == id)
-                                                                        .findAny();
-         if (mapping.isEmpty())
-            return;
-         final ExternalProjectMapping externalProjectMapping = mapping.get();
-         final Optional<Project> optionalProject = workedProjectsSet.stream()
-                                                                    .filter(wp -> wp.getId()
-                                                                          == externalProjectMapping.getProject()
-                                                                                                   .getId())
-                                                                    .findAny();
-         if (optionalProject.isPresent()) {
-            return;
+         final List<ExternalProjectMapping> mappingsForTask = mappedProjects.stream()
+                                                                            .filter(mp -> mp.getExternalTaskId() == id)
+                                                                            .toList();
+         for (ExternalProjectMapping externalProjectMapping : mappingsForTask) {
+            final Optional<Project> optionalProject = workedProjectsSet.stream()
+                                                                       .filter(wp -> wp.getId() == externalProjectMapping.getProject().getId())
+                                                                       .findAny();
+            if (optionalProject.isPresent()) {
+               continue;
+            }
+
+            String heimatNotes = addHeimatNotes(times);
+            long heimatTimeSeconds = addHeimatTimes(times);
+
+            final Optional<Mapping> existingMappingInList = list.stream()
+                                                                .filter(m -> m.heimatTaskId == id)
+                                                                .findAny();
+            if (existingMappingInList.isPresent()) {
+               Mapping existing = existingMappingInList.get();
+               // only add if not already present
+               boolean alreadyContains = existing.projects().stream()
+                                                 .anyMatch(p -> p.getId() == externalProjectMapping.getProject().getId());
+               if (!alreadyContains) {
+                  ArrayList<Project> newProjects = new ArrayList<>(existing.projects());
+                  newProjects.add(externalProjectMapping.getProject());
+                  Mapping updated = new Mapping(existing.heimatTaskId, existing.canBeSynced, existing.shouldBeSynced,
+                        existing.syncMessage, existing.bookingHint, existing.existingTimes, newProjects,
+                        existing.heimatNotes, existing.keeptimeNotes, existing.heimatSeconds, existing.keeptimeSeconds);
+                  list.remove(existing);
+                  list.add(updated);
+               }
+               // skip creating a separate entry
+               continue;
+            }
+
+            Text externalTaskName = new Text(externalProjectMapping.getExternalTaskName());
+            externalTaskName.setStyle("-fx-font-weight: bold;");
+            TextFlow syncMessage = new TextFlow(new Text("Present in HEIMAT but not KeepTime\n\nSync to "), externalTaskName,
+                  new Text("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
+
+            List<Project> allMappedProjects = mappingsForTask.stream()
+                                                             .map(ExternalProjectMapping::getProject)
+                                                             .toList();
+
+            final Mapping mapping2 = new Mapping(id, true, false,
+                  syncMessage, "", times,
+                  allMappedProjects,
+                  heimatNotes, "", heimatTimeSeconds, 0);
+            list.add(mapping2);
          }
-         String heimatNotes = addHeimatNotes(times);
-         long heimatTimeSeconds = addHeimatTimes(times);
-
-         Text externalTaskName = new Text(externalProjectMapping.getExternalTaskName());
-         externalTaskName.setStyle("-fx-font-weight: bold;");
-         TextFlow syncMessage = new TextFlow(new Text("Present in HEIMAT but not KeepTime\n\nSync to "), externalTaskName,
-               new Text("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
-
-         final Mapping mapping2 = new Mapping(id, true, false,
-               syncMessage, "", times, mappedProjects.stream()
-                                                                                                   .filter(
-                                                                                                         mp -> mp.getExternalTaskId()
-                                                                                                               == id)
-                                                                                                   .map(ExternalProjectMapping::getProject)
-                                                                                                   .toList(),
-               heimatNotes, "", heimatTimeSeconds, 0);
-         list.add(mapping2);
       });
 
       return list;
@@ -389,51 +453,54 @@ public class HeimatController {
       }
    }
 
+   private HeimatTask getHeimatTaskFromMapping(ExternalProjectMapping mapping) {
+      try {
+         String json = mapping.getExternalTaskMetadata();
+         if (json == null || json.isEmpty()) {
+            return null;
+         }
+         return objectMapper.readValue(json, HeimatTask.class);
+      } catch (Exception e) {
+         LOG.warn("Unable to deserialize HeimatTask from mapping metadata", e);
+         return null;
+      }
+   }
+
    public ExistingAndInvalidMappings getExistingProjectMappings(List<HeimatTask> externalProjects) {
       final List<ExternalProjectMapping> alreadyMappedProjects = externalProjectsMappingsRepository.findByExternalSystemId(
             ExternalSystem.Heimat);
-      final List<ExternalProjectMapping> invalidExternalMappings = new ArrayList<>();
 
-      final List<ProjectMapping> validProjectMappings = model.getSortedAvailableProjects().stream().map(p -> {
+      List<ProjectMapping> projectMappings = new ArrayList<>();
+      List<String> invalidMappingsAsString = new ArrayList<>();
+
+      for (Project p : model.getSortedAvailableProjects()) {
          final Optional<ExternalProjectMapping> mapping = alreadyMappedProjects.stream()
-                                                                               .filter(mp -> mp.getProject().getId()
-                                                                                     == p.getId())
+                                                                               .filter(mp -> mp.getProject().getId() == p.getId())
                                                                                .findAny();
          if (mapping.isEmpty()) {
-            return new ProjectMapping(p, null);
+            projectMappings.add(new ProjectMapping(p, null, false));
+            continue;
          }
+         final ExternalProjectMapping mapped = mapping.get();
+
+         HeimatTask mappedTask = getHeimatTaskFromMapping(mapped);
+
          final Optional<HeimatTask> any = externalProjects.stream()
-                                                          .filter(ep -> ep.id() == mapping.get().getExternalTaskId())
+                                                          .filter(ep -> ep.id() == mapped.getExternalTaskId())
                                                           .findAny();
          if (any.isEmpty()) {
-            LOG.warn("A mapping exists but task does not exist anymore in HEIMAT! '{}'->'{}'.",
-                  mapping.get().getProject(), mapping.get().getExternalTaskId());
-            invalidExternalMappings.add(mapping.get());
-            return new ProjectMapping(p, null);
+            // Heimat task not available today, but keep the mapping!
+            projectMappings.add(new ProjectMapping(p, mappedTask, true));
+            invalidMappingsAsString.add("[" + mapped.getExternalProjectName() + " - "
+                  + mapped.getExternalTaskName()
+                  + "] was mapped to [" + mapped.getProject().getName() + "]");
+         } else {
+            projectMappings.add(new ProjectMapping(p, any.get(), false));
          }
-         return new ProjectMapping(p, any.get());
-      }).toList();
-
-      final List<String> invalidMappingsAsString = invalidExternalMappings.stream()
-                                                                          .map(em -> "Task no longer exists: "
-                                                                                + em.getExternalProjectName() + " - "
-                                                                                + em.getExternalTaskName()
-                                                                                + "'. Was mapped to '" + em.getProject()
-                                                                                                           .getName()
-                                                                                + "'.")
-                                                                          .collect(Collectors.toCollection(
-                                                                                ArrayList::new));
-      /*
-      // I do not have all external projects here :( only already filtered ones
-      allExternalProjects.stream()
-                         .filter(HeimatTask::isStartAndEndTimeRequired)
-                         .map(p -> "Task " + p.taskHolderName() + " - " + p.name()
-                               + " requires start+end time which is not supported.")
-                         .forEach(invalidMappingsAsString::add);
-      */
-
-      return new ExistingAndInvalidMappings(validProjectMappings, invalidMappingsAsString);
+      }
+      return new ExistingAndInvalidMappings(projectMappings, invalidMappingsAsString);
    }
+
 
    public record UserMapping(Mapping mapping, boolean shouldSync, String userNotes, int userMinutes) {}
 
@@ -446,16 +513,17 @@ public class HeimatController {
    public static class ProjectMapping {
       private Project project;
       private HeimatTask heimatTask;
+      private boolean pendingRemoval;
 
-      public ProjectMapping(final Project project, final HeimatTask heimatTask) {
+      public ProjectMapping(final Project project, final HeimatTask heimatTask, boolean pendingRemoval) {
          this.project = project;
          this.heimatTask = heimatTask;
+         this.pendingRemoval = pendingRemoval;
       }
 
       public Project getProject() {
          return project;
       }
-
       public void setProject(final Project project) {
          this.project = project;
       }
@@ -463,9 +531,34 @@ public class HeimatController {
       public HeimatTask getHeimatTask() {
          return heimatTask;
       }
-
       public void setHeimatTask(final HeimatTask heimatTask) {
          this.heimatTask = heimatTask;
       }
+
+      public boolean isPendingRemoval() {
+         return pendingRemoval;
+      }
+      public void setPendingRemoval(boolean pendingRemoval) {
+         this.pendingRemoval = pendingRemoval;
+      }
+   }
+
+   public List<HeimatTask> getAllKnownHeimatTasks(final LocalDate forDate) {
+      List<HeimatTask> apiTasks = getTasks(forDate);
+
+      List<ExternalProjectMapping> mappings = externalProjectsMappingsRepository.findByExternalSystemId(ExternalSystem.Heimat);
+      List<HeimatTask> mappedTasks = mappings.stream()
+                                             .map(this::getHeimatTaskFromMapping)
+                                             .filter(Objects::nonNull)
+                                             .toList();
+
+      Map<Long, HeimatTask> taskMap = new LinkedHashMap<>();
+      for (HeimatTask t : mappedTasks) {
+         taskMap.put(t.id(), t);
+      }
+      for (HeimatTask t : apiTasks) {
+         taskMap.put(t.id(), t); // API result should overwrite mapped if present
+      }
+      return new ArrayList<>(taskMap.values());
    }
 }

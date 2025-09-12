@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -8,7 +9,7 @@
    <children>
       <AnchorPane fx:id="pane" prefHeight="600.0" prefWidth="1000.0">
          <children>
-            <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="603.0" prefWidth="1112.0" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0" />
+            <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="475.0" prefWidth="990.0" AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0" />
             <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in HEIMAT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
             <HBox spacing="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                <children>
@@ -42,17 +43,20 @@
                   </HBox>
                </children>
             </HBox>
-            <HBox alignment="CENTER" layoutX="489.0" layoutY="531.0" prefHeight="69.0" prefWidth="511.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+            <VBox layoutX="489.0" layoutY="531.0" prefHeight="84.0" prefWidth="386.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
                <children>
-                  <HBox fx:id="heimatTaskSearchContainer" alignment="CENTER" prefHeight="69.0" prefWidth="376.0" />
-                  <HBox alignment="CENTER" prefHeight="54.0" prefWidth="102.0" spacing="5.0">
+                  <HBox fx:id="heimatTaskSearchContainer" alignment="CENTER" prefHeight="33.0" prefWidth="381.0" />
+                  <HBox alignment="BOTTOM_RIGHT" prefHeight="35.0" prefWidth="376.0" spacing="5.0">
                      <children>
                         <Button fx:id="saveButton" mnemonicParsing="false" styleClass="primary-button" text="Sync" />
                         <Button fx:id="cancelButton" mnemonicParsing="false" styleClass="secondary-button" text="Cancel" />
                      </children>
                   </HBox>
                </children>
-            </HBox>
+               <padding>
+                  <Insets right="5.0" />
+               </padding>
+            </VBox>
          </children>
       </AnchorPane>
       <VBox fx:id="loadingScreen" alignment="CENTER" spacing="10.0" visible="false">

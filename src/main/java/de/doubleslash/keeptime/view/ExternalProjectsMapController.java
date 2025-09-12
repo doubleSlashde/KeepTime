@@ -24,6 +24,7 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.rest.integration.heimat.model.ExistingAndInvalidMappings;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
+import de.doubleslash.keeptime.viewpopup.SearchPopup;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,6 +36,8 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -86,15 +89,29 @@ public class ExternalProjectsMapController {
       tasksForDateDatePicker.setValue(LocalDate.now());
       tasksForDateDatePicker.setDisable(true);
       // TODO add listener on this thing
-      // but what happens with mapped projects not existing at that date? but actually not related to this feature alone
 
-      final List<HeimatTask> externalProjects = heimatController.getTasks(tasksForDateDatePicker.getValue());
+      final List<HeimatTask> externalProjects = heimatController.getAllKnownHeimatTasks(tasksForDateDatePicker.getValue());
+
       final ExistingAndInvalidMappings existingAndInvalidMappings = heimatController.getExistingProjectMappings(
             externalProjects);
-      final List<HeimatController.ProjectMapping> previousProjectMappings = existingAndInvalidMappings.validMappings();
 
+
+      final List<HeimatController.ProjectMapping> previousProjectMappings = existingAndInvalidMappings.validMappings();
       final ObservableList<HeimatController.ProjectMapping> newProjectMappings = FXCollections.observableArrayList(
             previousProjectMappings);
+
+      Platform.runLater(() -> {
+         List<String> warnings = existingAndInvalidMappings.invalidMappingsAsString();
+         if (!warnings.isEmpty()) {
+            if (showInvalidMappingsDialog(warnings)) {
+               newProjectMappings.stream()
+                                 .filter(HeimatController.ProjectMapping::isPendingRemoval)
+                                 .forEach(pm -> pm.setHeimatTask(null));
+               mappingTableView.refresh();
+            }
+         }
+      });
+
       final FilteredList<HeimatController.ProjectMapping> value = new FilteredList<>(newProjectMappings,
             pm -> pm.getProject().isWork());
       mappingTableView.setItems(value);
@@ -103,58 +120,56 @@ public class ExternalProjectsMapController {
       TableColumn<HeimatController.ProjectMapping, String> keepTimeColumn = new TableColumn<>("KeepTime project");
       keepTimeColumn.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getProject().getName()));
 
+      keepTimeColumn.setCellFactory(col -> new TableCell<>() {
+         @Override
+         protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+               setText(null);
+               setTooltip(null);
+            } else {
+               setText(item);
+               Tooltip tooltip = new Tooltip(item);
+               setTooltip(tooltip);
+            }
+         }
+      });
+
       // External Project column with dropdown
       final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(
             externalProjects);
-      externalProjectsObservableList.add(0, null); // option to clear selection
 
       TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("HEIMAT project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getHeimatTask()));
       externalColumn.setCellFactory(col -> new TableCell<>() {
-         // TODO search in box would be nice
-         private final ComboBox<HeimatTask> comboBox = new ComboBox<>(externalProjectsObservableList);
+         private final SearchPopup<HeimatTask> searchPopup = new SearchPopup<>(externalProjectsObservableList);
+
+         {
+            searchPopup.setDisplayTextFunction(ht -> ht == null ? "" : ht.taskHolderName() + " - " + ht.name());
+            searchPopup.setClearFieldAfterSelection(false);
+            searchPopup.setPromptText("Search Project...");
+            searchPopup.setOnItemSelected((selectedTask, popup) -> {
+               HeimatController.ProjectMapping mapping = getTableView().getItems().get(getIndex());
+               mapping.setHeimatTask(selectedTask);
+               searchPopup.setComboBoxTooltip(selectedTask.name() + " - " + selectedTask.id());
+               updateItem(selectedTask, false);
+            });
+         }
 
          @Override
          protected void updateItem(HeimatTask item, boolean empty) {
             super.updateItem(item, empty);
-            // selected item
-            comboBox.setButtonCell(new ListCell<>() {
-               @Override
-               protected void updateItem(HeimatTask item, boolean empty) {
-                  super.updateItem(item, empty);
-                  if (empty || item == null) {
-                     setText(null);
-                  } else {
-                     setText(item.taskHolderName() + " - " + item.name());
-                  }
-               }
-            });
-
-            // Dropdown
-            comboBox.setCellFactory(param -> new ListCell<>() {
-               @Override
-               protected void updateItem(HeimatTask item, boolean empty) {
-                  super.updateItem(item, empty);
-                  if (item == null || empty) {
-                     setGraphic(null);
-                     setText(null);
-                  } else {
-                     // TODO maybe show if the project was already mapped
-                     setText(item.taskHolderName() + " - " + item.name());
-                  }
-               }
-            });
-
             if (empty) {
                setGraphic(null);
                setText(null);
             } else {
-               comboBox.setValue(getTableView().getItems().get(getIndex()).getHeimatTask());
-               comboBox.setOnAction(e -> {
-                  HeimatController.ProjectMapping mapping = getTableView().getItems().get(getIndex());
-                  mapping.setHeimatTask(comboBox.getValue());
-               });
-               setGraphic(comboBox);
+               searchPopup.setSelectedItem(item);
+               if (item != null) {
+                  searchPopup.setComboBoxTooltip(item.name() + " - " + item.id());
+               } else {
+                  searchPopup.setComboBoxTooltip("");
+               }
+               setGraphic(searchPopup.getComboBox());
                setText(null);
             }
          }
@@ -179,7 +194,7 @@ public class ExternalProjectsMapController {
             final Project project = controller.addNewProject(
                   new Project(toBeCreatedHeimatTask.name() + " - " + toBeCreatedHeimatTask.taskHolderName(),
                         toBeCreatedHeimatTask.bookingHint(), ColorHelper.randomColor(), true, sortIndex));
-            newProjectMappings.add(new HeimatController.ProjectMapping(project, toBeCreatedHeimatTask));
+            newProjectMappings.add(new HeimatController.ProjectMapping(project, toBeCreatedHeimatTask, false));
          }
       });
 
@@ -189,11 +204,6 @@ public class ExternalProjectsMapController {
       });
 
       cancelButton.setOnAction(ae -> thisStage.close());
-
-      List<String> warnings = existingAndInvalidMappings.invalidMappingsAsString();
-      if (!warnings.isEmpty()) {
-         Platform.runLater(() -> showInvalidMappingsDialog(warnings));
-      }
    }
 
    private List<HeimatTask> showMultiSelectDialog(final List<HeimatTask> externalProjects,
@@ -210,6 +220,11 @@ public class ExternalProjectsMapController {
       ButtonType cancelButtonType = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
       dialog.getDialogPane().getButtonTypes().addAll(okButtonType, cancelButtonType);
 
+      // Observable and filtered list
+      ObservableList<HeimatTask> baseList = FXCollections.observableArrayList(externalProjects);
+      FilteredList<HeimatTask> filteredList = new FilteredList<>(baseList, t -> true);
+
+      // Name Column
       TableView<HeimatTask> tableView = new TableView<>();
       TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("HEIMAT project");
       nameColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
@@ -238,9 +253,10 @@ public class ExternalProjectsMapController {
       tableView.setEditable(false);
 
       tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-      tableView.setItems(FXCollections.observableArrayList(externalProjects));
+      tableView.setItems(filteredList);
 
-      Button selectAllUnmappedButton = new Button("Select unmapped projects (" + unmappedHeimatTasks.size() + ")");
+      Button selectAllUnmappedButton = new Button("Select unmapped projects ("
+            + unmappedHeimatTasks.size() + ")");
       selectAllUnmappedButton.getStyleClass().add("secondary-button");
       selectAllUnmappedButton.setOnAction(e -> {
          tableView.getSelectionModel().clearSelection();
@@ -250,7 +266,27 @@ public class ExternalProjectsMapController {
          tableView.requestFocus();
       });
 
-      VBox content = new VBox(10, selectAllUnmappedButton, tableView);
+      TextField searchField = new TextField();
+      searchField.setPromptText("Search...");
+      searchField.textProperty().addListener((obs, oldText, newText) -> {
+         String filter = newText == null ? "" : newText.trim().toLowerCase();
+         filteredList.setPredicate(task -> {
+            if (filter.isEmpty()) return true;
+            return task.taskHolderName().toLowerCase().contains(filter)
+                  || task.name().toLowerCase().contains(filter);
+         });
+
+         long visibleUnmapped = filteredList.stream().filter(unmappedHeimatTasks::contains).count();
+         selectAllUnmappedButton.setText("Select unmapped projects ("
+               + visibleUnmapped + ")");
+      });
+      searchField.getStyleClass().add("text-field");
+      searchField.setMaxWidth(Double.MAX_VALUE);
+      HBox.setHgrow(searchField, Priority.ALWAYS);
+
+      HBox headContent = new HBox(50, selectAllUnmappedButton, searchField);
+
+      VBox content = new VBox(10, headContent, tableView);
       dialog.getDialogPane().setContent(content);
       final List<HeimatTask> emptyList = List.of();
       dialog.setResultConverter(dialogButton -> {
@@ -279,11 +315,17 @@ public class ExternalProjectsMapController {
       return result.orElse(emptyList);
    }
 
-   private void showInvalidMappingsDialog(final List<String> warnings) {
-      Dialog<Void> dialog = new Dialog<>();
+   private boolean showInvalidMappingsDialog(final List<String> warnings) {
+      Dialog<ButtonType> dialog = new Dialog<>();
+
       dialog.initOwner(this.thisStage);
+
+      Stage dialogStage = (Stage) dialog.getDialogPane().getScene().getWindow();
+      dialogStage.getIcons().addAll(this.thisStage.getIcons());
+
       dialog.setTitle("Invalid mappings");
-      dialog.setHeaderText("Please note to following issue:");
+      dialog.setHeaderText("The following projects are no longer available.\n"
+            + "Would you like to remove them from your mapping list?");
 
       VBox warningBox = new VBox(10);
       for (String warning : warnings) {
@@ -299,10 +341,11 @@ public class ExternalProjectsMapController {
       dialog.getDialogPane().setContent(scrollPane);
       dialog.getDialogPane().setMinWidth(400);
 
-      // Add OK button
-      ButtonType okButton = new ButtonType("OK", ButtonBar.ButtonData.OK_DONE);
-      dialog.getDialogPane().getButtonTypes().add(okButton);
+      ButtonType removeButton = new ButtonType("Remove", ButtonBar.ButtonData.YES);
+      ButtonType keepButton = new ButtonType("Keep", ButtonBar.ButtonData.NO);
+      dialog.getDialogPane().getButtonTypes().setAll(removeButton, keepButton);
 
-      dialog.showAndWait();
+      Optional<ButtonType> result = dialog.showAndWait();
+      return result.isPresent() && result.get() == removeButton;
    }
 }
