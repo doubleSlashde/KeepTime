@@ -28,6 +28,23 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + Ask for notes when switching project (if empty): Pops up a dialog to add notes if no notes are given and you try to switch projects
 + Export: export database for backup and later import (import currently not yet implemented)
 
+#### Heimat Integration
+
+KeepTime can be integrated with Heimat, allowing you to map and import your Heimat projects directly into KeepTime.
+
+To enable Heimat integration:
+
+1. In the Settings, switch to the "Heimat" section.
+![Settings Heimat](readme/images/settingsHeimat.png?raw=true "Settings Heimat")
+2. Enter the following details:
+    - **URL:** `https://doubleslash.heimat.software`
+    - **Access Token:** Retrieve your access token from Heimat and paste it here.
+![Heimat Website](readme/images/heimatWebsite.png?raw=true "Heimat Website")
+3. Click on **"Validate connection"**. If the connection is valid, you can proceed.
+
+Once the connection is validated, you can use the **"Map projects"** feature to map your Heimat projects to KeepTime projects or import Heimat projects directly into KeepTime.
+
+
 ### Reports:
 ![Report Screen](readme/images/reportDescription.png?raw=true "Report")
 

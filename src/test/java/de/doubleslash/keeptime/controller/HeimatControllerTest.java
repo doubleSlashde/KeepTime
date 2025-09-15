@@ -384,7 +384,7 @@ class HeimatControllerTest {
       // ASSERT
       assertAll(() -> assertThat(tableRows.size(), Matchers.is(1)), () -> assertTrue(mapping.canBeSynced()),
             () -> assertTrue(mapping.canBeSynced()), () -> assertFalse(mapping.shouldBeSynced()),
-            () -> assertThat(mapping.syncMessage(), Matchers.containsString("Present in HEIMAT but not KeepTime")),
+            () -> assertThat(mapping.syncMessage(), Matchers.containsString("Present in Heimat but not KeepTime")),
             () -> assertThat(mapping.syncMessage(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),

@@ -16,29 +16,15 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Group?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.Hyperlink?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Line?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" stylesheets="@../css/dsStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
+<AnchorPane fx:id="settingsRoot" focusTraversable="true" prefHeight="285.0" prefWidth="514.0" style="-fx-background-color: white;" stylesheets="@../css/dsStyles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.SettingsController">
   <children>
     <TabPane layoutX="-50.0" layoutY="3.0" prefHeight="383.0" prefWidth="608.0" rotateGraphic="true" side="LEFT" stylesheets="@../css/settingsv2.css" tabClosingPolicy="UNAVAILABLE">
       <tabs>
@@ -456,7 +442,7 @@
             <Region fx:id="restAPIIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
           </graphic>
         </Tab>
-            <Tab text="HEIMAT">
+            <Tab text="Heimat">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
                      <children>
@@ -464,7 +450,7 @@
                            <children>
                               <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                  <children>
-                                    <Label prefHeight="28.0" prefWidth="279.0" text="HEIMAT Integration">
+                                    <Label prefHeight="28.0" prefWidth="279.0" text="Heimat Integration">
                                        <font>
                                           <Font name="System Bold" size="13.0" />
                                        </font>
@@ -488,7 +474,7 @@
                                  <children>
                                     <VBox styleClass="settingsBorder" stylesheets="@../css/settingsv2.css">
                                        <children>
-                                          <CheckBox fx:id="heimatActivationCheckbox" mnemonicParsing="false" text="Use HEIMAT">
+                                          <CheckBox fx:id="heimatActivationCheckbox" mnemonicParsing="false" text="Use Heimat">
                                              <font>
                                                 <Font name="Open Sans Regular" size="12.0" />
                                              </font>

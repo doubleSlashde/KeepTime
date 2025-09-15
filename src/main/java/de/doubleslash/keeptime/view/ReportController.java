@@ -143,7 +143,7 @@ public class ReportController {
       heimatSyncButton.setMinSize(25, 25);
       heimatSyncButton.setGraphic(svgNodeWithScale);
       heimatSyncButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-      heimatSyncButton.setTooltip(new Tooltip("Synchronize to HEIMAT..."));
+      heimatSyncButton.setTooltip(new Tooltip("Synchronize to Heimat..."));
       heimatSyncButton.setOnAction(ae-> {
          try {
             showSyncStage();
