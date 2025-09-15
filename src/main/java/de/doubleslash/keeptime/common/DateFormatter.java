@@ -31,7 +31,7 @@ public class DateFormatter {
    private static DateTimeFormatter dayDateFormatter = DateTimeFormatter.ofPattern("eeee dd.MM.yyyy");
    private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
-   private static Locale systemLocale = Locale.GERMAN;
+   private static Locale systemLocale = Locale.getDefault();
 
    private DateFormatter() {
       throw new IllegalStateException("Utility class: DateFormatter");

@@ -124,7 +124,9 @@ public class ExternalProjectsSyncController {
    private final Color colorLoadingSuccess = Color.valueOf("#74a317");
    private final Color colorLoadingFailure = Color.valueOf("#c63329");
 
-   private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
+   private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(
+         FormatStyle.MEDIUM,
+         DateFormatter.getSystemLocale());
    private ObservableList<TableRow> items;
 
    private LocalDate currentReportDate;
@@ -579,8 +581,10 @@ public class ExternalProjectsSyncController {
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
+      final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(
+            FormatStyle.MEDIUM,
+            DateFormatter.getSystemLocale());
       spinner.focusedProperty().addListener(e -> {
-         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = spinner.getEditor().textProperty();
          try {
             stringConverter.fromString(text.get());
@@ -621,7 +625,7 @@ public class ExternalProjectsSyncController {
 
       });
 
-      spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
+      spinner.getValueFactory().setConverter(stringConverter);
    }
 
    public static LocalTime decrementToLastFullQuarter(LocalTime time) {

@@ -18,11 +18,16 @@ package de.doubleslash.keeptime.common;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
+import javafx.scene.control.DatePicker;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Disabled
 class DateFormatterTest {
@@ -37,5 +42,22 @@ class DateFormatterTest {
 
       final long secondsBewtweenSwitched = DateFormatter.getSecondsBewtween(endDate, startDate);
       assertThat(secondsBewtweenSwitched, Matchers.is(0l)); // why??
+   }
+
+   @Test
+   void applySystemLocaleShouldSetDatePickerLocale() {
+      // GIVEN
+      Locale.setDefault(Locale.ENGLISH);
+      DateFormatter.setSystemLocale(Locale.GERMAN);
+      DatePicker datePicker = new DatePicker();
+      LocalDate date = LocalDate.of(2024, 6, 3);
+
+      // WHEN
+      DateFormatter.applySystemLocaleOnDate(datePicker);
+      datePicker.setValue(date);
+
+      // THEN
+      String shown = datePicker.getEditor().getText();
+      assertTrue(shown.contains("Montag") || shown.contains("06.2024") || shown.contains("06"));
    }
 }
