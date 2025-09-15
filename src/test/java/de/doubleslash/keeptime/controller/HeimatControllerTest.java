@@ -535,4 +535,45 @@ class HeimatControllerTest {
    }
    // shouldOnlyUpdateHeimatWhenSomethingHasChanged (not needed - user should decide)
 
+   @Test
+   void shouldNotCreateDuplicateHeimatEntryWhenMultipleProjectsMappedAndSomeHaveWork() {
+      // ARRANGE
+      // project 1 has work, project 2 does not
+      final Work work1 = new Work(now.minusMinutes(10), now, workProject1, "Notes 1");
+      workItems.add(work1);
+
+      externalMappings.add(project1To1Mapping);
+      externalMappings.add(project2To1Mapping);
+
+      // The mapped Heimat task has already been booked in Heimat
+      final HeimatTime existingTime = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+            null, 15, "Heimat note", 99);
+      when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime));
+
+      // ACT
+      final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
+
+      // ASSERT
+      // There should be exactly one row for this Heimat task
+      assertThat(tableRows.size(), Matchers.is(1));
+      final HeimatController.Mapping mapping = tableRows.get(0);
+
+      // The mapping should combine both projects in .projects()
+      assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2));
+
+      // The mapping should show KeepTime time for workProject1, and 0 for workProject2 (which is included in .projects() but has no time)
+      assertThat(mapping.keeptimeSeconds(), Matchers.is(10 * 60L));
+      assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1"));
+
+      // There should be Heimat time and notes as well
+      assertThat(mapping.heimatNotes(), Matchers.is("Heimat note"));
+      assertThat(mapping.heimatSeconds(), Matchers.is(15 * 60L));
+
+      String syncMessage = mapping.syncMessage().getChildren().stream()
+                                  .filter(n -> n instanceof Text)
+                                  .map(n -> ((Text) n).getText())
+                                  .collect(Collectors.joining());
+      assertThat(syncMessage, Matchers.not(Matchers.containsString("Present in HEIMAT but not KeepTime")));
+      assertThat(syncMessage, Matchers.containsString(project1To1Mapping.getExternalTaskName()));
+   }
 }
