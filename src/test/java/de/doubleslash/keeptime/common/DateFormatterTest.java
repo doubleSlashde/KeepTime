@@ -47,6 +47,7 @@ class DateFormatterTest {
    @Test
    void applySystemLocaleShouldSetDatePickerLocale() {
       // GIVEN
+      Locale defaultLocale = Locale.getDefault();
       Locale.setDefault(Locale.ENGLISH);
       DateFormatter.setSystemLocale(Locale.GERMAN);
       DatePicker datePicker = new DatePicker();
@@ -58,6 +59,9 @@ class DateFormatterTest {
 
       // THEN
       String shown = datePicker.getEditor().getText();
-      assertTrue(shown.contains("Montag") || shown.contains("06.2024") || shown.contains("06"));
+      assertTrue(shown.contains("Montag"));
+      assertTrue(shown.contains("06.2024"));
+
+      Locale.setDefault(defaultLocale);
    }
 }
