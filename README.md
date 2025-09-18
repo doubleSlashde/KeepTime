@@ -29,9 +29,31 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + Export: export database for backup and later import (import currently not yet implemented)
 
 ### Reports:
-![Report Screen](readme/images/reportDescription.png?raw=true "Report")
 
-+ the report screen gives you a summary for every day
+KeepTime’s reporting workflow works by tracking daily work and synchronizing project activities with external task management. Here’s how you use it:
+
+1. **Track Your Work**  
+   Throughout your workday, log activities and assign them to projects. Each entry includes a timeslot, duration, and optional notes.
+
+2. **Review Your Daily Report**  
+   At any time, open the report view to see an overview of your day, including all logged activities, their durations, and project associations.
+
+3. **Edit and Manage Entries**  
+   Use the controls in the report to copy, edit, or delete individual work entries as needed. You can also copy notes or summaries for external use.
+
+4. **Select the Day to View**  
+   Use the calendar widget to select which day’s report you want to review. Only days with recorded work are available.
+
+<img src="readme/images/reportDescription.png" width="600">
+
+5. **Synchronize Projects with Heimat**  
+   When ready to sync your work with Heimat:
+    - Open the project synchronization view.
+    - Select which projects to include in the synchronization.
+    - Press the Sync button to transfer your tracked work to Heimat.
+
+<img src="readme/images/externalProjectDialog.png" width="600">
+
 
 ## Install
 
