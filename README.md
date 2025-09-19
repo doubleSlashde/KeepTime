@@ -61,7 +61,7 @@ KeepTime’s reporting workflow works by tracking daily work and synchronizing p
 4. **Select the Day to View**  
    Use the calendar widget to select which day’s report you want to review. Only days with recorded work are available.
 
-<img src="readme/images/reportDescription.png" width="600">
+![Report Dialog](readme/images/reportDescription.png)
 
 5. **Synchronize Projects with Heimat**  
    When ready to sync your work with Heimat:
@@ -69,8 +69,7 @@ KeepTime’s reporting workflow works by tracking daily work and synchronizing p
     - Select which projects to include in the synchronization.
     - Press the Sync button to transfer your tracked work to Heimat.
 
-<img src="readme/images/externalProjectDialog.png" width="600">
-
+![External Project Dialog](readme/images/externalProjectDialog.png)
 
 ## Install
 
