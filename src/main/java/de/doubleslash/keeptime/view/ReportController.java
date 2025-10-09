@@ -361,9 +361,7 @@ public class ReportController {
          updateReport(newvalue);
       });
 
-      // HACK to show calendar from datepicker
-      // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
-      final DatePickerSkin datePickerSkin = new DatePickerSkin(myDatePicker);
+
       final Callback<DatePicker, DateCell> dayCellFactory = callback -> new DateCell() {
          @Override
          public void updateItem(final LocalDate item, final boolean empty) {
@@ -379,9 +377,19 @@ public class ReportController {
 
       };
       myDatePicker.setDayCellFactory(dayCellFactory);
-      final Node popupContent = datePickerSkin.getPopupContent();
-      this.topBorderPane.setRight(popupContent);
 
+      Locale defaultLocale = Locale.getDefault();
+      try {
+         Locale.setDefault(DateFormatter.getSystemLocale());
+
+         // HACK to show calendar from datepicker
+         // https://stackoverflow.com/questions/34681975/javafx-extract-calendar-popup-from-datepicker-only-show-popup
+         final DatePickerSkin datePickerSkin = new DatePickerSkin(myDatePicker);
+         final Node popupContent = datePickerSkin.getPopupContent();
+         this.topBorderPane.setRight(popupContent);
+      } finally {
+         Locale.setDefault(defaultLocale);
+      }
    }
 
    private Button createDeleteWorkButton(final Work w) {

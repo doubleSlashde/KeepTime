@@ -90,6 +90,7 @@ public class DateFormatter {
          }
       });
 
+      datePicker.setOnShowing(e -> Locale.setDefault(systemLocale));
       datePicker.setPromptText(formatter.format(LocalDate.now()));
    }
 }
