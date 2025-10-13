@@ -90,7 +90,9 @@ public class DateFormatter {
          }
       });
 
-      datePicker.setOnShowing(e -> Locale.setDefault(systemLocale));
+      datePicker.setOnShowing(e-> Locale.setDefault(Locale.Category.FORMAT, systemLocale));
+      datePicker.setOnHiding(e-> Locale.setDefault(Locale.Category.FORMAT, Locale.getDefault()));
+      datePicker.setOnAction(e-> Locale.setDefault(Locale.Category.FORMAT, Locale.getDefault()));
       datePicker.setPromptText(formatter.format(LocalDate.now()));
    }
 }

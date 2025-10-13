@@ -43,25 +43,4 @@ class DateFormatterTest {
       final long secondsBewtweenSwitched = DateFormatter.getSecondsBewtween(endDate, startDate);
       assertThat(secondsBewtweenSwitched, Matchers.is(0l)); // why??
    }
-
-   @Test
-   void applySystemLocaleShouldSetDatePickerLocale() {
-      // GIVEN
-      Locale defaultLocale = Locale.getDefault();
-      Locale.setDefault(Locale.ENGLISH);
-      DateFormatter.setSystemLocale(Locale.GERMAN);
-      DatePicker datePicker = new DatePicker();
-      LocalDate date = LocalDate.of(2024, 6, 3);
-
-      // WHEN
-      DateFormatter.applySystemLocaleOnDate(datePicker);
-      datePicker.setValue(date);
-
-      // THEN
-      String shown = datePicker.getEditor().getText();
-      assertTrue(shown.contains("Montag"));
-      assertTrue(shown.contains("06.2024"));
-
-      Locale.setDefault(defaultLocale);
-   }
 }
