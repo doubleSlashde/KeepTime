@@ -134,9 +134,7 @@ public class ExternalProjectsSyncController {
 
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
 
-   private SearchPopup<HeimatTask> heimatTaskSearchPopup;
    private ObservableList<TableRow> items;
-   private ObservableList<TableRow> itemsForBindings;
 
    private LocalDate currentReportDate;
    private Stage thisStage;
@@ -169,7 +167,7 @@ public class ExternalProjectsSyncController {
 
       mappingTableView.setItems(items);
 
-      itemsForBindings = FXCollections.observableArrayList(
+      ObservableList<TableRow> itemsForBindings = FXCollections.observableArrayList(
             item -> new javafx.beans.Observable[] { item.userTimeSeconds, item.shouldSyncCheckBox, item.userNotes });
       itemsForBindings.addAll(items);
       StringBinding totalSum = Bindings.createStringBinding(() -> localTimeStringConverter.toString(
@@ -210,7 +208,7 @@ public class ExternalProjectsSyncController {
          tasksNotInList.setPredicate(predicate);
       });
 
-      heimatTaskSearchPopup = new SearchPopup<>(tasksNotInList);
+      SearchPopup<HeimatTask> heimatTaskSearchPopup = new SearchPopup<>(tasksNotInList);
       heimatTaskSearchPopup.setDisplayTextFunction(task -> task.taskHolderName() + " - " + task.name());
 
       heimatTaskSearchPopup.setOnItemSelected((selectedTask, popup) -> {
@@ -228,8 +226,8 @@ public class ExternalProjectsSyncController {
                new HeimatController.Mapping(selectedTask.id(), true, true, syncMessage, "", List.of(), List.of(), "",
                      "", 0, 0), "", 0);
          items.add(addedRow);
-         itemsForBindings.add(addedRow);
-         mappingTableView.scrollTo(items.size() - 1);
+         itemsForBindings.add(addedRow); // add new row also to items2 - as it is not added automatically :(
+         mappingTableView.scrollTo(items.size() - 1); // scroll to newly added row
       });
       heimatTaskSearchPopup.setClearFieldAfterSelection(true);
 
