@@ -21,6 +21,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,6 +85,9 @@ public class App extends Application {
    @Override
    public void init() throws Exception {
       LOG.info("Starting KeepTime.");
+
+      setLocaleToEnglish();
+
       final DefaultExceptionHandler defaultExceptionHandler = new DefaultExceptionHandler();
       defaultExceptionHandler.register();
 
@@ -100,6 +104,22 @@ public class App extends Application {
       settings = springContext.getBean(Settings.class);
       controller.enableAutoSave();
       model.setSpringContext(springContext);
+   }
+
+   private void setLocaleToEnglish() {
+      final Locale systemDefaultLocale = Locale.getDefault();
+      final Locale wantedApplicationLocale = Locale.ENGLISH;
+
+      if(systemDefaultLocale.getLanguage().equals(wantedApplicationLocale.getLanguage())){
+         LOG.debug("Application Locale already is '{}'. Nothing to do.", wantedApplicationLocale);
+         return;
+      }
+
+      LOG.info("Setting application Locale to '{}', was '{}'.", wantedApplicationLocale, systemDefaultLocale);
+      Locale.setDefault(wantedApplicationLocale);
+      Locale.setDefault(Locale.Category.DISPLAY, wantedApplicationLocale);
+      // keep system locale for format conversions (date, currency, numbers)
+      Locale.setDefault(Locale.Category.FORMAT, systemDefaultLocale);
    }
 
    @Override
