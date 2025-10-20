@@ -193,12 +193,15 @@ public class HeimatController {
          long heimatTimeSeconds = times.stream()
                                        .reduce(0L, (subtotal, element) -> subtotal + element.durationInMinutes() * 60L,
                                              Long::sum);
-         final HeimatTask heimatTask = heimatTasks.stream()
-                                                  .filter(t -> t.id() == times.get(0).taskId())
-                                                  .findAny()
-                                                  .orElseThrow();
-         final Mapping mapping = new Mapping(id, true, false,
-               "Not mapped in KeepTime\n\n" + heimatTask.name() + "\n" + heimatTask.taskHolderName(), times,
+         final Optional<HeimatTask> optionalHeimatTask = heimatTasks.stream()
+                                                                    .filter(t -> t.id() == id)
+                                                                    .findAny();
+         String taskName = "Cannot resolve Heimat Task Id: " + id + " to name\nPlease check in Heimat";
+         if (optionalHeimatTask.isPresent()) {
+            final HeimatTask heimatTask = optionalHeimatTask.get();
+            taskName = heimatTask.name() + "\n" + heimatTask.taskHolderName();
+         }
+         final Mapping mapping = new Mapping(id, true, false, "Not mapped in KeepTime\n\n" + taskName, times,
                new ArrayList<>(0), heimatNotes, "", heimatTimeSeconds, 0);
          list.add(mapping);
       });
