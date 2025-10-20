@@ -223,7 +223,7 @@ public class ExternalProjectsSyncController {
                new StyledMessage.TextSegment("\n(" + selectedTask.taskHolderName() + ")"));
 
          TableRow addedRow = new TableRow(
-               new HeimatController.Mapping(selectedTask.id(), true, true, syncMessage, "", List.of(), List.of(), "",
+               new HeimatController.Mapping(selectedTask.id(), true, true, syncMessage, selectedTask.bookingHint(), List.of(), List.of(), "",
                      "", 0, 0), "", 0);
          items.add(addedRow);
          itemsForBindings.add(addedRow); // add new row also to items2 - as it is not added automatically :(
@@ -443,12 +443,13 @@ public class ExternalProjectsSyncController {
                                       .map(n -> ((Text) n).getText())
                                       .collect(Collectors.joining());
 
-            if (!item.bookingHint.isEmpty().get()) {
+            final String bookingHint = item.bookingHint.get();
+            if (!bookingHint.isEmpty()) {
                statusFlow = new TextFlow(statusFlow);
-               tooltip.setText(statusForTooltip + "\n" + item.bookingHint.get());
-               Text icon = new Text("ⓘ ");
+               tooltip.setText(statusForTooltip + "\nBookinghint: " + bookingHint);
+               Text icon = new Text(" ⓘ");
                icon.setStyle("-fx-text-fill: #1c2070; -fx-font-size: 14px;");
-               statusFlow.getChildren().add(0, icon);
+               statusFlow.getChildren().add(icon);
             } else {
                tooltip.setText(statusForTooltip);
             }

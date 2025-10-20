@@ -110,6 +110,7 @@ public class HeimatController {
          String heimatNotes = "";
          long heimatTimeSeconds = 0;
          boolean isMappedInHeimat = false;
+         String bookingHint = "";
          final Optional<ExternalProjectMapping> optHeimatMapping = mappedProjects.stream()
                                                                                  .filter(mp -> mp.getProject().getId()
                                                                                        == project.getId())
@@ -118,6 +119,11 @@ public class HeimatController {
          Optional<Mapping> optionalExistingMapping = Optional.empty();
          if (optHeimatMapping.isPresent()) {
             isMappedInHeimat = true;
+            bookingHint = heimatTasks.stream()
+                                     .filter(ht -> ht.id() == optHeimatMapping.get().getExternalTaskId())
+                                     .map(HeimatTask::bookingHint)
+                                     .findAny()
+                                     .orElseGet(String::new);
             optionalExistingMapping = list.stream()
                                           .filter(mapping -> mapping.heimatTaskId == optHeimatMapping.get()
                                                                                                      .getExternalTaskId())
@@ -160,12 +166,6 @@ public class HeimatController {
                   new StyledMessage.TextSegment(externalProjectMapping.getExternalTaskName(), true),
                   new StyledMessage.TextSegment("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
          }
-
-         final String bookingHint = heimatTasks.stream()
-                                               .filter(ht -> ht.id() == optHeimatMapping.get().getExternalTaskId())
-                                               .map(HeimatTask::bookingHint)
-                                               .findAny()
-                                               .orElseGet(String::new);
 
          if (optionalExistingMapping.isPresent()) {
             final Mapping existingMapping = optionalExistingMapping.get();
@@ -212,8 +212,7 @@ public class HeimatController {
          }
 
          final Mapping mapping = new Mapping(id, true, false,
-               StyledMessage.of(new StyledMessage.TextSegment("Not mapped in KeepTime\n\n" + taskName)), "",
-               times,
+               StyledMessage.of(new StyledMessage.TextSegment("Not mapped in KeepTime\n\n" + taskName)), "", times,
 
                new ArrayList<>(0), heimatNotes, "", heimatTimeSeconds, 0);
          list.add(mapping);
