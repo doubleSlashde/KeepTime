@@ -22,6 +22,7 @@ import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.StyledMessage;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.viewpopup.SearchPopup;
@@ -208,29 +209,22 @@ public class ExternalProjectsSyncController {
       });
 
       heimatTaskSearchPopup = new SearchPopup<>(tasksNotInList);
-      heimatTaskSearchPopup.setDisplayTextFunction(
-            task -> task.taskHolderName() + " - " + task.name()
-      );
+      heimatTaskSearchPopup.setDisplayTextFunction(task -> task.taskHolderName() + " - " + task.name());
 
       heimatTaskSearchPopup.setOnItemSelected((selectedTask, popup) -> {
-         if (selectedTask == null) return;
-         boolean alreadyExists = items.stream()
-                                      .anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
-         if (alreadyExists) return;
+         if (selectedTask == null)
+            return;
+         boolean alreadyExists = items.stream().anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
+         if (alreadyExists)
+            return;
 
-         Text externalTaskName = new Text(selectedTask.name());
-         externalTaskName.setStyle("-fx-font-weight: bold;");
-         TextFlow syncMessage = new TextFlow(new Text("Manually added\n\nSync to "), externalTaskName,
-               new Text("\n(" + selectedTask.taskHolderName() + ")"));
+         StyledMessage syncMessage = StyledMessage.of(new StyledMessage.TextSegment("Manually added\n\nSync to "),
+               new StyledMessage.TextSegment(selectedTask.name(), true),
+               new StyledMessage.TextSegment("\n(" + selectedTask.taskHolderName() + ")"));
 
          TableRow addedRow = new TableRow(
-               new HeimatController.Mapping(
-                     selectedTask.id(), true, true,
-                     syncMessage, "",
-                     List.of(), List.of(), "", "", 0, 0
-               ),
-               "", 0
-         );
+               new HeimatController.Mapping(selectedTask.id(), true, true, syncMessage, "", List.of(), List.of(), "",
+                     "", 0, 0), "", 0);
          items.add(addedRow);
          itemsForBindings.add(addedRow);
          mappingTableView.scrollTo(items.size() - 1);
@@ -447,12 +441,11 @@ public class ExternalProjectsSyncController {
             }
 
             TextFlow statusFlow = item.syncStatus;
-            String status = statusFlow.getChildren().stream()
+            String status = statusFlow.getChildren()
+                                      .stream()
                                       .filter(n -> n instanceof Text)
                                       .map(n -> ((Text) n).getText())
                                       .collect(Collectors.joining());
-
-
 
             if (!item.bookingHint.isEmpty().get()) {
                statusFlow = new TextFlow(statusFlow);
@@ -460,8 +453,7 @@ public class ExternalProjectsSyncController {
                Text icon = new Text("ⓘ ");
                icon.setStyle("-fx-text-fill: #1c2070; -fx-font-size: 14px;");
                statusFlow.getChildren().add(0, icon);
-            }
-            else {
+            } else {
                tooltip.setText(status);
             }
 
@@ -651,7 +643,7 @@ public class ExternalProjectsSyncController {
                }
             });
 
-            newScene.addEventFilter(KeyEvent.KEY_PRESSED, event ->{
+            newScene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
                if (event.getCode() == KeyCode.SHIFT) {
                   shiftDown.set(true);
                }
@@ -737,6 +729,25 @@ public class ExternalProjectsSyncController {
       this.thisStage = thisStage;
    }
 
+   /**
+    * Converts a StyledMessage to a TextFlow for UI display.
+    *
+    * @param styledMessage
+    *       The styled message to convert
+    * @return A TextFlow with properly styled text segments
+    */
+   private static TextFlow convertStyledMessageToTextFlow(StyledMessage styledMessage) {
+      TextFlow textFlow = new TextFlow();
+      for (StyledMessage.TextSegment segment : styledMessage.getSegments()) {
+         Text text = new Text(segment.text());
+         if (segment.bold()) {
+            text.setStyle("-fx-font-weight: bold;");
+         }
+         textFlow.getChildren().add(text);
+      }
+      return textFlow;
+   }
+
    public static class TableRow {
       private final HeimatController.Mapping mapping;
 
@@ -755,7 +766,7 @@ public class ExternalProjectsSyncController {
       public TableRow(HeimatController.Mapping mapping, String userNotes, final long userSeconds) {
          this.mapping = mapping;
          this.shouldSyncCheckBox = new SimpleBooleanProperty(mapping.shouldBeSynced());
-         this.syncStatus = mapping.syncMessage();
+         this.syncStatus = convertStyledMessageToTextFlow(mapping.syncMessage());
          this.bookingHint = new SimpleStringProperty(mapping.bookingHint());
 
          this.keeptimeNotes = new SimpleStringProperty(mapping.keeptimeNotes());
