@@ -110,12 +110,12 @@ public class App extends Application {
       final Locale systemDefaultLocale = Locale.getDefault();
       final Locale wantedApplicationLocale = Locale.ENGLISH;
 
-      if(systemDefaultLocale.getLanguage().equals(wantedApplicationLocale.getLanguage())){
-         LOG.debug("Application Locale already is '{}'. Nothing to do.", wantedApplicationLocale);
+      if (systemDefaultLocale.getLanguage().equals(wantedApplicationLocale.getLanguage())) {
+         LOG.debug("Application locale already is '{}'. Nothing to do.", wantedApplicationLocale);
          return;
       }
 
-      LOG.info("Setting application Locale to '{}', was '{}'.", wantedApplicationLocale, systemDefaultLocale);
+      LOG.info("Setting application locale to '{}', was '{}'.", wantedApplicationLocale, systemDefaultLocale);
       Locale.setDefault(wantedApplicationLocale);
       Locale.setDefault(Locale.Category.DISPLAY, wantedApplicationLocale);
       // keep system locale for format conversions (date, currency, numbers)
@@ -137,12 +137,13 @@ public class App extends Application {
       }
    }
 
-   public static void showErrorDialogAndWait(String title, String header, String content, final Exception e, Window window) {
+   public static void showErrorDialogAndWait(String title, String header, String content, final Exception e,
+         Window window) {
       final Alert alert = new Alert(AlertType.ERROR);
       alert.setTitle(title);
       alert.setHeaderText(header);
       alert.setContentText(content);
-      if(window != null) {
+      if (window != null) {
          alert.initOwner(window);
       }
       final StringWriter sw = new StringWriter();
