@@ -130,6 +130,8 @@ public class ExternalProjectsSyncController {
    private final Color colorLoadingSuccess = Color.valueOf("#74a317");
    private final Color colorLoadingFailure = Color.valueOf("#c63329");
 
+   private boolean shiftDown = false;
+
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
 
    private SearchPopup<HeimatTask> heimatTaskSearchPopup;
@@ -633,24 +635,6 @@ public class ExternalProjectsSyncController {
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
 
-      BooleanProperty shiftDown = new SimpleBooleanProperty(false);
-
-      spinner.sceneProperty().addListener((obs, oldScene, newScene) -> {
-         if (newScene != null) {
-            newScene.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-               if (event.getCode() == KeyCode.SHIFT) {
-                  shiftDown.set(false);
-               }
-            });
-
-            newScene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
-               if (event.getCode() == KeyCode.SHIFT) {
-                  shiftDown.set(true);
-               }
-            });
-         }
-      });
-
       spinner.focusedProperty().addListener(e -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = spinner.getEditor().textProperty();
@@ -673,7 +657,7 @@ public class ExternalProjectsSyncController {
                   return;
                final LocalTime time = getValue();
 
-               if (shiftDown.get())
+               if (shiftDown)
                   setValue(decrementToNextHour(time));
                else
                   setValue(decrementToLastFullQuarter(time));
@@ -689,7 +673,7 @@ public class ExternalProjectsSyncController {
                   return;
                final LocalTime time = getValue();
 
-               if (shiftDown.get())
+               if (shiftDown)
                   setValue(incrementToNextHour(time));
                else
                   setValue(incrementToNextFullQuarter(time));
@@ -727,6 +711,22 @@ public class ExternalProjectsSyncController {
 
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
+
+      registerKeyEventListenersForSpinners(thisStage);
+   }
+
+   private void registerKeyEventListenersForSpinners(final Stage thisStage) {
+      thisStage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+         if (event.getCode() == KeyCode.SHIFT) {
+            shiftDown = false;
+         }
+      });
+
+      thisStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+         if (event.getCode() == KeyCode.SHIFT) {
+            shiftDown = true;
+         }
+      });
    }
 
    /**
