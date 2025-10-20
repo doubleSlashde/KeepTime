@@ -282,11 +282,6 @@ public class ExternalProjectsSyncController {
                for (Project project : item) {
                   HBox row = createRow(project.getColor(), project.getName());
                   vbox.getChildren().add(row);
-
-                  // Set tooltip for the label
-                  Label label = (Label) row.getChildren().get(1);
-                  Tooltip tooltip = new Tooltip(label.getText());
-                  label.setTooltip(tooltip);
                }
                setGraphic(vbox);
             }
@@ -295,6 +290,7 @@ public class ExternalProjectsSyncController {
          private HBox createRow(Color color, String text) {
             Circle circle = new Circle(6, color);
             Label label = new Label(text);
+            label.setTooltip(new Tooltip(text));
 
             label.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(label, Priority.ALWAYS);
@@ -441,20 +437,20 @@ public class ExternalProjectsSyncController {
             }
 
             TextFlow statusFlow = item.syncStatus;
-            String status = statusFlow.getChildren()
+            String statusForTooltip = statusFlow.getChildren()
                                       .stream()
-                                      .filter(n -> n instanceof Text)
+                                      .filter(Text.class::isInstance)
                                       .map(n -> ((Text) n).getText())
                                       .collect(Collectors.joining());
 
             if (!item.bookingHint.isEmpty().get()) {
                statusFlow = new TextFlow(statusFlow);
-               tooltip.setText(status + "\n" + item.bookingHint.get());
+               tooltip.setText(statusForTooltip + "\n" + item.bookingHint.get());
                Text icon = new Text("ⓘ ");
                icon.setStyle("-fx-text-fill: #1c2070; -fx-font-size: 14px;");
                statusFlow.getChildren().add(0, icon);
             } else {
-               tooltip.setText(status);
+               tooltip.setText(statusForTooltip);
             }
 
             // Fix Cell height not aligning with Textflow
@@ -475,6 +471,7 @@ public class ExternalProjectsSyncController {
 
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
       mappingTableView.setSelectionModel(null);
+      mappingTableView.setFocusTraversable(false);
       mappingTableView.getColumns().forEach(column -> column.setSortable(false));
 
       saveButton.setOnAction(ae -> {
@@ -638,7 +635,8 @@ public class ExternalProjectsSyncController {
          final StringProperty text = spinner.getEditor().textProperty();
          try {
             stringConverter.fromString(text.get());
-            spinner.increment(0);
+            // needed to log in value from editor to spinner
+            spinner.increment(0); // TODO find better Solution
          } catch (final DateTimeParseException ex) {
             text.setValue(spinner.getValue().toString());
          }
