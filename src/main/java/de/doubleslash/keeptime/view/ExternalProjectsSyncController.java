@@ -25,7 +25,7 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.model.StyledMessage;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
-import de.doubleslash.keeptime.viewpopup.SearchPopup;
+import de.doubleslash.keeptime.viewpopup.SearchCombobox;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.RotateTransition;
@@ -208,10 +208,10 @@ public class ExternalProjectsSyncController {
          tasksNotInList.setPredicate(predicate);
       });
 
-      SearchPopup<HeimatTask> heimatTaskSearchPopup = new SearchPopup<>(tasksNotInList);
-      heimatTaskSearchPopup.setDisplayTextFunction(task -> task.taskHolderName() + " - " + task.name());
+      SearchCombobox<HeimatTask> heimatTaskSearchCombobox = new SearchCombobox<>(tasksNotInList);
+      heimatTaskSearchCombobox.setDisplayTextFunction(task -> task.taskHolderName() + " - " + task.name());
 
-      heimatTaskSearchPopup.setOnItemSelected((selectedTask, popup) -> {
+      heimatTaskSearchCombobox.setOnItemSelected((selectedTask, popup) -> {
          if (selectedTask == null)
             return;
          boolean alreadyExists = items.stream().anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
@@ -229,10 +229,10 @@ public class ExternalProjectsSyncController {
          itemsForBindings.add(addedRow); // add new row also to items2 - as it is not added automatically :(
          mappingTableView.scrollTo(items.size() - 1); // scroll to newly added row
       });
-      heimatTaskSearchPopup.setClearFieldAfterSelection(true);
+      heimatTaskSearchCombobox.setClearFieldAfterSelection(true);
 
-      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getComboBox());
-      HBox.setHgrow(heimatTaskSearchPopup.getComboBox(), Priority.ALWAYS);
+      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchCombobox.getComboBox());
+      HBox.setHgrow(heimatTaskSearchCombobox.getComboBox(), Priority.ALWAYS);
    }
 
    @FXML
@@ -291,9 +291,6 @@ public class ExternalProjectsSyncController {
             Circle circle = new Circle(6, color);
             Label label = new Label(text);
             label.setTooltip(new Tooltip(text));
-
-            label.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(label, Priority.ALWAYS);
 
             return new HBox(5, circle, label);
          }
@@ -453,10 +450,6 @@ public class ExternalProjectsSyncController {
             } else {
                tooltip.setText(statusForTooltip);
             }
-
-            // Fix Cell height not aligning with Textflow
-            // https://stackoverflow.com/questions/42855724/textflow-inside-tablecell-not-correct-cell-height
-            statusFlow.maxWidthProperty().bind(column.widthProperty());
 
             setGraphic(new Group(statusFlow));
 

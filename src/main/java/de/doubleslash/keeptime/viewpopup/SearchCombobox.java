@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SearchPopup<T> {
+public class SearchCombobox<T> {
    private final TextField searchField = new TextField();
    private final Button showSuggestionsButton = new Button("▼");
    private final ListView<T> suggestionList = new ListView<>();
@@ -33,14 +33,10 @@ public class SearchPopup<T> {
    private String promptText = "Select item…";
    private double maxSuggestionHeight = 200;
 
-   private BiConsumer<T, SearchPopup<T>> onItemSelected = (item, popup) -> {};
+   private BiConsumer<T, SearchCombobox<T>> onItemSelected = (item, popup) -> {};
    private boolean clearFieldAfterSelection = false;
 
-   public SearchPopup() {
-      this(FXCollections.observableArrayList());
-   }
-
-   public SearchPopup(ObservableList<T> items) {
+   public SearchCombobox(ObservableList<T> items) {
       container = new HBox(searchField, showSuggestionsButton);
       container.getStyleClass().add("search-popup-container");
       container.setAlignment(Pos.CENTER_LEFT);
@@ -246,7 +242,7 @@ public class SearchPopup<T> {
       return displayTextFunction;
    }
 
-   public void setOnItemSelected(BiConsumer<T, SearchPopup<T>> handler) {
+   public void setOnItemSelected(BiConsumer<T, SearchCombobox<T>> handler) {
       this.onItemSelected = handler != null ? handler : (item, popup) -> {};
    }
 
