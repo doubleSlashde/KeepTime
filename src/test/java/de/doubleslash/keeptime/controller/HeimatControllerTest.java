@@ -240,13 +240,9 @@ class HeimatControllerTest {
       // ASSERT
 
       final HeimatController.Mapping mapping = tableRows.get(0);
-      String syncMessage = mapping.syncMessage().getChildren().stream()
-                                  .filter(n -> n instanceof Text)
-                                  .map(n -> ((Text) n).getText())
-                                  .collect(Collectors.joining());
       assertFalse(mapping.canBeSynced());
       assertFalse(mapping.shouldBeSynced());
-      assertThat(syncMessage, Matchers.containsString("is not available"));
+      assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString("is not available"));
    }
 
    @Test
@@ -260,15 +256,11 @@ class HeimatControllerTest {
       final HeimatController.Mapping mapping = tableRows.get(0);
 
       // ASSERT
-      String syncMessage = mapping.syncMessage().getChildren().stream()
-                                  .filter(n -> n instanceof Text)
-                                  .map(n -> ((Text) n).getText())
-                                  .collect(Collectors.joining());
       assertTrue(mapping.canBeSynced());
       assertTrue(mapping.shouldBeSynced());
       assertThat(mapping.keeptimeSeconds(), Matchers.is(13 * 60L));
       assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1"));
-      assertThat(syncMessage, Matchers.containsString(project1To1Mapping.getExternalTaskName()));
+      assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName()));
    }
 
    @Test
@@ -363,13 +355,9 @@ class HeimatControllerTest {
       final HeimatController.Mapping mapping = tableRows.get(0);
 
       // ASSERT
-      String syncMessage = mapping.syncMessage().getChildren().stream()
-                                             .filter(n -> n instanceof Text)
-                                             .map(n -> ((Text) n).getText())
-                                             .collect(Collectors.joining());
       assertAll(() -> assertTrue(mapping.canBeSynced()), () -> assertFalse(mapping.shouldBeSynced()),
-            () -> assertThat(syncMessage, Matchers.containsString("Not mapped in KeepTime")),
-            () -> assertThat(syncMessage, Matchers.containsString(project1To1Mapping.getExternalTaskName())),
+            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString("Not mapped in KeepTime")),
+            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
             () -> assertThat(mapping.projects().size(), Matchers.is(0)),
@@ -397,14 +385,10 @@ class HeimatControllerTest {
       final HeimatController.Mapping mapping = tableRows.get(0);
 
       // ASSERT
-      String syncMessage = mapping.syncMessage().getChildren().stream()
-                                  .filter(n -> n instanceof Text)
-                                  .map(n -> ((Text) n).getText())
-                                  .collect(Collectors.joining());
       assertAll(() -> assertThat(tableRows.size(), Matchers.is(1)), () -> assertTrue(mapping.canBeSynced()),
             () -> assertTrue(mapping.canBeSynced()), () -> assertFalse(mapping.shouldBeSynced()),
-            () -> assertThat(syncMessage, Matchers.containsString("Present in HEIMAT but not KeepTime")),
-            () -> assertThat(syncMessage, Matchers.containsString(project1To1Mapping.getExternalTaskName())),
+            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString("Present in HEIMAT but not KeepTime")),
+            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
             () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2)),
@@ -569,11 +553,7 @@ class HeimatControllerTest {
       assertThat(mapping.heimatNotes(), Matchers.is("Heimat note"));
       assertThat(mapping.heimatSeconds(), Matchers.is(15 * 60L));
 
-      String syncMessage = mapping.syncMessage().getChildren().stream()
-                                  .filter(n -> n instanceof Text)
-                                  .map(n -> ((Text) n).getText())
-                                  .collect(Collectors.joining());
-      assertThat(syncMessage, Matchers.not(Matchers.containsString("Present in HEIMAT but not KeepTime")));
-      assertThat(syncMessage, Matchers.containsString(project1To1Mapping.getExternalTaskName()));
+      assertThat(mapping.syncMessage().toPlainText(), Matchers.not(Matchers.containsString("Present in HEIMAT but not KeepTime")));
+      assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName()));
    }
 }

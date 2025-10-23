@@ -22,9 +22,10 @@ import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.StyledMessage;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
-import de.doubleslash.keeptime.viewpopup.SearchPopup;
+import de.doubleslash.keeptime.viewpopup.SearchCombobox;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.RotateTransition;
@@ -129,11 +130,11 @@ public class ExternalProjectsSyncController {
    private final Color colorLoadingSuccess = Color.valueOf("#74a317");
    private final Color colorLoadingFailure = Color.valueOf("#c63329");
 
+   private boolean shiftDown = false;
+
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
 
-   private SearchPopup<HeimatTask> heimatTaskSearchPopup;
    private ObservableList<TableRow> items;
-   private ObservableList<TableRow> itemsForBindings;
 
    private LocalDate currentReportDate;
    private Stage thisStage;
@@ -167,7 +168,7 @@ public class ExternalProjectsSyncController {
 
       mappingTableView.setItems(items);
 
-      itemsForBindings = FXCollections.observableArrayList(
+      ObservableList<TableRow> itemsForBindings = FXCollections.observableArrayList(
             item -> new javafx.beans.Observable[] { item.userTimeSeconds, item.shouldSyncCheckBox, item.userNotes });
       itemsForBindings.addAll(items);
       StringBinding totalSum = Bindings.createStringBinding(() -> localTimeStringConverter.toString(
@@ -208,39 +209,33 @@ public class ExternalProjectsSyncController {
          tasksNotInList.setPredicate(predicate);
       });
 
-      heimatTaskSearchPopup = new SearchPopup<>(tasksNotInList);
-      heimatTaskSearchPopup.setDisplayTextFunction(
-            task -> task.taskHolderName() + " - " + task.name()
-      );
+      SearchCombobox<HeimatTask> heimatTaskSearchCombobox = new SearchCombobox<>(tasksNotInList);
+      heimatTaskSearchCombobox.setDisplayTextFunction(task -> task.taskHolderName() + " - " + task.name());
 
-      heimatTaskSearchPopup.setOnItemSelected((selectedTask, popup) -> {
-         if (selectedTask == null) return;
-         boolean alreadyExists = items.stream()
-                                      .anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
-         if (alreadyExists) return;
+      heimatTaskSearchCombobox.setOnItemSelected((selectedTask, popup) -> {
+         if (selectedTask == null)
+            return;
+         boolean alreadyExists = items.stream().anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
+         if (alreadyExists)
+            return;
 
-         Text externalTaskName = new Text(selectedTask.name());
-         externalTaskName.setStyle("-fx-font-weight: bold;");
-         TextFlow syncMessage = new TextFlow(new Text("Manually added\n\nSync to "), externalTaskName,
-               new Text("\n(" + selectedTask.taskHolderName() + ")"));
+         StyledMessage syncMessage = StyledMessage.of(new StyledMessage.TextSegment("Manually added\n\nSync to "),
+               new StyledMessage.TextSegment(selectedTask.name(), true),
+               new StyledMessage.TextSegment("\n(" + selectedTask.taskHolderName() + ")"));
 
          TableRow addedRow = new TableRow(
-               new HeimatController.Mapping(
-                     selectedTask.id(), true, true,
-                     syncMessage, "",
-                     List.of(), List.of(), "", "", 0, 0
-               ),
-               "", 0
-         );
+               new HeimatController.Mapping(selectedTask.id(), true, true, syncMessage, selectedTask.bookingHint(), List.of(), List.of(), "",
+                     "", 0, 0), "", 0);
          items.add(addedRow);
-         itemsForBindings.add(addedRow);
-         mappingTableView.scrollTo(items.size() - 1);
+         itemsForBindings.add(addedRow); // add new row also to items2 - as it is not added automatically :(
+         mappingTableView.scrollTo(items.size() - 1); // scroll to newly added row
       });
-      heimatTaskSearchPopup.setClearFieldAfterSelection(true);
-      heimatTaskSearchPopup.setMaxSuggestionHeight(220);
-      heimatTaskSearchPopup.setPromptText("Select Project...");
-      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchPopup.getComboBox());
-      HBox.setHgrow(heimatTaskSearchPopup.getComboBox(), Priority.ALWAYS);
+
+      heimatTaskSearchCombobox.setClearFieldAfterSelection(true);
+      heimatTaskSearchCombobox.setMaxSuggestionHeight(220);
+      heimatTaskSearchCombobox.setPromptText("Select Project...");
+      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchCombobox.getComboBox());
+      HBox.setHgrow(heimatTaskSearchCombobox.getComboBox(), Priority.ALWAYS);
    }
 
    @FXML
@@ -290,11 +285,6 @@ public class ExternalProjectsSyncController {
                for (Project project : item) {
                   HBox row = createRow(project.getColor(), project.getName());
                   vbox.getChildren().add(row);
-
-                  // Set tooltip for the label
-                  Label label = (Label) row.getChildren().get(1);
-                  Tooltip tooltip = new Tooltip(label.getText());
-                  label.setTooltip(tooltip);
                }
                setGraphic(vbox);
             }
@@ -303,9 +293,7 @@ public class ExternalProjectsSyncController {
          private HBox createRow(Color color, String text) {
             Circle circle = new Circle(6, color);
             Label label = new Label(text);
-
-            label.setMaxWidth(Double.MAX_VALUE);
-            HBox.setHgrow(label, Priority.ALWAYS);
+            label.setTooltip(new Tooltip(text));
 
             return new HBox(5, circle, label);
          }
@@ -449,27 +437,22 @@ public class ExternalProjectsSyncController {
             }
 
             TextFlow statusFlow = item.syncStatus;
-            String status = statusFlow.getChildren().stream()
-                                      .filter(n -> n instanceof Text)
+            String statusForTooltip = statusFlow.getChildren()
+                                      .stream()
+                                      .filter(Text.class::isInstance)
                                       .map(n -> ((Text) n).getText())
                                       .collect(Collectors.joining());
 
-
-
-            if (!item.bookingHint.isEmpty().get()) {
+            final String bookingHint = item.bookingHint.get();
+            if (!bookingHint.isEmpty()) {
                statusFlow = new TextFlow(statusFlow);
-               tooltip.setText(status + "\n" + item.bookingHint.get());
-               Text icon = new Text("ⓘ ");
+               tooltip.setText(statusForTooltip + "\nBookinghint: " + bookingHint);
+               Text icon = new Text(" ⓘ");
                icon.setStyle("-fx-text-fill: #1c2070; -fx-font-size: 14px;");
-               statusFlow.getChildren().add(0, icon);
+               statusFlow.getChildren().add(icon);
+            } else {
+               tooltip.setText(statusForTooltip);
             }
-            else {
-               tooltip.setText(status);
-            }
-
-            // Fix Cell height not aligning with Textflow
-            // https://stackoverflow.com/questions/42855724/textflow-inside-tablecell-not-correct-cell-height
-            statusFlow.maxWidthProperty().bind(column.widthProperty());
 
             setGraphic(new Group(statusFlow));
 
@@ -485,6 +468,7 @@ public class ExternalProjectsSyncController {
 
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
       mappingTableView.setSelectionModel(null);
+      mappingTableView.setFocusTraversable(false);
       mappingTableView.getColumns().forEach(column -> column.setSortable(false));
 
       saveButton.setOnAction(ae -> {
@@ -647,30 +631,13 @@ public class ExternalProjectsSyncController {
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
 
-      BooleanProperty shiftDown = new SimpleBooleanProperty(false);
-
-      spinner.sceneProperty().addListener((obs, oldScene, newScene) -> {
-         if (newScene != null) {
-            newScene.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
-               if (event.getCode() == KeyCode.SHIFT) {
-                  shiftDown.set(false);
-               }
-            });
-
-            newScene.addEventFilter(KeyEvent.KEY_PRESSED, event ->{
-               if (event.getCode() == KeyCode.SHIFT) {
-                  shiftDown.set(true);
-               }
-            });
-         }
-      });
-
       spinner.focusedProperty().addListener(e -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = spinner.getEditor().textProperty();
          try {
             stringConverter.fromString(text.get());
-            spinner.increment(0);
+            // needed to log in value from editor to spinner
+            spinner.increment(0); // TODO find better Solution
          } catch (final DateTimeParseException ex) {
             text.setValue(spinner.getValue().toString());
          }
@@ -687,7 +654,7 @@ public class ExternalProjectsSyncController {
                   return;
                final LocalTime time = getValue();
 
-               if (shiftDown.get())
+               if (shiftDown)
                   setValue(decrementToNextHour(time));
                else
                   setValue(decrementToLastFullQuarter(time));
@@ -703,7 +670,7 @@ public class ExternalProjectsSyncController {
                   return;
                final LocalTime time = getValue();
 
-               if (shiftDown.get())
+               if (shiftDown)
                   setValue(incrementToNextHour(time));
                else
                   setValue(incrementToNextFullQuarter(time));
@@ -742,12 +709,48 @@ public class ExternalProjectsSyncController {
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
 
+
       thisStage.setOnCloseRequest(e -> {
          if (closingTimeline != null) {
             closingTimeline.stop();
             closingTimeline = null;
          }
       });
+
+      registerKeyEventListenersForSpinners(thisStage);
+   }
+
+   private void registerKeyEventListenersForSpinners(final Stage thisStage) {
+      thisStage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+         if (event.getCode() == KeyCode.SHIFT) {
+            shiftDown = false;
+         }
+      });
+
+      thisStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+         if (event.getCode() == KeyCode.SHIFT) {
+            shiftDown = true;
+         }
+      });
+   }
+
+   /**
+    * Converts a StyledMessage to a TextFlow for UI display.
+    *
+    * @param styledMessage
+    *       The styled message to convert
+    * @return A TextFlow with properly styled text segments
+    */
+   private static TextFlow convertStyledMessageToTextFlow(StyledMessage styledMessage) {
+      TextFlow textFlow = new TextFlow();
+      for (StyledMessage.TextSegment segment : styledMessage.getSegments()) {
+         Text text = new Text(segment.text());
+         if (segment.bold()) {
+            text.setStyle("-fx-font-weight: bold;");
+         }
+         textFlow.getChildren().add(text);
+      }
+      return textFlow;
    }
 
    public static class TableRow {
@@ -768,7 +771,7 @@ public class ExternalProjectsSyncController {
       public TableRow(HeimatController.Mapping mapping, String userNotes, final long userSeconds) {
          this.mapping = mapping;
          this.shouldSyncCheckBox = new SimpleBooleanProperty(mapping.shouldBeSynced());
-         this.syncStatus = mapping.syncMessage();
+         this.syncStatus = convertStyledMessageToTextFlow(mapping.syncMessage());
          this.bookingHint = new SimpleStringProperty(mapping.bookingHint());
 
          this.keeptimeNotes = new SimpleStringProperty(mapping.keeptimeNotes());

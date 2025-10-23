@@ -24,7 +24,7 @@ import de.doubleslash.keeptime.model.Model;
 import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.rest.integration.heimat.model.ExistingAndInvalidMappings;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
-import de.doubleslash.keeptime.viewpopup.SearchPopup;
+import de.doubleslash.keeptime.viewpopup.SearchCombobox;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -142,7 +142,7 @@ public class ExternalProjectsMapController {
       TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("HEIMAT project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getHeimatTask()));
       externalColumn.setCellFactory(col -> new TableCell<>() {
-         private final SearchPopup<HeimatTask> searchPopup = new SearchPopup<>(externalProjectsObservableList);
+         private final SearchCombobox<HeimatTask> searchPopup = new SearchCombobox<>(externalProjectsObservableList);
 
          {
             searchPopup.setDisplayTextFunction(ht -> ht == null ? "" : ht.taskHolderName() + " - " + ht.name());

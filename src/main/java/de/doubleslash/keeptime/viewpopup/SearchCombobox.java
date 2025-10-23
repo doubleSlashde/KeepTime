@@ -18,7 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class SearchPopup<T> {
+public class SearchCombobox<T> {
    private final TextField searchField = new TextField();
    private final Button showSuggestionsButton = new Button("▼");
    private final ListView<T> suggestionList = new ListView<>();
@@ -33,15 +33,11 @@ public class SearchPopup<T> {
    private String promptText = "Select item…";
    private double maxSuggestionHeight = 200;
 
-   private BiConsumer<T, SearchPopup<T>> onItemSelected = (item, popup) -> {
+   private BiConsumer<T, SearchCombobox<T>> onItemSelected = (item, popup) -> {
    };
    private boolean clearFieldAfterSelection = false;
 
-   public SearchPopup() {
-      this(FXCollections.observableArrayList());
-   }
-
-   public SearchPopup(ObservableList<T> items) {
+   public SearchCombobox(ObservableList<T> items) {
       container = new HBox(searchField, showSuggestionsButton);
       container.getStyleClass().add("search-popup-container");
       container.setAlignment(Pos.CENTER_LEFT);
@@ -69,6 +65,7 @@ public class SearchPopup<T> {
       suggestionList.setCellFactory(listView -> new ListCell<>() {
          private final Label label = new Label();
          private final StackPane pane = new StackPane(label);
+
          {
             label.setWrapText(true);
             label.setStyle("-fx-padding: 2;");
@@ -202,7 +199,7 @@ public class SearchPopup<T> {
       suggestionList.setMaxHeight(height);
    }
 
-   public HBox getComboBox() { return container; }
+   public HBox getComboBox() {return container;}
 
    public void show(Node owner) {
       if (owner == null || suggestionList.getItems().isEmpty())
@@ -232,20 +229,20 @@ public class SearchPopup<T> {
       return null;
    }
 
-   public TextField getSearchField() { return searchField; }
+   public TextField getSearchField() {return searchField;}
 
-   public ListView<T> getSuggestionList() { return suggestionList; }
+   public ListView<T> getSuggestionList() {return suggestionList;}
 
-   public Button getShowSuggestionsButton() { return showSuggestionsButton; }
+   public Button getShowSuggestionsButton() {return showSuggestionsButton;}
 
-   public Function<T, String> getDisplayTextFunction() { return displayTextFunction; }
+   public Function<T, String> getDisplayTextFunction() {return displayTextFunction;}
 
-   public void setOnItemSelected(BiConsumer<T, SearchPopup<T>> handler) {
+   public void setOnItemSelected(BiConsumer<T, SearchCombobox<T>> handler) {
       this.onItemSelected = handler != null ? handler : (item, popup) -> {
       };
    }
 
-   public void setClearFieldAfterSelection(boolean c) { this.clearFieldAfterSelection = c; }
+   public void setClearFieldAfterSelection(boolean c) {this.clearFieldAfterSelection = c;}
 
    public void clear() {
       searchField.clear();
