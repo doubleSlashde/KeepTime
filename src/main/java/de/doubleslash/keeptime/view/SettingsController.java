@@ -415,21 +415,25 @@ public class SettingsController {
       heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
          try{
             final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
-            if (!JwtDecoder.isExpired(jwt, LocalDateTime.now())) {
-               heimatExpiresLabel.setText("Expired:");
-               heimatExpiresLabel.setTextFill(Color.RED);
+            final boolean isExpired = !JwtDecoder.isExpired(jwt, LocalDateTime.now());
+            final String expirationDate = jwt.expiration().toString();
+            
+            // Keep label text consistent, show expired status in the value
+            heimatExpiresLabel.setText("Expires:");
+            heimatExpiresLabel.setTextFill(Color.BLACK);
+            
+            if (isExpired) {
+               expirationDateLabel.setText(expirationDate + " (Expired)");
                expirationDateLabel.setTextFill(Color.RED);
             } else {
-               heimatExpiresLabel.setText("Expires:");
-               heimatExpiresLabel.setTextFill(Color.BLACK);
+               expirationDateLabel.setText(expirationDate);
                expirationDateLabel.setTextFill(Color.BLACK);
             }
 
-            expirationDateLabel.setText(jwt.expiration().toString());
-
          } catch(Exception e){
-            heimatExpiresLabel.setText("");
+            heimatExpiresLabel.setText("Expires:");
             expirationDateLabel.setText("Does not seem to be valid");
+            expirationDateLabel.setTextFill(Color.RED);
          }
       });
       heimatValidateConnectionLabel.setText("Not validated.");

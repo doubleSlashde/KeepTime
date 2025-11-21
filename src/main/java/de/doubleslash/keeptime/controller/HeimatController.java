@@ -171,28 +171,15 @@ public class HeimatController {
          if (optionalExistingMapping.isPresent()) {
             final Mapping existingMapping = optionalExistingMapping.get();
 
-            // Ensure we merge projects robustly: include any projects mapped to the same Heimat task
+            // Only include projects that were actually worked on at this date
             final ArrayList<Project> projects = new ArrayList<>(existingMapping.projects());
-            if (optHeimatMapping.isPresent()) {
-               final long mappedTaskId = optHeimatMapping.get().getExternalTaskId();
-               final List<Project> allMappedForTask = mappedProjects.stream()
-                                                                    .filter(
-                                                                          mp -> mp.getExternalTaskId() == mappedTaskId)
-                                                                    .map(ExternalProjectMapping::getProject)
-                                                                    .toList();
-               for (Project p : allMappedForTask) {
-                  boolean alreadyContains = projects.stream().anyMatch(pp -> pp.getId() == p.getId());
-                  if (!alreadyContains) {
-                     projects.add(p);
-                  }
-               }
-            } else {
-               // fallback: ensure current project is present
-               boolean alreadyContains = projects.stream().anyMatch(p -> p.getId() == project.getId());
-               if (!alreadyContains) {
-                  projects.add(project);
-               }
+            // Ensure current project is present (it's already in workedProjectsSet, so it was worked on)
+            boolean alreadyContains = projects.stream().anyMatch(p -> p.getId() == project.getId());
+            if (!alreadyContains) {
+               projects.add(project);
             }
+            // Filter to only keep projects that were actually worked on
+            projects.removeIf(p -> !workedProjectsSet.contains(p));
 
             final long keepTimeSeconds = existingMapping.keeptimeSeconds() + projectWorkSeconds;
             final long heimatSeconds = existingMapping.heimatSeconds();
@@ -214,15 +201,14 @@ public class HeimatController {
             list.remove(existingMapping);
             list.add(mapping);
          } else {
-            // FIX: when creating a new mapping row for a project that is mapped to a Heimat task,
-            // include ALL Projects that are mapped to the same Heimat task so that projects without
-            // KeepTime entries (no worked time) are also shown in the same row (case 4).
+            // Only include projects that were actually worked on at this date
             final List<Project> projects;
             if (optHeimatMapping.isPresent()) {
                final long mappedTaskId = optHeimatMapping.get().getExternalTaskId();
                projects = mappedProjects.stream()
                                         .filter(mp -> mp.getExternalTaskId() == mappedTaskId)
                                         .map(ExternalProjectMapping::getProject)
+                                        .filter(workedProjectsSet::contains)
                                         .collect(Collectors.toList());
             } else {
                projects = Collections.singletonList(project);
@@ -256,9 +242,12 @@ public class HeimatController {
             taskName = heimatTask.name() + "\n" + heimatTask.taskHolderName();
          }
 
-         final Mapping mapping = new Mapping(id, true, false,
-               StyledMessage.of(new StyledMessage.TextSegment("Not mapped in KeepTime\n\n" + taskName)), "", times,
+         // Build sync message with task name in bold
+         StyledMessage syncMessage = StyledMessage.of(
+               new StyledMessage.TextSegment("Not mapped in KeepTime\n\n"),
+               new StyledMessage.TextSegment(taskName, true));
 
+         final Mapping mapping = new Mapping(id, true, false, syncMessage, "", times,
                new ArrayList<>(0), heimatNotes, "", heimatTimeSeconds, 0);
          list.add(mapping);
       });
@@ -281,23 +270,8 @@ public class HeimatController {
             long heimatTimeSeconds = addHeimatTimes(times);
 
             final Optional<Mapping> existingMappingInList = list.stream().filter(m -> m.heimatTaskId == id).findAny();
+            // If there's already a mapping from worked-on projects, don't add non-worked projects to it
             if (existingMappingInList.isPresent()) {
-               Mapping existing = existingMappingInList.get();
-               // only add if not already present
-               boolean alreadyContains = existing.projects()
-                                                 .stream()
-                                                 .anyMatch(
-                                                       p -> p.getId() == externalProjectMapping.getProject().getId());
-               if (!alreadyContains) {
-                  ArrayList<Project> newProjects = new ArrayList<>(existing.projects());
-                  newProjects.add(externalProjectMapping.getProject());
-                  Mapping updated = new Mapping(existing.heimatTaskId, existing.canBeSynced, existing.shouldBeSynced,
-                        existing.syncMessage, existing.bookingHint, existing.existingTimes, newProjects,
-                        existing.heimatNotes, existing.keeptimeNotes, existing.heimatSeconds, existing.keeptimeSeconds);
-                  list.remove(existing);
-                  list.add(updated);
-               }
-               // skip creating a separate entry
                continue;
             }
 
