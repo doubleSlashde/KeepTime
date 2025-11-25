@@ -73,6 +73,6 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 ## Requirements
 * Operating System
   * Windows 7, 10, 11
-  * Linux (tested on Ubuntu 18.04)
+  * Linux (tested on Ubuntu 18.04, Fedora Workstation 43)
   * Mac (tested on MacBook M2 Pro (ARM based CPU))
 * Java >= 17
