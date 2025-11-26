@@ -8,14 +8,13 @@ The following instructions explain how to build KeepTime from sources.
   * 17 ✅
   * 21 ✅
   * 23 ✅
-  * 25 ❗ (Compatible for building without test)
+  * 25 ❗
 * Maven
 
 Amazon Corretto JDK has JavaFx Bundled.  
 For other JDKs you may have to install JavaFx separately.
 
-The Mockito mocking library version in use for tests is not compatible with Java 25.  
-If you trust us and you don't need to run test but you just want to build from the stable `main` branch, Java 25 is supported.
+The Mockito mocking library version in use for tests is not compatible with Java 25.
 
 ## Build Commands
 
