@@ -168,6 +168,12 @@
       <version>2.18.2</version>
     </dependency>
 
+    <!-- for Argon2PasswordEncoder -->
+    <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk18on</artifactId>
+        <version>1.78.1</version> <!-- or latest -->
+    </dependency>
   </dependencies>
   <build>
     <finalName>keeptime-${project.version}</finalName>
