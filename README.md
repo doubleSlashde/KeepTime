@@ -30,17 +30,17 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 
 #### Heimat Integration
 
-KeepTime can be integrated with Heimat, allowing you to map and import your Heimat projects directly into KeepTime.
+KeepTime can be integrated with [Heimat](https://doubleslash.heimat.software), allowing you to map and import your Heimat projects directly into KeepTime.
 
 To enable Heimat integration:
 
 1. In the Settings, switch to the "Heimat" section.
-![Settings Heimat](readme/images/settingsHeimat.png?raw=true "Settings Heimat")
-2. Enter the following details:
-    - **URL:** `https://doubleslash.heimat.software`
+   ![Settings Heimat](readme/images/settingsHeimat.png?raw=true "Settings Heimat")
+1. Enter the following details:
+    - **URL:** `https://your-heimat-domain-com`
     - **Access Token:** Retrieve your access token from Heimat and paste it here.
 ![Heimat Website](readme/images/heimatWebsite.png?raw=true "Heimat Website")
-3. Click on **"Validate connection"**. If the connection is valid, you can proceed.
+1. Click on **"Validate connection"**. If the connection is valid, you can proceed.
 
 Once the connection is validated, you can use the **"Map projects"** feature to map your Heimat projects to KeepTime projects or import Heimat projects directly into KeepTime.
 

@@ -442,7 +442,7 @@
             <Region fx:id="restAPIIcon" prefHeight="15.0" prefWidth="15.0" rotate="-90.0" />
           </graphic>
         </Tab>
-            <Tab text="Heimat">
+            <Tab text="HEIMAT">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="420.0" prefWidth="407.0">
                      <children>
