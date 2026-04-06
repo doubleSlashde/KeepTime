@@ -325,7 +325,7 @@ public class ExternalProjectsSyncController {
             } else {
                keeptimeLabel.setText("KeepTime: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.keeptimeTimeSeconds.get())));
-               heimatLabel.setText("HEIMAT: " + localTimeStringConverter.toString(
+               heimatLabel.setText("Heimat: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.heimatTimeSeconds.get())));
                timeSpinner.setDisable(!item.mapping.canBeSynced());
                timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(0));
@@ -384,7 +384,7 @@ public class ExternalProjectsSyncController {
             final Label keeptimeLabel = new Label("KeepTime:");
             keeptimeLabel.setMinWidth(60);
             hbox.getChildren().addAll(copyKeepTimeNotes, keeptimeLabel, keepTimeNotesLabel);
-            final Label heimatLabel = new Label("HEIMAT:");
+            final Label heimatLabel = new Label("Heimat:");
             heimatLabel.setMinWidth(60);
             hbox2.getChildren().addAll(copyHeimatNotes, heimatLabel, heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox, hbox2);

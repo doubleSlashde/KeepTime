@@ -85,7 +85,7 @@ public class HeimatController {
       try {
          heimatAPI.isLoginValid();
       } catch (Exception e) {
-         throw new SecurityException("Could not connect to HEIMAT API. Maybe wrong configuration?", e);
+         throw new SecurityException("Could not connect to Heimat API. Maybe wrong configuration?", e);
       }
    }
 
@@ -237,7 +237,7 @@ public class HeimatController {
          long heimatTimeSeconds = addHeimatTimes(times);
 
          StyledMessage syncMessage = StyledMessage.of(
-               new StyledMessage.TextSegment("Present in HEIMAT but not KeepTime\n\nSync to "),
+               new StyledMessage.TextSegment("Present in Heimat but not KeepTime\n\nSync to "),
                new StyledMessage.TextSegment(externalProjectMapping.getExternalTaskName(), true),
                new StyledMessage.TextSegment("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
 
@@ -408,7 +408,7 @@ public class HeimatController {
                                                           .filter(ep -> ep.id() == mapping.get().getExternalTaskId())
                                                           .findAny();
          if (any.isEmpty()) {
-            LOG.warn("A mapping exists but task does not exist anymore in HEIMAT! '{}'->'{}'.",
+            LOG.warn("A mapping exists but task does not exist anymore in Heimat! '{}'->'{}'.",
                   mapping.get().getProject(), mapping.get().getExternalTaskId());
             invalidExternalMappings.add(mapping.get());
             return new ProjectMapping(p, null);
