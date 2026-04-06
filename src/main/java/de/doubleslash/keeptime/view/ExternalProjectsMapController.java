@@ -148,7 +148,7 @@ public class ExternalProjectsMapController {
       // External Project column with dropdown
       final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(
             externalProjects);
-
+      externalProjectsObservableList.add(0,null);
       TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("Heimat project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getHeimatTask()));
       externalColumn.setCellFactory(col -> new TableCell<>() {
@@ -161,7 +161,8 @@ public class ExternalProjectsMapController {
             searchPopup.setOnItemSelected((selectedTask, popup) -> {
                HeimatController.ProjectMapping mapping = getTableView().getItems().get(getIndex());
                mapping.setHeimatTask(selectedTask);
-               searchPopup.setComboBoxTooltip(selectedTask.name() + " - " + selectedTask.id());
+               if(selectedTask != null)
+                  searchPopup.setComboBoxTooltip(selectedTask.name() + " - " + selectedTask.id());
                updateItem(selectedTask, false);
             });
          }

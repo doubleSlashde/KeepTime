@@ -77,10 +77,10 @@ public class SearchCombobox<T> {
          @Override
          protected void updateItem(T item, boolean empty) {
             super.updateItem(item, empty);
-            if (empty || item == null) {
+            if (empty) {
                setGraphic(null);
             } else {
-               label.setText(displayTextFunction.apply(item));
+               label.setText(item == null ? "-" : displayTextFunction.apply(item));
                setGraphic(pane);
             }
          }
@@ -131,8 +131,7 @@ public class SearchCombobox<T> {
       suggestionList.setOnKeyPressed(ev -> {
          if (ev.getCode() == KeyCode.ENTER) {
             T selected = suggestionList.getSelectionModel().getSelectedItem();
-            if (selected != null)
-               handleSelection(selected);
+            handleSelection(selected);
          } else if (ev.getCode() == KeyCode.UP && suggestionList.getSelectionModel().getSelectedIndex() == 0) {
             searchField.requestFocus();
          } else if (ev.getCode() == KeyCode.ESCAPE) {
@@ -143,8 +142,7 @@ public class SearchCombobox<T> {
 
       suggestionList.setOnMouseClicked(ev -> {
          T selected = suggestionList.getSelectionModel().getSelectedItem();
-         if (selected != null)
-            handleSelection(selected);
+         handleSelection(selected);
       });
 
       searchField.textProperty().addListener((obs, oldText, newText) -> filterList(newText));
@@ -153,8 +151,10 @@ public class SearchCombobox<T> {
    private void filterList(String input) {
       String filter = (input == null) ? "" : input.trim().toLowerCase();
       ObservableList<T> filtered = FXCollections.observableArrayList(allItems.stream()
-                                                                             .filter(item -> displayTextFunction.apply(
-                                                                                   item).toLowerCase().contains(filter))
+                                                                             .filter(item -> {
+                                                                                if(item == null) return filter.isEmpty();
+                                                                                return displayTextFunction.apply(
+                                                                                   item).toLowerCase().contains(filter);})
                                                                              .collect(Collectors.toList()));
       suggestionList.setItems(filtered);
       if (!filtered.isEmpty() && searchField.isFocused()) {
