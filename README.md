@@ -30,7 +30,7 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 
 #### Heimat Integration
 
-KeepTime can be integrated with [Heimat](https://doubleslash.heimat.software), allowing you to map and import your Heimat projects directly into KeepTime.
+KeepTime can be integrated with [Heimat](https://heimat-software.com/), allowing you to map and import your Heimat projects directly into KeepTime.
 
 To enable Heimat integration:
 
