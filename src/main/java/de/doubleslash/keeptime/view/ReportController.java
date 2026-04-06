@@ -25,6 +25,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
@@ -169,15 +170,15 @@ public class ReportController {
          syncStage.setResizable(true);
          syncStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-         final Scene settingsScene = new Scene(syncRoot);
-         settingsScene.setOnKeyPressed(ke -> {
+         final Scene syncScene = new Scene(syncRoot);
+         syncScene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                LOG.info("pressed ESCAPE");
                syncStage.close();
             }
          });
 
-         syncStage.setScene(settingsScene);
+         syncStage.setScene(syncScene);
          syncStage.showAndWait();
       } catch (final Exception e) {
          throw new FXMLLoaderException(e);
