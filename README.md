@@ -4,6 +4,8 @@ Application to track your time spent on different projects each day. Aim was to 
 
 Create projects and choose if they are counted as 'work time'. Select the project you work on. Before you switch the project, write a comment on what u did. Change the project. Repeat.
 
+KeepTime can connect to [Heimat](https://heimat-software.com/) so you can import Heimat projects and sync your tracked time back to Heimat. Details: [heimat.md](readme/heimat.md).
+
 ## Usage
 
 ### Main view:
@@ -28,23 +30,6 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + Ask for notes when switching project (if empty): Pops up a dialog to add notes if no notes are given and you try to switch projects
 + Export: export database for backup and later import (import currently not yet implemented)
 
-#### Heimat Integration
-
-KeepTime can be integrated with [Heimat](https://heimat-software.com/), allowing you to map and import your Heimat projects directly into KeepTime.
-
-To enable Heimat integration:
-
-1. In the Settings, switch to the "HEIMAT" section.
-   ![Settings Heimat](readme/images/settingsHeimat.png?raw=true "Settings Heimat")
-1. Enter the following details:
-    - **URL:** `https://your-heimat-domain-com`
-    - **Access Token:** Retrieve your access token from Heimat and paste it here.
-![Heimat Website](readme/images/heimatWebsite.png?raw=true "Heimat Website")
-1. Click on **"Validate connection"**. If the connection is valid, you can proceed.
-
-Once the connection is validated, you can use the **"Map projects"** feature to map your Heimat projects to KeepTime projects or import Heimat projects directly into KeepTime.
-
-
 ### Reports:
 
 KeepTime’s reporting workflow works by tracking daily work and synchronizing project activities with external task management. Here’s how you use it:
@@ -61,15 +46,10 @@ KeepTime’s reporting workflow works by tracking daily work and synchronizing p
 4. **Select the Day to View**  
    Use the calendar widget to select which day’s report you want to review. Only days with recorded work are available.
 
-![Report Dialog](readme/images/reportDescription.png)
-
 5. **Synchronize Projects with Heimat**  
-   When ready to sync your work with Heimat:
-    - Open the project synchronization view.
-    - Select which projects to include in the synchronization.
-    - Press the Sync button to transfer your tracked work to Heimat.
+   If you want you can syncronize the current date with Heimat. See [heimat.md](readme/heimat.md)
 
-![External Project Dialog](readme/images/externalProjectDialog.png)
+![Report Dialog](readme/images/reportDescription.png)
 
 ## Install
 
