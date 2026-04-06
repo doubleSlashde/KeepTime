@@ -26,15 +26,14 @@ import de.doubleslash.keeptime.rest.integration.heimat.model.ExistingAndInvalidM
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
 import de.doubleslash.keeptime.view.ProjectReport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class HeimatController {
@@ -85,7 +84,7 @@ public class HeimatController {
       try {
          heimatAPI.isLoginValid();
       } catch (Exception e) {
-         throw new SecurityException("Could not connect to HEIMAT API. Maybe wrong configuration?", e);
+         throw new SecurityException("Could not connect to Heimat API. Maybe wrong configuration?", e);
       }
    }
 
@@ -254,14 +253,14 @@ public class HeimatController {
 
       taskIdToHeimatTimesMap.forEach((id, times) -> {
          final List<ExternalProjectMapping> mappingsForTask = mappedProjects.stream()
-                                                                            .filter(mp -> mp.getExternalTaskId() == id)
-                                                                            .toList();
+                 .filter(mp -> mp.getExternalTaskId() == id)
+                 .toList();
          for (ExternalProjectMapping externalProjectMapping : mappingsForTask) {
             final Optional<Project> optionalProject = workedProjectsSet.stream()
-                                                                       .filter(wp -> wp.getId()
-                                                                             == externalProjectMapping.getProject()
-                                                                                                      .getId())
-                                                                       .findAny();
+                    .filter(wp -> wp.getId()
+                            == externalProjectMapping.getProject()
+                            .getId())
+                    .findAny();
             if (optionalProject.isPresent()) {
                continue;
             }
@@ -276,14 +275,14 @@ public class HeimatController {
             }
 
             StyledMessage syncMessage = StyledMessage.of(
-                  new StyledMessage.TextSegment("Present in HEIMAT but not KeepTime\n\nSync to "),
-                  new StyledMessage.TextSegment(externalProjectMapping.getExternalTaskName(), true),
-                  new StyledMessage.TextSegment("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
+                    new StyledMessage.TextSegment("Present in Heimat but not KeepTime\n\nSync to "),
+                    new StyledMessage.TextSegment(externalProjectMapping.getExternalTaskName(), true),
+                    new StyledMessage.TextSegment("\n(" + externalProjectMapping.getExternalProjectName() + ")"));
 
             List<Project> allMappedProjects = mappingsForTask.stream().map(ExternalProjectMapping::getProject).toList();
 
             final Mapping mapping2 = new Mapping(id, true, false, syncMessage, "", times, allMappedProjects,
-                  heimatNotes, "", heimatTimeSeconds, 0);
+                    heimatNotes, "", heimatTimeSeconds, 0);
             list.add(mapping2);
          }
       });

@@ -143,7 +143,7 @@ public class ExternalProjectsMapController {
       final ObservableList<HeimatTask> externalProjectsObservableList = FXCollections.observableArrayList(
             externalProjects);
 
-      TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("HEIMAT project");
+      TableColumn<HeimatController.ProjectMapping, HeimatTask> externalColumn = new TableColumn<>("Heimat project");
       externalColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue().getHeimatTask()));
       externalColumn.setCellFactory(col -> new TableCell<>() {
          private final SearchCombobox<HeimatTask> searchPopup = new SearchCombobox<>(externalProjectsObservableList);
@@ -213,7 +213,7 @@ public class ExternalProjectsMapController {
    private List<HeimatTask> showMultiSelectDialog(final List<HeimatTask> externalProjects,
          List<HeimatTask> unmappedHeimatTasks) {
       Dialog<List<HeimatTask>> dialog = new Dialog<>();
-      dialog.setTitle("Import HEIMAT projects");
+      dialog.setTitle("Import Heimat projects");
       dialog.setHeaderText("You can select mutliple items");
       dialog.initOwner(this.thisStage);
       dialog.setWidth(600);
@@ -230,7 +230,7 @@ public class ExternalProjectsMapController {
 
       // Name Column
       TableView<HeimatTask> tableView = new TableView<>();
-      TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("HEIMAT project");
+      TableColumn<HeimatTask, HeimatTask> nameColumn = new TableColumn<>("Heimat project");
       nameColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
       nameColumn.setCellFactory(param -> new TableCell<>() {
          @Override

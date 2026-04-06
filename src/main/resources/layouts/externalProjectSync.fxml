@@ -10,7 +10,7 @@
       <AnchorPane fx:id="pane" prefHeight="600.0" prefWidth="1000.0">
          <children>
             <TableView fx:id="mappingTableView" layoutY="50.0" prefHeight="475.0" prefWidth="990.0" AnchorPane.bottomAnchor="90.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0" />
-            <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in HEIMAT" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
+            <Hyperlink fx:id="externalSystemLink" layoutX="29.0" layoutY="723.0" text="Open day in Heimat" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
             <HBox spacing="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
                <children>
                   <Label text="Day to sync" />
@@ -23,13 +23,13 @@
                      <children>
                         <HBox spacing="5.0">
                            <children>
-                              <Label text="New HEIMAT time:" />
+                              <Label text="New Heimat time:" />
                               <Label fx:id="sumTimeLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" text="00:00" />
                            </children>
                         </HBox>
                         <HBox spacing="5.0">
                            <children>
-                              <Label text="Current HEIMAT time:" />
+                              <Label text="Current Heimat time:" />
                               <Label fx:id="heimatTimeLabel" text="00:00" />
                            </children>
                         </HBox>
@@ -67,7 +67,7 @@
                   <Font size="18.0" />
                </font>
             </Label>
-            <Hyperlink fx:id="externalSystemLinkLoadingScreen" text="Open day in HEIMAT" />
+            <Hyperlink fx:id="externalSystemLinkLoadingScreen" text="Open day in Heimat" />
             <Label fx:id="loadingClosingMessage" alignment="CENTER" contentDisplay="CENTER" layoutX="473.0" layoutY="307.0" text="Closing in..." textAlignment="CENTER">
                <font>
                   <Font size="18.0" />

@@ -7,14 +7,15 @@
   <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <fileNamePattern>logs/log-%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>30</maxHistory>
-      <totalSizeCap>3GB</totalSizeCap>
+      <maxHistory>7</maxHistory>
+      <cleanHistoryOnStart>true</cleanHistoryOnStart>
+      <totalSizeCap>10MB</totalSizeCap>
     </rollingPolicy>
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
     </encoder>
   </appender>
-  
+
   <root level="info">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="rollingFile" />
