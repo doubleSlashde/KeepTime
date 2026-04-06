@@ -28,6 +28,8 @@ import de.doubleslash.keeptime.viewpopup.SearchCombobox;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -90,25 +92,8 @@ public class ExternalProjectsMapController {
       this.heimatController = heimatController;
    }
 
-   private ExistingAndInvalidMappings existingAndInvalidMappings;
-   private ObservableList<HeimatController.ProjectMapping> newProjectMappings;
-
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
-      // Show invalid mappings dialog when stage is shown
-      thisStage.setOnShown(e -> {
-         if (existingAndInvalidMappings != null && newProjectMappings != null) {
-            List<String> warnings = existingAndInvalidMappings.invalidMappingsAsString();
-            if (!warnings.isEmpty()) {
-               if (showInvalidMappingsDialog(warnings)) {
-                  newProjectMappings.stream()
-                                    .filter(HeimatController.ProjectMapping::isPendingRemoval)
-                                    .forEach(pm -> pm.setHeimatTask(null));
-                  mappingTableView.refresh();
-               }
-            }
-         }
-      });
    }
 
    @FXML
@@ -119,11 +104,23 @@ public class ExternalProjectsMapController {
 
       final List<HeimatTask> externalProjects = heimatController.getTasks(tasksForDateDatePicker.getValue());
 
-      existingAndInvalidMappings = heimatController.getExistingProjectMappings(externalProjects);
+      final ExistingAndInvalidMappings existingAndInvalidMappings = heimatController.getExistingProjectMappings(externalProjects);
 
       final List<HeimatController.ProjectMapping> previousProjectMappings = existingAndInvalidMappings.validMappings();
-      newProjectMappings = FXCollections.observableArrayList(
+      final ObservableList<HeimatController.ProjectMapping> newProjectMappings = FXCollections.observableArrayList(
             previousProjectMappings);
+
+      Platform.runLater(() -> {
+         List<String> warnings = existingAndInvalidMappings.invalidMappingsAsString();
+         if (!warnings.isEmpty()) {
+            if (showInvalidMappingsDialog(warnings)) {
+               newProjectMappings.stream()
+                       .filter(HeimatController.ProjectMapping::isPendingRemoval)
+                       .forEach(pm -> pm.setHeimatTask(null));
+               mappingTableView.refresh();
+            }
+         }
+      });
 
       final FilteredList<HeimatController.ProjectMapping> value = new FilteredList<>(newProjectMappings,
             pm -> pm.getProject().isWork());
