@@ -9,7 +9,7 @@
       <fileNamePattern>logs/log-%d{yyyy-MM-dd}.log</fileNamePattern>
       <maxHistory>7</maxHistory>
       <cleanHistoryOnStart>true</cleanHistoryOnStart>
-      <totalSizeCap>3GB</totalSizeCap>
+      <totalSizeCap>10MB</totalSizeCap>
     </rollingPolicy>
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
