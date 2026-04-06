@@ -34,7 +34,7 @@ KeepTime can be integrated with [Heimat](https://heimat-software.com/), allowing
 
 To enable Heimat integration:
 
-1. In the Settings, switch to the "Heimat" section.
+1. In the Settings, switch to the "HEIMAT" section.
    ![Settings Heimat](readme/images/settingsHeimat.png?raw=true "Settings Heimat")
 1. Enter the following details:
     - **URL:** `https://your-heimat-domain-com`
