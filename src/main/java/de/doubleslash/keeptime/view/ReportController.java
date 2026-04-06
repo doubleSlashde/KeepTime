@@ -139,7 +139,19 @@ public class ReportController {
       expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
       initTableView();
       initHeimatIntegration();
+      initAddManualWorkButton();
+
+   }
+
+   private void initAddManualWorkButton() {
       addWorkButton.setOnAction(e -> onAddWork());
+      final SVGPath svgNodeWithScale = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_PLUS_SOLID, 0.03, 0.03);
+      svgNodeWithScale.setStyle("-fx-fill: #00759e");
+      addWorkButton.setMaxSize(25,25);
+      addWorkButton.setMinSize(25, 25);
+      addWorkButton.setGraphic(svgNodeWithScale);
+      addWorkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      addWorkButton.setTooltip(new Tooltip("Add work entry..."));
    }
 
    private void initHeimatIntegration() {
