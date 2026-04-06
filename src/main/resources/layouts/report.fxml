@@ -87,7 +87,12 @@
             </BorderPane>
             <BorderPane>
                <left>
-                  <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Collapse" />
+                   <HBox spacing="5.0">
+                       <children>
+                           <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Collapse" />
+                           <Button fx:id="addWorkButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Add Work" />
+                       </children>
+                   </HBox>
                </left>
                <right>
                   <Button fx:id="heimatSyncButton" mnemonicParsing="false" styleClass="secondary-button" text="Sync2Heimat" />

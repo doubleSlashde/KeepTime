@@ -18,6 +18,8 @@ package de.doubleslash.keeptime.view;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -102,6 +104,9 @@ public class ReportController {
    @FXML
    private Button heimatSyncButton;
 
+   @FXML
+   private Button addWorkButton;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private final Model model;
@@ -134,6 +139,7 @@ public class ReportController {
       expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
       initTableView();
       initHeimatIntegration();
+      addWorkButton.setOnAction(e -> onAddWork());
    }
 
    private void initHeimatIntegration() {
@@ -535,6 +541,39 @@ public class ReportController {
 
       copyButton.setOnAction(eventListener);
       return copyButton;
+   }
+
+   private void onAddWork() {
+      final boolean isToday = LocalDate.now().equals(currentReportDate);
+      final LocalDateTime now = LocalDateTime.now();
+      final LocalDateTime defaultStart = isToday ? now.minusMinutes(15) : currentReportDate.atTime(LocalTime.of(9, 0));
+      final LocalDateTime defaultEnd = isToday ? now : currentReportDate.atTime(LocalTime.of(10, 0));
+
+      final Project defaultProject = model.activeWorkItem.get() != null
+              ? model.activeWorkItem.get().getProject()
+              : model.getIdleProject();
+
+      final Work newWorkDefaults = new Work(defaultStart, defaultEnd, defaultProject, "");
+      final Dialog<Work> dialog = setupAddWorkDialog(newWorkDefaults);
+
+      final Optional<Work> result = dialog.showAndWait();
+      result.ifPresent(createdWork -> {
+         controller.addWork(createdWork);
+         this.update();
+      });
+   }
+
+   private Dialog<Work> setupAddWorkDialog(final Work work) {
+      final Dialog<Work> dialog = new Dialog<>();
+      dialog.initOwner(stage);
+      dialog.setTitle("Add work");
+      dialog.setHeaderText("Add work");
+      dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      final GridPane grid = setUpEditWorkGridPane(work, dialog);
+      dialog.getDialogPane().setContent(grid);
+
+      return dialog;
    }
 
    public void update() {
