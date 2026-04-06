@@ -36,7 +36,19 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -105,10 +117,9 @@ public class ExternalProjectsMapController {
       tasksForDateDatePicker.setDisable(true);
       // TODO add listener on this thing
 
-      final List<HeimatTask> externalProjects = heimatController.getAllKnownHeimatTasks(tasksForDateDatePicker.getValue());
+      final List<HeimatTask> externalProjects = heimatController.getTasks(tasksForDateDatePicker.getValue());
 
       existingAndInvalidMappings = heimatController.getExistingProjectMappings(externalProjects);
-
 
       final List<HeimatController.ProjectMapping> previousProjectMappings = existingAndInvalidMappings.validMappings();
       newProjectMappings = FXCollections.observableArrayList(
@@ -164,6 +175,7 @@ public class ExternalProjectsMapController {
             if (empty) {
                setGraphic(null);
                setText(null);
+               setStyle(null);
             } else {
                searchPopup.setSelectedItem(item);
                if (item != null) {
@@ -171,6 +183,10 @@ public class ExternalProjectsMapController {
                } else {
                   searchPopup.setComboBoxTooltip("");
                }
+
+               // highlight mappings which do not exist anymore
+               final String highlightStyle = item != null && !externalProjects.contains(item) ? "-fx-background-color: lightsalmon;" : null;
+               setStyle(highlightStyle);
                setGraphic(searchPopup.getComboBox());
                setText(null);
             }

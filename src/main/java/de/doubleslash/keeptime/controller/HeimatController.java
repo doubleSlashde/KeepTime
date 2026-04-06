@@ -454,26 +454,6 @@ public class HeimatController {
       }
    }
 
-   public List<HeimatTask> getAllKnownHeimatTasks(final LocalDate forDate) {
-      List<HeimatTask> apiTasks = getTasks(forDate);
-
-      List<ExternalProjectMapping> mappings = externalProjectsMappingsRepository.findByExternalSystemId(
-              ExternalSystem.Heimat);
-      List<HeimatTask> mappedTasks = mappings.stream()
-              .map(this::getHeimatTaskFromMapping)
-              .filter(Objects::nonNull)
-              .toList();
-
-      Map<Long, HeimatTask> taskMap = new LinkedHashMap<>();
-      for (HeimatTask t : mappedTasks) {
-         taskMap.put(t.id(), t);
-      }
-      for (HeimatTask t : apiTasks) {
-         taskMap.put(t.id(), t); // API result should overwrite mapped if present
-      }
-      return new ArrayList<>(taskMap.values());
-   }
-
    public record UserMapping(Mapping mapping, boolean shouldSync, String userNotes, int userMinutes) {}
 
    public record Mapping(long heimatTaskId, boolean canBeSynced, boolean shouldBeSynced, StyledMessage syncMessage,
