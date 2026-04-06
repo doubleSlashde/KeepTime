@@ -412,7 +412,7 @@ public class SettingsController {
       heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
          try{
             final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
-            final boolean isExpired = !JwtDecoder.isExpired(jwt, LocalDateTime.now());
+            final boolean isExpired = JwtDecoder.isExpired(jwt, LocalDateTime.now());
             final String expirationDate = jwt.expiration().toString();
             
             if (isExpired) {

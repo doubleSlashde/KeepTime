@@ -58,7 +58,7 @@ public class JwtDecoder {
    }
 
    public static boolean isExpired(JWTTokenAttributes token, LocalDateTime localDateTimeNow) {
-      return token.expiration.isAfter(localDateTimeNow);
+      return localDateTimeNow.isAfter(token.expiration);
    }
 
    private static String removeBearerPrefix(String token) {
