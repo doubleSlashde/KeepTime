@@ -214,9 +214,6 @@ public class SettingsController {
    private PasswordField heimatPatTextField;
 
    @FXML
-   private Label heimatExpiresLabel;
-
-   @FXML
    private Label expirationDateLabel;
 
    @FXML
@@ -418,10 +415,6 @@ public class SettingsController {
             final boolean isExpired = !JwtDecoder.isExpired(jwt, LocalDateTime.now());
             final String expirationDate = jwt.expiration().toString();
             
-            // Keep label text consistent, show expired status in the value
-            heimatExpiresLabel.setText("Expires:");
-            heimatExpiresLabel.setTextFill(Color.BLACK);
-            
             if (isExpired) {
                expirationDateLabel.setText(expirationDate + " (Expired)");
                expirationDateLabel.setTextFill(Color.RED);
@@ -431,7 +424,6 @@ public class SettingsController {
             }
 
          } catch(Exception e){
-            heimatExpiresLabel.setText("Expires:");
             expirationDateLabel.setText("Does not seem to be valid");
             expirationDateLabel.setTextFill(Color.RED);
          }

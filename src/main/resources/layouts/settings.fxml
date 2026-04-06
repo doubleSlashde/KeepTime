@@ -499,7 +499,7 @@
                                           </HBox>
                                           <HBox layoutX="11.0" layoutY="75.0">
                                              <children>
-                                                <Label fx:id="heimatExpiresLabel" disable="true" layoutX="10.0" layoutY="10.0" prefHeight="17.0" prefWidth="129.0" />
+                                                <Label disable="true" layoutX="10.0" layoutY="10.0" prefHeight="17.0" prefWidth="129.0" text="Expires:" />
                                                 <Label fx:id="expirationDateLabel" disable="true" layoutX="10.0" layoutY="10.0" prefHeight="17.0" prefWidth="244.0" />
                                              </children>
                                           </HBox>
