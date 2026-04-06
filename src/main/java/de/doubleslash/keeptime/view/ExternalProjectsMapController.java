@@ -25,6 +25,9 @@ import de.doubleslash.keeptime.model.Project;
 import de.doubleslash.keeptime.rest.integration.heimat.model.ExistingAndInvalidMappings;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.viewpopup.SearchCombobox;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -42,10 +45,6 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 
 @Component
 public class ExternalProjectsMapController {
@@ -108,8 +107,7 @@ public class ExternalProjectsMapController {
 
       final List<HeimatTask> externalProjects = heimatController.getAllKnownHeimatTasks(tasksForDateDatePicker.getValue());
 
-      existingAndInvalidMappings = heimatController.getExistingProjectMappings(
-            externalProjects);
+      existingAndInvalidMappings = heimatController.getExistingProjectMappings(externalProjects);
 
 
       final List<HeimatController.ProjectMapping> previousProjectMappings = existingAndInvalidMappings.validMappings();
