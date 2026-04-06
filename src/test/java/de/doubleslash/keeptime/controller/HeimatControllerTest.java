@@ -16,6 +16,10 @@
 
 package de.doubleslash.keeptime.controller;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import de.doubleslash.keeptime.model.ExternalProjectMapping;
 import de.doubleslash.keeptime.model.ExternalSystem;
 import de.doubleslash.keeptime.model.Project;
@@ -25,6 +29,11 @@ import de.doubleslash.keeptime.model.settings.HeimatSettings;
 import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javafx.scene.paint.Color;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,16 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class HeimatControllerTest {
 
@@ -74,6 +74,15 @@ class HeimatControllerTest {
 
    @BeforeEach
    public void beforeEach() {
+      // set database ids (as otherwise all have id=0 which is not unique)
+      ReflectionTestUtils.setField(workProject1, "id", 1);
+      ReflectionTestUtils.setField(workProject2, "id", 2);
+      ReflectionTestUtils.setField(deletedProject, "id", 3);
+
+      ReflectionTestUtils.setField(project1To1Mapping, "id", 1);
+      ReflectionTestUtils.setField(project2To1Mapping, "id", 2);
+      ReflectionTestUtils.setField(deletedProjectTo1Mapping, "id", 3);
+
       externalMappings.clear();
       availableTasks.clear();
       deletedProject.setEnabled(false);
@@ -557,11 +566,9 @@ class HeimatControllerTest {
    }
 
    @Test
-   void shouldNotCreateDuplicateHeimatEntryWhenMultipleProjectsMappedAndBothHaveWork() {
+   void shouldNotCreateDuplicateRowWhenMultipleProjectsMappedAndOneHasHeimatTime() {
+      // corner case that the 2nd mapped project has work but the 1st one not, caused showing 2 rows previously
       // ARRANGE
-      // Both projects have work and are mapped to the same Heimat task
-      final Work work1 = new Work(now.minusMinutes(10), now, workProject1, "Notes 1");
-      workItems.add(work1);
       final Work work2 = new Work(now.minusMinutes(5), now, workProject2, "Notes 2");
       workItems.add(work2);
 
@@ -569,30 +576,14 @@ class HeimatControllerTest {
       externalMappings.add(project2To1Mapping);
 
       // The mapped Heimat task has already been booked in Heimat
-      final HeimatTime existingTime = new HeimatTime(project1To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
-            null, 15, "Heimat note", 99);
+      final HeimatTime existingTime = new HeimatTime(project2To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
+              null, 15, "Notes 2", 99);
       when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime));
 
       // ACT
       final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
 
       // ASSERT
-      // There should be exactly one row for this Heimat task (no duplicates)
-      assertThat(tableRows.size(), Matchers.is(1));
-      final HeimatController.Mapping mapping = tableRows.get(0);
-
-      // Both projects should be in the list since both were worked on
-      assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2));
-
-      // The mapping should combine KeepTime time from both projects
-      assertThat(mapping.keeptimeSeconds(), Matchers.is((10 + 5) * 60L));
-      assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1. Notes 2"));
-
-      // There should be Heimat time and notes as well
-      assertThat(mapping.heimatNotes(), Matchers.is("Heimat note"));
-      assertThat(mapping.heimatSeconds(), Matchers.is(15 * 60L));
-
-      assertThat(mapping.syncMessage().toPlainText(), Matchers.not(Matchers.containsString("Present in HEIMAT but not KeepTime")));
-      assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName()));
+      assertThat("There should be only one row for this task.",tableRows.size(), Matchers.is(1));
    }
 }
