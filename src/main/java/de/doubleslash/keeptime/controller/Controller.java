@@ -272,6 +272,17 @@ public class Controller {
       model.getWorkRepository().delete(workToBeDeleted);
    }
 
+   public Work addWork(final Work work) {
+      LOG.info("Adding work '{}'", work);
+      final Work saved = model.getWorkRepository().save(work);
+      // show in report if it belongs to today
+      final LocalDate today = dateProvider.dateTimeNow().toLocalDate();
+      if (today.equals(saved.getStartTime().toLocalDate())) {
+         model.getPastWorkItems().add(saved);
+      }
+      return saved;
+   }
+
    /**
     * Changes the indexes of the originalList parameter to have a consistent order.
     *

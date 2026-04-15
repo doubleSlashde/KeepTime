@@ -17,9 +17,6 @@
 package de.doubleslash.keeptime.view;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
-import java.time.format.FormatStyle;
 
 import javafx.scene.control.skin.ComboBoxListViewSkin;
 import org.slf4j.Logger;
@@ -35,7 +32,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.transformation.FilteredList;
@@ -46,8 +42,6 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -55,7 +49,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.util.StringConverter;
-import javafx.util.converter.LocalTimeStringConverter;
 
 public class ManageWorkController {
 
@@ -70,10 +63,10 @@ public class ManageWorkController {
    private DatePicker startDatePicker;
 
    @FXML
-   private Spinner<LocalTime> startTimeSpinner;
+   private TimePickerComboBox startTimePicker;
 
    @FXML
-   private Spinner<LocalTime> endTimeSpinner;
+   private TimePickerComboBox endTimePicker;
 
    @FXML
    private DatePicker endDatePicker;
@@ -102,10 +95,6 @@ public class ManageWorkController {
    @FXML
    private void initialize() {
 
-      setUpTimeSpinner(startTimeSpinner);
-
-      setUpTimeSpinner(endTimeSpinner);
-
       setUpTimeRestriction();
 
       setProjectUpComboBox();
@@ -121,20 +110,20 @@ public class ManageWorkController {
    private void setUpTimeRestriction() {
 
       BooleanBinding isValidBinding = Bindings.createBooleanBinding(() -> {
-         if (startTimeSpinner.getValue() == null || endTimeSpinner.getValue() == null
+         if (startTimePicker.getValue() == null || endTimePicker.getValue() == null
                || startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
             return false;
          }
 
-         LocalDateTime start = LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue());
-         LocalDateTime end = LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue());
+         LocalDateTime start = LocalDateTime.of(startDatePicker.getValue(), startTimePicker.getValue());
+         LocalDateTime end = LocalDateTime.of(endDatePicker.getValue(), endTimePicker.getValue());
 
          if (start.isAfter(end)) {
             return false;
          } else {
             return true;
          }
-      }, startTimeSpinner.valueProperty(), endTimeSpinner.valueProperty(), endDatePicker.valueProperty(),
+   }, startTimePicker.valueProperty(), endTimePicker.valueProperty(), endDatePicker.valueProperty(),
             startDatePicker.valueProperty());
 
       this.isValidProperty.bind(isValidBinding);
@@ -149,48 +138,6 @@ public class ManageWorkController {
       }, isValidProperty));
    }
 
-   private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
-      spinner.focusedProperty().addListener((e) -> {
-         final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
-         final StringProperty text = spinner.getEditor().textProperty();
-         try {
-            stringConverter.fromString(text.get());
-            // needed to log in value from editor to spinner
-            spinner.increment(0); // TODO find better Solution
-         } catch (final DateTimeParseException ex) {
-            text.setValue(spinner.getValue().toString());
-         }
-      });
-
-      spinner.setValueFactory(new SpinnerValueFactory<LocalTime>() {
-
-         @Override
-         public void decrement(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.minusMinutes(steps));
-            }
-
-         }
-
-         @Override
-         public void increment(final int steps) {
-            if (getValue() == null) {
-               setValue(LocalTime.now());
-            } else {
-               final LocalTime time = getValue();
-               setValue(time.plusMinutes(steps));
-            }
-
-         }
-
-      });
-
-      spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
-
-   }
 
    private void setProjectUpComboBox() {
       // color Dropdown Options
@@ -330,8 +277,8 @@ public class ManageWorkController {
       startDatePicker.setValue(work.getStartTime().toLocalDate());
       endDatePicker.setValue(work.getEndTime().toLocalDate());
 
-      startTimeSpinner.getValueFactory().setValue(work.getStartTime().toLocalTime());
-      endTimeSpinner.getValueFactory().setValue(work.getEndTime().toLocalTime());
+      startTimePicker.setValue(work.getStartTime().toLocalTime());
+      endTimePicker.setValue(work.getEndTime().toLocalTime());
 
       noteTextArea.setText(work.getNotes());
 
@@ -366,8 +313,8 @@ public class ManageWorkController {
    }
 
    public Work getWorkFromUserInput() {
-      return new Work(LocalDateTime.of(startDatePicker.getValue(), startTimeSpinner.getValue()),
-            LocalDateTime.of(endDatePicker.getValue(), endTimeSpinner.getValue()), selectedProject,
+   return new Work(LocalDateTime.of(startDatePicker.getValue(), startTimePicker.getValue()),
+      LocalDateTime.of(endDatePicker.getValue(), endTimePicker.getValue()), selectedProject,
             noteTextArea.getText());
    }
 

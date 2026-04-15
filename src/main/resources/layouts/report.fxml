@@ -16,18 +16,13 @@
  You should have received a copy of the GNU General Public License
  along with this program. If not, see <http://www.gnu.org/licenses/>. -->
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="reportRoot" focusTraversable="true" prefWidth="500.0" style="-fx-background-color: white;" stylesheets="@../css/dsStyles.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ReportController">
+<AnchorPane fx:id="reportRoot" focusTraversable="true" prefWidth="500.0" style="-fx-background-color: white;" stylesheets="@../css/dsStyles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.doubleslash.keeptime.view.ReportController">
    <children>
       <VBox>
          <children>
@@ -87,10 +82,15 @@
             </BorderPane>
             <BorderPane>
                <left>
-                  <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Collapse" />
+                   <HBox spacing="5.0">
+                       <children>
+                           <Button fx:id="expandCollapseButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Collapse" />
+                           <Button fx:id="addWorkButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="80.0" styleClass="secondary-button" text="Add Work" />
+                    </children>
+                   </HBox>
                </left>
                <right>
-                  <Button fx:id="heimatSyncButton" mnemonicParsing="false" styleClass="secondary-button" text="Sync2Heimat" />
+                        <Button fx:id="heimatSyncButton" mnemonicParsing="false" styleClass="secondary-button" text="Sync2Heimat" />
                </right>
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
