@@ -138,6 +138,7 @@ public class ExternalProjectsSyncController {
 
    private LocalDate currentReportDate;
    private Stage thisStage;
+   private Timeline closingTimeline;
    private final HeimatController heimatController;
    private final RotateTransition loadingSpinnerAnimation = new RotateTransition(Duration.seconds(1),
          syncingIconRegion);
@@ -229,8 +230,10 @@ public class ExternalProjectsSyncController {
          itemsForBindings.add(addedRow); // add new row also to items2 - as it is not added automatically :(
          mappingTableView.scrollTo(items.size() - 1); // scroll to newly added row
       });
-      heimatTaskSearchCombobox.setClearFieldAfterSelection(true);
 
+      heimatTaskSearchCombobox.setClearFieldAfterSelection(true);
+      heimatTaskSearchCombobox.setMaxSuggestionHeight(220);
+      heimatTaskSearchCombobox.setPromptText("Select Project...");
       heimatTaskSearchContainer.getChildren().add(heimatTaskSearchCombobox.getComboBox());
       HBox.setHgrow(heimatTaskSearchCombobox.getComboBox(), Priority.ALWAYS);
    }
@@ -506,10 +509,14 @@ public class ExternalProjectsSyncController {
                      loadingSuccess);
             }
 
+            if (closingTimeline != null) {
+               closingTimeline.stop();
+            }
+
             final AtomicInteger remainingSeconds = new AtomicInteger(closingSeconds);
             loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
             loadingClosingMessage.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            closingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
                remainingSeconds.getAndDecrement();
                loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
                if (remainingSeconds.get() <= 0) {
@@ -518,8 +525,8 @@ public class ExternalProjectsSyncController {
                   loadingClosingMessage.setVisible(false);
                }
             }));
-            timeline.setCycleCount(remainingSeconds.get());
-            timeline.play();
+            closingTimeline.setCycleCount(remainingSeconds.get());
+            closingTimeline.play();
          });
 
          task.setOnFailed(e -> {
@@ -701,6 +708,14 @@ public class ExternalProjectsSyncController {
 
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
+
+
+      thisStage.setOnCloseRequest(e -> {
+         if (closingTimeline != null) {
+            closingTimeline.stop();
+            closingTimeline = null;
+         }
+      });
 
       registerKeyEventListenersForSpinners(thisStage);
    }

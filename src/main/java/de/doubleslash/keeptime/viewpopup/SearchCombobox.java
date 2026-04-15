@@ -33,7 +33,8 @@ public class SearchCombobox<T> {
    private String promptText = "Select item…";
    private double maxSuggestionHeight = 200;
 
-   private BiConsumer<T, SearchCombobox<T>> onItemSelected = (item, popup) -> {};
+   private BiConsumer<T, SearchCombobox<T>> onItemSelected = (item, popup) -> {
+   };
    private boolean clearFieldAfterSelection = false;
 
    public SearchCombobox(ObservableList<T> items) {
@@ -64,20 +65,22 @@ public class SearchCombobox<T> {
       suggestionList.setCellFactory(listView -> new ListCell<>() {
          private final Label label = new Label();
          private final StackPane pane = new StackPane(label);
+
          {
             label.setWrapText(true);
-            label.setStyle("-fx-padding: 5;");
+            label.setStyle("-fx-padding: 2;");
             pane.setAlignment(Pos.CENTER_LEFT);
             pane.setMinWidth(0);
             pane.setPrefWidth(1);
          }
+
          @Override
          protected void updateItem(T item, boolean empty) {
             super.updateItem(item, empty);
-            if (empty || item == null) {
+            if (empty) {
                setGraphic(null);
             } else {
-               label.setText(displayTextFunction.apply(item));
+               label.setText(item == null ? "-" : displayTextFunction.apply(item));
                setGraphic(pane);
             }
          }
@@ -91,14 +94,15 @@ public class SearchCombobox<T> {
       });
 
       ChangeListener<Boolean> hidePopupListener = (obs, was, isNow) -> {
-         if (!searchField.isFocused() && !suggestionList.isFocused()) popup.hide();
+         if (!searchField.isFocused() && !suggestionList.isFocused())
+            popup.hide();
       };
 
       searchField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
          if (isNowFocused && !clearFieldAfterSelection) {
             filterList(""); // Show all items
             show(searchField);
-            searchField.selectAll(); // <--- This line selects all text!
+            searchField.selectAll();
          }
       });
 
@@ -127,7 +131,7 @@ public class SearchCombobox<T> {
       suggestionList.setOnKeyPressed(ev -> {
          if (ev.getCode() == KeyCode.ENTER) {
             T selected = suggestionList.getSelectionModel().getSelectedItem();
-            if (selected != null) handleSelection(selected);
+            handleSelection(selected);
          } else if (ev.getCode() == KeyCode.UP && suggestionList.getSelectionModel().getSelectedIndex() == 0) {
             searchField.requestFocus();
          } else if (ev.getCode() == KeyCode.ESCAPE) {
@@ -138,21 +142,20 @@ public class SearchCombobox<T> {
 
       suggestionList.setOnMouseClicked(ev -> {
          T selected = suggestionList.getSelectionModel().getSelectedItem();
-         if (selected != null) handleSelection(selected);
+         handleSelection(selected);
       });
 
-      searchField.textProperty().addListener((obs, oldText, newText) -> {
-         filterList(newText);
-      });
+      searchField.textProperty().addListener((obs, oldText, newText) -> filterList(newText));
    }
 
    private void filterList(String input) {
       String filter = (input == null) ? "" : input.trim().toLowerCase();
-      ObservableList<T> filtered = FXCollections.observableArrayList(
-            allItems.stream()
-                    .filter(item -> displayTextFunction.apply(item).toLowerCase().contains(filter))
-                    .collect(Collectors.toList())
-      );
+      ObservableList<T> filtered = FXCollections.observableArrayList(allItems.stream()
+                                                                             .filter(item -> {
+                                                                                if(item == null) return filter.isEmpty();
+                                                                                return displayTextFunction.apply(
+                                                                                   item).toLowerCase().contains(filter);})
+                                                                             .collect(Collectors.toList()));
       suggestionList.setItems(filtered);
       if (!filtered.isEmpty() && searchField.isFocused()) {
          show(searchField);
@@ -196,14 +199,13 @@ public class SearchCombobox<T> {
       suggestionList.setMaxHeight(height);
    }
 
-   public HBox getComboBox() {
-      return container;
-   }
+   public HBox getComboBox() {return container;}
 
    public void show(Node owner) {
-      if (owner == null || suggestionList.getItems().isEmpty()) return;
+      if (owner == null || suggestionList.getItems().isEmpty())
+         return;
       Bounds bounds = owner.localToScreen(owner.getBoundsInLocal());
-      suggestionList.setPrefWidth(searchField.getWidth());
+      suggestionList.setPrefWidth(container.getWidth());
       popup.show(owner, bounds.getMinX(), bounds.getMaxY());
    }
 
@@ -221,38 +223,44 @@ public class SearchCombobox<T> {
    public T getSelectedItem() {
       String text = searchField.getText();
       for (T item : allItems) {
-         if (displayTextFunction.apply(item).equals(text)) return item;
+         if (displayTextFunction.apply(item).equals(text))
+            return item;
       }
       return null;
    }
 
-   public TextField getSearchField() {
-      return searchField;
-   }
+   public TextField getSearchField() {return searchField;}
 
-   public ListView<T> getSuggestionList() {
-      return suggestionList;
-   }
+   public ListView<T> getSuggestionList() {return suggestionList;}
 
-   public Button getShowSuggestionsButton() {
-      return showSuggestionsButton;
-   }
+   public Button getShowSuggestionsButton() {return showSuggestionsButton;}
 
-   public Function<T, String> getDisplayTextFunction() {
-      return displayTextFunction;
-   }
+   public Function<T, String> getDisplayTextFunction() {return displayTextFunction;}
 
    public void setOnItemSelected(BiConsumer<T, SearchCombobox<T>> handler) {
-      this.onItemSelected = handler != null ? handler : (item, popup) -> {};
+      this.onItemSelected = handler != null ? handler : (item, popup) -> {
+      };
    }
 
-   public void setClearFieldAfterSelection(boolean c) {
-      this.clearFieldAfterSelection = c;
-   }
+   public void setClearFieldAfterSelection(boolean c) {this.clearFieldAfterSelection = c;}
 
    public void clear() {
       searchField.clear();
       if (!promptText.isEmpty())
          searchField.setPromptText(promptText);
+   }
+
+   public void setComboBoxTooltip(String tooltipText) {
+      if (tooltipText != null && !tooltipText.isBlank()) {
+         Tooltip tooltip = new Tooltip(tooltipText);
+
+         Tooltip.install(container, tooltip);
+         Tooltip.install(searchField, tooltip);
+         Tooltip.install(showSuggestionsButton, tooltip);
+      } else {
+         Tooltip.uninstall(container, null);
+         Tooltip.uninstall(searchField, null);
+         Tooltip.uninstall(showSuggestionsButton, null);
+      }
    }
 }

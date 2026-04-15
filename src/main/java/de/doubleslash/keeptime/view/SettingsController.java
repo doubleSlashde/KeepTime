@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -213,7 +214,7 @@ public class SettingsController {
    private PasswordField heimatPatTextField;
 
    @FXML
-   private Label heimatExpiresLabel;
+   private Label expirationDateLabel;
 
    @FXML
    private Button heimatValidateConnectionButton;
@@ -411,9 +412,20 @@ public class SettingsController {
       heimatPatTextField.textProperty().addListener((observable, oldValue, newValue)->{
          try{
             final JwtDecoder.JWTTokenAttributes jwt = JwtDecoder.parse(newValue);
-            heimatExpiresLabel.setText(jwt.expiration().toString());
+            final boolean isExpired = JwtDecoder.isExpired(jwt, LocalDateTime.now());
+            final String expirationDate = jwt.expiration().toString();
+            
+            if (isExpired) {
+               expirationDateLabel.setText(expirationDate + " (Expired)");
+               expirationDateLabel.setTextFill(Color.RED);
+            } else {
+               expirationDateLabel.setText(expirationDate);
+               expirationDateLabel.setTextFill(Color.BLACK);
+            }
+
          } catch(Exception e){
-            heimatExpiresLabel.setText("Does not seem to be valid");
+            expirationDateLabel.setText("Does not seem to be valid");
+            expirationDateLabel.setTextFill(Color.RED);
          }
       });
       heimatValidateConnectionLabel.setText("Not validated.");
@@ -462,27 +474,27 @@ public class SettingsController {
    private void showMapProjectsStage() {
       try{
          // Settings stage
-         final FXMLLoader fxmlLoader2 = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
-         fxmlLoader2.setControllerFactory(model.getSpringContext()::getBean);
-         final Parent settingsRoot = fxmlLoader2.load();
-         ExternalProjectsMapController settingsController = fxmlLoader2.getController();
-         Stage settingsStage = new Stage();
-         settingsController.setStage(settingsStage);
-         settingsStage.initModality(Modality.APPLICATION_MODAL);
-         settingsStage.setTitle("External Project Mappings");
-         settingsStage.setResizable(false);
-         settingsStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
+         final FXMLLoader fxmlLoader = createFXMLLoader(RESOURCE.FXML_EXT_PROJECT_MAPPING);
+         fxmlLoader.setControllerFactory(model.getSpringContext()::getBean);
+         final Parent externalProjectRoot = fxmlLoader.load();
+         ExternalProjectsMapController externalProjectsMapController = fxmlLoader.getController();
+         Stage externalProjectMappingStage = new Stage();
+         externalProjectsMapController.setStage(externalProjectMappingStage);
+         externalProjectMappingStage.initModality(Modality.APPLICATION_MODAL);
+         externalProjectMappingStage.setTitle("External Project Mappings");
+         externalProjectMappingStage.setResizable(false);
+         externalProjectMappingStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-         final Scene settingsScene = new Scene(settingsRoot);
-         settingsScene.setOnKeyPressed(ke -> {
+         final Scene externalProjectMappingScene = new Scene(externalProjectRoot);
+         externalProjectMappingScene.setOnKeyPressed(ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                LOG.info("pressed ESCAPE");
-               settingsStage.close();
+               externalProjectMappingStage.close();
             }
          });
 
-         settingsStage.setScene(settingsScene);
-         settingsStage.showAndWait();
+         externalProjectMappingStage.setScene(externalProjectMappingScene);
+         externalProjectMappingStage.showAndWait();
       } catch (final Exception e) {
          throw new FXMLLoaderException(e);
       }
