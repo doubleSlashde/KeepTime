@@ -81,6 +81,8 @@ public class Resources {
 
       SVG_ROTATE_ICON("/svgs/rotate-solid.svg"),
 
+      SVG_PLUS_SOLID("/svgs/plus-solid.svg"),
+
       ICON_MAIN("/icons/icon.png"),
 
       /** CSS **/

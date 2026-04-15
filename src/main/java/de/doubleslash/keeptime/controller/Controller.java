@@ -128,6 +128,16 @@ public class Controller {
       return project;
    }
 
+   public Work addWork(final Work work) {
+      LOG.info("Adding work '{}'", work);
+      final Work saved = model.getWorkRepository().save(work);
+      // show in report if it belongs to today
+      final LocalDate today = dateProvider.dateTimeNow().toLocalDate();
+      if (today.equals(saved.getStartTime().toLocalDate())) {
+         model.getPastWorkItems().add(saved);
+      }
+      return saved;
+   }
 
    public void updateColorSettings(final Color hoverBackgroundColor,final Color hoverFontColor,final Color defaultBackgroundColor,final Color defaultFontColor,final Color taskBarColor) {
       settings.setTaskBarColor(taskBarColor);
