@@ -18,23 +18,18 @@ package de.doubleslash.keeptime.controller;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.when;
 
-import de.doubleslash.keeptime.model.ExternalProjectMapping;
-import de.doubleslash.keeptime.model.ExternalSystem;
-import de.doubleslash.keeptime.model.Project;
-import de.doubleslash.keeptime.model.Work;
-import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
-import de.doubleslash.keeptime.model.settings.HeimatSettings;
-import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
-import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
-import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import javafx.scene.paint.Color;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,14 +38,30 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.doubleslash.keeptime.model.*;
+import de.doubleslash.keeptime.model.repos.ExternalProjectsMappingsRepository;
+import de.doubleslash.keeptime.model.settings.HeimatSettings;
+import de.doubleslash.keeptime.rest.integration.heimat.HeimatAPI;
+import de.doubleslash.keeptime.rest.integration.heimat.model.ExistingAndInvalidMappings;
+import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
+import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTime;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+import javafx.scene.paint.Color;
+
 class HeimatControllerTest {
 
    private static HeimatSettings mockedHeimatSettings;
    private static HeimatAPI mockedHeimatAPI;
    private static ExternalProjectsMappingsRepository mockedExternalMappingsRepository;
+   private static Model mockedModel;
    private static HeimatController heimatController;
 
    final List<ExternalProjectMapping> externalMappings = new ArrayList<>();
+   final ObservableList<Project> availableProjects = FXCollections.observableArrayList();
 
    final ArrayList<Work> workItems = new ArrayList<>();
    final LocalDateTime now = LocalDateTime.now();
@@ -85,13 +96,17 @@ class HeimatControllerTest {
 
       externalMappings.clear();
       availableTasks.clear();
+      availableProjects.clear();
       deletedProject.setEnabled(false);
 
       mockedHeimatSettings = Mockito.mock(HeimatSettings.class);
       mockedHeimatAPI = Mockito.mock(HeimatAPI.class);
       mockedExternalMappingsRepository = Mockito.mock(ExternalProjectsMappingsRepository.class);
+      mockedModel = Mockito.mock(Model.class);
+      SortedList<Project> sortedList = new SortedList<>(availableProjects, Comparator.comparing(Project::getIndex));
+      when(mockedModel.getSortedAvailableProjects()).thenReturn(sortedList);
       heimatController = new HeimatController(mockedHeimatSettings, mockedHeimatAPI, mockedExternalMappingsRepository,
-            new Controller(null, null, null, null), null);
+            new Controller(null, null, null, null), mockedModel);
 
       when(mockedExternalMappingsRepository.findByExternalSystemId(ExternalSystem.Heimat)).thenReturn(externalMappings);
 
@@ -267,7 +282,8 @@ class HeimatControllerTest {
       assertTrue(mapping.shouldBeSynced());
       assertThat(mapping.keeptimeSeconds(), Matchers.is(13 * 60L));
       assertThat(mapping.keeptimeNotes(), Matchers.is("Notes 1"));
-      assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName()));
+      assertThat(mapping.syncMessage().toPlainText(),
+            Matchers.containsString(project1To1Mapping.getExternalTaskName()));
    }
 
    @Test
@@ -295,7 +311,7 @@ class HeimatControllerTest {
             () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1. Existing note 2")),
             () -> assertThat(mapping.heimatSeconds(), Matchers.is((60 + 30) * 60L)),
             () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
-            //
+      //
       );
    }
 
@@ -321,7 +337,7 @@ class HeimatControllerTest {
             () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1")),
             () -> assertThat(mapping.heimatSeconds(), Matchers.is((60) * 60L)),
             () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1))
-            //
+      //
       );
    }
 
@@ -364,14 +380,15 @@ class HeimatControllerTest {
       // ASSERT
       assertAll(() -> assertTrue(mapping.canBeSynced()), () -> assertFalse(mapping.shouldBeSynced()),
             () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString("Not mapped in KeepTime")),
-            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
+            () -> assertThat(mapping.syncMessage().toPlainText(),
+                  Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
             () -> assertThat(mapping.projects().size(), Matchers.is(0)),
             () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1. Existing note 2")),
             () -> assertThat(mapping.heimatSeconds(), Matchers.is((60 + 30) * 60L)),
             () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
-            //
+      //
       );
    }
 
@@ -394,15 +411,17 @@ class HeimatControllerTest {
       // ASSERT
       assertAll(() -> assertThat(tableRows.size(), Matchers.is(1)), () -> assertTrue(mapping.canBeSynced()),
             () -> assertTrue(mapping.canBeSynced()), () -> assertFalse(mapping.shouldBeSynced()),
-            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString("Present in Heimat but not KeepTime")),
-            () -> assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName())),
+            () -> assertThat(mapping.syncMessage().toPlainText(),
+                  Matchers.containsString("Present in Heimat but not KeepTime")),
+            () -> assertThat(mapping.syncMessage().toPlainText(),
+                  Matchers.containsString(project1To1Mapping.getExternalTaskName())),
             () -> assertThat(mapping.keeptimeSeconds(), Matchers.is(0L)),
             () -> assertThat(mapping.keeptimeNotes(), Matchers.is("")),
             () -> assertThat(mapping.projects(), Matchers.containsInAnyOrder(workProject1, workProject2)),
             () -> assertThat(mapping.heimatNotes(), Matchers.is("Existing note 1. Existing note 2")),
             () -> assertThat(mapping.heimatSeconds(), Matchers.is((60 + 30) * 60L)),
             () -> assertThat(mapping.existingTimes(), Matchers.containsInAnyOrder(existingTime1, existingTime2))
-            //
+      //
       );
    }
 
@@ -561,8 +580,10 @@ class HeimatControllerTest {
       assertThat(mapping.heimatNotes(), Matchers.is("Heimat note"));
       assertThat(mapping.heimatSeconds(), Matchers.is(15 * 60L));
 
-      assertThat(mapping.syncMessage().toPlainText(), Matchers.not(Matchers.containsString("Present in HEIMAT but not KeepTime")));
-      assertThat(mapping.syncMessage().toPlainText(), Matchers.containsString(project1To1Mapping.getExternalTaskName()));
+      assertThat(mapping.syncMessage().toPlainText(),
+            Matchers.not(Matchers.containsString("Present in HEIMAT but not KeepTime")));
+      assertThat(mapping.syncMessage().toPlainText(),
+            Matchers.containsString(project1To1Mapping.getExternalTaskName()));
    }
 
    @Test
@@ -577,13 +598,117 @@ class HeimatControllerTest {
 
       // The mapped Heimat task has already been booked in Heimat
       final HeimatTime existingTime = new HeimatTime(project2To1Mapping.getExternalTaskId(), now.toLocalDate(), null,
-              null, 15, "Notes 2", 99);
+            null, 15, "Notes 2", 99);
       when(mockedHeimatAPI.getMyTimes(now.toLocalDate())).thenReturn(Arrays.asList(existingTime));
 
       // ACT
       final List<HeimatController.Mapping> tableRows = heimatController.getTableRows(now.toLocalDate(), workItems);
 
       // ASSERT
-      assertThat("There should be only one row for this task.",tableRows.size(), Matchers.is(1));
+      assertThat("There should be only one row for this task.", tableRows.size(), Matchers.is(1));
+   }
+
+   /* getExistingProjectMappings */
+
+   @Test
+   void shouldMarkMappingAsPendingRemovalWhenHeimatTaskNoLongerExistsInExternalProjects() throws Exception {
+      // ARRANGE
+      availableProjects.add(workProject1);
+
+      String taskJson = new ObjectMapper().writeValueAsString(heimatTask1);
+      ExternalProjectMapping mappingWithMetadata = new ExternalProjectMapping(ExternalSystem.Heimat,
+            heimatTask1.taskHolderName(), heimatTask1.id(), heimatTask1.name(), taskJson, workProject1);
+      ReflectionTestUtils.setField(mappingWithMetadata, "id", 10);
+      externalMappings.add(mappingWithMetadata);
+
+      List<HeimatTask> externalProjects = new ArrayList<>();
+
+      // ACT
+      ExistingAndInvalidMappings result = heimatController.getExistingProjectMappings(externalProjects);
+
+      // ASSERT
+      assertAll(() -> assertThat(result.validMappings(), Matchers.hasSize(1)),
+            () -> assertTrue(result.validMappings().get(0).isPendingRemoval()),
+            () -> assertNotNull(result.validMappings().get(0).getHeimatTask()),
+            () -> assertThat(result.validMappings().get(0).getHeimatTask().id(), Matchers.is(heimatTask1.id())),
+            () -> assertThat(result.validMappings().get(0).getHeimatTask().name(), Matchers.is(heimatTask1.name())),
+            () -> assertThat(result.invalidMappingsAsString(), Matchers.hasSize(1)),
+            () -> assertThat(result.invalidMappingsAsString().get(0), Matchers.containsString("Task no longer exists")),
+            () -> assertThat(result.invalidMappingsAsString().get(0), Matchers.containsString(heimatTask1.name())),
+            () -> assertThat(result.invalidMappingsAsString().get(0), Matchers.containsString(workProject1.getName())));
+   }
+
+   @Test
+   void shouldNotMarkMappingAsPendingRemovalWhenHeimatTaskStillExists() {
+      // ARRANGE
+      availableProjects.add(workProject1);
+      externalMappings.add(project1To1Mapping);
+
+      List<HeimatTask> externalProjects = List.of(heimatTask1);
+
+      // ACT
+      ExistingAndInvalidMappings result = heimatController.getExistingProjectMappings(externalProjects);
+
+      // ASSERT
+      assertAll(() -> assertThat(result.validMappings(), Matchers.hasSize(1)),
+            () -> assertFalse(result.validMappings().get(0).isPendingRemoval()),
+            () -> assertThat(result.validMappings().get(0).getHeimatTask(), Matchers.is(heimatTask1)),
+            () -> assertThat(result.invalidMappingsAsString(), Matchers.empty()));
+   }
+
+   @Test
+   void shouldReturnMappingWithoutHeimatTaskAndNotPendingRemovalWhenProjectIsNotMapped() {
+      // ARRANGE
+      availableProjects.add(workProject1);
+
+      List<HeimatTask> externalProjects = List.of(heimatTask1);
+
+      // ACT
+      ExistingAndInvalidMappings result = heimatController.getExistingProjectMappings(externalProjects);
+
+      // ASSERT
+      assertAll(() -> assertThat(result.validMappings(), Matchers.hasSize(1)),
+            () -> assertFalse(result.validMappings().get(0).isPendingRemoval()),
+            () -> assertNull(result.validMappings().get(0).getHeimatTask()),
+            () -> assertThat(result.invalidMappingsAsString(), Matchers.empty()));
+   }
+
+   @Test
+   void shouldMarkOnlyInvalidMappingsAsPendingRemovalWhenMixOfValidAndInvalid() throws Exception {
+      // ARRANGE
+      availableProjects.addAll(workProject1, workProject2);
+
+      externalMappings.add(project1To1Mapping);
+
+      String task2Json = new ObjectMapper().writeValueAsString(heimatTask2);
+      ExternalProjectMapping mappingToDeletedTask = new ExternalProjectMapping(ExternalSystem.Heimat,
+            heimatTask2.taskHolderName(), heimatTask2.id(), heimatTask2.name(), task2Json, workProject2);
+      ReflectionTestUtils.setField(mappingToDeletedTask, "id", 20);
+      externalMappings.add(mappingToDeletedTask);
+
+      List<HeimatTask> externalProjects = List.of(heimatTask1);
+
+      // ACT
+      ExistingAndInvalidMappings result = heimatController.getExistingProjectMappings(externalProjects);
+
+      // ASSERT
+      HeimatController.ProjectMapping mapping1 = result.validMappings()
+                                                       .stream()
+                                                       .filter(m -> m.getProject().getId() == workProject1.getId())
+                                                       .findFirst()
+                                                       .orElseThrow();
+      HeimatController.ProjectMapping mapping2 = result.validMappings()
+                                                       .stream()
+                                                       .filter(m -> m.getProject().getId() == workProject2.getId())
+                                                       .findFirst()
+                                                       .orElseThrow();
+
+      assertAll(() -> assertThat(result.validMappings(), Matchers.hasSize(2)),
+            () -> assertFalse(mapping1.isPendingRemoval()),
+            () -> assertThat(mapping1.getHeimatTask(), Matchers.is(heimatTask1)),
+            () -> assertTrue(mapping2.isPendingRemoval()), () -> assertNotNull(mapping2.getHeimatTask()),
+            () -> assertThat(mapping2.getHeimatTask().id(), Matchers.is(heimatTask2.id())),
+            () -> assertThat(result.invalidMappingsAsString(), Matchers.hasSize(1)),
+            () -> assertThat(result.invalidMappingsAsString().get(0), Matchers.containsString(heimatTask2.name())));
    }
 }
