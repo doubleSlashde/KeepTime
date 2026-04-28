@@ -226,7 +226,7 @@ public class ExternalProjectsMapController {
          List<HeimatTask> unmappedHeimatTasks) {
       Dialog<List<HeimatTask>> dialog = new Dialog<>();
       dialog.setTitle("Import Heimat projects");
-      dialog.setHeaderText("You can select mutliple items");
+      dialog.setHeaderText("You can select multiple items");
       dialog.initOwner(this.thisStage);
       dialog.setWidth(600);
       dialog.setHeight(500);
