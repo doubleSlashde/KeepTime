@@ -357,8 +357,8 @@ public class ExternalProjectsMapController {
       dialog.getDialogPane().setContent(scrollPane);
       dialog.getDialogPane().setMinWidth(400);
 
-      ButtonType removeButton = new ButtonType("Remove", ButtonBar.ButtonData.YES);
-      ButtonType keepButton = new ButtonType("Keep", ButtonBar.ButtonData.NO);
+      ButtonType removeButton = new ButtonType("Remove", ButtonBar.ButtonData.NO);
+      ButtonType keepButton = new ButtonType("Keep", ButtonBar.ButtonData.YES);
       dialog.getDialogPane().getButtonTypes().setAll(removeButton, keepButton);
 
       Optional<ButtonType> result = dialog.showAndWait();
