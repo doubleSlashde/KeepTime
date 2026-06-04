@@ -105,11 +105,16 @@
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
       <version>2.8.17</version>
     </dependency>
-    <!-- Overwrite tomcat version due to security vulnerability -->
+    <!-- Overwrite tomcat version due to security vulnerability. remove when possible -->
     <dependency>
       <groupId>org.apache.tomcat.embed</groupId>
       <artifactId>tomcat-embed-core</artifactId>
       <version>10.1.55</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-websocket</artifactId>
+        <version>10.1.55</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
