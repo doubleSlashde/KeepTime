@@ -187,14 +187,25 @@ public class ExternalProjectsSyncController {
       heimatTimeLabel.setText(localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::heimatSeconds).sum())));
 
-      BooleanBinding projectsValidProperty = Bindings.createBooleanBinding(() -> items.stream().anyMatch(item -> {
-         boolean shouldSync = item.shouldSyncCheckBox.get();
-         boolean hasNote = !item.userNotes.get().isBlank();
-         boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
-         return shouldSync && !(hasNote && hasTime);
-      }), itemsForBindings);
+      BooleanBinding saveButtonDisabledProperty = Bindings.createBooleanBinding(() -> {
+         boolean anyShouldSync = items.stream().anyMatch(item -> item.shouldSyncCheckBox.get());
+         if (!anyShouldSync) {
+            return true;
+         }
+         return items.stream().anyMatch(item -> {
+            if (!item.shouldSyncCheckBox.get()) {
+               return false;
+            }
+            boolean hasNote = !item.userNotes.get().isBlank();
+            boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
+            return !(hasNote && hasTime);
+         });
+      }, itemsForBindings);
 
-      saveButton.disableProperty().bind(projectsValidProperty);
+      saveButton.disableProperty().bind(saveButtonDisabledProperty);
+      saveButton.textProperty().bind(Bindings.createStringBinding(
+            () -> "Sync (" + items.stream().filter(item -> item.shouldSyncCheckBox.get()).count() + ")",
+            itemsForBindings));
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
       externalSystemLinkLoadingScreen.setOnAction(
             ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
@@ -247,21 +258,21 @@ public class ExternalProjectsSyncController {
       // Custom Cell Factory to disable CheckBoxes
       shouldSyncColumn.setCellFactory(col -> new TableCell<>() {
          private final CheckBox checkBox = new CheckBox();
-         private ChangeListener<Boolean> boolChangeListener;
+         private BooleanProperty boundProperty = null;
 
          @Override
          protected void updateItem(TableRow item, boolean empty) {
             super.updateItem(item, empty);
-            if (boolChangeListener != null)
-               checkBox.selectedProperty().removeListener(boolChangeListener);
-
+            if(boundProperty != null){
+               checkBox.selectedProperty().unbindBidirectional(boundProperty);
+               boundProperty = null;
+            }
             if (empty || item == null) {
                setGraphic(null);
             } else {
                checkBox.setDisable(!item.mapping.canBeSynced());
-               checkBox.setSelected(item.shouldSyncCheckBox.get());
-               boolChangeListener = (obs, oldText, newBoolean) -> item.shouldSyncCheckBox.set(newBoolean);
-               checkBox.selectedProperty().addListener(boolChangeListener);
+               checkBox.selectedProperty().bindBidirectional(item.shouldSyncCheckBox);
+               boundProperty = item.shouldSyncCheckBox;
                setAlignment(Pos.TOP_CENTER);
                setGraphic(checkBox);
             }
@@ -337,6 +348,7 @@ public class ExternalProjectsSyncController {
                   localTimeChangeListener = (observable, oldValue, newValue) -> {
                      item.userTimeSeconds.set(newValue.toSecondOfDay());
                      spinnerValidConsumer.accept(timeSpinner);
+                     item.shouldSyncCheckBox.set(true);
                   };
                   spinnerValidConsumer.accept(timeSpinner);
                   timeSpinner.valueProperty().addListener(localTimeChangeListener);
