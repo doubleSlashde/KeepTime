@@ -203,6 +203,9 @@ public class ExternalProjectsSyncController {
       }, itemsForBindings);
 
       saveButton.disableProperty().bind(saveButtonDisabledProperty);
+      saveButton.textProperty().bind(Bindings.createStringBinding(
+            () -> "Sync (" + items.stream().filter(item -> item.shouldSyncCheckBox.get()).count() + ")",
+            itemsForBindings));
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
       externalSystemLinkLoadingScreen.setOnAction(
             ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
