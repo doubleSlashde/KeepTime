@@ -187,14 +187,22 @@ public class ExternalProjectsSyncController {
       heimatTimeLabel.setText(localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::heimatSeconds).sum())));
 
-      BooleanBinding projectsValidProperty = Bindings.createBooleanBinding(() -> items.stream().anyMatch(item -> {
-         boolean shouldSync = item.shouldSyncCheckBox.get();
-         boolean hasNote = !item.userNotes.get().isBlank();
-         boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
-         return shouldSync && !(hasNote && hasTime);
-      }), itemsForBindings);
+      BooleanBinding saveButtonDisabledProperty = Bindings.createBooleanBinding(() -> {
+         boolean anyShouldSync = items.stream().anyMatch(item -> item.shouldSyncCheckBox.get());
+         if (!anyShouldSync) {
+            return true;
+         }
+         return items.stream().anyMatch(item -> {
+            if (!item.shouldSyncCheckBox.get()) {
+               return false;
+            }
+            boolean hasNote = !item.userNotes.get().isBlank();
+            boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
+            return !(hasNote && hasTime);
+         });
+      }, itemsForBindings);
 
-      saveButton.disableProperty().bind(projectsValidProperty);
+      saveButton.disableProperty().bind(saveButtonDisabledProperty);
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
       externalSystemLinkLoadingScreen.setOnAction(
             ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
