@@ -32,7 +32,7 @@ public class FileOpenHelper {
       final File file = new File(filePath);
       final Runtime rt = Runtime.getRuntime();
 
-      if (!file.exists() || file.isFile()) {
+      if (!file.exists() || !file.isFile()) {
          LOG.warn("Filepath does not seem to exist or does not point to a file: '{}'.", filePath);
          return false;
       }

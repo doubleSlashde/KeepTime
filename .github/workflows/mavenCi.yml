@@ -44,12 +44,6 @@ jobs:
           name: KeepTime-${{ env.version }}
           path: /home/runner/work/KeepTime/KeepTime/target/*-bin.zip
 
-      - name: Analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -V -B sonar:sonar -Dsonar.host.url=${{ secrets.HOST_URL }} -Dsonar.organization=${{ secrets.ORGANIZATION_NAME }} -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -Dsonar.java.binaries=. -Dsonar.qualitygate.wait=false
-
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
 

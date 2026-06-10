@@ -22,8 +22,10 @@ import de.doubleslash.keeptime.common.Resources;
 import de.doubleslash.keeptime.common.SvgNodeProvider;
 import de.doubleslash.keeptime.controller.HeimatController;
 import de.doubleslash.keeptime.model.Project;
+import de.doubleslash.keeptime.model.StyledMessage;
 import de.doubleslash.keeptime.model.Work;
 import de.doubleslash.keeptime.rest.integration.heimat.model.HeimatTask;
+import de.doubleslash.keeptime.viewpopup.SearchCombobox;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.RotateTransition;
@@ -41,13 +43,18 @@ import javafx.collections.transformation.FilteredList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import javafx.util.converter.LocalTimeStringConverter;
@@ -64,6 +71,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static de.doubleslash.keeptime.view.ReportController.copyToClipboard;
 
@@ -110,9 +118,7 @@ public class ExternalProjectsSyncController {
    private Region syncingIconRegion;
 
    @FXML
-   private ComboBox<HeimatTask> heimatTaskComboBox;
-   @FXML
-   private Button addHeimatTaskButton;
+   private HBox heimatTaskSearchContainer;
 
    private final SVGPath loadingSpinner = SvgNodeProvider.getSvgNodeWithScale(Resources.RESOURCE.SVG_SPINNER_SOLID, 0.1,
          0.1);
@@ -124,11 +130,15 @@ public class ExternalProjectsSyncController {
    private final Color colorLoadingSuccess = Color.valueOf("#74a317");
    private final Color colorLoadingFailure = Color.valueOf("#c63329");
 
+   private boolean shiftDown = false;
+
    private final LocalTimeStringConverter localTimeStringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
+
    private ObservableList<TableRow> items;
 
    private LocalDate currentReportDate;
    private Stage thisStage;
+   private Timeline closingTimeline;
    private final HeimatController heimatController;
    private final RotateTransition loadingSpinnerAnimation = new RotateTransition(Duration.seconds(1),
          syncingIconRegion);
@@ -158,9 +168,9 @@ public class ExternalProjectsSyncController {
 
       mappingTableView.setItems(items);
 
-      ObservableList<TableRow> items2 = FXCollections.observableArrayList(
+      ObservableList<TableRow> itemsForBindings = FXCollections.observableArrayList(
             item -> new javafx.beans.Observable[] { item.userTimeSeconds, item.shouldSyncCheckBox, item.userNotes });
-      items2.addAll(items);
+      itemsForBindings.addAll(items);
       StringBinding totalSum = Bindings.createStringBinding(() -> localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(
                   items.stream().filter(item -> item.mapping.heimatTaskId() != -1L) // if its bookable in heimat
@@ -169,7 +179,7 @@ public class ExternalProjectsSyncController {
                              return item.userTimeSeconds.getValue();
                           else
                              return item.heimatTimeSeconds.get();
-                       }).sum())), items2);
+                       }).sum())), itemsForBindings);
       sumTimeLabel.textProperty().bind(totalSum);
 
       keepTimeTimeLabel.setText(localTimeStringConverter.toString(
@@ -177,19 +187,31 @@ public class ExternalProjectsSyncController {
       heimatTimeLabel.setText(localTimeStringConverter.toString(
             LocalTime.ofSecondOfDay(tableRows.stream().mapToLong(HeimatController.Mapping::heimatSeconds).sum())));
 
-      BooleanBinding projectsValidProperty = Bindings.createBooleanBinding(() -> items.stream().anyMatch(item -> {
-         boolean shouldSync = item.shouldSyncCheckBox.get();
-         boolean hasNote = !item.userNotes.get().isBlank();
-         boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
-         return shouldSync && !(hasNote && hasTime);
-      }), items2);
+      BooleanBinding saveButtonDisabledProperty = Bindings.createBooleanBinding(() -> {
+         boolean anyShouldSync = items.stream().anyMatch(item -> item.shouldSyncCheckBox.get());
+         if (!anyShouldSync) {
+            return true;
+         }
+         return items.stream().anyMatch(item -> {
+            if (!item.shouldSyncCheckBox.get()) {
+               return false;
+            }
+            boolean hasNote = !item.userNotes.get().isBlank();
+            boolean hasTime = areSecondsOfDayValid(item.userTimeSeconds.get());
+            return !(hasNote && hasTime);
+         });
+      }, itemsForBindings);
 
-      saveButton.disableProperty().bind(projectsValidProperty);
+      saveButton.disableProperty().bind(saveButtonDisabledProperty);
+      saveButton.textProperty().bind(Bindings.createStringBinding(
+            () -> "Sync (" + items.stream().filter(item -> item.shouldSyncCheckBox.get()).count() + ")",
+            itemsForBindings));
       externalSystemLink.setOnAction(ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
       externalSystemLinkLoadingScreen.setOnAction(
             ae -> BrowserHelper.openURL(heimatController.getUrlForDay(currentReportDate)));
 
       final List<HeimatTask> tasksForDay = heimatController.getTasks(currentReportDate);
+
       final FilteredList<HeimatTask> tasksNotInList = new FilteredList<>(FXCollections.observableArrayList(tasksForDay),
             (task) -> items.stream().noneMatch(tr -> task.id() == tr.mapping.heimatTaskId()));
       items.addListener((ListChangeListener<? super TableRow>) c -> {
@@ -197,46 +219,38 @@ public class ExternalProjectsSyncController {
          tasksNotInList.setPredicate(null);
          tasksNotInList.setPredicate(predicate);
       });
-      heimatTaskComboBox.setItems(tasksNotInList);
-      addHeimatTaskButton.disableProperty()
-                         .bind(heimatTaskComboBox.getSelectionModel().selectedItemProperty().isNull());
-      addHeimatTaskButton.setOnAction(ae -> {
-         final HeimatTask task = heimatTaskComboBox.getValue();
-         final TableRow addedRow = new TableRow(new HeimatController.Mapping(task.id(), true, true,
-               "Manually added\n\nSync to " + task.name() + "\n(" + task.taskHolderName() + ")", List.of(), List.of(),
-               "", "", 0, 0), "", 0);
+
+      SearchCombobox<HeimatTask> heimatTaskSearchCombobox = new SearchCombobox<>(tasksNotInList);
+      heimatTaskSearchCombobox.setDisplayTextFunction(task -> task.taskHolderName() + " - " + task.name());
+
+      heimatTaskSearchCombobox.setOnItemSelected((selectedTask, popup) -> {
+         if (selectedTask == null)
+            return;
+         boolean alreadyExists = items.stream().anyMatch(row -> row.mapping.heimatTaskId() == selectedTask.id());
+         if (alreadyExists)
+            return;
+
+         StyledMessage syncMessage = StyledMessage.of(new StyledMessage.TextSegment("Manually added\n\nSync to "),
+               new StyledMessage.TextSegment(selectedTask.name(), true),
+               new StyledMessage.TextSegment("\n(" + selectedTask.taskHolderName() + ")"));
+
+         TableRow addedRow = new TableRow(
+               new HeimatController.Mapping(selectedTask.id(), true, true, syncMessage, selectedTask.bookingHint(), List.of(), List.of(), "",
+                     "", 0, 0), "", 0);
          items.add(addedRow);
-         items2.add(addedRow); // add new row also to items2 - as it is not added automatically :(
-         heimatTaskComboBox.getSelectionModel().clearSelection();
+         itemsForBindings.add(addedRow); // add new row also to items2 - as it is not added automatically :(
          mappingTableView.scrollTo(items.size() - 1); // scroll to newly added row
       });
 
+      heimatTaskSearchCombobox.setClearFieldAfterSelection(true);
+      heimatTaskSearchCombobox.setMaxSuggestionHeight(220);
+      heimatTaskSearchCombobox.setPromptText("Select Project...");
+      heimatTaskSearchContainer.getChildren().add(heimatTaskSearchCombobox.getComboBox());
+      HBox.setHgrow(heimatTaskSearchCombobox.getComboBox(), Priority.ALWAYS);
    }
 
    @FXML
    private void initialize() {
-      heimatTaskComboBox.setCellFactory(param -> new ListCell<>() {
-         @Override
-         protected void updateItem(HeimatTask item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-               setText(null);
-            } else {
-               setText(item.taskHolderName() + " - " + item.name());
-            }
-         }
-      });
-      heimatTaskComboBox.setButtonCell(new ListCell<>() {
-         @Override
-         protected void updateItem(HeimatTask item, boolean empty) {
-            super.updateItem(item, empty);
-            if (empty || item == null) {
-               setText(null);
-            } else {
-               setText(item.name() + " - " + item.taskHolderName());
-            }
-         }
-      });
       initializeLoadingScreen();
 
       TableColumn<TableRow, TableRow> shouldSyncColumn = new TableColumn<>("Sync");
@@ -244,21 +258,21 @@ public class ExternalProjectsSyncController {
       // Custom Cell Factory to disable CheckBoxes
       shouldSyncColumn.setCellFactory(col -> new TableCell<>() {
          private final CheckBox checkBox = new CheckBox();
-         private ChangeListener<Boolean> boolChangeListener;
+         private BooleanProperty boundProperty = null;
 
          @Override
          protected void updateItem(TableRow item, boolean empty) {
             super.updateItem(item, empty);
-            if (boolChangeListener != null)
-               checkBox.selectedProperty().removeListener(boolChangeListener);
-
+            if(boundProperty != null){
+               checkBox.selectedProperty().unbindBidirectional(boundProperty);
+               boundProperty = null;
+            }
             if (empty || item == null) {
                setGraphic(null);
             } else {
                checkBox.setDisable(!item.mapping.canBeSynced());
-               checkBox.setSelected(item.shouldSyncCheckBox.get());
-               boolChangeListener = (obs, oldText, newBoolean) -> item.shouldSyncCheckBox.set(newBoolean);
-               checkBox.selectedProperty().addListener(boolChangeListener);
+               checkBox.selectedProperty().bindBidirectional(item.shouldSyncCheckBox);
+               boundProperty = item.shouldSyncCheckBox;
                setAlignment(Pos.TOP_CENTER);
                setGraphic(checkBox);
             }
@@ -278,7 +292,11 @@ public class ExternalProjectsSyncController {
                setText(null);
             } else {
                VBox vbox = new VBox(5);
-               item.forEach(project -> vbox.getChildren().add(createRow(project.getColor(), project.getName())));
+
+               for (Project project : item) {
+                  HBox row = createRow(project.getColor(), project.getName());
+                  vbox.getChildren().add(row);
+               }
                setGraphic(vbox);
             }
          }
@@ -286,6 +304,7 @@ public class ExternalProjectsSyncController {
          private HBox createRow(Color color, String text) {
             Circle circle = new Circle(6, color);
             Label label = new Label(text);
+            label.setTooltip(new Tooltip(text));
 
             return new HBox(5, circle, label);
          }
@@ -320,7 +339,7 @@ public class ExternalProjectsSyncController {
             } else {
                keeptimeLabel.setText("KeepTime: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.keeptimeTimeSeconds.get())));
-               heimatLabel.setText("HEIMAT: " + localTimeStringConverter.toString(
+               heimatLabel.setText("Heimat: " + localTimeStringConverter.toString(
                      LocalTime.ofSecondOfDay(item.heimatTimeSeconds.get())));
                timeSpinner.setDisable(!item.mapping.canBeSynced());
                timeSpinner.getValueFactory().setValue(LocalTime.ofSecondOfDay(0));
@@ -329,6 +348,7 @@ public class ExternalProjectsSyncController {
                   localTimeChangeListener = (observable, oldValue, newValue) -> {
                      item.userTimeSeconds.set(newValue.toSecondOfDay());
                      spinnerValidConsumer.accept(timeSpinner);
+                     item.shouldSyncCheckBox.set(true);
                   };
                   spinnerValidConsumer.accept(timeSpinner);
                   timeSpinner.valueProperty().addListener(localTimeChangeListener);
@@ -379,7 +399,7 @@ public class ExternalProjectsSyncController {
             final Label keeptimeLabel = new Label("KeepTime:");
             keeptimeLabel.setMinWidth(60);
             hbox.getChildren().addAll(copyKeepTimeNotes, keeptimeLabel, keepTimeNotesLabel);
-            final Label heimatLabel = new Label("HEIMAT:");
+            final Label heimatLabel = new Label("Heimat:");
             heimatLabel.setMinWidth(60);
             hbox2.getChildren().addAll(copyHeimatNotes, heimatLabel, heimatNotesLabel);
             container.getChildren().addAll(textArea, hbox, hbox2);
@@ -411,8 +431,46 @@ public class ExternalProjectsSyncController {
          }
       });
 
-      TableColumn<TableRow, String> syncColumn = new TableColumn<>("Sync Status");
-      syncColumn.setCellValueFactory(data -> data.getValue().syncStatus);
+      TableColumn<TableRow, TableRow> syncColumn = new TableColumn<>("Sync Status");
+      syncColumn.setCellValueFactory(data -> new SimpleObjectProperty<>(data.getValue()));
+      syncColumn.setCellFactory(column -> new TableCell<>() {
+
+         private final Tooltip tooltip = new Tooltip();
+
+         @Override
+         protected void updateItem(TableRow item, boolean empty) {
+
+            super.updateItem(item, empty);
+
+            if (empty || item == null) {
+               setTooltip(null);
+               setGraphic(null);
+               return;
+            }
+
+            TextFlow statusFlow = item.syncStatus;
+            String statusForTooltip = statusFlow.getChildren()
+                                      .stream()
+                                      .filter(Text.class::isInstance)
+                                      .map(n -> ((Text) n).getText())
+                                      .collect(Collectors.joining());
+
+            final String bookingHint = item.bookingHint.get();
+            if (!bookingHint.isEmpty()) {
+               statusFlow = new TextFlow(statusFlow);
+               tooltip.setText(statusForTooltip + "\nBookinghint: " + bookingHint);
+               Text icon = new Text(" ⓘ");
+               icon.setStyle("-fx-text-fill: #1c2070; -fx-font-size: 14px;");
+               statusFlow.getChildren().add(icon);
+            } else {
+               tooltip.setText(statusForTooltip);
+            }
+
+            setGraphic(new Group(statusFlow));
+
+            setTooltip(tooltip);
+         }
+      });
 
       shouldSyncColumn.setPrefWidth(50);
       projectColumn.setPrefWidth(100);
@@ -422,6 +480,7 @@ public class ExternalProjectsSyncController {
 
       mappingTableView.getColumns().addAll(shouldSyncColumn, projectColumn, timeColumn, notesColumn, syncColumn);
       mappingTableView.setSelectionModel(null);
+      mappingTableView.setFocusTraversable(false);
       mappingTableView.getColumns().forEach(column -> column.setSortable(false));
 
       saveButton.setOnAction(ae -> {
@@ -462,10 +521,14 @@ public class ExternalProjectsSyncController {
                      loadingSuccess);
             }
 
+            if (closingTimeline != null) {
+               closingTimeline.stop();
+            }
+
             final AtomicInteger remainingSeconds = new AtomicInteger(closingSeconds);
             loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
             loadingClosingMessage.setVisible(true);
-            Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            closingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
                remainingSeconds.getAndDecrement();
                loadingClosingMessage.setText("Closing in " + remainingSeconds + " seconds...");
                if (remainingSeconds.get() <= 0) {
@@ -474,8 +537,8 @@ public class ExternalProjectsSyncController {
                   loadingClosingMessage.setVisible(false);
                }
             }));
-            timeline.setCycleCount(remainingSeconds.get());
-            timeline.play();
+            closingTimeline.setCycleCount(remainingSeconds.get());
+            closingTimeline.play();
          });
 
          task.setOnFailed(e -> {
@@ -579,6 +642,7 @@ public class ExternalProjectsSyncController {
    }
 
    private void setUpTimeSpinner(final Spinner<LocalTime> spinner) {
+
       spinner.focusedProperty().addListener(e -> {
          final LocalTimeStringConverter stringConverter = new LocalTimeStringConverter(FormatStyle.MEDIUM);
          final StringProperty text = spinner.getEditor().textProperty();
@@ -601,9 +665,12 @@ public class ExternalProjectsSyncController {
                if (steps == 0)
                   return;
                final LocalTime time = getValue();
-               setValue(decrementToLastFullQuarter(time));
-            }
 
+               if (shiftDown)
+                  setValue(decrementToNextHour(time));
+               else
+                  setValue(decrementToLastFullQuarter(time));
+            }
          }
 
          @Override
@@ -614,11 +681,13 @@ public class ExternalProjectsSyncController {
                if (steps == 0)
                   return;
                final LocalTime time = getValue();
-               setValue(incrementToNextFullQuarter(time));
+
+               if (shiftDown)
+                  setValue(incrementToNextHour(time));
+               else
+                  setValue(incrementToNextFullQuarter(time));
             }
-
          }
-
       });
 
       spinner.getValueFactory().setConverter(new LocalTimeStringConverter(FormatStyle.MEDIUM));
@@ -638,8 +707,62 @@ public class ExternalProjectsSyncController {
       return time.plusMinutes(increment).withSecond(0).withNano(0);
    }
 
+   public static LocalTime incrementToNextHour(LocalTime time) {
+      return time.plusHours(1).withMinute(0).withSecond(0).withNano(0);
+   }
+
+   public static LocalTime decrementToNextHour(LocalTime time) {
+      if (time.getHour() == 0)
+         return LocalTime.MIDNIGHT;
+
+      return time.minusHours(1).withMinute(0).withSecond(0).withNano(0);
+   }
+
    public void setStage(final Stage thisStage) {
       this.thisStage = thisStage;
+
+
+      thisStage.setOnCloseRequest(e -> {
+         if (closingTimeline != null) {
+            closingTimeline.stop();
+            closingTimeline = null;
+         }
+      });
+
+      registerKeyEventListenersForSpinners(thisStage);
+   }
+
+   private void registerKeyEventListenersForSpinners(final Stage thisStage) {
+      thisStage.addEventFilter(KeyEvent.KEY_RELEASED, event -> {
+         if (event.getCode() == KeyCode.SHIFT) {
+            shiftDown = false;
+         }
+      });
+
+      thisStage.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+         if (event.getCode() == KeyCode.SHIFT) {
+            shiftDown = true;
+         }
+      });
+   }
+
+   /**
+    * Converts a StyledMessage to a TextFlow for UI display.
+    *
+    * @param styledMessage
+    *       The styled message to convert
+    * @return A TextFlow with properly styled text segments
+    */
+   private static TextFlow convertStyledMessageToTextFlow(StyledMessage styledMessage) {
+      TextFlow textFlow = new TextFlow();
+      for (StyledMessage.TextSegment segment : styledMessage.getSegments()) {
+         Text text = new Text(segment.text());
+         if (segment.bold()) {
+            text.setStyle("-fx-font-weight: bold;");
+         }
+         textFlow.getChildren().add(text);
+      }
+      return textFlow;
    }
 
    public static class TableRow {
@@ -654,12 +777,14 @@ public class ExternalProjectsSyncController {
       public final LongProperty userTimeSeconds;
       public final LongProperty heimatTimeSeconds;
 
-      public final StringProperty syncStatus;
+      public final TextFlow syncStatus;
+      public final StringProperty bookingHint;
 
       public TableRow(HeimatController.Mapping mapping, String userNotes, final long userSeconds) {
          this.mapping = mapping;
          this.shouldSyncCheckBox = new SimpleBooleanProperty(mapping.shouldBeSynced());
-         this.syncStatus = new SimpleStringProperty(mapping.syncMessage());
+         this.syncStatus = convertStyledMessageToTextFlow(mapping.syncMessage());
+         this.bookingHint = new SimpleStringProperty(mapping.bookingHint());
 
          this.keeptimeNotes = new SimpleStringProperty(mapping.keeptimeNotes());
          this.keeptimeTimeSeconds = new SimpleLongProperty(mapping.keeptimeSeconds());

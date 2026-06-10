@@ -4,6 +4,8 @@ Application to track your time spent on different projects each day. Aim was to 
 
 Create projects and choose if they are counted as 'work time'. Select the project you work on. Before you switch the project, write a comment on what u did. Change the project. Repeat.
 
+KeepTime can connect to [Heimat](https://heimat-software.com/) so you can import Heimat projects and sync your tracked time back to Heimat. Details: [heimat.md](readme/heimat.md).
+
 ## Usage
 
 ### Main view:
@@ -29,9 +31,25 @@ Create projects and choose if they are counted as 'work time'. Select the projec
 + Export: export database for backup and later import (import currently not yet implemented)
 
 ### Reports:
-![Report Screen](readme/images/reportDescription.png?raw=true "Report")
 
-+ the report screen gives you a summary for every day
+KeepTime’s reporting workflow works by tracking daily work and synchronizing project activities with external task management. Here’s how you use it:
+
+1. **Track Your Work**  
+   Throughout your workday, log activities and assign them to projects. Each entry includes a timeslot, duration, and optional notes.
+
+2. **Review Your Daily Report**  
+   At any time, open the report view to see an overview of your day, including all logged activities, their durations, and project associations.
+
+3. **Edit and Manage Entries**  
+   Use the controls in the report to copy, edit, or delete individual work entries as needed. You can also copy notes or summaries for external use.
+
+4. **Select the Day to View**  
+   Use the calendar widget to select which day’s report you want to review. Only days with recorded work are available.
+
+5. **Synchronize Projects with Heimat**  
+   If you want you can syncronize the current date with Heimat. See [heimat.md](readme/heimat.md)
+
+![Report Dialog](readme/images/reportDescription.png)
 
 ## Install
 
@@ -73,6 +91,6 @@ You should put the .jar in an extra folder as a *logs* and a *db* folder will be
 ## Requirements
 * Operating System
   * Windows 7, 10, 11
-  * Linux (tested on Ubuntu 18.04)
+  * Linux (tested on Ubuntu 18.04, Fedora Workstation 43)
   * Mac (tested on MacBook M2 Pro (ARM based CPU))
 * Java >= 17

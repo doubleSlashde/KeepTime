@@ -18,6 +18,8 @@ package de.doubleslash.keeptime.view;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import org.slf4j.Logger;
@@ -101,6 +104,9 @@ public class ReportController {
    @FXML
    private Button heimatSyncButton;
 
+   @FXML
+   private Button addWorkButton;
+
    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
    private final Model model;
@@ -133,6 +139,19 @@ public class ReportController {
       expandCollapseButton.setOnMouseClicked(event ->toggleCollapseExpandReport());
       initTableView();
       initHeimatIntegration();
+      initAddManualWorkButton();
+
+   }
+
+   private void initAddManualWorkButton() {
+      addWorkButton.setOnAction(e -> onAddWork());
+      final SVGPath svgNodeWithScale = SvgNodeProvider.getSvgNodeWithScale(RESOURCE.SVG_PLUS_SOLID, 0.03, 0.03);
+      svgNodeWithScale.setStyle("-fx-fill: #00759e");
+      addWorkButton.setMaxSize(25,25);
+      addWorkButton.setMinSize(25, 25);
+      addWorkButton.setGraphic(svgNodeWithScale);
+      addWorkButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+      addWorkButton.setTooltip(new Tooltip("Add work entry..."));
    }
 
    private void initHeimatIntegration() {
@@ -143,7 +162,7 @@ public class ReportController {
       heimatSyncButton.setMinSize(25, 25);
       heimatSyncButton.setGraphic(svgNodeWithScale);
       heimatSyncButton.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-      heimatSyncButton.setTooltip(new Tooltip("Synchronize to HEIMAT..."));
+      heimatSyncButton.setTooltip(new Tooltip("Synchronize to Heimat..."));
       heimatSyncButton.setOnAction(ae-> {
          try {
             showSyncStage();
@@ -169,15 +188,15 @@ public class ReportController {
          syncStage.setResizable(true);
          syncStage.getIcons().add(new Image(Resources.getResource(RESOURCE.ICON_MAIN).toString()));
 
-         final Scene settingsScene = new Scene(syncRoot);
-         settingsScene.setOnKeyPressed(ke -> {
+         final Scene syncScene = new Scene(syncRoot);
+         syncScene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                LOG.info("pressed ESCAPE");
                syncStage.close();
             }
          });
 
-         syncStage.setScene(settingsScene);
+         syncStage.setScene(syncScene);
          syncStage.showAndWait();
       } catch (final Exception e) {
          throw new FXMLLoaderException(e);
@@ -534,6 +553,39 @@ public class ReportController {
 
       copyButton.setOnAction(eventListener);
       return copyButton;
+   }
+
+   private void onAddWork() {
+      final boolean isToday = LocalDate.now().equals(currentReportDate);
+      final LocalDateTime now = LocalDateTime.now();
+      final LocalDateTime defaultStart = isToday ? now.minusMinutes(15) : currentReportDate.atTime(LocalTime.of(9, 0));
+      final LocalDateTime defaultEnd = isToday ? now : currentReportDate.atTime(LocalTime.of(10, 0));
+
+      final Project defaultProject = model.activeWorkItem.get() != null
+              ? model.activeWorkItem.get().getProject()
+              : model.getIdleProject();
+
+      final Work newWorkDefaults = new Work(defaultStart, defaultEnd, defaultProject, "");
+      final Dialog<Work> dialog = setupAddWorkDialog(newWorkDefaults);
+
+      final Optional<Work> result = dialog.showAndWait();
+      result.ifPresent(createdWork -> {
+         controller.addWork(createdWork);
+         this.update();
+      });
+   }
+
+   private Dialog<Work> setupAddWorkDialog(final Work work) {
+      final Dialog<Work> dialog = new Dialog<>();
+      dialog.initOwner(stage);
+      dialog.setTitle("Add work");
+      dialog.setHeaderText("Add work");
+      dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      final GridPane grid = setUpEditWorkGridPane(work, dialog);
+      dialog.getDialogPane().setContent(grid);
+
+      return dialog;
    }
 
    public void update() {
