@@ -253,6 +253,8 @@ public class ExternalProjectsMapController {
                setText(null);
             } else {
                setText(item.taskHolderName() + " - " + item.name());
+               String toolTipText = item.name();
+               setTooltip(new Tooltip(toolTipText));
             }
          }
       });
