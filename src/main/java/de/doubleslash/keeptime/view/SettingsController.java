@@ -44,6 +44,7 @@ import org.h2.tools.Script;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import de.doubleslash.keeptime.ApplicationProperties;
@@ -770,12 +771,15 @@ public class SettingsController {
       String username = authName.getText();
       String password = authPassword.getText();
 
+      PasswordEncoder passwordEncoder = DefaultPasswordEncoder.getPasswordEncoder();
+      String encodedPassword = passwordEncoder.encode(password);
+
       Map<String, String> propertiesToUpdate = new HashMap<>();
       propertiesToUpdate.put("spring.main.web-application-type", "");
       propertiesToUpdate.put("server.port", authPort.getText());
       propertiesToUpdate.put("api", "ON");
       propertiesToUpdate.put("spring.security.user.name", username);
-      propertiesToUpdate.put("spring.security.user.password", password);
+      propertiesToUpdate.put("spring.security.user.password", encodedPassword);
 
       propertyWrite(propertiesToUpdate);
    }
